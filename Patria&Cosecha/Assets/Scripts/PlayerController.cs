@@ -31,12 +31,12 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         //ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
+        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.4f + 0.2f, whatIsGround);
 
         MyInput();
         SpeedControl();
 
-        if (grounded)
+        if (!grounded)
             rb.drag = groundDrag;
         else
             rb.drag = 0;
