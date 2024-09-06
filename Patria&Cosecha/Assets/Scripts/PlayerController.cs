@@ -30,16 +30,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        //ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.4f + 0.2f, whatIsGround);
+        //GROUND CHECK
+        //grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.4f + 0.2f, whatIsGround);
 
         MyInput();
         SpeedControl();
-
-        if (!grounded)
-            rb.drag = groundDrag;
-        else
-            rb.drag = 0;
+        
+        rb.drag = groundDrag;
     }
 
     private void FixedUpdate()
@@ -71,5 +68,13 @@ public class PlayerController : MonoBehaviour
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        var rayDistance = playerHeight * 0.4f + 0.2f;
+
+        Gizmos.DrawRay(transform.position, Vector3.down * rayDistance);
+        Gizmos.color = Color.yellow;
     }
 }
