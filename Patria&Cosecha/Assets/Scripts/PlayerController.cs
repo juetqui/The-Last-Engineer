@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -22,6 +23,11 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
 
+    [SerializeField] private LayerMask _taskObjectsLayer;
+    [SerializeField] private float _taskInteractionDistance = 2f;
+
+    public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,11 +36,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        //GROUND CHECK
-        //grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.4f + 0.2f, whatIsGround);
-
         MyInput();
         SpeedControl();
+        InitTask();
+
+        ResetLevel();
         
         rb.drag = groundDrag;
     }
@@ -70,11 +76,22 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    private void InitTask()
     {
-        var rayDistance = playerHeight * 0.4f + 0.2f;
+        RaycastHit hit;
 
-        Gizmos.DrawRay(transform.position, Vector3.down * rayDistance);
-        Gizmos.color = Color.yellow;
+        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2, transform.position.z);
+
+        if (Physics.Raycast(rayPos, transform.forward, out hit, _taskInteractionDistance, _taskObjectsLayer))
+        {
+            CowsTaskManager taskObject = hit.transform.gameObject.GetComponent<CowsTaskManager>();
+
+            if (Input.GetKeyDown(KeyCode.E)) taskObject.StartTask();
+        }
+    }
+
+    private void ResetLevel()
+    {
+        if (Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

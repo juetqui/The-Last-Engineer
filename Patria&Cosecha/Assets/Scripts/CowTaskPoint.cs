@@ -14,22 +14,20 @@ public class CowTaskPoint : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("Position: " + transform.position);
         if (Vector3.Distance(transform.position, player.transform.position) <= _catchPosition && _canAddToCounter)
             AddPointsToCounter();
     }
 
     public void UpdatePosition(Vector3 newPosition)
     {
-        Debug.Log("Spawn Point: " + newPosition);
         transform.position = newPosition;
         _canAddToCounter = true;
     }
 
     private void AddPointsToCounter()
     {
+        _canAddToCounter = false;
         taskManager.AddToCounter();
         taskPointGenerator.RespawnPoint();
-        _canAddToCounter = false;
     }
 }

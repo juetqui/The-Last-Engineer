@@ -7,11 +7,12 @@ public class CowTaskPointsGenerator : MonoBehaviour
     private PlayerController _player = default;
     
     [SerializeField] private CowsTaskManager _taskManager = default;
-    [SerializeField] private CowTaskPoint _pointPrefab = default;
-
-    [SerializeField] private float _generateDistance = 12f;
+    [SerializeField] private CowTaskPoint _pointPrefab = default, _currentInstance = default;
+    
+    [SerializeField] private float _generateDistance = 12f, _thresholdDistance = 2f;
 
     private bool _isNewPoint = true, _respawnPoint = false;
+    private Vector3 _lastSpawnPosition = Vector3.zero;
 
     private void Start()
     {
@@ -22,27 +23,24 @@ public class CowTaskPointsGenerator : MonoBehaviour
 
     private void Update()
     {
-        if(_taskManager.TaskStarted && _isNewPoint || _taskManager.TaskStarted && _respawnPoint) SpawnPoint();
+        if (_taskManager.TaskStarted && _isNewPoint)
+        {
+            _isNewPoint = false;
+            _currentInstance = Instantiate(_pointPrefab);
+            SpawnPoint();
+        }
+        else if (_taskManager.TaskStarted && _respawnPoint) SpawnPoint();
+        else if (!_taskManager.TaskStarted && _currentInstance != null)
+        {
+            _isNewPoint = true;
+            Destroy(_currentInstance.gameObject);
+        }
     }
 
     private void SpawnPoint()
     {
-        _pointPrefab.UpdatePosition(GenerateRandomPosition());
-
-        if (_isNewPoint)
-        {
-            Instantiate(_pointPrefab);
-            _isNewPoint = false;
-        }
-        else _respawnPoint = false;
-    }
-
-    private Vector3 GenerateRandomPosition()
-    {
-        float randomX = Random.Range(-_generateDistance, _generateDistance + 1);
-        float randomZ = Random.Range(-_generateDistance, _generateDistance + 1);
-
-        return new Vector3(transform.position.x + randomX, 2, transform.position.z + randomZ);
+        _currentInstance.UpdatePosition(GenerateRandomPosition());
+        _respawnPoint = false;
     }
 
     public void RespawnPoint()
@@ -50,17 +48,17 @@ public class CowTaskPointsGenerator : MonoBehaviour
         _respawnPoint = true;
     }
 
-    private void OnDrawGizmos()
+    private Vector3 GenerateRandomPosition()
     {
-        Vector3 rayInit = new(transform.position.x, 2, transform.position.z);
-        
-        Vector3 rayDirectionX = new(_generateDistance, 0, 0);
-        Vector3 rayDirectionZ = new(0, 0, _generateDistance);
+        float randomX = Random.Range(-_generateDistance, _generateDistance + 1);
+        float randomZ = Random.Range(-_generateDistance, _generateDistance + 1);
 
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawRay(rayInit, rayDirectionX);
+        Vector3 newPosition = new Vector3(transform.position.x + randomX, 1f, transform.position.z + randomZ);
+
+        if (Vector3.Distance(_lastSpawnPosition, newPosition) <= _thresholdDistance) GenerateRandomPosition();
         
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(rayInit, rayDirectionZ);
+        _lastSpawnPosition = newPosition;
+
+        return newPosition;
     }
 }
