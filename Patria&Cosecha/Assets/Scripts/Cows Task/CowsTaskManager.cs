@@ -5,7 +5,7 @@ using UnityEngine;
 public class CowsTaskManager : MonoBehaviour
 {
 
-    [SerializeField] private PlayerController _player = default;
+    [SerializeField] private PlayerTDController _player = default;
     [SerializeField] private GameObject _fenceDoor = default;
     [SerializeField] private Transform _startPoint = default;
     [SerializeField] private Material _taskMaterial = default;
@@ -14,7 +14,7 @@ public class CowsTaskManager : MonoBehaviour
     private float _interactionDistance = default;
     private int _tasksCompleted = 0, _taskCount = 0, _totalToFinish = 5;
 
-    public PlayerController Player { get { return _player; } }
+    public PlayerTDController Player { get { return _player; } }
     public bool TaskStarted { get { return _taskStarted; } }
     public int CurrentPoints { get { return _taskCount; } }
     public int TotalPoints { get { return _totalToFinish; } }

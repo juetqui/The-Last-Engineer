@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CowTaskPoint : MonoBehaviour
 {
-    public PlayerController player = default;
+    public PlayerTDController player = default;
     public CowTaskPointsGenerator taskPointGenerator = default;
     public CowsTaskManager taskManager = default;
 

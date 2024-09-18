@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class CowTaskPointsGenerator : MonoBehaviour
 {
-    private PlayerController _player = default;
+    private PlayerTDController _player = default;
     
     [SerializeField] private CowsTaskManager _taskManager = default;
-    [SerializeField] private CowTaskPoint _pointPrefab = default, _currentInstance = default;
+    [SerializeField] private CowTaskPoint _pointPrefab = default;
+    
+    private CowTaskPoint _currentInstance = default;
     
     [SerializeField] private float _generateDistance = 12f, _thresholdDistance = 2f;
 
