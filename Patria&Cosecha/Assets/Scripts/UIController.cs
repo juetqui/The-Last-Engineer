@@ -6,6 +6,7 @@ using TMPro;
 
 public class UIController : MonoBehaviour
 {
+    [SerializeField] private PlayerTDController _player;
     [SerializeField] private CowsTaskManager _taskManager;
     [SerializeField] private TextMeshProUGUI _objectiveText, _completedText;
     [SerializeField] private Image _descriptionContainer, _objectiveContainer, _completedContainer;
@@ -20,8 +21,8 @@ public class UIController : MonoBehaviour
         if (_taskManager.TaskStarted)
         {
             _descriptionContainer.gameObject.SetActive(true);
-            _objectiveContainer.gameObject.SetActive(true);
-            _objectiveText.text = $"PUNTOS RECOLECTADOS {_taskManager.CurrentPoints}/{_taskManager.TotalPoints}";
+            //_objectiveContainer.gameObject.SetActive(true);
+            //_objectiveText.text = $"PUNTOS CONECTADOS {_taskManager.CurrentPoints}/{_taskManager.TotalPoints}";
         }
         else
         {
@@ -29,6 +30,6 @@ public class UIController : MonoBehaviour
             _objectiveContainer.gameObject.SetActive(false);
         }
 
-        _completedText.text = $"TAREAS REALIZADAS: {_taskManager.CompletedTasks}";
+        _completedText.text = $"ITEM: {_player.CurrentNode}";
     }
 }

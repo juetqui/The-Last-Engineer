@@ -4,26 +4,31 @@ using UnityEngine.SceneManagement;
 public class PlayerTDController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float _moveSpeed, _rotSpeed;
+    [SerializeField] private float _moveSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f;
+    [SerializeField] private LayerMask _taskObjectsLayer = default, _nodesLayer = default;
+    [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
 
-    private float _horizontalInput, _verticalInput;
+    private float _horizontalInput = default, _verticalInput = default;
 
-    private Vector3 _moveDir;
+    private Vector3 _moveDir = default;
 
-    [SerializeField] private LayerMask _taskObjectsLayer;
-    [SerializeField] private float _taskInteractionDistance = 2f;
+    private NodeType _currentNode = default;
 
     public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
+    public NodeType CurrentNode { get { return _currentNode; } }
 
-    //private void Start()
-    //{
-
-    //}
+    private void Start()
+    {
+        _cubeNode.gameObject.SetActive(false);
+        _sphereNode.gameObject.SetActive(false);
+        _capsuleNode.gameObject.SetActive(false);
+    }
 
     private void Update()
     {
         MovePlayer(GetMoveInput());
-        InitTask();
+        ChangeNode();
+        PlaceNode();
 
         ResetLevel();
     }
@@ -32,7 +37,6 @@ public class PlayerTDController : MonoBehaviour
     {
         _horizontalInput = Input.GetAxisRaw("Horizontal");
         _verticalInput = Input.GetAxisRaw("Vertical");
-
         _moveDir = new Vector3(_horizontalInput, 0, _verticalInput);
 
         return _moveDir;
@@ -51,22 +55,67 @@ public class PlayerTDController : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
     }
 
-    private void InitTask()
+    private void ChangeNode()
     {
         RaycastHit hit;
 
-        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2, transform.position.z);
+        if (Physics.Raycast(transform.position, transform.forward, out hit, _taskInteractionDistance, _nodesLayer))
+        {
+            ElectricityNode node = hit.transform.gameObject.GetComponent<ElectricityNode>();
+
+            if (node != null && Input.GetKeyDown(KeyCode.E))
+            {
+                _currentNode = node.NodeType;
+                CheckCurrentNode();
+            }
+        }
+    }
+
+    private void PlaceNode()
+    {
+        RaycastHit hit;
 
         if (Physics.Raycast(transform.position, transform.forward, out hit, _taskInteractionDistance, _taskObjectsLayer))
         {
-            CowsTaskManager taskObject = hit.transform.gameObject.GetComponent<CowsTaskManager>();
+            ConnectionNode taskObject = hit.transform.gameObject.GetComponent<ConnectionNode>();
 
-            if (taskObject != null && Input.GetKeyDown(KeyCode.E)) taskObject.StartTask();
+            if (taskObject != null && Input.GetKeyDown(KeyCode.E)) taskObject.SetNode(_currentNode);
         }
     }
 
     private void ResetLevel()
     {
         if (Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void CheckCurrentNode()
+    {
+        if (_currentNode == NodeType.Cube)
+        {
+            _cubeNode.gameObject.SetActive(true);
+            _sphereNode.gameObject.SetActive(false);
+            _capsuleNode.gameObject.SetActive(false);
+        }
+        else if (_currentNode == NodeType.Sphere)
+        {
+            _cubeNode.gameObject.SetActive(false);
+            _sphereNode.gameObject.SetActive(true);
+            _capsuleNode.gameObject.SetActive(false);
+        }
+        else if (_currentNode == NodeType.Capsule)
+        {
+            _cubeNode.gameObject.SetActive(false);
+            _sphereNode.gameObject.SetActive(false);
+            _capsuleNode.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.cyan;
+
+        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        
+        Gizmos.DrawRay(rayPos, transform.forward * _taskInteractionDistance);
     }
 }
