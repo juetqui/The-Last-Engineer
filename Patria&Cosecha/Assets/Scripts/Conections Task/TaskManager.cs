@@ -10,7 +10,6 @@ public class TaskManager : MonoBehaviour
     private bool _running = false;
 
     private Dictionary<NodeType, NodeType> _nodesDictionary = new Dictionary<NodeType, NodeType>();
-    private NodeType _lastRecieved = default;
 
     public bool Running { get { return _running; } }
 
@@ -21,6 +20,8 @@ public class TaskManager : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(_workingNodes);
+
         if (_workingNodes == _totalToFinish && _nodesDictionary.Count == _totalToFinish)
         {
             _running = true;
@@ -32,13 +33,17 @@ public class TaskManager : MonoBehaviour
     {
         if (!_nodesDictionary.ContainsKey(nodeType))
         {
-            _lastRecieved = nodeType;
             _nodesDictionary.Add(nodeType, nodeType);
             _workingNodes++;
         }
-        else
+    }
+
+    public void RemoveConnection(NodeType nodeType)
+    {
+        if (_nodesDictionary.ContainsKey(nodeType))
         {
-            Debug.Log("NODO REPETIDO");
+            _nodesDictionary.Remove(nodeType);
+            _workingNodes--;
         }
     }
 }

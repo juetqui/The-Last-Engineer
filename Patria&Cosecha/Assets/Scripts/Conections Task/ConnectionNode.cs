@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
@@ -9,7 +10,7 @@ public class ConnectionNode : MonoBehaviour
 
     private ConnectionParticles _connectionPs;
     private MeshRenderer _renderer;
-    private bool _isWorking = default, _hasError = default;
+    private bool _isWorking = default, _hasError = default, _isDisabled = false;
     private NodeType _typeReceived = default;
 
     public bool IsWorking { get { return _isWorking; } }
@@ -24,7 +25,7 @@ public class ConnectionNode : MonoBehaviour
 
     void Update()
     {
-        TurnOnReceivedNode();
+        if (!_isDisabled) TurnOnReceivedNode();
         _connectionPs.OnUpdate();
     }
 
@@ -74,8 +75,10 @@ public class ConnectionNode : MonoBehaviour
         }
         else
         {
+            _taskManager.RemoveConnection(_requiredType);
             _isWorking = false;
             _hasError = true;
+            StartCoroutine(DisableConnection());
         }
     }
 
@@ -83,6 +86,18 @@ public class ConnectionNode : MonoBehaviour
     {
         _typeReceived = node;
         CheckReceivedNode();
+    }
+
+    private IEnumerator DisableConnection()
+    {
+        _isDisabled = true;
+        Color oldColor = _renderer.material.color;
+        _renderer.material.color = Color.red;
+
+        yield return new WaitForSeconds(3f);
+
+        _isDisabled = false;
+        _renderer.material.color = oldColor;
     }
 }
 
