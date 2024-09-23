@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerTDController : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f;
+    [SerializeField] private float _moveSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f, _taskInteractionOffset = default;
     [SerializeField] private LayerMask _taskObjectsLayer = default, _nodesLayer = default;
     [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
 
@@ -58,6 +58,17 @@ public class PlayerTDController : MonoBehaviour
     private void ChangeNode()
     {
         RaycastHit hit;
+
+        Vector3 rayPos = new Vector3(transform.position.x + _taskInteractionOffset, transform.position.y, transform.position.z);
+
+        // CORREGIR PARA HACER CON SPHERECAST
+
+        //if (Physics.SphereCast(rayPos, _taskInteractionDistance, transform.forward, out hit, _taskInteractionDistance, _nodesLayer))
+        //{
+        //    ElectricityNode node = hit.transform.gameObject.GetComponent<ElectricityNode>();
+
+        //    if (node != null && Input.GetKeyDown(KeyCode.E)) _currentNode = node.NodeType;
+        //}
 
         if (Physics.Raycast(transform.position, transform.forward, out hit, _taskInteractionDistance, _nodesLayer))
         {
@@ -123,5 +134,7 @@ public class PlayerTDController : MonoBehaviour
         Vector3 rayPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         
         Gizmos.DrawRay(rayPos, transform.forward * _taskInteractionDistance);
+
+        //Gizmos.DrawWireSphere(rayPos, _taskInteractionDistance);
     }
 }

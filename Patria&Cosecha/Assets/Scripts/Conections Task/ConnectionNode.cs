@@ -70,7 +70,7 @@ public class ConnectionNode : MonoBehaviour
         {
             _isWorking = true;
             _hasError = false;
-            _taskManager.AddConnection();
+            _taskManager.AddConnection(_typeReceived);
         }
         else
         {

@@ -11,16 +11,18 @@ public class ConnectionParticles
 
     public void OnUpdate()
     {
-        var em = _ps.emission;
-        em.enabled = true;
+        //_ps.gameObject.SetActive(true);
 
-        em.rateOverTime = 0f;
+        //var em = _ps.emission;
+        //em.enabled = true;
 
-        em.SetBursts(
-            new ParticleSystem.Burst[]
-            {
-                new ParticleSystem.Burst(0.25f, 15)
-            }
-        );
+        //em.rateOverTime = 0f;
+
+        //em.SetBursts(
+        //    new ParticleSystem.Burst[]
+        //    {
+        //        new ParticleSystem.Burst(0.25f, 15)
+        //    }
+        //);
     }
 }

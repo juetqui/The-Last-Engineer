@@ -29,6 +29,12 @@ public class UIController : MonoBehaviour
             _objectiveContainer.gameObject.SetActive(false);
         }
 
-        _completedText.text = $"ITEM: {_player.CurrentNode}";
+        if (_player.CurrentNode != NodeType.None)
+        {
+            _completedContainer.gameObject.SetActive(true);
+            _completedText.text = $"ITEM: {_player.CurrentNode}";
+        }
+        else _completedContainer.gameObject.SetActive(false);
+
     }
 }
