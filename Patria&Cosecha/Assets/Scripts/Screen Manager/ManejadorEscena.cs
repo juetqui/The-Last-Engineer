@@ -9,7 +9,7 @@ public class ManejadorEscena : MonoBehaviour
     }
     public void Game()
     {
-        SceneManager.LoadScene("Matias - Test");
+        SceneManager.LoadScene("Julian - Test");
     }
     public void Credits()
     {
