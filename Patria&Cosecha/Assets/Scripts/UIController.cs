@@ -7,7 +7,7 @@ using TMPro;
 public class UIController : MonoBehaviour
 {
     [SerializeField] private PlayerTDController _player;
-    [SerializeField] private CowsTaskManager _taskManager;
+    [SerializeField] private TaskManager _taskManager;
     [SerializeField] private TextMeshProUGUI _objectiveText, _completedText;
     [SerializeField] private Image _descriptionContainer, _objectiveContainer, _completedContainer;
 
@@ -18,11 +18,10 @@ public class UIController : MonoBehaviour
 
     void Update()
     {
-        if (_taskManager.TaskStarted)
+        if (_taskManager.Running)
         {
-            _descriptionContainer.gameObject.SetActive(true);
-            //_objectiveContainer.gameObject.SetActive(true);
-            //_objectiveText.text = $"PUNTOS CONECTADOS {_taskManager.CurrentPoints}/{_taskManager.TotalPoints}";
+            _objectiveContainer.gameObject.SetActive(true);
+            _objectiveText.text = "NODOS CONECTADOS CORRECTAMENTE";
         }
         else
         {

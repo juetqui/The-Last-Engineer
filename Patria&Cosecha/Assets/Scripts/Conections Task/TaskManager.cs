@@ -1,18 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TaskManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private ConnectionNode[] _connections;
+
+    private int _workingNodes = default, _totalToFinish = default;
+    private bool _running = false;
+
+    public bool Running { get { return _running; } }
+
     void Start()
     {
-        
+        _totalToFinish = _connections.Length;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        Debug.Log("Is running: " + _running);
+
+        if (_workingNodes == _totalToFinish) _running = true;
+    }
+
+    public void AddConnection()
+    {
+        _workingNodes++;
     }
 }

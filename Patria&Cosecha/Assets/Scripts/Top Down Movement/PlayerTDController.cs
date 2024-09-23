@@ -3,15 +3,12 @@ using UnityEngine.SceneManagement;
 
 public class PlayerTDController : MonoBehaviour
 {
-    [Header("Movement")]
     [SerializeField] private float _moveSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f;
     [SerializeField] private LayerMask _taskObjectsLayer = default, _nodesLayer = default;
     [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
 
     private float _horizontalInput = default, _verticalInput = default;
-
     private Vector3 _moveDir = default;
-
     private NodeType _currentNode = default;
 
     public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
@@ -19,6 +16,8 @@ public class PlayerTDController : MonoBehaviour
 
     private void Start()
     {
+        _currentNode = NodeType.None;
+
         _cubeNode.gameObject.SetActive(false);
         _sphereNode.gameObject.SetActive(false);
         _capsuleNode.gameObject.SetActive(false);
@@ -29,6 +28,7 @@ public class PlayerTDController : MonoBehaviour
         MovePlayer(GetMoveInput());
         ChangeNode();
         PlaceNode();
+        CheckCurrentNode();
 
         ResetLevel();
     }
@@ -63,11 +63,7 @@ public class PlayerTDController : MonoBehaviour
         {
             ElectricityNode node = hit.transform.gameObject.GetComponent<ElectricityNode>();
 
-            if (node != null && Input.GetKeyDown(KeyCode.E))
-            {
-                _currentNode = node.NodeType;
-                CheckCurrentNode();
-            }
+            if (node != null && Input.GetKeyDown(KeyCode.E)) _currentNode = node.NodeType;
         }
     }
 
@@ -79,7 +75,11 @@ public class PlayerTDController : MonoBehaviour
         {
             ConnectionNode taskObject = hit.transform.gameObject.GetComponent<ConnectionNode>();
 
-            if (taskObject != null && Input.GetKeyDown(KeyCode.E)) taskObject.SetNode(_currentNode);
+            if (taskObject != null && Input.GetKeyDown(KeyCode.E))
+            {
+                taskObject.SetNode(_currentNode);
+                _currentNode = NodeType.None;
+            }
         }
     }
 
@@ -107,6 +107,12 @@ public class PlayerTDController : MonoBehaviour
             _cubeNode.gameObject.SetActive(false);
             _sphereNode.gameObject.SetActive(false);
             _capsuleNode.gameObject.SetActive(true);
+        }
+        else
+        {
+            _cubeNode.gameObject.SetActive(false);
+            _sphereNode.gameObject.SetActive(false);
+            _capsuleNode.gameObject.SetActive(false);
         }
     }
 
