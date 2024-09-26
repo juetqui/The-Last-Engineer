@@ -20,8 +20,6 @@ public class TaskManager : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(_workingNodes);
-
         if (_workingNodes == _totalToFinish && _nodesDictionary.Count == _totalToFinish)
         {
             _running = true;

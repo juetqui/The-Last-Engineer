@@ -1,3 +1,4 @@
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,29 +9,37 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
 
     private float _horizontalInput = default, _verticalInput = default;
+    private bool _isInGrabArea = false;
     private Vector3 _moveDir = default;
     private NodeType _currentNode = default;
+    private Rigidbody _rb = default;
+    private ElectricityNode _nodeToChange = default;
 
     public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
     public NodeType CurrentNode { get { return _currentNode; } }
 
     private void Start()
     {
+        _rb = GetComponent<Rigidbody>();
         _currentNode = NodeType.None;
 
         _cubeNode.gameObject.SetActive(false);
         _sphereNode.gameObject.SetActive(false);
         _capsuleNode.gameObject.SetActive(false);
+        CheckCurrentNode();
     }
 
     private void Update()
     {
-        MovePlayer(GetMoveInput());
-        ChangeNode();
-        PlaceNode();
-        CheckCurrentNode();
+        if (_isInGrabArea && _nodeToChange) ChangeNode(_nodeToChange.NodeType);
 
+        PlaceNode();
         ResetLevel();
+    }
+
+    private void FixedUpdate()
+    {
+        MovePlayer(GetMoveInput());
     }
 
     private Vector3 GetMoveInput()
@@ -46,7 +55,9 @@ public class PlayerTDController : MonoBehaviour
     {
         if (moveDir.magnitude > 0.1f) RotatePlayer(moveDir);
 
-        transform.position += moveDir.normalized * _moveSpeed * Time.deltaTime;
+        Vector3 dir = moveDir.normalized * _moveSpeed;
+
+        if (_rb.velocity.magnitude < _moveSpeed) _rb.AddForce(dir, ForceMode.VelocityChange);
     }
 
     private void RotatePlayer(Vector3 rotDir)
@@ -55,26 +66,12 @@ public class PlayerTDController : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
     }
 
-    private void ChangeNode()
+    private void ChangeNode(NodeType nodeType)
     {
-        RaycastHit hit;
-
-        Vector3 rayPos = new Vector3(transform.position.x + _taskInteractionOffset, transform.position.y, transform.position.z);
-
-        // CORREGIR PARA HACER CON SPHERECAST
-
-        //if (Physics.SphereCast(rayPos, _taskInteractionDistance, transform.forward, out hit, _taskInteractionDistance, _nodesLayer))
-        //{
-        //    ElectricityNode node = hit.transform.gameObject.GetComponent<ElectricityNode>();
-
-        //    if (node != null && Input.GetKeyDown(KeyCode.E)) _currentNode = node.NodeType;
-        //}
-
-        if (Physics.Raycast(transform.position, transform.forward, out hit, _taskInteractionDistance, _nodesLayer))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            ElectricityNode node = hit.transform.gameObject.GetComponent<ElectricityNode>();
-
-            if (node != null && Input.GetKeyDown(KeyCode.E)) _currentNode = node.NodeType;
+            _currentNode = nodeType;
+            CheckCurrentNode();
         }
     }
 
@@ -90,6 +87,7 @@ public class PlayerTDController : MonoBehaviour
             {
                 taskObject.SetNode(_currentNode);
                 _currentNode = NodeType.None;
+                CheckCurrentNode();
             }
         }
     }
@@ -124,6 +122,29 @@ public class PlayerTDController : MonoBehaviour
             _cubeNode.gameObject.SetActive(false);
             _sphereNode.gameObject.SetActive(false);
             _capsuleNode.gameObject.SetActive(false);
+        }
+    }
+
+    private void OnTriggerStay(Collider coll)
+    {
+        if (coll.CompareTag("Node") && _nodeToChange == null)
+        {
+            ElectricityNode node = coll.gameObject.GetComponent<ElectricityNode>();
+
+            if (node != null)
+            {
+                _isInGrabArea = true;
+                _nodeToChange = node;
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider coll)
+    {
+        if (coll.CompareTag("Node"))
+        {
+            _isInGrabArea = false;
+            _nodeToChange = null;
         }
     }
 
