@@ -4,16 +4,16 @@ using UnityEngine.SceneManagement;
 
 public class PlayerTDController : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f, _taskInteractionOffset = default;
-    [SerializeField] private LayerMask _taskObjectsLayer = default, _nodesLayer = default;
+    [SerializeField] private float _moveSpeed = default, _dashSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f;
     [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
 
     private float _horizontalInput = default, _verticalInput = default;
-    private bool _isInGrabArea = false;
+    private bool _isInGrabArea = false, _isInPlaceArea = false;
     private Vector3 _moveDir = default;
     private NodeType _currentNode = default;
     private Rigidbody _rb = default;
     private ElectricityNode _nodeToChange = default;
+    private ConnectionNode _nodeToConnect = default;
 
     public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
     public NodeType CurrentNode { get { return _currentNode; } }
@@ -31,15 +31,16 @@ public class PlayerTDController : MonoBehaviour
 
     private void Update()
     {
-        if (_isInGrabArea && _nodeToChange) ChangeNode(_nodeToChange.NodeType);
+        if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
+        if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
 
-        PlaceNode();
         ResetLevel();
     }
 
     private void FixedUpdate()
     {
         MovePlayer(GetMoveInput());
+        Dash(GetMoveInput());
     }
 
     private Vector3 GetMoveInput()
@@ -60,6 +61,19 @@ public class PlayerTDController : MonoBehaviour
         if (_rb.velocity.magnitude < _moveSpeed) _rb.AddForce(dir, ForceMode.VelocityChange);
     }
 
+    private void Dash(Vector3 moveDir)
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (moveDir.magnitude <= 0) moveDir = Vector3.forward;
+            Debug.Log(moveDir);
+            
+            Vector3 dir = moveDir.normalized * _dashSpeed;
+            
+            _rb.AddForce(dir, ForceMode.Impulse);
+        }
+    }
+
     private void RotatePlayer(Vector3 rotDir)
     {
         Quaternion toRotation = Quaternion.LookRotation(rotDir.normalized, Vector3.up);
@@ -77,18 +91,11 @@ public class PlayerTDController : MonoBehaviour
 
     private void PlaceNode()
     {
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, transform.forward, out hit, _taskInteractionDistance, _taskObjectsLayer))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            ConnectionNode taskObject = hit.transform.gameObject.GetComponent<ConnectionNode>();
-
-            if (taskObject != null && Input.GetKeyDown(KeyCode.E))
-            {
-                taskObject.SetNode(_currentNode);
-                _currentNode = NodeType.None;
-                CheckCurrentNode();
-            }
+            _nodeToConnect.SetNode(_currentNode);
+            _currentNode = NodeType.None;
+            CheckCurrentNode();
         }
     }
 
@@ -137,6 +144,16 @@ public class PlayerTDController : MonoBehaviour
                 _nodeToChange = node;
             }
         }
+        else if (coll.CompareTag("Connection") && _nodeToConnect == null)
+        {
+            ConnectionNode node = coll.gameObject.GetComponent<ConnectionNode>();
+
+            if (node != null)
+            {
+                _isInPlaceArea = true;
+                _nodeToConnect = node;
+            }
+        }
     }
 
     private void OnTriggerExit(Collider coll)
@@ -146,16 +163,10 @@ public class PlayerTDController : MonoBehaviour
             _isInGrabArea = false;
             _nodeToChange = null;
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.cyan;
-
-        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        
-        Gizmos.DrawRay(rayPos, transform.forward * _taskInteractionDistance);
-
-        //Gizmos.DrawWireSphere(rayPos, _taskInteractionDistance);
+        else if (coll.CompareTag("Connection"))
+        {
+            _isInPlaceArea = false;
+            _nodeToConnect = null;
+        }
     }
 }
