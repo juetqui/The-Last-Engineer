@@ -3,13 +3,18 @@ using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
 {
-    [SerializeField] private ParticleSystem _particles;
+    [SerializeField] private AudioSource _audioSrc = default;
     [SerializeField] private TaskManager _taskManager = default;
+    [SerializeField] private ParticleSystem _particles = default;
+    [SerializeField] private AudioClip _placedClip = default, _errorClip = default;
     [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
+    
+    [SerializeField] private Color _color = default;
     [SerializeField] private NodeType _requiredType = default;
 
-    private ConnectionParticles _connectionPs;
-    private MeshRenderer _renderer;
+    private ConnectionParticles _connectionPs = default;
+    private ConnectionsView _connectionsView = default;
+    private MeshRenderer _renderer = default;
     private bool _isWorking = default, _hasError = default, _isDisabled = false;
     private NodeType _typeReceived = default;
 
@@ -21,40 +26,32 @@ public class ConnectionNode : MonoBehaviour
         _renderer = GetComponent<MeshRenderer>();
         TurnOffNodes();
         _connectionPs = new ConnectionParticles(_particles);
+
+        _connectionsView = new ConnectionsView(_renderer.material, _color);
+        _connectionsView.OnStart();
     }
 
     void Update()
     {
         if (!_isDisabled) TurnOnReceivedNode();
-        _connectionPs.OnUpdate();
     }
 
     private void TurnOnReceivedNode()
     {
-        _renderer.enabled = false;
-
         if (_typeReceived == NodeType.Cube)
         {
+            TurnOffNodes();
             _cubeNode.gameObject.SetActive(true);
-            _sphereNode.gameObject.SetActive(false);
-            _capsuleNode.gameObject.SetActive(false);
         }
         else if (_typeReceived == NodeType.Sphere)
         {
-            _cubeNode.gameObject.SetActive(false);
+            TurnOffNodes();
             _sphereNode.gameObject.SetActive(true);
-            _capsuleNode.gameObject.SetActive(false);
         }
         else if (_typeReceived == NodeType.Capsule)
         {
-            _cubeNode.gameObject.SetActive(false);
-            _sphereNode.gameObject.SetActive(false);
-            _capsuleNode.gameObject.SetActive(true);
-        }
-        else
-        {
-            _renderer.enabled = true;
             TurnOffNodes();
+            _capsuleNode.gameObject.SetActive(true);
         }
     }
 
@@ -69,35 +66,47 @@ public class ConnectionNode : MonoBehaviour
     {
         if (_typeReceived == _requiredType)
         {
+            _audioSrc.clip = _placedClip;
+            _connectionPs.ActivatePSError(false);
+            _renderer.enabled = false;
             _isWorking = true;
             _hasError = false;
             _taskManager.AddConnection(_typeReceived);
         }
         else
         {
+            _audioSrc.clip = _errorClip;
+            _renderer.enabled = true;
             _taskManager.RemoveConnection(_requiredType);
             _isWorking = false;
             _hasError = true;
+
+            _connectionPs.ActivatePSError(true);
             StartCoroutine(DisableConnection());
         }
+
+        TurnOnReceivedNode();
+        _audioSrc.Play();
     }
 
     public void SetNode(NodeType node)
     {
-        _typeReceived = node;
-        CheckReceivedNode();
+        if (!_isDisabled && node != NodeType.None)
+        {
+            _typeReceived = node;
+            CheckReceivedNode();
+        }
     }
 
     private IEnumerator DisableConnection()
     {
         _isDisabled = true;
-        Color oldColor = _renderer.material.color;
         _renderer.material.color = Color.red;
 
         yield return new WaitForSeconds(3f);
 
         _isDisabled = false;
-        _renderer.material.color = oldColor;
+        _renderer.material.color = _color;
     }
 }
 

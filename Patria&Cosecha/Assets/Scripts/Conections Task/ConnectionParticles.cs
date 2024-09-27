@@ -9,20 +9,8 @@ public class ConnectionParticles
         _ps = ps;
     }
 
-    public void OnUpdate()
+    public void ActivatePSError(bool turnOnOff)
     {
-        //_ps.gameObject.SetActive(true);
-
-        //var em = _ps.emission;
-        //em.enabled = true;
-
-        //em.rateOverTime = 0f;
-
-        //em.SetBursts(
-        //    new ParticleSystem.Burst[]
-        //    {
-        //        new ParticleSystem.Burst(0.25f, 15)
-        //    }
-        //);
+        _ps.gameObject.SetActive(turnOnOff);
     }
 }
