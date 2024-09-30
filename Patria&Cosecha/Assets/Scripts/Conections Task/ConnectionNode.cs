@@ -53,6 +53,7 @@ public class ConnectionNode : MonoBehaviour
             TurnOffNodes();
             _capsuleNode.gameObject.SetActive(true);
         }
+        else TurnOffNodes();
     }
 
     private void TurnOffNodes()
@@ -96,6 +97,12 @@ public class ConnectionNode : MonoBehaviour
             _typeReceived = node;
             CheckReceivedNode();
         }
+    }
+
+    public void ResetNode()
+    {
+        _typeReceived = NodeType.None;
+        CheckReceivedNode();
     }
 
     private IEnumerator DisableConnection()

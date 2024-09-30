@@ -38,7 +38,6 @@ public class PlayerController : MonoBehaviour
     {
         MyInput();
         SpeedControl();
-        InitTask();
 
         ResetLevel();
         
@@ -73,20 +72,6 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
-        }
-    }
-
-    private void InitTask()
-    {
-        RaycastHit hit;
-
-        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2, transform.position.z);
-
-        if (Physics.Raycast(rayPos, transform.forward, out hit, _taskInteractionDistance, _taskObjectsLayer))
-        {
-            CowsTaskManager taskObject = hit.transform.gameObject.GetComponent<CowsTaskManager>();
-
-            if (Input.GetKeyDown(KeyCode.E)) taskObject.StartTask();
         }
     }
 

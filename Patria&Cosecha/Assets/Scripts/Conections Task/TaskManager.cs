@@ -4,7 +4,7 @@ using UnityEngine;
 public class TaskManager : MonoBehaviour
 {
     [SerializeField] private ConnectionNode[] _connections;
-    [SerializeField] private GameObject _door;
+    [SerializeField] private GameObject _door, _energyModule, _nodeToConnect;
 
     private int _workingNodes = default, _totalToFinish = default;
     private bool _running = false;
@@ -24,6 +24,7 @@ public class TaskManager : MonoBehaviour
         {
             _running = true;
             _door.SetActive(false);
+            _nodeToConnect.GetComponent<Renderer>().material = _energyModule.GetComponent<Renderer>().material;
         }
     }
 
