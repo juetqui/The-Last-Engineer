@@ -14,6 +14,7 @@ public class PlayerTDController : MonoBehaviour
     private Rigidbody _rb = default;
     private ElectricityNode _nodeToChange = default;
     private ConnectionNode _nodeToConnect = default;
+    private CombineMachine _combineMachine = default;
 
     public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
     public NodeType CurrentNode { get { return _currentNode; } }
@@ -33,6 +34,7 @@ public class PlayerTDController : MonoBehaviour
     {
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
         if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
+        if (_isInPlaceArea && _combineMachine != null) CombineNode();
 
         ResetLevel();
     }
@@ -99,6 +101,16 @@ public class PlayerTDController : MonoBehaviour
         }
     }
 
+    private void CombineNode()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            _combineMachine.SetNode(_currentNode);
+            _currentNode = NodeType.None;
+            CheckCurrentNode();
+        }
+    }
+
     private void ResetLevel()
     {
         if (Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -154,6 +166,16 @@ public class PlayerTDController : MonoBehaviour
                 _nodeToConnect = node;
             }
         }
+        else if (coll.CompareTag("Combiner") && _combineMachine == null)
+        {
+            CombineMachine machine = coll.GetComponent<CombineMachine>();
+            
+            if (machine != null)
+            {
+                _isInPlaceArea = true;
+                _combineMachine = machine;
+            }
+        }
     }
 
     private void OnTriggerExit(Collider coll)
@@ -167,6 +189,11 @@ public class PlayerTDController : MonoBehaviour
         {
             _isInPlaceArea = false;
             _nodeToConnect = null;
+        }
+        else if (coll.CompareTag("Combiner"))
+        {
+            _isInPlaceArea = false;
+            _combineMachine = null;
         }
     }
 }
