@@ -5,7 +5,8 @@ public class CombineMachine : MonoBehaviour
     [SerializeField] private ElectricityNode[] _nodes = default;
     [SerializeField] private ElectricityNode[] _firstNodePrefabs = default;
     [SerializeField] private ElectricityNode[] _secondNodePrefabs = default;
-    
+    [SerializeField] private CombinedNode[] _combinedNodes = default;
+
     private NodeType _firstNode = NodeType.None, _secondNode = NodeType.None;
 
     void Start()
@@ -24,39 +25,45 @@ public class CombineMachine : MonoBehaviour
 
         Debug.Log(_firstNode + " + " + _secondNode);
 
-        //if (_firstNode == NodeType.Cube)
-        //{
-        //    if (_secondNode == NodeType.Sphere)
-        //    {
+        if (_firstNode == NodeType.Cube)
+        {
+            if (_secondNode == NodeType.Sphere)
+            {
 
-        //    }
-        //    else if (_secondNode == NodeType.Capsule)
-        //    {
+            }
+            else if (_secondNode == NodeType.Capsule)
+            {
+                foreach (var combined in _combinedNodes)
+                {
+                    if (combined.CombinedType == CombinedType.CubeCapsule) combined.gameObject.SetActive(true);
+                }
+            }
+        }
+        else if (_firstNode == NodeType.Sphere)
+        {
+            if (_secondNode == NodeType.Cube)
+            {
 
-        //    }
-        //}
-        //else if (_firstNode == NodeType.Sphere)
-        //{
-        //    if (_secondNode == NodeType.Cube)
-        //    {
+            }
+            else if (_secondNode == NodeType.Capsule)
+            {
 
-        //    }
-        //    else if (_secondNode == NodeType.Capsule)
-        //    {
+            }
+        }
+        else if (_firstNode == NodeType.Capsule)
+        {
+            if (_secondNode == NodeType.Cube)
+            {
+                foreach (var combined in _combinedNodes)
+                {
+                    if (combined.CombinedType == CombinedType.CubeCapsule) combined.gameObject.SetActive(true);
+                }
+            }
+            else if (_secondNode == NodeType.Sphere)
+            {
 
-        //    }
-        //}
-        //else if (_firstNode == NodeType.Capsule)
-        //{
-        //    if (_secondNode == NodeType.Cube)
-        //    {
-
-        //    }
-        //    else if (_secondNode == NodeType.Sphere)
-        //    {
-
-        //    }
-        //}
+            }
+        }
     }
 
     private void TurnOnRecievedNode()
@@ -92,10 +99,17 @@ public class CombineMachine : MonoBehaviour
         {
             secondPrefab.gameObject.SetActive(false);
         }
+
+        foreach (var combinedNode in _combinedNodes)
+        {
+            combinedNode.gameObject.SetActive(false);
+        }
     }
 
     public void SetNode(NodeType node)
     {
+        if (node == NodeType.None) return;
+
         if (_firstNode != NodeType.None && node != _firstNode) _secondNode = node;
         else _firstNode = node;
         TurnOnRecievedNode();
