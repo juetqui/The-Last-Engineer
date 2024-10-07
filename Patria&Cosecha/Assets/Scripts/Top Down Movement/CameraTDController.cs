@@ -20,15 +20,15 @@ public class CameraTDController : MonoBehaviour
 
     void Start()
     {
-        _baseCameraPosition = transform.position;  // Guardar la posición base de la cámara
+        _baseCameraPosition = transform.position;
     }
 
     void Update()
     {
-        SmoothFollow();
+        if (_player != null) SmoothFollow();
         ApplyBreathEffect();
 
-        if (_player.GetComponent<Rigidbody>().velocity.magnitude <= 0.3f) ResetCamera();
+        if (_player != null && _player.GetComponent<Rigidbody>().velocity.magnitude <= 0.3f) ResetCamera();
     }
 
     private void SmoothFollow()

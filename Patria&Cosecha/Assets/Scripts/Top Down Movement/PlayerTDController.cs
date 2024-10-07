@@ -113,7 +113,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void ResetLevel()
     {
-        if (Input.GetKeyDown(KeyCode.R)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (Input.GetKeyDown(KeyCode.L)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void CheckCurrentNode()
