@@ -1,14 +1,14 @@
-using Unity.Burst.CompilerServices;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerTDController : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed = default, _dashSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f;
+    [SerializeField] private float _moveSpeed = default, _dashSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f, _dashDuration = default, _dashCooldown = default;
     [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
 
     private float _horizontalInput = default, _verticalInput = default;
-    private bool _isInGrabArea = false, _isInPlaceArea = false;
+    private bool _isInGrabArea = false, _isInPlaceArea = false, _availableToDash = false, _canDash = true, _isDashing = false;
     private Vector3 _moveDir = default;
     private NodeType _currentNode = default;
     private Rigidbody _rb = default;
@@ -42,7 +42,9 @@ public class PlayerTDController : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer(GetMoveInput());
-        Dash(GetMoveInput());
+
+        if (_availableToDash && Input.GetKeyDown(KeyCode.Space) && _canDash && !_isDashing)
+            StartCoroutine(Dash());
     }
 
     private Vector3 GetMoveInput()
@@ -61,19 +63,6 @@ public class PlayerTDController : MonoBehaviour
         Vector3 dir = moveDir.normalized * _moveSpeed;
 
         if (_rb.velocity.magnitude < _moveSpeed) _rb.AddForce(dir, ForceMode.VelocityChange);
-    }
-
-    private void Dash(Vector3 moveDir)
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (moveDir.magnitude <= 0) moveDir = Vector3.forward;
-            Debug.Log(moveDir);
-            
-            Vector3 dir = moveDir.normalized * _dashSpeed;
-            
-            _rb.AddForce(dir, ForceMode.Impulse);
-        }
     }
 
     private void RotatePlayer(Vector3 rotDir)
@@ -109,6 +98,33 @@ public class PlayerTDController : MonoBehaviour
             _currentNode = NodeType.None;
             CheckCurrentNode();
         }
+    }
+
+    private IEnumerator Dash()
+    {
+        Debug.Log("Dash");
+
+        _canDash = false;
+        _isDashing = true;
+
+        Vector3 dashDirection = _rb.velocity.normalized;
+
+        if (dashDirection.magnitude == 0)
+        {
+            _isDashing = false;
+            _canDash = true;
+            yield break;
+        }
+
+        _rb.AddForce(dashDirection * _dashSpeed, ForceMode.VelocityChange);
+
+        yield return new WaitForSeconds(_dashDuration);
+
+        _isDashing = false;
+
+        yield return new WaitForSeconds(_dashCooldown);
+
+        _canDash = true;
     }
 
     private void ResetLevel()
@@ -154,6 +170,18 @@ public class PlayerTDController : MonoBehaviour
             {
                 _isInGrabArea = true;
                 _nodeToChange = node;
+                _availableToDash = false;
+            }
+            else
+            {
+                CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
+                
+                if (node != null)
+                {
+                    _isInGrabArea = true;
+                    _nodeToChange = node;
+                    _availableToDash = true;
+                }
             }
         }
         else if (coll.CompareTag("Connection") && _nodeToConnect == null)

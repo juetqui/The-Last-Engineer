@@ -7,6 +7,7 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private bool _isChildren = default;
 
     public NodeType NodeType { get { return _nodeType; } }
+    public bool IsChildren { get { return _isChildren; } }
 
     private void Update()
     {
@@ -20,4 +21,15 @@ public class ElectricityNode : MonoBehaviour
         transform.position = new Vector3(transform.position.x, newY, transform.position.z);
         transform.Rotate(0, _rotSpeed * Time.deltaTime, 0);
     }
+}
+
+public enum NodeType
+{
+    None,
+    Cube,
+    Sphere,
+    Capsule,
+    CubeSphere,
+    CubeCapsule,
+    SphereCapsule
 }

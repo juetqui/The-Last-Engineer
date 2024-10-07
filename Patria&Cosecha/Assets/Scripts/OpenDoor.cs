@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class OpenDoor : MonoBehaviour
 {
-    [SerializeField] private Transform _openPos = default, _closePos = default;
+    [SerializeField] private Transform _openPos = default;
     [SerializeField] private TaskManager _taskManager = default;
 
     private bool _canOpen = false, _isMoving = false;

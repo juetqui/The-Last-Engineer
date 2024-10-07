@@ -5,7 +5,6 @@ public class TaskManager : MonoBehaviour
 {
     [SerializeField] private ConnectionNode[] _connections;
     [SerializeField] private GameObject _energyModule, _nodeToConnect;
-    [SerializeField] private LevelChanger _levelChanger;
 
     private int _workingNodes = default, _totalToFinish = default;
     private bool _running = false;
@@ -32,6 +31,7 @@ public class TaskManager : MonoBehaviour
     {
         if (!_nodesDictionary.ContainsKey(nodeType))
         {
+            Debug.Log(nodeType);
             _nodesDictionary.Add(nodeType, nodeType);
             _workingNodes++;
         }

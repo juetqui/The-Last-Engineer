@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class CombineMachine : MonoBehaviour
 {
-    [SerializeField] private ElectricityNode[] _nodes = default;
     [SerializeField] private ElectricityNode[] _firstNodePrefabs = default;
     [SerializeField] private ElectricityNode[] _secondNodePrefabs = default;
     [SerializeField] private CombinedNode[] _combinedNodes = default;
@@ -21,10 +20,6 @@ public class CombineMachine : MonoBehaviour
 
     private void CombineNodes()
     {
-        Debug.Log("Combine Ready");
-
-        Debug.Log(_firstNode + " + " + _secondNode);
-
         if (_firstNode == NodeType.Cube)
         {
             if (_secondNode == NodeType.Sphere)
@@ -35,7 +30,7 @@ public class CombineMachine : MonoBehaviour
             {
                 foreach (var combined in _combinedNodes)
                 {
-                    if (combined.CombinedType == CombinedType.CubeCapsule) combined.gameObject.SetActive(true);
+                    if (combined.NodeType == NodeType.CubeCapsule) combined.gameObject.SetActive(true);
                 }
             }
         }
@@ -56,7 +51,7 @@ public class CombineMachine : MonoBehaviour
             {
                 foreach (var combined in _combinedNodes)
                 {
-                    if (combined.CombinedType == CombinedType.CubeCapsule) combined.gameObject.SetActive(true);
+                    if (combined.NodeType == NodeType.CubeCapsule) combined.gameObject.SetActive(true);
                 }
             }
             else if (_secondNode == NodeType.Sphere)

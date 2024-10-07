@@ -2,26 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CombinedNode : MonoBehaviour
+public class CombinedNode : ElectricityNode
 {
-    [SerializeField] CombinedType _combinedType;
-
-    public CombinedType CombinedType { get { return _combinedType; } }
+    [SerializeField] private PlayerTDController _player;
+    private Renderer _renderer;
 
     void Start()
     {
-        
+        StartUpNode();
     }
 
-    void Update()
+    //private void Update()
+    //{
+
+    //}
+
+    private void StartUpNode()
     {
-        
-    }
-}
+        _renderer = GetComponent<Renderer>();
 
-public enum CombinedType
-{
-    CubeCapsule,
-    CubeSphere,
-    SphereCapsule
+        if (this.NodeType == NodeType.CubeCapsule)
+        {
+            //_renderer.material.SetColor("CubeColor", FF00FF);
+        }
+    }
 }

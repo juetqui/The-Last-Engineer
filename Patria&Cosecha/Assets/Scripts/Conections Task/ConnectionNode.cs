@@ -116,11 +116,3 @@ public class ConnectionNode : MonoBehaviour
         _renderer.material.color = _color;
     }
 }
-
-public enum NodeType
-{
-    None,
-    Cube,
-    Sphere,
-    Capsule
-}
