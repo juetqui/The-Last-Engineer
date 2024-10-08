@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CombinedNode : ElectricityNode
@@ -12,10 +10,17 @@ public class CombinedNode : ElectricityNode
         StartUpNode();
     }
 
-    //private void Update()
-    //{
+    private void Update()
+    {
 
-    //}
+    }
+
+    public void Attach()
+    {
+        transform.SetParent(_player.transform, false);
+        transform.localScale = Vector3.one;
+        transform.localPosition = new Vector3(0, 0, 1.5f);
+    }
 
     private void StartUpNode()
     {

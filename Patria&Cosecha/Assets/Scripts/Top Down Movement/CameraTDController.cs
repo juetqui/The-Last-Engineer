@@ -23,7 +23,7 @@ public class CameraTDController : MonoBehaviour
         _baseCameraPosition = transform.position;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (_player != null) SmoothFollow();
         ApplyBreathEffect();

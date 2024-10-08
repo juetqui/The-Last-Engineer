@@ -1,11 +1,22 @@
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerTDController : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed = default, _dashSpeed = default, _rotSpeed = default, _taskInteractionDistance = 2f, _dashDuration = default, _dashCooldown = default;
-    [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
+    [Header("Movement")]
+    [SerializeField] private float _moveSpeed = default;
+    [SerializeField] private float _rotSpeed = default;
+
+    [Header("Dash")]
+    [SerializeField] private float _dashSpeed = default;
+    [SerializeField] private float _dashDuration = default;
+    [SerializeField] private float _dashCooldown = default;
+
+    [Header("Nodes")]
+    [SerializeField] private ElectricityNode[] _nodes = default;
+    [SerializeField] private CombinedNode[] _combinedNodes = default;
 
     private float _horizontalInput = default, _verticalInput = default;
     private bool _isInGrabArea = false, _isInPlaceArea = false, _availableToDash = false, _canDash = true, _isDashing = false;
@@ -13,26 +24,25 @@ public class PlayerTDController : MonoBehaviour
     private NodeType _currentNode = default;
     private Rigidbody _rb = default;
     private ElectricityNode _nodeToChange = default;
+    private CombinedNode _nodeToAttach = default;
     private ConnectionNode _nodeToConnect = default;
     private CombineMachine _combineMachine = default;
 
-    public float TaskInteractionDistance { get { return _taskInteractionDistance; } }
     public NodeType CurrentNode { get { return _currentNode; } }
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _currentNode = NodeType.None;
-
-        _cubeNode.gameObject.SetActive(false);
-        _sphereNode.gameObject.SetActive(false);
-        _capsuleNode.gameObject.SetActive(false);
+        
+        TurnOffNodes();
         CheckCurrentNode();
     }
 
     private void Update()
     {
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
+        if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
         if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
         if (_isInPlaceArea && _combineMachine != null) CombineNode();
 
@@ -78,6 +88,11 @@ public class PlayerTDController : MonoBehaviour
             _currentNode = nodeType;
             CheckCurrentNode();
         }
+    }
+
+    private void AttachCombined(CombinedNode combined)
+    {
+        if (Input.GetKeyDown(KeyCode.E)) combined.Attach();
     }
 
     private void PlaceNode()
@@ -134,29 +149,32 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckCurrentNode()
     {
-        if (_currentNode == NodeType.Cube)
+        TurnOffNodes();
+
+        foreach (var node in _nodes)
         {
-            _cubeNode.gameObject.SetActive(true);
-            _sphereNode.gameObject.SetActive(false);
-            _capsuleNode.gameObject.SetActive(false);
+            if (_currentNode == node.NodeType)
+            {
+                node.gameObject.SetActive(true);
+            }
+            else CheckInCombined();
         }
-        else if (_currentNode == NodeType.Sphere)
+    }
+
+    private void TurnOffNodes()
+    {
+        foreach (var node in _nodes) node.gameObject.SetActive(false);
+        foreach (var combined in _combinedNodes) combined.gameObject.SetActive(false);
+    }
+
+    private void CheckInCombined()
+    {
+        foreach (var combined in _combinedNodes)
         {
-            _cubeNode.gameObject.SetActive(false);
-            _sphereNode.gameObject.SetActive(true);
-            _capsuleNode.gameObject.SetActive(false);
-        }
-        else if (_currentNode == NodeType.Capsule)
-        {
-            _cubeNode.gameObject.SetActive(false);
-            _sphereNode.gameObject.SetActive(false);
-            _capsuleNode.gameObject.SetActive(true);
-        }
-        else
-        {
-            _cubeNode.gameObject.SetActive(false);
-            _sphereNode.gameObject.SetActive(false);
-            _capsuleNode.gameObject.SetActive(false);
+            if (_currentNode == combined.NodeType)
+            {
+                combined.gameObject.SetActive(true);
+            }
         }
     }
 
@@ -172,16 +190,16 @@ public class PlayerTDController : MonoBehaviour
                 _nodeToChange = node;
                 _availableToDash = false;
             }
-            else
+        }
+        else if (coll.CompareTag("Node") && _nodeToAttach == null)
+        {
+            CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
+
+            if (combinedNode != null)
             {
-                CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
-                
-                if (node != null)
-                {
-                    _isInGrabArea = true;
-                    _nodeToChange = node;
-                    _availableToDash = true;
-                }
+                _isInGrabArea = true;
+                _nodeToAttach = combinedNode;
+                //_availableToDash = true;
             }
         }
         else if (coll.CompareTag("Connection") && _nodeToConnect == null)
