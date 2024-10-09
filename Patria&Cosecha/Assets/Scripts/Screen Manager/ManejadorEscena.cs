@@ -9,7 +9,7 @@ public class ManejadorEscena : MonoBehaviour
     }
     public void Game()
     {
-        SceneManager.LoadScene("Level1");
+        SceneManager.LoadScene("Lvl 1");
     }
     public void Credits()
     {
