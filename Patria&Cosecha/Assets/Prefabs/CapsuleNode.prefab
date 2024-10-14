@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 5930456737846497255}
   - component: {fileID: 7870322233572225317}
   - component: {fileID: 7010885102378863494}
-  - component: {fileID: 6480111322506548762}
   - component: {fileID: 7035182527668067892}
+  - component: {fileID: 6480111322506548762}
+  - component: {fileID: 2636490892167215146}
   m_Layer: 7
   m_Name: CapsuleNode
   m_TagString: Node
@@ -109,24 +110,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6480111322506548762
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1265145715978936780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd01a876d9d10384c9f1a7a327f5e3c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _nodeType: 3
-  _rotSpeed: 75
-  _minY: 1.5
-  _maxY: 2
-  _moveSpeed: 2
-  _isChildren: 0
 --- !u!136 &7035182527668067892
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -150,3 +133,39 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6480111322506548762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265145715978936780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd01a876d9d10384c9f1a7a327f5e3c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _nodeType: 3
+  _rotSpeed: 75
+  _minY: 1.5
+  _maxY: 2
+  _moveSpeed: 2
+  _isChildren: 0
+--- !u!114 &2636490892167215146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265145715978936780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 0, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []

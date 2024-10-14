@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using UnityEngine;
 
 public class CameraTDController : MonoBehaviour
@@ -15,7 +14,7 @@ public class CameraTDController : MonoBehaviour
 
     private Vector3 _basePos = default;
 
-    private void Start()
+    private void Awake()
     {
         _basePos = transform.position;
     }

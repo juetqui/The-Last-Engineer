@@ -1,5 +1,4 @@
 using System.Collections;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -100,6 +99,7 @@ public class PlayerTDController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             _nodeToConnect.SetNode(_currentNode);
+            _nodeToConnect = null;
             _currentNode = NodeType.None;
             CheckCurrentNode();
         }
@@ -110,6 +110,7 @@ public class PlayerTDController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             _combineMachine.SetNode(_currentNode);
+            _combineMachine = null;
             _currentNode = NodeType.None;
             CheckCurrentNode();
         }

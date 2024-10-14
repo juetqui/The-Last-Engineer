@@ -3,15 +3,19 @@ using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
 {
+    [Header("Level")]
+    [SerializeField] private NodeType _requiredType = default;
+    [SerializeField] private TaskManager _taskManager = default;
+    [SerializeField] private ElectricityNode[] _nodes = default;
+
+    [Header("Object")]
     [SerializeField] private Collider _collider = default;
     [SerializeField] private AudioSource _audioSrc = default;
-    [SerializeField] private TaskManager _taskManager = default;
     [SerializeField] private ParticleSystem _particles = default;
     [SerializeField] private AudioClip _placedClip = default, _errorClip = default;
-    [SerializeField] private ElectricityNode _cubeNode = default, _sphereNode = default, _capsuleNode = default;
     
+
     [SerializeField] private Color _color = default;
-    [SerializeField] private NodeType _requiredType = default;
 
     private ConnectionParticles _connectionPs = default;
     private ConnectionsView _connectionsView = default;
@@ -39,29 +43,20 @@ public class ConnectionNode : MonoBehaviour
 
     private void TurnOnReceivedNode()
     {
-        if (_typeReceived == NodeType.Cube)
+        TurnOffNodes();
+
+        foreach (var node in _nodes)
         {
-            TurnOffNodes();
-            _cubeNode.gameObject.SetActive(true);
+            if (node.NodeType == _typeReceived) node.gameObject.SetActive(true);
         }
-        else if (_typeReceived == NodeType.Sphere)
-        {
-            TurnOffNodes();
-            _sphereNode.gameObject.SetActive(true);
-        }
-        else if (_typeReceived == NodeType.Capsule)
-        {
-            TurnOffNodes();
-            _capsuleNode.gameObject.SetActive(true);
-        }
-        else TurnOffNodes();
     }
 
     private void TurnOffNodes()
     {
-        _cubeNode.gameObject.SetActive(false);
-        _sphereNode.gameObject.SetActive(false);
-        _capsuleNode.gameObject.SetActive(false);
+        foreach (var node in _nodes)
+        {
+            node.gameObject.SetActive(false);
+        }
     }
 
     private void CheckReceivedNode()

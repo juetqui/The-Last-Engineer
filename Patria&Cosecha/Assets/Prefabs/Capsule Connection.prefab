@@ -130,11 +130,12 @@ GameObject:
   - component: {fileID: 7876417285230734817}
   - component: {fileID: 2079571354344734399}
   - component: {fileID: 3249274544705933397}
+  - component: {fileID: 6763900616505377805}
   - component: {fileID: 7984298551104268430}
   - component: {fileID: 1428863666069102288}
   m_Layer: 6
   m_Name: Capsule Connection
-  m_TagString: Untagged
+  m_TagString: Connection
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -232,6 +233,27 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!65 &6763900616505377805
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4495235784345067281}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &7984298551104268430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,17 +266,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 845d4cb351f0afd498616beee39ed885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collider: {fileID: 3249274544705933397}
-  _audioSrc: {fileID: 1428863666069102288}
+  _requiredType: 3
   _taskManager: {fileID: 0}
+  _nodes:
+  - {fileID: 5684241970881711715}
+  - {fileID: 9133212419979507754}
+  - {fileID: 8659322149711652966}
+  _collider: {fileID: 6763900616505377805}
+  _audioSrc: {fileID: 1428863666069102288}
   _particles: {fileID: 6332584926658332959}
   _placedClip: {fileID: 8300000, guid: b67d9a0226ed30240b4f66b100687440, type: 3}
   _errorClip: {fileID: 8300000, guid: 484bb4b1764914b409cf63924f0eb044, type: 3}
-  _cubeNode: {fileID: 5684241970881711715}
-  _sphereNode: {fileID: 9133212419979507754}
-  _capsuleNode: {fileID: 8659322149711652966}
-  _color: {r: 0, g: 0, b: 0, a: 0}
-  _requiredType: 3
+  _color: {r: 0, g: 0, b: 1, a: 1}
 --- !u!82 &1428863666069102288
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5425,6 +5448,18 @@ PrefabInstance:
       value: CapsuleNode
       objectReference: {fileID: 0}
     - target: {fileID: 2108494762873943596, guid: f5270294ab001e146bd762ad754480f3, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2108494762873943596, guid: f5270294ab001e146bd762ad754480f3, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2108494762873943596, guid: f5270294ab001e146bd762ad754480f3, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2108494762873943596, guid: f5270294ab001e146bd762ad754480f3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -5464,7 +5499,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7035182527668067892, guid: f5270294ab001e146bd762ad754480f3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -5493,6 +5529,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6192189977762405333}
     m_Modifications:
+    - target: {fileID: 2707877859804264848, guid: 3b7026c034d6adb41b75928a6a75a423, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 2707877859804264848, guid: 3b7026c034d6adb41b75928a6a75a423, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 2707877859804264848, guid: 3b7026c034d6adb41b75928a6a75a423, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.75
+      objectReference: {fileID: 0}
     - target: {fileID: 2707877859804264848, guid: 3b7026c034d6adb41b75928a6a75a423, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -5537,7 +5585,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: SphereNode
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1644626447100604612, guid: 3b7026c034d6adb41b75928a6a75a423, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -5622,7 +5671,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7263793796731990730, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

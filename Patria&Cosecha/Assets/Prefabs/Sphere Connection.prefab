@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6816508030737508881}
   - component: {fileID: 4222485631765714640}
   - component: {fileID: 2525293579730637949}
-  - component: {fileID: 4773613889190011515}
+  - component: {fileID: 4691676489291271131}
   - component: {fileID: 4542737650370878685}
   - component: {fileID: 8733452468447253690}
   m_Layer: 6
@@ -113,8 +113,8 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &4773613889190011515
-SphereCollider:
+--- !u!65 &4691676489291271131
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -132,7 +132,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1
+  m_Size: {x: 2, y: 2, z: 2}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &4542737650370878685
 MonoBehaviour:
@@ -146,17 +146,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 845d4cb351f0afd498616beee39ed885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _collider: {fileID: 2525293579730637949}
-  _audioSrc: {fileID: 8733452468447253690}
+  _requiredType: 2
   _taskManager: {fileID: 0}
+  _nodes:
+  - {fileID: 6830245976628851543}
+  - {fileID: 4587066011137743538}
+  - {fileID: 2093431757020082890}
+  _collider: {fileID: 4691676489291271131}
+  _audioSrc: {fileID: 8733452468447253690}
   _particles: {fileID: 8876913860498825264}
   _placedClip: {fileID: 8300000, guid: b67d9a0226ed30240b4f66b100687440, type: 3}
   _errorClip: {fileID: 8300000, guid: 484bb4b1764914b409cf63924f0eb044, type: 3}
-  _cubeNode: {fileID: 6830245976628851543}
-  _sphereNode: {fileID: 4587066011137743538}
-  _capsuleNode: {fileID: 2093431757020082890}
   _color: {r: 0, g: 1, b: 0, a: 1}
-  _requiredType: 2
 --- !u!82 &8733452468447253690
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5504,7 +5505,8 @@ PrefabInstance:
       propertyPath: _isChildren
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7035182527668067892, guid: f5270294ab001e146bd762ad754480f3, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -5601,7 +5603,8 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7263793796731990730, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -5694,7 +5697,8 @@ PrefabInstance:
       propertyPath: _isChildren
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1644626447100604612, guid: 3b7026c034d6adb41b75928a6a75a423, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
