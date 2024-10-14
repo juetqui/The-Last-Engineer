@@ -97,6 +97,12 @@ public class ConnectionNode : MonoBehaviour
         }
     }
 
+    public void SetCombined(CombinedNode combined)
+    {
+        _typeReceived = combined.NodeType;
+        combined.Attach(transform);
+    }
+
     public void ResetNode()
     {
         _typeReceived = NodeType.None;

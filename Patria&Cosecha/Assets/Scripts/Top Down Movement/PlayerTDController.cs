@@ -49,7 +49,7 @@ public class PlayerTDController : MonoBehaviour
 
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
         if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
-        if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
+        if (_isInPlaceArea && _nodeToConnect != null || _isInPlaceArea && _nodeToAttach != null) PlaceNode();
         if (_isInPlaceArea && _combineMachine != null) CombineNode();
     }
 
@@ -65,7 +65,8 @@ public class PlayerTDController : MonoBehaviour
         {
             Vector3 dir = new Vector3(0, -1, 0);
             _rb.AddForce(dir.normalized * 10);
-            StartCoroutine(RestartLevel());
+            //StartCoroutine(RestartLevel());
+            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
@@ -90,6 +91,8 @@ public class PlayerTDController : MonoBehaviour
         StartCoroutine(DashCooldown());
         
         if (moveDir == Vector3.zero) return;
+
+        moveDir = new Vector3(moveDir.x, moveDir.y + 0.2f, moveDir.z);
 
         Vector3 dir = moveDir.normalized * _dashSpeed;
 
@@ -133,7 +136,14 @@ public class PlayerTDController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            _nodeToConnect.SetNode(_currentNode);
+            if (_currentNode == NodeType.CubeCapsule)
+            {
+                Debug.Log(_nodeToAttach);
+                _nodeToConnect.SetCombined(_nodeToAttach);
+            }
+            else _nodeToConnect.SetNode(_currentNode);
+
+
             _nodeToConnect = null;
             _currentNode = NodeType.None;
             CheckCurrentNode();
@@ -256,7 +266,6 @@ public class PlayerTDController : MonoBehaviour
     private IEnumerator RestartLevel()
     {
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void OnDrawGizmos()
