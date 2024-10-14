@@ -8,7 +8,7 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _moveSpeed = default;
     [SerializeField] private float _rotSpeed = default;
     [SerializeField] private float _dashSpeed = default;
-    [SerializeField] private LayerMask _voidMask = default;
+    [SerializeField] private LayerMask _groundMask = default;
 
     [Header("Nodes")]
     [SerializeField] private ElectricityNode[] _nodes = default;
@@ -60,15 +60,12 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckFloor()
     {
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, -transform.up, out hit, 2.5f, _voidMask)) return;
+        if (Physics.Raycast(transform.position, -transform.up, 2.5f, _groundMask)) return;
         else
         {
             Vector3 dir = new Vector3(0, -1, 0);
             _rb.AddForce(dir.normalized * 10);
-
-            if (Vector3.Distance(transform.position, hit.transform.position) <= 0.1f) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            StartCoroutine(RestartLevel());
         }
     }
 
@@ -256,9 +253,15 @@ public class PlayerTDController : MonoBehaviour
         _rb.drag = oldDrag;
     }
 
+    private IEnumerator RestartLevel()
+    {
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, -transform.up * 2.5f);
+        Gizmos.DrawRay(transform.position, -transform.up * 2f);
     }
 }
