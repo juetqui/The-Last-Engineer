@@ -10,5 +10,8 @@ public class LevelChanger : MonoBehaviour
         PlayerTDController player = coll.GetComponent<PlayerTDController>();
 
         if (player != null && _taskManager.Running) SceneManager.LoadScene("Lvl 2");
+
+        Debug.Log(SceneManager.GetActiveScene().name);
+
     }
 }
