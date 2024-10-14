@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
 {
+    [SerializeField] private Collider _collider = default;
     [SerializeField] private AudioSource _audioSrc = default;
     [SerializeField] private TaskManager _taskManager = default;
     [SerializeField] private ParticleSystem _particles = default;
@@ -70,6 +71,7 @@ public class ConnectionNode : MonoBehaviour
             _audioSrc.clip = _placedClip;
             _connectionPs.ActivatePSError(false);
             _renderer.enabled = false;
+            _collider.enabled = false;
             _isWorking = true;
             _hasError = false;
             _taskManager.AddConnection(_typeReceived);
@@ -78,6 +80,7 @@ public class ConnectionNode : MonoBehaviour
         {
             _audioSrc.clip = _errorClip;
             _renderer.enabled = true;
+            _collider.enabled = true;
             _taskManager.RemoveConnection(_requiredType);
             _isWorking = false;
             _hasError = true;
