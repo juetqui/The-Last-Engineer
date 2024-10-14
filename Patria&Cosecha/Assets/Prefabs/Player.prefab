@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7747279032991326772}
   - component: {fileID: 5341273095444713540}
   - component: {fileID: 25903407062140201}
+  - component: {fileID: 5582248738459197904}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -138,7 +139,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 116
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &25903407062140201
 MonoBehaviour:
@@ -154,14 +155,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 10
   _rotSpeed: 10
-  _dashSpeed: 30
-  _dashDuration: 0
-  _dashCooldown: 0
+  _dashSpeed: 20
+  _voidMask:
+    serializedVersion: 2
+    m_Bits: 8
   _nodes:
   - {fileID: 4715747930865511114}
   - {fileID: 3697128035962322080}
   - {fileID: 4098899442652182501}
-  _combinedNodes: []
+--- !u!114 &5582248738459197904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2577820091817530548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 0, b: 0, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &4531282956397301266
 GameObject:
   m_ObjectHideFlags: 0

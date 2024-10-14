@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class CombinedNode : ElectricityNode
 {
-    [SerializeField] private PlayerTDController _player;
     private Renderer _renderer;
 
     void Start()
@@ -15,9 +14,9 @@ public class CombinedNode : ElectricityNode
 
     }
 
-    public void Attach()
+    public void Attach(Transform player)
     {
-        transform.SetParent(_player.transform, false);
+        transform.SetParent(player, false);
         transform.localScale = Vector3.one;
         transform.localPosition = new Vector3(0, 0, 1.5f);
     }

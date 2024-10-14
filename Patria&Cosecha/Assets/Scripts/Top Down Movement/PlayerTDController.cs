@@ -7,20 +7,18 @@ public class PlayerTDController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float _moveSpeed = default;
     [SerializeField] private float _rotSpeed = default;
-
-    [Header("Dash")]
     [SerializeField] private float _dashSpeed = default;
-    [SerializeField] private float _dashDuration = default;
-    [SerializeField] private float _dashCooldown = default;
+    [SerializeField] private LayerMask _voidMask = default;
 
     [Header("Nodes")]
     [SerializeField] private ElectricityNode[] _nodes = default;
-    [SerializeField] private CombinedNode[] _combinedNodes = default;
 
-    private float _horizontalInput = default, _verticalInput = default;
-    private bool _isInGrabArea = false, _isInPlaceArea = false, _availableToDash = false, _canDash = true, _isDashing = false;
+    private float _horizontalInput = default, _verticalInput = default, _oldMass = default, _oldDrag = default;
+    private bool _canMove = true, _isInGrabArea = false, _isInPlaceArea = false, _canDash = false, _isDashing = false;
+    
     private Vector3 _moveDir = default;
     private NodeType _currentNode = default;
+    
     private Rigidbody _rb = default;
     private ElectricityNode _nodeToChange = default;
     private CombinedNode _nodeToAttach = default;
@@ -32,6 +30,9 @@ public class PlayerTDController : MonoBehaviour
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
+        _oldMass = _rb.mass;
+        _oldDrag = _rb.drag;
+
         _currentNode = NodeType.None;
         
         TurnOffNodes();
@@ -40,20 +41,35 @@ public class PlayerTDController : MonoBehaviour
 
     private void Update()
     {
+        if (CheckForDash()) Dash(GetMoveInput());
+
+        CheckAbility();
+        ResetLevel();
+        CheckFloor();
+
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
         if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
         if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
         if (_isInPlaceArea && _combineMachine != null) CombineNode();
-
-        ResetLevel();
     }
 
     private void FixedUpdate()
     {
-        MovePlayer(GetMoveInput());
+        if (_canMove) MovePlayer(GetMoveInput());
+    }
 
-        if (_availableToDash && Input.GetKeyDown(KeyCode.Space) && _canDash && !_isDashing)
-            StartCoroutine(Dash());
+    private void CheckFloor()
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, -transform.up, out hit, 2.5f, _voidMask)) return;
+        else
+        {
+            Vector3 dir = new Vector3(0, -1, 0);
+            _rb.AddForce(dir.normalized * 10);
+
+            if (Vector3.Distance(transform.position, hit.transform.position) <= 0.1f) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     private Vector3 GetMoveInput()
@@ -63,6 +79,24 @@ public class PlayerTDController : MonoBehaviour
         _moveDir = new Vector3(_horizontalInput, 0, _verticalInput);
 
         return _moveDir;
+    }
+
+    private bool CheckForDash()
+    {
+        if (_canDash && !_isDashing && Input.GetKeyDown(KeyCode.Space)) return true;
+        
+        return false;
+    }
+
+    private void Dash(Vector3 moveDir)
+    {
+        StartCoroutine(DashCooldown());
+        
+        if (moveDir == Vector3.zero) return;
+
+        Vector3 dir = moveDir.normalized * _dashSpeed;
+
+        _rb.AddForce(dir, ForceMode.Impulse);
     }
 
     private void MovePlayer(Vector3 moveDir)
@@ -91,7 +125,11 @@ public class PlayerTDController : MonoBehaviour
 
     private void AttachCombined(CombinedNode combined)
     {
-        if (Input.GetKeyDown(KeyCode.E)) combined.Attach();
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            combined.Attach(transform);
+            _currentNode = combined.NodeType;
+        }
     }
 
     private void PlaceNode()
@@ -116,33 +154,6 @@ public class PlayerTDController : MonoBehaviour
         }
     }
 
-    private IEnumerator Dash()
-    {
-        Debug.Log("Dash");
-
-        _canDash = false;
-        _isDashing = true;
-
-        Vector3 dashDirection = _rb.velocity.normalized;
-
-        if (dashDirection.magnitude == 0)
-        {
-            _isDashing = false;
-            _canDash = true;
-            yield break;
-        }
-
-        _rb.AddForce(dashDirection * _dashSpeed, ForceMode.VelocityChange);
-
-        yield return new WaitForSeconds(_dashDuration);
-
-        _isDashing = false;
-
-        yield return new WaitForSeconds(_dashCooldown);
-
-        _canDash = true;
-    }
-
     private void ResetLevel()
     {
         if (Input.GetKeyDown(KeyCode.L)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -154,29 +165,19 @@ public class PlayerTDController : MonoBehaviour
 
         foreach (var node in _nodes)
         {
-            if (_currentNode == node.NodeType)
-            {
-                node.gameObject.SetActive(true);
-            }
-            else CheckInCombined();
+            if (_currentNode == node.NodeType) node.gameObject.SetActive(true);
         }
     }
 
     private void TurnOffNodes()
     {
         foreach (var node in _nodes) node.gameObject.SetActive(false);
-        foreach (var combined in _combinedNodes) combined.gameObject.SetActive(false);
     }
 
-    private void CheckInCombined()
+    private void CheckAbility()
     {
-        foreach (var combined in _combinedNodes)
-        {
-            if (_currentNode == combined.NodeType)
-            {
-                combined.gameObject.SetActive(true);
-            }
-        }
+        if (_currentNode == NodeType.CubeCapsule) _canDash = true;
+        else _canDash = false;
     }
 
     private void OnTriggerStay(Collider coll)
@@ -189,7 +190,6 @@ public class PlayerTDController : MonoBehaviour
             {
                 _isInGrabArea = true;
                 _nodeToChange = node;
-                _availableToDash = false;
             }
         }
         else if (coll.CompareTag("Node") && _nodeToAttach == null)
@@ -200,7 +200,6 @@ public class PlayerTDController : MonoBehaviour
             {
                 _isInGrabArea = true;
                 _nodeToAttach = combinedNode;
-                //_availableToDash = true;
             }
         }
         else if (coll.CompareTag("Connection") && _nodeToConnect == null)
@@ -242,5 +241,24 @@ public class PlayerTDController : MonoBehaviour
             _isInPlaceArea = false;
             _combineMachine = null;
         }
+    }
+
+    private IEnumerator DashCooldown()
+    {
+        float oldDrag = _rb.drag;
+
+        _isDashing = true;
+        _rb.drag = oldDrag / 2;
+
+        yield return new WaitForSeconds(2f);
+
+        _isDashing = false;
+        _rb.drag = oldDrag;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(transform.position, -transform.up * 2.5f);
     }
 }
