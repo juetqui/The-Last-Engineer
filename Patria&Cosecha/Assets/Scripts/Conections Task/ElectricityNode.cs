@@ -16,11 +16,20 @@ public class ElectricityNode : MonoBehaviour
 
     private void MoveObject()
     {
+        Vector3 currentPosition = transform.position;
         float newY = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
 
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        transform.position = new Vector3(currentPosition.x, newY, currentPosition.z);
         transform.Rotate(0, _rotSpeed * Time.deltaTime, 0);
     }
+
+    public void Attach(Transform newParent, Vector3 newPos)
+    {
+        transform.SetParent(newParent, false);
+        transform.localScale = Vector3.one;
+        transform.localPosition = newPos;
+    }
+
 }
 
 public enum NodeType
@@ -29,7 +38,7 @@ public enum NodeType
     Cube,
     Sphere,
     Capsule,
+    Dash,
     CubeSphere,
-    CubeCapsule,
     SphereCapsule
 }

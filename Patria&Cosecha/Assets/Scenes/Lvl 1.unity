@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657815, g: 0.4964137, b: 0.57481843, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465781, g: 0.49641365, b: 0.57481843, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1406,6 +1406,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 845d4cb351f0afd498616beee39ed885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &1447940477 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 4111767658034296274, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+  m_PrefabInstance: {fileID: 1925711313}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1447940478 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 920065348525157892, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+  m_PrefabInstance: {fileID: 1925711313}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1450856681
 GameObject:
   m_ObjectHideFlags: 0
@@ -2056,6 +2066,14 @@ PrefabInstance:
       propertyPath: _taskManager
       value: 
       objectReference: {fileID: 724320570}
+    - target: {fileID: 7042764185482838604, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+      propertyPath: _nodeRendererRender
+      value: 
+      objectReference: {fileID: 1447940478}
+    - target: {fileID: 7042764185482838604, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+      propertyPath: _nodeRendererColider
+      value: 
+      objectReference: {fileID: 1447940477}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

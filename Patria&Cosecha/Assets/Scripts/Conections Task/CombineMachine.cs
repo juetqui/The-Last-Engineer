@@ -4,7 +4,7 @@ public class CombineMachine : MonoBehaviour
 {
     [SerializeField] private ElectricityNode[] _firstNodePrefabs = default;
     [SerializeField] private ElectricityNode[] _secondNodePrefabs = default;
-    [SerializeField] private CombinedNode[] _combinedNodes = default;
+    //[SerializeField] private CombinedNode[] _combinedNodes = default;
 
     private NodeType _firstNode = NodeType.None, _secondNode = NodeType.None;
 
@@ -20,46 +20,24 @@ public class CombineMachine : MonoBehaviour
 
     private void CombineNodes()
     {
-        if (_firstNode == NodeType.Cube)
-        {
-            if (_secondNode == NodeType.Sphere)
-            {
+        if (_firstNode == NodeType.None || _secondNode == NodeType.None) return;
 
-            }
-            else if (_secondNode == NodeType.Capsule)
-            {
-                foreach (var combined in _combinedNodes)
-                {
-                    if (combined.NodeType == NodeType.CubeCapsule) combined.gameObject.SetActive(true);
-                }
-            }
-        }
-        else if (_firstNode == NodeType.Sphere)
-        {
-            if (_secondNode == NodeType.Cube)
-            {
-
-            }
-            else if (_secondNode == NodeType.Capsule)
-            {
-
-            }
-        }
-        else if (_firstNode == NodeType.Capsule)
-        {
-            if (_secondNode == NodeType.Cube)
-            {
-                foreach (var combined in _combinedNodes)
-                {
-                    if (combined.NodeType == NodeType.CubeCapsule) combined.gameObject.SetActive(true);
-                }
-            }
-            else if (_secondNode == NodeType.Sphere)
-            {
-
-            }
-        }
+        //if (IsValidCombination(NodeType.Cube, NodeType.Capsule)) ActivateCombinedNode(NodeType.Dash);
+        // Añadir otros casos según sea necesario
     }
+
+    private bool IsValidCombination(NodeType node1, NodeType node2)
+    {
+        return (_firstNode == node1 && _secondNode == node2) || (_firstNode == node2 && _secondNode == node1);
+    }
+
+    //private void ActivateCombinedNode(NodeType combinedType)
+    //{
+    //    foreach (var combined in _combinedNodes)
+    //    {
+    //        if (combined.NodeType == combinedType) combined.gameObject.SetActive(true);
+    //    }
+    //}
 
     private void TurnOnRecievedNode()
     {
@@ -85,19 +63,16 @@ public class CombineMachine : MonoBehaviour
 
     private void TurnOffNodes()
     {
-        foreach (var firstPrefab in _firstNodePrefabs)
-        {
-            firstPrefab.gameObject.SetActive(false);
-        }
+        DisableAllNodes(_firstNodePrefabs);
+        DisableAllNodes(_secondNodePrefabs);
+        //DisableAllNodes(_combinedNodes);
+    }
 
-        foreach (var secondPrefab in _secondNodePrefabs)
+    private void DisableAllNodes(ElectricityNode[] nodes)
+    {
+        foreach (var node in nodes)
         {
-            secondPrefab.gameObject.SetActive(false);
-        }
-
-        foreach (var combinedNode in _combinedNodes)
-        {
-            combinedNode.gameObject.SetActive(false);
+            node.gameObject.SetActive(false);
         }
     }
 

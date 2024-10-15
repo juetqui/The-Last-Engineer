@@ -9,39 +9,61 @@ public class TaskManager : MonoBehaviour
     private int _workingNodes = default, _totalToFinish = default;
     private bool _running = false;
 
-    private Dictionary<NodeType, NodeType> _nodesDictionary = new Dictionary<NodeType, NodeType>();
+    private HashSet<NodeType> _nodesSet = new HashSet<NodeType>();
 
     public bool Running { get { return _running; } }
 
     void Start()
     {
         _totalToFinish = _connections.Length;
+        ValidateAllConnections();
     }
 
-    void Update()
+    // Valida si todos los nodos han sido correctamente conectados
+    private void ValidateAllConnections()
     {
-        if (_workingNodes == _totalToFinish && _nodesDictionary.Count == _totalToFinish)
+        if (_workingNodes == _totalToFinish && _nodesSet.Count == _totalToFinish)
         {
             _running = true;
-            _nodeToConnect.GetComponent<Renderer>().material = _energyModule.GetComponent<Renderer>().material;
+            OnAllNodesConnected();  // Ejecuta lógica cuando todo está conectado
+        }
+        else
+        {
+            _running = false;
         }
     }
 
+    // Lógica que ocurre cuando todos los nodos están conectados
+    private void OnAllNodesConnected()
+    {
+        if (_nodeToConnect != null && _energyModule != null)
+        {
+            Renderer nodeRenderer = _nodeToConnect.GetComponent<Renderer>();
+            Renderer energyRenderer = _energyModule.GetComponent<Renderer>();
+            if (nodeRenderer != null && energyRenderer != null)
+            {
+                nodeRenderer.material = energyRenderer.material;
+            }
+        }
+    }
+
+    // Agrega un nodo conectado y valida si se ha completado el estado
     public void AddConnection(NodeType nodeType)
     {
-        if (!_nodesDictionary.ContainsKey(nodeType))
+        if (_nodesSet.Add(nodeType))  // Solo suma si el nodo es nuevo
         {
-            _nodesDictionary.Add(nodeType, nodeType);
             _workingNodes++;
+            ValidateAllConnections();  // Validar cuando se agrega una conexión
         }
     }
 
+    // Remueve un nodo de la lista de conexiones y valida el estado
     public void RemoveConnection(NodeType nodeType)
     {
-        if (_nodesDictionary.ContainsKey(nodeType))
+        if (_nodesSet.Remove(nodeType))  // Solo resta si el nodo estaba presente
         {
-            _nodesDictionary.Remove(nodeType);
             _workingNodes--;
+            ValidateAllConnections();  // Validar cuando se elimina una conexión
         }
     }
 }

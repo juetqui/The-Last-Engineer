@@ -25,7 +25,7 @@ public class PlayerTDController : MonoBehaviour
     
     private Rigidbody _rb = default;
     private ElectricityNode _nodeToChange = default;
-    private CombinedNode _nodeToAttach = default;
+    //private CombinedNode _nodeToAttach = default;
     private ConnectionNode _nodeToConnect = default;
     private CombineMachine _combineMachine = default;
 
@@ -53,7 +53,7 @@ public class PlayerTDController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
 
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
-        if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
+        //if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
         if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
         if (_isInTakeArea && _combineMachine != null) CombineNode();
     }
@@ -89,29 +89,26 @@ public class PlayerTDController : MonoBehaviour
         }
     }
 
-    private void AttachCombined(CombinedNode combined)
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            combined.Attach(transform, new Vector3(0, 0, 1.5f));
-            _currentNode = combined.NodeType;
-        }
-    }
+    //private void AttachCombined(CombinedNode combined)
+    //{
+    //    if (Input.GetKeyDown(KeyCode.E))
+    //    {
+    //        combined.Attach(transform, new Vector3(0, 0, 1.5f));
+    //        _currentNode = combined.NodeType;
+    //    }
+    //}
 
     private void PlaceNode()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (_currentNode == NodeType.CubeCapsule)
+            if (_nodeToConnect != null)
             {
-                _nodeToConnect.SetCombined(_nodeToAttach);
-                _nodeToAttach = null;
+                _nodeToConnect.SetNode(_currentNode);
+                _nodeToConnect = null;
+                _currentNode = NodeType.None;
+                CheckCurrentNode();
             }
-            else _nodeToConnect.SetNode(_currentNode);
-
-            _nodeToConnect = null;
-            _currentNode = NodeType.None;
-            CheckCurrentNode();
         }
     }
 
@@ -146,7 +143,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckAbility()
     {
-        if (_currentNode == NodeType.CubeCapsule) _canDash = true;
+        if (_currentNode == NodeType.Dash) _canDash = true;
         else _canDash = false;
     }
 
@@ -167,16 +164,16 @@ public class PlayerTDController : MonoBehaviour
                 _nodeToChange = node;
             }
         }
-        else if (coll.CompareTag("Combined") && _nodeToAttach == null)
-        {
-            CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
+        //else if (coll.CompareTag("Combined") && _nodeToAttach == null)
+        //{
+        //    CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
 
-            if (combinedNode != null)
-            {
-                _isInGrabArea = true;
-                _nodeToAttach = combinedNode;
-            }
-        }
+        //    if (combinedNode != null)
+        //    {
+        //        _isInGrabArea = true;
+        //        _nodeToAttach = combinedNode;
+        //    }
+        //}
         else if (coll.CompareTag("Connection") && _nodeToConnect == null)
         {
             ConnectionNode node = coll.gameObject.GetComponent<ConnectionNode>();
