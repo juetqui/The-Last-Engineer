@@ -11,6 +11,7 @@ public class PlayerTDController : MonoBehaviour
 
     [Header("Dash")]
     [SerializeField] private float _dashSpeed = default;
+    [SerializeField] private float _dashDrag = default;
     [SerializeField] private float _dashCooldown = default;
 
     [Header("Nodes")]
@@ -28,13 +29,16 @@ public class PlayerTDController : MonoBehaviour
     private ConnectionNode _nodeToConnect = default;
     private CombineMachine _combineMachine = default;
 
+    private PlayerTDModel _playerModel = default;
+
     public NodeType CurrentNode { get { return _currentNode; } }
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
-
         _currentNode = NodeType.None;
+
+        _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
         
         TurnOffNodes();
         CheckCurrentNode();
@@ -43,9 +47,9 @@ public class PlayerTDController : MonoBehaviour
     private void Update()
     {
         CheckAbility();
-        CheckFloor();
 
-        if (CheckForDash()) Dash(GetMoveInput());
+        if (CheckForDash()) Dash(GetMovement());
+
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
 
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
@@ -56,22 +60,10 @@ public class PlayerTDController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MovePlayer(GetMoveInput());
+        if (!_isDashing) _playerModel.OnUpdate(GetMovement());
     }
 
-    private void CheckFloor()
-    {
-        Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1);
-
-        if (Physics.Raycast(rayDir, -transform.up, 2.5f, _groundMask)) return;
-        else
-        {
-            Vector3 dir = new Vector3(0, -1, 0);
-            _rb.AddForce(dir.normalized * 20);
-        }
-    }
-
-    private Vector3 GetMoveInput()
+    private Vector3 GetMovement()
     {
         _horizontalInput = Input.GetAxisRaw("Horizontal");
         _verticalInput = Input.GetAxisRaw("Vertical");
@@ -80,38 +72,12 @@ public class PlayerTDController : MonoBehaviour
         return _moveDir;
     }
 
-    private bool CheckForDash()
-    {
-        if (_canDash && !_isDashing && Input.GetKeyDown(KeyCode.Space)) return true;
-        
-        return false;
-    }
+    private bool CheckForDash() => _canDash && !_isDashing && Input.GetKeyDown(KeyCode.Space);
 
     private void Dash(Vector3 moveDir)
-    {   
-        if (moveDir == Vector3.zero) return;
-
-        moveDir = new Vector3(moveDir.x, moveDir.y + 0.1f, moveDir.z);
-        Vector3 dir = moveDir.normalized * _dashSpeed;
-
-        _rb.AddForce(dir, ForceMode.Impulse);
-
+    {
+        _playerModel.Dash(moveDir);
         StartCoroutine(DashCooldown());
-    }
-
-    private void MovePlayer(Vector3 moveDir)
-    {
-        if (moveDir.magnitude > 0.1f) RotatePlayer(moveDir);
-
-        Vector3 dir = moveDir.normalized * _moveSpeed;
-
-        if (_rb.velocity.magnitude < _moveSpeed) _rb.AddForce(dir, ForceMode.VelocityChange);
-    }
-
-    private void RotatePlayer(Vector3 rotDir)
-    {
-        Quaternion toRotation = Quaternion.LookRotation(rotDir.normalized, Vector3.up);
-        transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
     }
 
     private void ChangeNode(NodeType nodeType)
@@ -170,9 +136,7 @@ public class PlayerTDController : MonoBehaviour
         TurnOffNodes();
 
         foreach (var node in _nodes)
-        {
             if (_currentNode == node.NodeType) node.gameObject.SetActive(true);
-        }
     }
 
     private void TurnOffNodes()
@@ -254,24 +218,19 @@ public class PlayerTDController : MonoBehaviour
         }
     }
 
-    private IEnumerator DashCooldown()
-    {
-        float oldDrag = _rb.drag;
-
-        _isDashing = true;
-        _rb.drag = oldDrag / 2;
-
-        yield return new WaitForSeconds(_dashCooldown);
-
-        _isDashing = false;
-        _rb.drag = oldDrag;
-    }
-
     private void OnDrawGizmos()
     {
         Vector3 rayDir = new Vector3(transform.localPosition.x - 0.8f, transform.localPosition.y, transform.localPosition.z);
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawRay(rayDir, -transform.up * 2f);
+    }
+    
+    private IEnumerator DashCooldown()
+    {
+        _isDashing = true;
+        yield return new WaitForSeconds(_dashCooldown);
+        _playerModel.EndDash();
+        _isDashing = false;
     }
 }
