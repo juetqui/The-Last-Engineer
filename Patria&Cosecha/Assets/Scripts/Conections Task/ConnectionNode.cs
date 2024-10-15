@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class ConnectionNode : MonoBehaviour
 {
@@ -27,11 +28,12 @@ public class ConnectionNode : MonoBehaviour
         _nodeChecker = new NodeChecker(_taskManager, _requiredType);
     }
 
-    public void SetNode(NodeType node)
+    public void SetNode(ElectricityNode node)
     {
-        if (!_isDisabled && node != NodeType.None)
+        if (!_isDisabled && node.NodeType != NodeType.None)
         {
-            _typeReceived = node;
+            node.Attach(transform, Vector3.zero);
+            _typeReceived = node.NodeType;
             CheckReceivedNode();
         }
     }

@@ -14,22 +14,18 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _dashDrag = default;
     [SerializeField] private float _dashCooldown = default;
 
-    [Header("Nodes")]
-    [SerializeField] private ElectricityNode[] _nodes = default;
-
     private float _horizontalInput = default, _verticalInput = default;
-    private bool _isInGrabArea = false, _isInPlaceArea = false, _isInTakeArea = false, _canDash = false, _isDashing = false;
+    private bool _canDash = false, _isDashing = false;
     
     private Vector3 _moveDir = default;
     private NodeType _currentNode = default;
     
     private Rigidbody _rb = default;
-    private ElectricityNode _nodeToChange = default;
-    //private CombinedNode _nodeToAttach = default;
-    private ConnectionNode _nodeToConnect = default;
-    private CombineMachine _combineMachine = default;
-
     private PlayerTDModel _playerModel = default;
+
+    private ElectricityNode _node = default;
+    private ConnectionNode _connectionNode = default;
+
 
     public NodeType CurrentNode { get { return _currentNode; } }
 
@@ -39,9 +35,6 @@ public class PlayerTDController : MonoBehaviour
         _currentNode = NodeType.None;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        
-        TurnOffNodes();
-        CheckCurrentNode();
     }
 
     private void Update()
@@ -51,11 +44,7 @@ public class PlayerTDController : MonoBehaviour
         if (CheckForDash()) Dash(GetMovement());
 
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
-
-        if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
-        //if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
-        if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
-        if (_isInTakeArea && _combineMachine != null) CombineNode();
+        if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
     }
 
     private void FixedUpdate()
@@ -80,65 +69,38 @@ public class PlayerTDController : MonoBehaviour
         StartCoroutine(DashCooldown());
     }
 
-    private void ChangeNode(NodeType nodeType)
+    private void CheckInteraction()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            _currentNode = nodeType;
-            CheckCurrentNode();
-        }
+        if (_node != null) ChangeNode();
+        if (_connectionNode != null) PlaceNode();
     }
 
-    //private void AttachCombined(CombinedNode combined)
-    //{
-    //    if (Input.GetKeyDown(KeyCode.E))
-    //    {
-    //        combined.Attach(transform, new Vector3(0, 0, 1.5f));
-    //        _currentNode = combined.NodeType;
-    //    }
-    //}
+    private void ChangeNode()
+    {
+        Vector3 attachPos = new Vector3(0, 0, 1.2f);
+        _node.Attach(this, attachPos);
+        _currentNode = _node.NodeType;
+    }
 
     private void PlaceNode()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (_currentNode != NodeType.None)
         {
-            if (_nodeToConnect != null)
-            {
-                _nodeToConnect.SetNode(_currentNode);
-                _nodeToConnect = null;
-                _currentNode = NodeType.None;
-                CheckCurrentNode();
-            }
+            _connectionNode.SetNode(_node);
+            _currentNode = NodeType.None;
+            _node = null;
+            _connectionNode = null;
         }
     }
 
     private void CombineNode()
     {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            _combineMachine.SetNode(_currentNode);
-            _combineMachine = null;
-            _currentNode = NodeType.None;
-            CheckCurrentNode();
-        }
+        _currentNode = NodeType.None;
     }
 
     private void ResetLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    private void CheckCurrentNode()
-    {
-        TurnOffNodes();
-
-        foreach (var node in _nodes)
-            if (_currentNode == node.NodeType) node.gameObject.SetActive(true);
-    }
-
-    private void TurnOffNodes()
-    {
-        foreach (var node in _nodes) node.gameObject.SetActive(false);
     }
 
     private void CheckAbility()
@@ -149,70 +111,14 @@ public class PlayerTDController : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.CompareTag("Void")) ResetLevel();
-    }
-
-    private void OnTriggerStay(Collider coll)
-    {
-        if (coll.CompareTag("Node") && _nodeToChange == null)
-        {
-            ElectricityNode node = coll.gameObject.GetComponent<ElectricityNode>();
-
-            if (node != null)
-            {
-                _isInGrabArea = true;
-                _nodeToChange = node;
-            }
-        }
-        //else if (coll.CompareTag("Combined") && _nodeToAttach == null)
-        //{
-        //    CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
-
-        //    if (combinedNode != null)
-        //    {
-        //        _isInGrabArea = true;
-        //        _nodeToAttach = combinedNode;
-        //    }
-        //}
-        else if (coll.CompareTag("Connection") && _nodeToConnect == null)
-        {
-            ConnectionNode node = coll.gameObject.GetComponent<ConnectionNode>();
-
-            if (node != null)
-            {
-                _isInPlaceArea = true;
-                _nodeToConnect = node;
-            }
-        }
-        else if (coll.CompareTag("Combiner") && _combineMachine == null)
-        {
-            CombineMachine machine = coll.GetComponent<CombineMachine>();
-            
-            if (machine != null)
-            {
-                _isInTakeArea = true;
-                _combineMachine = machine;
-            }
-        }
+        if (coll.GetComponent<ElectricityNode>() != null) _node = coll.GetComponent<ElectricityNode>();
+        else if (coll.GetComponent<ConnectionNode>() != null) _connectionNode = coll.GetComponent<ConnectionNode>();
     }
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.CompareTag("Node"))
-        {
-            _isInGrabArea = false;
-            _nodeToChange = null;
-        }
-        else if (coll.CompareTag("Connection"))
-        {
-            _isInPlaceArea = false;
-            _nodeToConnect = null;
-        }
-        else if (coll.CompareTag("Combiner"))
-        {
-            _isInTakeArea = false;
-            _combineMachine = null;
-        }
+        if (coll.GetComponent<ElectricityNode>() != null) _node = null;
+        else if (coll.GetComponent<ConnectionNode>() != null) _connectionNode = null;
     }
 
     private void OnDrawGizmos()
