@@ -14,11 +14,11 @@ public class CombinedNode : ElectricityNode
 
     }
 
-    public void Attach(Transform player)
+    public void Attach(Transform newParent, Vector3 newPos)
     {
-        transform.SetParent(player, false);
+        transform.SetParent(newParent, false);   
         transform.localScale = Vector3.one;
-        transform.localPosition = new Vector3(0, 0, 1.5f);
+        transform.localPosition = newPos;
     }
 
     private void StartUpNode()

@@ -99,8 +99,10 @@ public class ConnectionNode : MonoBehaviour
 
     public void SetCombined(CombinedNode combined)
     {
+        combined.Attach(transform, Vector3.zero);
+        
         _typeReceived = combined.NodeType;
-        combined.Attach(transform);
+        CheckReceivedNode();
     }
 
     public void ResetNode()

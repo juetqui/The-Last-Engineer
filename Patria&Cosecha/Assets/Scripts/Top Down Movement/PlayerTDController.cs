@@ -7,14 +7,17 @@ public class PlayerTDController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float _moveSpeed = default;
     [SerializeField] private float _rotSpeed = default;
-    [SerializeField] private float _dashSpeed = default;
     [SerializeField] private LayerMask _groundMask = default;
+
+    [Header("Dash")]
+    [SerializeField] private float _dashSpeed = default;
+    [SerializeField] private float _dashCooldown = default;
 
     [Header("Nodes")]
     [SerializeField] private ElectricityNode[] _nodes = default;
 
-    private float _horizontalInput = default, _verticalInput = default, _oldMass = default, _oldDrag = default;
-    private bool _canMove = true, _isInGrabArea = false, _isInPlaceArea = false, _canDash = false, _isDashing = false;
+    private float _horizontalInput = default, _verticalInput = default;
+    private bool _isInGrabArea = false, _isInPlaceArea = false, _isInTakeArea = false, _canDash = false, _isDashing = false;
     
     private Vector3 _moveDir = default;
     private NodeType _currentNode = default;
@@ -30,8 +33,6 @@ public class PlayerTDController : MonoBehaviour
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
-        _oldMass = _rb.mass;
-        _oldDrag = _rb.drag;
 
         _currentNode = NodeType.None;
         
@@ -41,32 +42,32 @@ public class PlayerTDController : MonoBehaviour
 
     private void Update()
     {
-        if (CheckForDash()) Dash(GetMoveInput());
-
         CheckAbility();
-        ResetLevel();
         CheckFloor();
+
+        if (CheckForDash()) Dash(GetMoveInput());
+        if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
 
         if (_isInGrabArea && _nodeToChange != null) ChangeNode(_nodeToChange.NodeType);
         if (_isInGrabArea && _nodeToAttach != null) AttachCombined(_nodeToAttach);
-        if (_isInPlaceArea && _nodeToConnect != null || _isInPlaceArea && _nodeToAttach != null) PlaceNode();
-        if (_isInPlaceArea && _combineMachine != null) CombineNode();
+        if (_isInPlaceArea && _nodeToConnect != null) PlaceNode();
+        if (_isInTakeArea && _combineMachine != null) CombineNode();
     }
 
     private void FixedUpdate()
     {
-        if (_canMove) MovePlayer(GetMoveInput());
+        MovePlayer(GetMoveInput());
     }
 
     private void CheckFloor()
     {
-        if (Physics.Raycast(transform.position, -transform.up, 2.5f, _groundMask)) return;
+        Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1);
+
+        if (Physics.Raycast(rayDir, -transform.up, 2.5f, _groundMask)) return;
         else
         {
             Vector3 dir = new Vector3(0, -1, 0);
-            _rb.AddForce(dir.normalized * 10);
-            //StartCoroutine(RestartLevel());
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            _rb.AddForce(dir.normalized * 20);
         }
     }
 
@@ -87,16 +88,15 @@ public class PlayerTDController : MonoBehaviour
     }
 
     private void Dash(Vector3 moveDir)
-    {
-        StartCoroutine(DashCooldown());
-        
+    {   
         if (moveDir == Vector3.zero) return;
 
-        moveDir = new Vector3(moveDir.x, moveDir.y + 0.2f, moveDir.z);
-
+        moveDir = new Vector3(moveDir.x, moveDir.y + 0.1f, moveDir.z);
         Vector3 dir = moveDir.normalized * _dashSpeed;
 
         _rb.AddForce(dir, ForceMode.Impulse);
+
+        StartCoroutine(DashCooldown());
     }
 
     private void MovePlayer(Vector3 moveDir)
@@ -127,7 +127,7 @@ public class PlayerTDController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            combined.Attach(transform);
+            combined.Attach(transform, new Vector3(0, 0, 1.5f));
             _currentNode = combined.NodeType;
         }
     }
@@ -138,11 +138,10 @@ public class PlayerTDController : MonoBehaviour
         {
             if (_currentNode == NodeType.CubeCapsule)
             {
-                Debug.Log(_nodeToAttach);
                 _nodeToConnect.SetCombined(_nodeToAttach);
+                _nodeToAttach = null;
             }
             else _nodeToConnect.SetNode(_currentNode);
-
 
             _nodeToConnect = null;
             _currentNode = NodeType.None;
@@ -163,7 +162,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void ResetLevel()
     {
-        if (Input.GetKeyDown(KeyCode.L)) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void CheckCurrentNode()
@@ -187,6 +186,11 @@ public class PlayerTDController : MonoBehaviour
         else _canDash = false;
     }
 
+    private void OnTriggerEnter(Collider coll)
+    {
+        if (coll.CompareTag("Void")) ResetLevel();
+    }
+
     private void OnTriggerStay(Collider coll)
     {
         if (coll.CompareTag("Node") && _nodeToChange == null)
@@ -199,7 +203,7 @@ public class PlayerTDController : MonoBehaviour
                 _nodeToChange = node;
             }
         }
-        else if (coll.CompareTag("Node") && _nodeToAttach == null)
+        else if (coll.CompareTag("Combined") && _nodeToAttach == null)
         {
             CombinedNode combinedNode = coll.gameObject.GetComponent<CombinedNode>();
 
@@ -225,7 +229,7 @@ public class PlayerTDController : MonoBehaviour
             
             if (machine != null)
             {
-                _isInPlaceArea = true;
+                _isInTakeArea = true;
                 _combineMachine = machine;
             }
         }
@@ -245,7 +249,7 @@ public class PlayerTDController : MonoBehaviour
         }
         else if (coll.CompareTag("Combiner"))
         {
-            _isInPlaceArea = false;
+            _isInTakeArea = false;
             _combineMachine = null;
         }
     }
@@ -257,20 +261,17 @@ public class PlayerTDController : MonoBehaviour
         _isDashing = true;
         _rb.drag = oldDrag / 2;
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(_dashCooldown);
 
         _isDashing = false;
         _rb.drag = oldDrag;
     }
 
-    private IEnumerator RestartLevel()
-    {
-        yield return new WaitForSeconds(1f);
-    }
-
     private void OnDrawGizmos()
     {
+        Vector3 rayDir = new Vector3(transform.localPosition.x - 0.8f, transform.localPosition.y, transform.localPosition.z);
+
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, -transform.up * 2f);
+        Gizmos.DrawRay(rayDir, -transform.up * 2f);
     }
 }

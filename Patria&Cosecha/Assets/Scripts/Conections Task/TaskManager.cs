@@ -31,7 +31,6 @@ public class TaskManager : MonoBehaviour
     {
         if (!_nodesDictionary.ContainsKey(nodeType))
         {
-            Debug.Log(nodeType);
             _nodesDictionary.Add(nodeType, nodeType);
             _workingNodes++;
         }
