@@ -1,18 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTDView : MonoBehaviour
+public class PlayerTDView
 {
-    // Start is called before the first frame update
-    void Start()
+    private AudioSource _source = default;
+
+    public PlayerTDView(AudioSource source)
+    {
+        _source = source;
+    }
+
+    public void OnUpdate()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public float WalkSound(ref float time)
     {
+        if (!_source.isPlaying)
+        {
+            float pitch = Random.Range(0.85f, 1.25f);
+            
+            _source.pitch = pitch;
+            _source.Play();
+        }
         
+        return 0;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,7 +15,10 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _dashDrag = default;
     [SerializeField] private float _dashCooldown = default;
 
-    private float _horizontalInput = default, _verticalInput = default;
+    [Header("Audio")]
+    [SerializeField] AudioSource _source = default;
+
+    private float _horizontalInput = default, _verticalInput = default, _timer = default, _stepInterval = 0.25f;
     private bool _canDash = false, _isDashing = false;
     
     private Vector3 _moveDir = default;
@@ -22,6 +26,7 @@ public class PlayerTDController : MonoBehaviour
     
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
+    private PlayerTDView _playerView = default;
 
     private ElectricityNode _node = default;
     private ConnectionNode _connectionNode = default;
@@ -35,11 +40,13 @@ public class PlayerTDController : MonoBehaviour
         _currentNode = NodeType.None;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
+        _playerView = new PlayerTDView(_source);
     }
 
     private void Update()
     {
         CheckAbility();
+        WalkSound();
 
         if (CheckForDash()) Dash(GetMovement());
 
@@ -67,6 +74,17 @@ public class PlayerTDController : MonoBehaviour
     {
         _playerModel.Dash(moveDir);
         StartCoroutine(DashCooldown());
+    }
+
+    private void WalkSound()
+    {
+        if (GetMovement().x != 0 || GetMovement().z != 0)
+        {
+            _timer += Time.deltaTime;
+            
+            if (_timer >= _stepInterval) _timer = _playerView.WalkSound(ref _timer);
+        }
+        else _timer = 0;
     }
 
     private void CheckInteraction()
