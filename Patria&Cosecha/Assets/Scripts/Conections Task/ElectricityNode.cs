@@ -7,8 +7,11 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private float _rotSpeed = default, _minY = default, _maxY = default, _moveSpeed = default;
     [SerializeField] private bool _isChildren = default;
 
+    private bool _isConnected = false;
+
     public NodeType NodeType { get { return _nodeType; } }
     public bool IsChildren { get { return _isChildren; } }
+    public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } }
 
     private void Update()
     {
@@ -28,6 +31,8 @@ public class ElectricityNode : MonoBehaviour
 
     public void Attach(PlayerTDController player, Vector3 newPos)
     {
+        if (_isConnected) return;
+
         _collider.enabled = false;
         Attach(player.transform, newPos, true);
     }

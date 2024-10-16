@@ -1,25 +1,27 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 public class ConnectionNode : MonoBehaviour
 {
-    private NodeRenderer _nodeRenderer;
-    private NodeChecker _nodeChecker;
+    [SerializeField] private TaskManager _taskManager = default;
+    [SerializeField] private NodeType _requiredType = default;
 
-    [SerializeField] private TaskManager _taskManager;
-    [SerializeField] private NodeType _requiredType;
-
-    [SerializeField] private NodeType _typeReceived = NodeType.None;
-    private bool _isDisabled = false;
-
-    [SerializeField] private Renderer _nodeRendererRender;
-    [SerializeField] private Collider _nodeRendererColider;
+    [Header("MVC View")]
+    [SerializeField] private Renderer _nodeRendererRender = default;
+    [SerializeField] private Collider _nodeRendererColider = default;
     [SerializeField] private AudioSource _audioSrc = default;
     [SerializeField] private AudioClip _placedClip = default;
     [SerializeField] private AudioClip _errorClip = default;
     [SerializeField] private Color _defaultColor = default;
     [SerializeField] private ParticleSystem _ps = default;
+
+
+    private NodeRenderer _nodeRenderer = default;
+    private NodeChecker _nodeChecker = default;
+    private ElectricityNode _recievedNode = default;
+
+    private NodeType _typeReceived = NodeType.None;
+    private bool _isDisabled = false;
 
     private void Start()
     {
@@ -30,9 +32,11 @@ public class ConnectionNode : MonoBehaviour
 
     public void SetNode(ElectricityNode node)
     {
+        Debug.Log(node);
         if (!_isDisabled && node.NodeType != NodeType.None)
         {
             node.Attach(transform, Vector3.zero);
+            _recievedNode = node;
             _typeReceived = node.NodeType;
             CheckReceivedNode();
         }
@@ -42,6 +46,7 @@ public class ConnectionNode : MonoBehaviour
     {
         if (_nodeChecker.IsNodeCorrect(_typeReceived))
         {
+            _recievedNode.IsConnected = true;
             _nodeRenderer.Enable(false);
             _nodeRenderer.PlayClip(_placedClip);
             _nodeRenderer.PlayEffect(false);
@@ -49,6 +54,7 @@ public class ConnectionNode : MonoBehaviour
         }
         else
         {
+            _recievedNode.IsConnected = false;
             _nodeRenderer.Enable(true);
             _nodeRenderer.PlayClip(_errorClip);
             _nodeRenderer.PlayEffect(true);
@@ -66,5 +72,7 @@ public class ConnectionNode : MonoBehaviour
 
         _isDisabled = false;
         _nodeRenderer.ChangeColor(_defaultColor);
+        _recievedNode = null;
+        _typeReceived = NodeType.None;
     }
 }

@@ -17,6 +17,8 @@ public class PlayerTDController : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] AudioSource _source = default;
+    [SerializeField] AudioClip _walkClip = default;
+    [SerializeField] AudioClip _grabClip = default;
 
     private float _horizontalInput = default, _verticalInput = default, _timer = default, _stepInterval = 0.25f;
     private bool _canDash = false, _isDashing = false;
@@ -40,7 +42,7 @@ public class PlayerTDController : MonoBehaviour
         _currentNode = NodeType.None;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        _playerView = new PlayerTDView(_source);
+        _playerView = new PlayerTDView(_source, _walkClip, _grabClip);
     }
 
     private void Update()
@@ -89,14 +91,21 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckInteraction()
     {
-        if (_node != null) ChangeNode();
-        if (_connectionNode != null) PlaceNode();
+        if (_node != null)
+        {
+            ChangeNode();
+
+            if (_connectionNode != null) PlaceNode();
+        }
     }
 
     private void ChangeNode()
     {
+        if (_currentNode != NodeType.None) return;
+
         Vector3 attachPos = new Vector3(0, 0, 1.2f);
         _node.Attach(this, attachPos);
+        _playerView.GrabNode();
         _currentNode = _node.NodeType;
     }
 
