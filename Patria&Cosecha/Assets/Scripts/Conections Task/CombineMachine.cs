@@ -1,87 +1,50 @@
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class CombineMachine : MonoBehaviour
 {
-    [SerializeField] private ElectricityNode[] _firstNodePrefabs = default;
-    [SerializeField] private ElectricityNode[] _secondNodePrefabs = default;
-    //[SerializeField] private CombinedNode[] _combinedNodes = default;
+    [SerializeField] private ElectricityNode _combinedNode;
+    [SerializeField] private Vector3 _firstNodePos, _secondNodePos;
 
-    private NodeType _firstNode = NodeType.None, _secondNode = NodeType.None;
+    private ElectricityNode _firstNode = default, _secondNode = default;
 
     void Start()
     {
-        TurnOffNodes();
     }
 
     void Update()
     {
-        if (_firstNode != NodeType.None && _secondNode != NodeType.None) CombineNodes();
+        if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) CombineNodes();
     }
 
     private void CombineNodes()
     {
-        if (_firstNode == NodeType.None || _secondNode == NodeType.None) return;
-
-        //if (IsValidCombination(NodeType.Cube, NodeType.Capsule)) ActivateCombinedNode(NodeType.Dash);
-        // Añadir otros casos según sea necesario
+        Debug.Log("Combine");
+        // SI EL PLAYER ATIVA LA MÁQUINA, SE CREA EL NODO COMBINADO CORRSPONDIENTE
     }
 
-    private bool IsValidCombination(NodeType node1, NodeType node2)
-    {
-        return (_firstNode == node1 && _secondNode == node2) || (_firstNode == node2 && _secondNode == node1);
-    }
+    private bool IsValidCombination(NodeType firstType, NodeType secondType) => (firstType != NodeType.Dash || secondType != NodeType.Dash);
 
-    //private void ActivateCombinedNode(NodeType combinedType)
-    //{
-    //    foreach (var combined in _combinedNodes)
-    //    {
-    //        if (combined.NodeType == combinedType) combined.gameObject.SetActive(true);
-    //    }
-    //}
-
-    private void TurnOnRecievedNode()
+    public void SetNode(ElectricityNode node)
     {
-        TurnOffNodes();
-        
-        if (_firstNode != NodeType.None)
+        if (node.NodeType == NodeType.None) return;
+        else if (_firstNode == null)
         {
-            foreach (var firstPrefab in _firstNodePrefabs)
-            {
-                if (firstPrefab.NodeType == _firstNode) firstPrefab.gameObject.SetActive(true);
-            }
+            _firstNode = node;
+            node.Attach(transform, _firstNodePos);
         }
-
-        if (_secondNode != NodeType.None)
+        else if (_firstNode != null && node.NodeType != _firstNode.NodeType)
         {
-            foreach (var secondPrefab in _secondNodePrefabs)
-            {
-                if (secondPrefab.NodeType == _secondNode) secondPrefab.gameObject.SetActive(true);
-            }
+            _secondNode = node;
+            node.Attach(transform, _secondNodePos);
         }
-
+        else return;
     }
 
-    private void TurnOffNodes()
+    public void UnsetNode(ElectricityNode node)
     {
-        DisableAllNodes(_firstNodePrefabs);
-        DisableAllNodes(_secondNodePrefabs);
-        //DisableAllNodes(_combinedNodes);
-    }
-
-    private void DisableAllNodes(ElectricityNode[] nodes)
-    {
-        foreach (var node in nodes)
-        {
-            node.gameObject.SetActive(false);
-        }
-    }
-
-    public void SetNode(NodeType node)
-    {
-        if (node == NodeType.None) return;
-
-        if (_firstNode != NodeType.None && node != _firstNode) _secondNode = node;
-        else _firstNode = node;
-        TurnOnRecievedNode();
+        if (node.NodeType == _firstNode.NodeType) _firstNode = null;
+        else if (node.NodeType == _secondNode.NodeType) _secondNode = null;
+        else return;
     }
 }
