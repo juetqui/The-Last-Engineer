@@ -1,10 +1,11 @@
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 public class CombineMachine : MonoBehaviour
 {
     [SerializeField] private ElectricityNode _combinedNode;
-    [SerializeField] private Vector3 _firstNodePos, _secondNodePos;
+    [SerializeField] private Collider _trigger;
+    [SerializeField] private Vector3 _firstNodePos;
+    [SerializeField] private Vector3 _secondNodePos;
 
     private ElectricityNode _firstNode = default, _secondNode = default;
 
@@ -15,10 +16,12 @@ public class CombineMachine : MonoBehaviour
     void Update()
     {
         if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) CombineNodes();
+        else _trigger.enabled = true;
     }
 
     private void CombineNodes()
     {
+        _trigger.enabled = false;
         Debug.Log("Combine");
         // SI EL PLAYER ATIVA LA MÁQUINA, SE CREA EL NODO COMBINADO CORRSPONDIENTE
     }
