@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerTDModel
 {
-    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _dashCooldown = default;
+    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default;
     private bool _isDashing = false;
     
     private Rigidbody _rb = default;
@@ -10,7 +10,7 @@ public class PlayerTDModel
     
     private LayerMask _groundMask = default;
 
-    public PlayerTDModel(Rigidbody rb, Transform transform, LayerMask groundMask, float moveSpeed, float rotSpeed, float dashSpeed, float dashDrag, float dashCooldown)
+    public PlayerTDModel(Rigidbody rb, Transform transform, LayerMask groundMask, float moveSpeed, float rotSpeed, float dashSpeed, float dashDrag)
     {
         _rb = rb;
         _transform = transform;
@@ -19,7 +19,6 @@ public class PlayerTDModel
         _rotSpeed = rotSpeed;
         _dashSpeed = dashSpeed;
         _dashDrag = dashDrag;
-        _dashCooldown = dashCooldown;
     }
 
     //void Start()

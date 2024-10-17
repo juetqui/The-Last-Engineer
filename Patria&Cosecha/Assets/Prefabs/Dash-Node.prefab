@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4269208713776983056}
   - component: {fileID: 150517889913984463}
   - component: {fileID: 6780995477048435280}
+  - component: {fileID: 8310705788573480185}
   - component: {fileID: 8847332344261839867}
   m_Layer: 0
   m_Name: Dash-Node
@@ -88,6 +89,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8310705788573480185
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386148299800845151}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3, y: 2, z: 3}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8847332344261839867
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,10 +123,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _nodeType: 4
-  _rotSpeed: 0
-  _minY: 0
-  _maxY: 0
-  _moveSpeed: 0
+  _collider: {fileID: 8310705788573480185}
+  _rotSpeed: 75
+  _minY: 1
+  _maxY: 2
+  _moveSpeed: 2
   _isChildren: 0
 --- !u!1 &1543790701579727668
 GameObject:

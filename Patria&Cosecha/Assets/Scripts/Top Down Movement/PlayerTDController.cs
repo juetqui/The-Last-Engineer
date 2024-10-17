@@ -6,24 +6,24 @@ using UnityEngine.SceneManagement;
 public class PlayerTDController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float _moveSpeed = default;
-    [SerializeField] private float _rotSpeed = default;
-    [SerializeField] private LayerMask _groundMask = default;
+    [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _rotSpeed;
+    [SerializeField] private LayerMask _groundMask;
 
     [Header("Dash")]
-    [SerializeField] private float _dashSpeed = default;
-    [SerializeField] private float _dashDrag = default;
-    [SerializeField] private float _dashCooldown = default;
+    [SerializeField] private float _dashSpeed;
+    [SerializeField] private float _dashDrag;
+    [SerializeField] private float _dashCooldown;
 
     [Header("Audio")]
-    [SerializeField] AudioSource _source = default;
-    [SerializeField] AudioClip _walkClip = default;
-    [SerializeField] AudioClip _grabClip = default;
+    [SerializeField] AudioSource _source;
+    [SerializeField] AudioClip _walkClip;
+    [SerializeField] AudioClip _grabClip;
 
-    private float _horizontalInput = default, _verticalInput = default;
+    private float _dashTimer = default;
     private bool _canDash = false, _isDashing = false, _isInPlaceArea = false;
-    
-    private Vector3 _moveDir = default;
+
+    private bool CanDash { get { return _node != null && _node.NodeType == NodeType.Dash; }}
     
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
@@ -37,16 +37,16 @@ public class PlayerTDController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
 
-        _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
+        _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag);
         _playerView = new PlayerTDView(_source, _walkClip, _grabClip);
     }
 
     private void Update()
     {
-        CheckAbility();
         _playerView.WalkSound(GetMovement());
 
-        if (CheckForDash()) Dash(GetMovement());
+        if (_dashTimer > 0f) _dashTimer -= Time.deltaTime;
+        else if (CanDash && CheckForDash() && _dashTimer <= 0f) Dash(GetMovement());
 
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
@@ -59,11 +59,10 @@ public class PlayerTDController : MonoBehaviour
 
     private Vector3 GetMovement()
     {
-        _horizontalInput = Input.GetAxisRaw("Horizontal");
-        _verticalInput = Input.GetAxisRaw("Vertical");
-        _moveDir = new Vector3(_horizontalInput, 0, _verticalInput);
-
-        return _moveDir;
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
+        
+        return new Vector3(horizontalInput, 0, verticalInput);
     }
 
     private bool CheckForDash() => _canDash && !_isDashing && Input.GetKeyDown(KeyCode.Space);
@@ -71,7 +70,8 @@ public class PlayerTDController : MonoBehaviour
     private void Dash(Vector3 moveDir)
     {
         _playerModel.Dash(moveDir);
-        StartCoroutine(DashCooldown());
+        _dashTimer = _dashCooldown;
+        _isDashing= true;
     }
 
     private void CheckInteraction()
@@ -81,7 +81,6 @@ public class PlayerTDController : MonoBehaviour
             if (_connectionNode != null && _isInPlaceArea) PlaceNode();
             else ChangeNode();
         }
-        else Debug.Log("Empty");
     }
 
     private void ChangeNode()
@@ -110,38 +109,30 @@ public class PlayerTDController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private void CheckAbility()
-    {
-        if (_node != null && _node.NodeType == NodeType.Dash) _canDash = true;
-        else _canDash = false;
-    }
-
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.GetComponent<ElectricityNode>() != null)
+        ElectricityNode node = coll.GetComponent<ElectricityNode>();
+        ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
+
+        if (node != null)
         {
-            _node = coll.GetComponent<ElectricityNode>();
+            _node = node;
             _connectionNode = null;
             _isInPlaceArea = false;
         }
-        else if (coll.GetComponent<ConnectionNode>() != null)
+        else if (connectionNode != null)
         {
-            _connectionNode = coll.GetComponent<ConnectionNode>();
+            _connectionNode = connectionNode;
             _isInPlaceArea = true;
         }
     }
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.GetComponent<ElectricityNode>() != null) _node = null;
-        else if (coll.GetComponent<ConnectionNode>() != null) _connectionNode = null;
-    }
-    
-    private IEnumerator DashCooldown()
-    {
-        _isDashing = true;
-        yield return new WaitForSeconds(_dashCooldown);
-        _playerModel.EndDash();
-        _isDashing = false;
+        ElectricityNode node = coll.GetComponent<ElectricityNode>();
+        ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
+
+        if (node != null) _node = null;
+        else if (connectionNode != null) _connectionNode = null;
     }
 }
