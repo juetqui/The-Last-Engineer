@@ -5,6 +5,8 @@ public class PlayerTDView
     private AudioSource _source = default;
     private AudioClip _walkClip = default, _grabClip = default;
 
+    private float _timer = default, _interval = 0.025f;
+
     public PlayerTDView(AudioSource source, AudioClip walkClip, AudioClip grabClip)
     {
         _source = source;
@@ -12,22 +14,22 @@ public class PlayerTDView
         _grabClip = grabClip;
     }
 
-    public void OnUpdate()
+    public void WalkSound(Vector3 moveVector)
     {
-        
-    }
+        if (moveVector.x != 0 && !_source.isPlaying || moveVector.z != 0 && !_source.isPlaying)
+        {
+            _timer += Time.deltaTime;
 
-    public float WalkSound(ref float time)
-    {
-        if (_source.isPlaying) return 0;
-            
-        float pitch = Random.Range(0.85f, 1.25f);
+            if (_timer >= _interval)
+            {
+                float pitch = Random.Range(1f, 1.5f);
 
-        _source.clip = _walkClip;
-        _source.pitch = pitch;
-        _source.Play();
-        
-        return 0;
+                _source.clip = _walkClip;
+                _source.pitch = pitch;
+                _source.Play();
+            }
+        }
+        else _timer = 0;
     }
 
     public void GrabNode()

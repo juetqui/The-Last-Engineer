@@ -20,11 +20,10 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] AudioClip _walkClip = default;
     [SerializeField] AudioClip _grabClip = default;
 
-    private float _horizontalInput = default, _verticalInput = default, _timer = default, _stepInterval = 0.25f;
-    private bool _canDash = false, _isDashing = false;
+    private float _horizontalInput = default, _verticalInput = default;
+    private bool _canDash = false, _isDashing = false, _isInPlaceArea = false;
     
     private Vector3 _moveDir = default;
-    private NodeType _currentNode = default;
     
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
@@ -34,12 +33,9 @@ public class PlayerTDController : MonoBehaviour
     private ConnectionNode _connectionNode = default;
 
 
-    public NodeType CurrentNode { get { return _currentNode; } }
-
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
-        _currentNode = NodeType.None;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
         _playerView = new PlayerTDView(_source, _walkClip, _grabClip);
@@ -48,7 +44,7 @@ public class PlayerTDController : MonoBehaviour
     private void Update()
     {
         CheckAbility();
-        WalkSound();
+        _playerView.WalkSound(GetMovement());
 
         if (CheckForDash()) Dash(GetMovement());
 
@@ -78,51 +74,34 @@ public class PlayerTDController : MonoBehaviour
         StartCoroutine(DashCooldown());
     }
 
-    private void WalkSound()
-    {
-        if (GetMovement().x != 0 || GetMovement().z != 0)
-        {
-            _timer += Time.deltaTime;
-            
-            if (_timer >= _stepInterval) _timer = _playerView.WalkSound(ref _timer);
-        }
-        else _timer = 0;
-    }
-
     private void CheckInteraction()
     {
+        Debug.Log("Node: " + _node);
+        Debug.Log("Connection: " + _connectionNode);
         if (_node != null)
         {
-            ChangeNode();
-
-            if (_connectionNode != null) PlaceNode();
+            if (_connectionNode != null && _isInPlaceArea) PlaceNode();
+            else ChangeNode();
         }
     }
 
     private void ChangeNode()
     {
-        if (_currentNode != NodeType.None) return;
-
         Vector3 attachPos = new Vector3(0, 0, 1.2f);
         _node.Attach(this, attachPos);
         _playerView.GrabNode();
-        _currentNode = _node.NodeType;
     }
 
     private void PlaceNode()
     {
-        if (_currentNode != NodeType.None)
-        {
-            _connectionNode.SetNode(_node);
-            _currentNode = NodeType.None;
-            _node = null;
-            _connectionNode = null;
-        }
+        _connectionNode.SetNode(_node);
+        _node = null;
+        _connectionNode = null;
     }
 
     private void CombineNode()
     {
-        _currentNode = NodeType.None;
+        _node = null;
     }
 
     private void ResetLevel()
@@ -132,28 +111,29 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckAbility()
     {
-        if (_currentNode == NodeType.Dash) _canDash = true;
+        if (_node != null && _node.NodeType == NodeType.Dash) _canDash = true;
         else _canDash = false;
     }
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.GetComponent<ElectricityNode>() != null) _node = coll.GetComponent<ElectricityNode>();
-        else if (coll.GetComponent<ConnectionNode>() != null) _connectionNode = coll.GetComponent<ConnectionNode>();
+        if (coll.GetComponent<ElectricityNode>() != null)
+        {
+            _node = coll.GetComponent<ElectricityNode>();
+            _connectionNode = null;
+            _isInPlaceArea = false;
+        }
+        else if (coll.GetComponent<ConnectionNode>() != null)
+        {
+            _connectionNode = coll.GetComponent<ConnectionNode>();
+            _isInPlaceArea = true;
+        }
     }
 
     private void OnTriggerExit(Collider coll)
     {
         if (coll.GetComponent<ElectricityNode>() != null) _node = null;
         else if (coll.GetComponent<ConnectionNode>() != null) _connectionNode = null;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Vector3 rayDir = new Vector3(transform.localPosition.x - 0.8f, transform.localPosition.y, transform.localPosition.z);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(rayDir, -transform.up * 2f);
     }
     
     private IEnumerator DashCooldown()

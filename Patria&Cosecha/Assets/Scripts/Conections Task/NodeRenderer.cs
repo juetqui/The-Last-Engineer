@@ -2,16 +2,17 @@ using UnityEngine;
 
 public class NodeRenderer : INodeEffect, INodeAudio
 {
-    private Renderer _renderer;
-    private Collider _collider;
-    private Color _color;
-    private ParticleSystem _ps;
-    private AudioSource _source;
+    private Renderer _renderer = default;
+    private Collider _collider = default, _triggerCollider = default;
+    private Color _color = default;
+    private ParticleSystem _ps = default;
+    private AudioSource _source = default;
 
-    public NodeRenderer(Renderer renderer, Collider collider, Color color, ParticleSystem ps, AudioSource source)
+    public NodeRenderer(Renderer renderer, Collider collider, Collider triggerCollider, Color color, ParticleSystem ps, AudioSource source)
     {
         _renderer = renderer;
         _collider = collider;
+        _triggerCollider = triggerCollider;
         _color = color;
         _ps = ps;
         _source = source;
@@ -28,6 +29,11 @@ public class NodeRenderer : INodeEffect, INodeAudio
     {
         _renderer.enabled = value;
         _collider.enabled = value;
+    }
+
+    public void EnableTrigger(bool value)
+    {
+        _triggerCollider.enabled = value;
     }
 
     public void ChangeColor(Color color)

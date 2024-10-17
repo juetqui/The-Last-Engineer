@@ -7,8 +7,9 @@ public class ConnectionNode : MonoBehaviour
     [SerializeField] private NodeType _requiredType = default;
 
     [Header("MVC View")]
-    [SerializeField] private Renderer _nodeRendererRender = default;
-    [SerializeField] private Collider _nodeRendererColider = default;
+    [SerializeField] private Renderer _render = default;
+    [SerializeField] private Collider _colider = default;
+    [SerializeField] private Collider _triggerCollider = default;
     [SerializeField] private AudioSource _audioSrc = default;
     [SerializeField] private AudioClip _placedClip = default;
     [SerializeField] private AudioClip _errorClip = default;
@@ -20,37 +21,41 @@ public class ConnectionNode : MonoBehaviour
     private NodeChecker _nodeChecker = default;
     private ElectricityNode _recievedNode = default;
 
-    private NodeType _typeReceived = NodeType.None;
     private bool _isDisabled = false;
 
     private void Start()
     {
-        _nodeRenderer = new NodeRenderer(_nodeRendererRender, _nodeRendererColider, _defaultColor, _ps, _audioSrc);
+        _nodeRenderer = new NodeRenderer(_render, _colider, _triggerCollider, _defaultColor, _ps, _audioSrc);
         _nodeRenderer.OnStart();
         _nodeChecker = new NodeChecker(_taskManager, _requiredType);
     }
 
     public void SetNode(ElectricityNode node)
     {
-        Debug.Log(node);
-        if (!_isDisabled && node.NodeType != NodeType.None)
-        {
-            node.Attach(transform, Vector3.zero);
-            _recievedNode = node;
-            _typeReceived = node.NodeType;
-            CheckReceivedNode();
-        }
+        if (_isDisabled || node.NodeType == NodeType.None) return;
+
+        node.Attach(transform, Vector3.zero, false);
+        _recievedNode = node;
+        CheckReceivedNode();
+    }
+
+    public void UnsetNode()
+    {
+        _recievedNode = null;
+        _nodeRenderer.EnableTrigger(true);
     }
 
     private void CheckReceivedNode()
     {
-        if (_nodeChecker.IsNodeCorrect(_typeReceived))
+        _nodeRenderer.EnableTrigger(false);
+
+        if (_nodeChecker.IsNodeCorrect(_recievedNode.NodeType))
         {
             _recievedNode.IsConnected = true;
             _nodeRenderer.Enable(false);
             _nodeRenderer.PlayClip(_placedClip);
             _nodeRenderer.PlayEffect(false);
-            _nodeChecker.HandleNodeCorrect(_typeReceived);
+            _nodeChecker.HandleNodeCorrect(_recievedNode.NodeType);
         }
         else
         {
@@ -58,7 +63,7 @@ public class ConnectionNode : MonoBehaviour
             _nodeRenderer.Enable(true);
             _nodeRenderer.PlayClip(_errorClip);
             _nodeRenderer.PlayEffect(true);
-            _nodeChecker.HandleNodeIncorrect(_typeReceived);
+            _nodeChecker.HandleNodeIncorrect(_recievedNode.NodeType);
             StartCoroutine(DisableConnection());
         }
     }
@@ -72,7 +77,5 @@ public class ConnectionNode : MonoBehaviour
 
         _isDisabled = false;
         _nodeRenderer.ChangeColor(_defaultColor);
-        _recievedNode = null;
-        _typeReceived = NodeType.None;
     }
 }

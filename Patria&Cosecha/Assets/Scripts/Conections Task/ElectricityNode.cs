@@ -5,8 +5,9 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private NodeType _nodeType = default;
     [SerializeField] private Collider _collider = default;
     [SerializeField] private float _rotSpeed = default, _minY = default, _maxY = default, _moveSpeed = default;
-    [SerializeField] private bool _isChildren = default;
+    [SerializeField] private bool _isChildren = false;
 
+    private ConnectionNode _connectionNode = default;
     private bool _isConnected = false;
 
     public NodeType NodeType { get { return _nodeType; } }
@@ -16,6 +17,7 @@ public class ElectricityNode : MonoBehaviour
     private void Update()
     {
         if (!_isChildren) MoveObject();
+        if (_isConnected) _collider.enabled = false;
     }
 
     private void MoveObject()
@@ -32,14 +34,24 @@ public class ElectricityNode : MonoBehaviour
     public void Attach(PlayerTDController player, Vector3 newPos)
     {
         if (_isConnected) return;
-
+        
         _collider.enabled = false;
         Attach(player.transform, newPos, true);
+
+        if (_isChildren && _connectionNode != null)
+        {
+            _connectionNode.UnsetNode();
+            _connectionNode = null;
+        }
     }
 
     public void Attach(Transform newParent, Vector3 newPos, bool parentIsPlayer = false)
     {
-        if (!parentIsPlayer) _collider.enabled = true;
+        if (!parentIsPlayer)
+        {
+            _collider.enabled = true;
+            _connectionNode = newParent.GetComponent<ConnectionNode>();
+        }
         
         _isChildren = true;
         
@@ -57,6 +69,7 @@ public enum NodeType
     Sphere,
     Capsule,
     Dash,
+    
     CubeSphere,
     SphereCapsule
 }
