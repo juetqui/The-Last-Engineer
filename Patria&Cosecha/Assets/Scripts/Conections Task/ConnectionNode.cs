@@ -23,6 +23,8 @@ public class ConnectionNode : MonoBehaviour
 
     private bool _isDisabled = false;
 
+    public bool IsDisabled { get { return _isDisabled; } }
+
     private void Start()
     {
         _nodeRenderer = new NodeRenderer(_render, _colider, _triggerCollider, _defaultColor, _ps, _audioSrc);

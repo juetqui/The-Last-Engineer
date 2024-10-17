@@ -76,13 +76,12 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckInteraction()
     {
-        Debug.Log("Node: " + _node);
-        Debug.Log("Connection: " + _connectionNode);
         if (_node != null)
         {
             if (_connectionNode != null && _isInPlaceArea) PlaceNode();
             else ChangeNode();
         }
+        else Debug.Log("Empty");
     }
 
     private void ChangeNode()
@@ -94,6 +93,8 @@ public class PlayerTDController : MonoBehaviour
 
     private void PlaceNode()
     {
+        if (_connectionNode.IsDisabled) return;
+
         _connectionNode.SetNode(_node);
         _node = null;
         _connectionNode = null;
