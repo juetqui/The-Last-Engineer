@@ -19,13 +19,12 @@ public class TaskManager : MonoBehaviour
         ValidateAllConnections();
     }
 
-    // Valida si todos los nodos han sido correctamente conectados
     private void ValidateAllConnections()
     {
         if (_workingNodes == _totalToFinish && _nodesSet.Count == _totalToFinish)
         {
             _running = true;
-            OnAllNodesConnected();  // Ejecuta lógica cuando todo está conectado
+            OnAllNodesConnected();
         }
         else
         {
@@ -33,7 +32,6 @@ public class TaskManager : MonoBehaviour
         }
     }
 
-    // Lógica que ocurre cuando todos los nodos están conectados
     private void OnAllNodesConnected()
     {
         if (_nodeToConnect != null && _energyModule != null)
@@ -47,23 +45,21 @@ public class TaskManager : MonoBehaviour
         }
     }
 
-    // Agrega un nodo conectado y valida si se ha completado el estado
     public void AddConnection(NodeType nodeType)
     {
-        if (_nodesSet.Add(nodeType))  // Solo suma si el nodo es nuevo
+        if (_nodesSet.Add(nodeType))
         {
             _workingNodes++;
-            ValidateAllConnections();  // Validar cuando se agrega una conexión
+            ValidateAllConnections();
         }
     }
 
-    // Remueve un nodo de la lista de conexiones y valida el estado
     public void RemoveConnection(NodeType nodeType)
     {
-        if (_nodesSet.Remove(nodeType))  // Solo resta si el nodo estaba presente
+        if (_nodesSet.Remove(nodeType))
         {
             _workingNodes--;
-            ValidateAllConnections();  // Validar cuando se elimina una conexión
+            ValidateAllConnections();
         }
     }
 }
