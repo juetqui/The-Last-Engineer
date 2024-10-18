@@ -5,7 +5,7 @@ public class PlayerTDView
     private AudioSource _source = default;
     private AudioClip _walkClip = default, _grabClip = default;
 
-    private float _timer = default, _interval = 0.025f;
+    private float _timer = default, _interval = 0.0125f;
 
     public PlayerTDView(AudioSource source, AudioClip walkClip, AudioClip grabClip)
     {

@@ -5,6 +5,7 @@ public class TaskManager : MonoBehaviour
 {
     [SerializeField] private ConnectionNode[] _connections;
     [SerializeField] private GameObject _energyModule, _nodeToConnect;
+    [SerializeField] private AudioSource _source;
 
     private int _workingNodes = default, _totalToFinish = default;
     private bool _running = false;
@@ -41,6 +42,7 @@ public class TaskManager : MonoBehaviour
             if (nodeRenderer != null && energyRenderer != null)
             {
                 nodeRenderer.material = energyRenderer.material;
+                _source.Play();
             }
         }
     }

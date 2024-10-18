@@ -11,6 +11,8 @@ public class ElectricityNode : MonoBehaviour
 
     private NodeView _nodeView = default;
     private ConnectionNode _connectionNode = default;
+    private CombineMachine _combineMachine = default;
+    
     private bool _isConnected = false;
 
     public NodeType NodeType { get { return _nodeType; } }
@@ -54,14 +56,21 @@ public class ElectricityNode : MonoBehaviour
             _connectionNode.UnsetNode();
             _connectionNode = null;
         }
+        else if (_isChildren && _combineMachine != null)
+        {
+            _combineMachine.UnsetNode(this);
+            _combineMachine = null;
+        }
     }
 
     public void Attach(Transform newParent, Vector3 newPos, bool parentIsPlayer = false)
     {
         if (!parentIsPlayer)
         {
-            _collider.enabled = true;
             _connectionNode = newParent.GetComponent<ConnectionNode>();
+            _combineMachine = newParent.GetComponent<CombineMachine>();
+            
+            _collider.enabled = true;
             transform.localScale = Vector3.one;
         }
         

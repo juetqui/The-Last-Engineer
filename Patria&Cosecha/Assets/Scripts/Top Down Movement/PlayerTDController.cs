@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,9 +19,7 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] AudioClip _grabClip;
 
     private float _dashTimer = default;
-    private bool _canDash = false, _isDashing = false, _isInPlaceArea = false;
-
-    private bool CanDash { get { return _node != null && _node.NodeType == NodeType.Dash; }}
+    private bool _canDash = false, _isDashing = false;
     
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
@@ -31,7 +27,13 @@ public class PlayerTDController : MonoBehaviour
 
     private ElectricityNode _node = default;
     private ConnectionNode _connectionNode = default;
+    private CombineMachine _combineMachine = default;
 
+    private NodeType _currentType = NodeType.None;
+
+    private bool CanDash { get { return _node != null && _node.NodeType == NodeType.Dash; } }
+    private bool IsInConnectArea { get { return _connectionNode != null; } }
+    private bool IsInCombineArea { get { return _combineMachine != null; } }
 
     private void Start()
     {
@@ -76,16 +78,19 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckInteraction()
     {
-        if (_node != null)
+        if (_node != null && _currentType == NodeType.None) ChangeNode();
+        else if (_node != null && _currentType != NodeType.None)
         {
-            if (_connectionNode != null && _isInPlaceArea) PlaceNode();
-            else ChangeNode();
+            if (_connectionNode != null && IsInConnectArea) PlaceNode();
+            if (_combineMachine != null && IsInCombineArea) PlaceInMachine();
         }
     }
 
     private void ChangeNode()
     {
-        Vector3 attachPos = new Vector3(0, 0, 1.2f);
+        _currentType = _node.NodeType;
+
+        Vector3 attachPos = new Vector3(0, 1f, 1.2f);
         _node.Attach(this, attachPos);
         _playerView.GrabNode();
     }
@@ -95,13 +100,20 @@ public class PlayerTDController : MonoBehaviour
         if (_connectionNode.IsDisabled) return;
 
         _connectionNode.SetNode(_node);
-        _node = null;
         _connectionNode = null;
+        ResetNode();
     }
 
-    private void CombineNode()
+    private void PlaceInMachine()
+    {
+        _combineMachine.SetNode(_node);
+        ResetNode();
+    }
+
+    private void ResetNode()
     {
         _node = null;
+        _currentType = NodeType.None;
     }
 
     private void ResetLevel()
@@ -113,26 +125,21 @@ public class PlayerTDController : MonoBehaviour
     {
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
         ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
+        CombineMachine machine = coll.GetComponent<CombineMachine>();
 
-        if (node != null)
-        {
-            _node = node;
-            _connectionNode = null;
-            _isInPlaceArea = false;
-        }
-        else if (connectionNode != null)
-        {
-            _connectionNode = connectionNode;
-            _isInPlaceArea = true;
-        }
+        if (node != null && _currentType == NodeType.None) _node = node;
+        else if (connectionNode != null) _connectionNode = connectionNode;
+        else if (machine != null) _combineMachine = machine;
     }
 
     private void OnTriggerExit(Collider coll)
     {
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
         ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
+        CombineMachine machine = coll.GetComponent<CombineMachine>();
 
-        if (node != null) _node = null;
+        if (node != null && _currentType == NodeType.None) _node = null;
         else if (connectionNode != null) _connectionNode = null;
+        else if (machine != null) _combineMachine = null;
     }
 }
