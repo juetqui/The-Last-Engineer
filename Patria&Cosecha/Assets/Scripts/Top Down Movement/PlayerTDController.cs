@@ -13,10 +13,11 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _dashDrag;
     [SerializeField] private float _dashCooldown;
 
-    [Header("Audio")]
-    [SerializeField] AudioSource _source;
-    [SerializeField] AudioClip _walkClip;
-    [SerializeField] AudioClip _grabClip;
+    [Header("View")]
+    [SerializeField] private Animator _animator;
+    [SerializeField] private AudioSource _source;
+    [SerializeField] private AudioClip _walkClip;
+    [SerializeField] private AudioClip _grabClip;
 
     private float _dashTimer = default;
     private bool _canDash = false, _isDashing = false;
@@ -40,12 +41,12 @@ public class PlayerTDController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag);
-        _playerView = new PlayerTDView(_source, _walkClip, _grabClip);
+        _playerView = new PlayerTDView(_animator, _source, _walkClip, _grabClip);
     }
 
     private void Update()
     {
-        _playerView.WalkSound(GetMovement());
+        _playerView.Walk(GetMovement());
 
         if (_dashTimer > 0f) _dashTimer -= Time.deltaTime;
         else if (CanDash && CheckForDash() && _dashTimer <= 0f) Dash(GetMovement());

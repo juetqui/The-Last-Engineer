@@ -2,21 +2,33 @@ using UnityEngine;
 
 public class PlayerTDView
 {
+    private Animator _animator = default;
     private AudioSource _source = default;
     private AudioClip _walkClip = default, _grabClip = default;
 
     private float _timer = default, _interval = 0.0125f;
 
-    public PlayerTDView(AudioSource source, AudioClip walkClip, AudioClip grabClip)
+    public PlayerTDView(Animator animator, AudioSource source, AudioClip walkClip, AudioClip grabClip)
     {
+        _animator = animator;
         _source = source;
         _walkClip = walkClip;
         _grabClip = grabClip;
     }
 
-    public void WalkSound(Vector3 moveVector)
+    public void Walk(Vector3 moveVector)
     {
-        if (moveVector.x != 0 && !_source.isPlaying || moveVector.z != 0 && !_source.isPlaying)
+        if (moveVector.x != 0 || moveVector.z != 0)
+        {
+            _animator.SetBool("IsWalking", true);
+            WalkSound();
+        }
+        else _animator.SetBool("IsWalking", false);
+    }
+
+    private void WalkSound()
+    {
+        if (!_source.isPlaying)
         {
             _timer += Time.deltaTime;
 

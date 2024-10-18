@@ -36,8 +36,8 @@ public class CameraTDController : MonoBehaviour
         float breathSinXY = breathSinX + breathSinY;
         float breathCosXY = breathCosX + breathCosY;
 
-        float breathX = Mathf.Lerp(breathSinX + breathCosX, breathSinXY + breathCosXY, 1);
-        float breathY = Mathf.Lerp(breathSinY + breathCosY, breathSinXY + breathCosXY, 1);
+        float breathX = Mathf.Lerp(breathSinX + breathSinY, breathSinXY + breathCosXY, 0.5f);
+        float breathY = Mathf.Lerp(breathCosX + breathCosY, breathSinXY + breathCosXY, 0.5f);
 
         transform.position = _basePos + new Vector3(breathX, breathY, 0f);
     }
