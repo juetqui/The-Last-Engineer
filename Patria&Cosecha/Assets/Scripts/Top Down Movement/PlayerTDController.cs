@@ -18,9 +18,6 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private AudioSource _source;
     [SerializeField] private AudioClip _walkClip;
     [SerializeField] private AudioClip _grabClip;
-
-    private float _dashTimer = default;
-    private bool _canDash = false, _isDashing = false;
     
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
@@ -32,7 +29,7 @@ public class PlayerTDController : MonoBehaviour
 
     private NodeType _currentType = NodeType.None;
 
-    private bool CanDash { get { return _node != null && _node.NodeType == NodeType.Dash; } }
+    private bool CanDash { get { return _currentType == NodeType.Dash; } }
     private bool IsInConnectArea { get { return _connectionNode != null; } }
     private bool IsInCombineArea { get { return _combineMachine != null; } }
 
@@ -40,16 +37,20 @@ public class PlayerTDController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
 
-        _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag);
+        _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
         _playerView = new PlayerTDView(_animator, _source, _walkClip, _grabClip);
     }
 
     private void Update()
     {
+        _playerModel.DashSpeed = _dashSpeed;
+        _playerModel.DashDrag = _dashDrag;
+
         _playerView.Walk(GetMovement());
 
-        if (_dashTimer > 0f) _dashTimer -= Time.deltaTime;
-        else if (CanDash && CheckForDash() && _dashTimer <= 0f) Dash(GetMovement());
+        _playerModel.UpdateDashTimer(Time.deltaTime);
+
+        if (CheckForDash()) _playerModel.Dash(GetMovement());
 
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
@@ -57,7 +58,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!_isDashing) _playerModel.OnUpdate(GetMovement());
+        if (!_playerModel.IsDashing) _playerModel.OnUpdate(GetMovement(), Time.deltaTime);
     }
 
     private Vector3 GetMovement()
@@ -68,14 +69,7 @@ public class PlayerTDController : MonoBehaviour
         return new Vector3(horizontalInput, 0, verticalInput);
     }
 
-    private bool CheckForDash() => _canDash && !_isDashing && Input.GetKeyDown(KeyCode.Space);
-
-    private void Dash(Vector3 moveDir)
-    {
-        _playerModel.Dash(moveDir);
-        _dashTimer = _dashCooldown;
-        _isDashing= true;
-    }
+    private bool CheckForDash() => CanDash && !_playerModel.IsDashing && Input.GetKeyDown(KeyCode.Space);
 
     private void CheckInteraction()
     {
@@ -131,6 +125,7 @@ public class PlayerTDController : MonoBehaviour
         if (node != null && _currentType == NodeType.None) _node = node;
         else if (connectionNode != null) _connectionNode = connectionNode;
         else if (machine != null) _combineMachine = machine;
+        else if (coll.CompareTag("Void")) ResetLevel();
     }
 
     private void OnTriggerExit(Collider coll)

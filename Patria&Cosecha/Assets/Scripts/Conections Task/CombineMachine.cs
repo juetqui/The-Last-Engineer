@@ -9,16 +9,11 @@ public class CombineMachine : MonoBehaviour
     [SerializeField] private Transform _combinedNodePos;
 
     private ElectricityNode _firstNode = default, _secondNode = default;
-    private bool _isActive = false, _canCombine;
+    private bool _isActive = false;
 
     public bool IsActive { get { return _isActive; } }
-    public bool CanCombine { get { return _canCombine; } set { _canCombine = value; } }
 
-    void Start()
-    {
-    }
-
-    void Update()
+    private void Update()
     {
         if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) Activate();
         else Deactivate();
@@ -28,8 +23,6 @@ public class CombineMachine : MonoBehaviour
     {
         _isActive = true;
         _trigger.enabled = false;
-
-        if (_canCombine) CombineNodes();
     }
 
     private void Deactivate()
@@ -38,7 +31,7 @@ public class CombineMachine : MonoBehaviour
         _trigger.enabled = true;
     }
 
-    private void CombineNodes()
+    public void CombineNodes()
     {
         Instantiate(_combinedNode, _combinedNodePos);
     }

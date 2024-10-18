@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerTDModel
 {
-    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default;
+    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _dashCooldown = default, _dashTimer = default;
     private bool _isDashing = false;
     
     private Rigidbody _rb = default;
@@ -10,7 +10,11 @@ public class PlayerTDModel
     
     private LayerMask _groundMask = default;
 
-    public PlayerTDModel(Rigidbody rb, Transform transform, LayerMask groundMask, float moveSpeed, float rotSpeed, float dashSpeed, float dashDrag)
+    public bool IsDashing {  get { return _isDashing; } }
+    public float DashSpeed { get { return _dashSpeed; } set { _dashSpeed = value; } }
+    public float DashDrag { get { return _dashDrag; } set { _dashDrag = value; } }
+
+    public PlayerTDModel(Rigidbody rb, Transform transform, LayerMask groundMask, float moveSpeed, float rotSpeed, float dashSpeed, float dashDrag, float dashCooldown)
     {
         _rb = rb;
         _transform = transform;
@@ -19,25 +23,24 @@ public class PlayerTDModel
         _rotSpeed = rotSpeed;
         _dashSpeed = dashSpeed;
         _dashDrag = dashDrag;
+        _dashCooldown = dashCooldown;
     }
 
-    //void Start()
-    //{
-        
-    //}
-
-    public void OnUpdate(Vector3 moveDir)
+    public void OnUpdate(Vector3 moveDir, float deltaTime)
     {
-        CheckFloor();
+        CheckFloor(deltaTime);
         MovePlayer(moveDir);
     }
 
-    private void CheckFloor()
+    private void CheckFloor(float deltaTime)
     {
         Vector3 rayDir = new Vector3(_transform.position.x, _transform.position.y, _transform.position.z - 1);
 
         if (!_isDashing && !Physics.Raycast(rayDir, -_transform.up, 2.5f, _groundMask))
+        {
             _rb.AddForce(Vector3.down * 200);
+            _transform.localScale -= Vector3.one * 5 * deltaTime;
+        }
     }
 
     private void MovePlayer(Vector3 moveDir)
@@ -59,15 +62,24 @@ public class PlayerTDModel
     {
         if (_isDashing) return;
 
-        _rb.drag = _dashDrag;
+        RotatePlayer(moveDir);
 
         Vector3 dir = moveDir.normalized * _dashSpeed;
-        _rb.AddForce(dir, ForceMode.Impulse);
-        RotatePlayer(moveDir);
+        
+        _rb.drag = _dashDrag;
+        _rb.AddForce(dir, ForceMode.VelocityChange);
+        
         _isDashing = true;
+        _dashTimer = _dashCooldown;
     }
 
-    public void EndDash()
+    public void UpdateDashTimer(float deltaTime)
+    {
+        if (_dashTimer > 0f && _isDashing) _dashTimer -= deltaTime;
+        else EndDash();
+    }
+
+    private void EndDash()
     {
         _isDashing = false;
         _rb.drag = 0f;
