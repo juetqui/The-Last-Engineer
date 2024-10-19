@@ -14,6 +14,7 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _dashCooldown;
 
     [Header("View")]
+    [SerializeField] private ParticleSystem _ps;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _source;
     [SerializeField] private AudioClip _walkClip;
@@ -26,19 +27,23 @@ public class PlayerTDController : MonoBehaviour
     private ElectricityNode _node = default;
     private ConnectionNode _connectionNode = default;
     private CombineMachine _combineMachine = default;
+    private CombinerController _combiner = default;
 
     private NodeType _currentType = NodeType.None;
 
     private bool CanDash { get { return _currentType == NodeType.Dash; } }
     private bool IsInConnectArea { get { return _connectionNode != null; } }
-    private bool IsInCombineArea { get { return _combineMachine != null; } }
+    private bool IsInCombinationArea { get { return _combineMachine != null; } }
+    private bool IsInCombinerArea { get { return _combiner != null; } }
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        _playerView = new PlayerTDView(_animator, _source, _walkClip, _grabClip);
+        _playerView = new PlayerTDView(_ps, _animator, _source, _walkClip, _grabClip);
+
+        _playerModel.OnStart();
     }
 
     private void Update()
@@ -50,7 +55,12 @@ public class PlayerTDController : MonoBehaviour
 
         _playerModel.UpdateDashTimer(Time.deltaTime);
 
-        if (CheckForDash()) _playerModel.Dash(GetMovement());
+        if (CheckForDash())
+        {
+            _playerModel.Dash(GetMovement());
+            _playerView.PlayDashPS();
+        }
+        else _playerView.StopDashPS();
 
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
@@ -77,7 +87,8 @@ public class PlayerTDController : MonoBehaviour
         else if (_node != null && _currentType != NodeType.None)
         {
             if (_connectionNode != null && IsInConnectArea) PlaceNode();
-            if (_combineMachine != null && IsInCombineArea) PlaceInMachine();
+            if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
+            if (_combiner != null && IsInCombinerArea) _combiner.ActivateCombineMachine();
         }
     }
 
@@ -121,10 +132,12 @@ public class PlayerTDController : MonoBehaviour
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
         ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
         CombineMachine machine = coll.GetComponent<CombineMachine>();
+        CombinerController combiner = coll.GetComponent<CombinerController>();
 
         if (node != null && _currentType == NodeType.None) _node = node;
         else if (connectionNode != null) _connectionNode = connectionNode;
         else if (machine != null) _combineMachine = machine;
+        else if (combiner != null) _combiner = combiner;
         else if (coll.CompareTag("Void")) ResetLevel();
     }
 
@@ -133,9 +146,11 @@ public class PlayerTDController : MonoBehaviour
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
         ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
         CombineMachine machine = coll.GetComponent<CombineMachine>();
+        CombinerController combiner = coll.GetComponent<CombinerController>();
 
         if (node != null && _currentType == NodeType.None) _node = null;
         else if (connectionNode != null) _connectionNode = null;
         else if (machine != null) _combineMachine = null;
+        else if (combiner != null) _combiner = null;
     }
 }

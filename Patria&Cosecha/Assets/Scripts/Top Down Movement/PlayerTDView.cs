@@ -2,14 +2,17 @@ using UnityEngine;
 
 public class PlayerTDView
 {
+    private ParticleSystem _ps = default;
+
     private Animator _animator = default;
     private AudioSource _source = default;
     private AudioClip _walkClip = default, _grabClip = default;
 
     private float _timer = default, _interval = 0.0125f;
 
-    public PlayerTDView(Animator animator, AudioSource source, AudioClip walkClip, AudioClip grabClip)
+    public PlayerTDView(ParticleSystem ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip grabClip)
     {
+        _ps = ps;
         _animator = animator;
         _source = source;
         _walkClip = walkClip;
@@ -42,6 +45,16 @@ public class PlayerTDView
             }
         }
         else _timer = 0;
+    }
+
+    public void PlayDashPS()
+    {
+        _ps.Play();
+    }
+
+    public void StopDashPS()
+    {
+        _ps.Stop();
     }
 
     public void GrabNode()

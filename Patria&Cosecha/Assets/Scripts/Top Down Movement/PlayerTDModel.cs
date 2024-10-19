@@ -4,6 +4,7 @@ public class PlayerTDModel
 {
     private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _dashCooldown = default, _dashTimer = default;
     private bool _isDashing = false;
+    private Vector3 _oldScale = default;
     
     private Rigidbody _rb = default;
     private Transform _transform = default;
@@ -26,6 +27,12 @@ public class PlayerTDModel
         _dashCooldown = dashCooldown;
     }
 
+    public void OnStart()
+    {
+        _oldScale = _transform.localScale;
+        
+    }
+
     public void OnUpdate(Vector3 moveDir, float deltaTime)
     {
         CheckFloor(deltaTime);
@@ -41,6 +48,7 @@ public class PlayerTDModel
             _rb.AddForce(Vector3.down * 200);
             _transform.localScale -= Vector3.one * 5 * deltaTime;
         }
+        else if (_transform.localScale != _oldScale) _transform.localScale = _oldScale;
     }
 
     private void MovePlayer(Vector3 moveDir)
@@ -66,6 +74,7 @@ public class PlayerTDModel
 
         Vector3 dir = moveDir.normalized * _dashSpeed;
         
+        _rb.useGravity = false;
         _rb.drag = _dashDrag;
         _rb.AddForce(dir, ForceMode.VelocityChange);
         
@@ -82,6 +91,7 @@ public class PlayerTDModel
     private void EndDash()
     {
         _isDashing = false;
+        _rb.useGravity = true;
         _rb.drag = 0f;
     }
 }
