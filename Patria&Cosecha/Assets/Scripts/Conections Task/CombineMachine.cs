@@ -1,14 +1,15 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CombineMachine : MonoBehaviour
 {
-    [SerializeField] private ElectricityNode _combinedNode;
+    [SerializeField] private GameObject _combinedPrefab;
     [SerializeField] private Collider _trigger;
     [SerializeField] private Transform _firstNodePos;
     [SerializeField] private Transform _secondNodePos;
     [SerializeField] private Transform _combinedNodePos;
 
-    private ElectricityNode _firstNode = default, _secondNode = default;
+    private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode;
     private bool _isActive = false;
 
     public bool IsActive { get { return _isActive; } }
@@ -33,14 +34,15 @@ public class CombineMachine : MonoBehaviour
 
     public void CombineNodes()
     {
-        Instantiate(_combinedNode, _combinedNodePos);
-
-        Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f);
-        
-        _combinedNode.Attach(_combinedNodePos.position, transform, newScale);
-
         Destroy(_firstNode.gameObject);
         Destroy(_secondNode.gameObject);
+        GameObject combinedNode = Instantiate(_combinedPrefab, _combinedNodePos);
+
+        _combinedNode = combinedNode.GetComponent<ElectricityNode>();
+
+        Vector3 newScale = new Vector3(2, 2, 2);
+        _combinedNode.Attach(_combinedNodePos.position, transform, newScale);
+        
     }
 
     private bool IsValidCombination(NodeType firstType, NodeType secondType) => (firstType != NodeType.Dash || secondType != NodeType.Dash);
