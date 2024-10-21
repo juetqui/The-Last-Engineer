@@ -17,7 +17,7 @@ public class CombinerController : MonoBehaviour
 
     private void Update()
     {
-        if (_combineMachine.IsActive) _view.Enabled();
+        _view.Enabled(_combineMachine.IsActive);
     }
 
     public void ActivateCombineMachine()

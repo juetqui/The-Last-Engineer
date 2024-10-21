@@ -21,14 +21,14 @@ public class ElectricityNode : MonoBehaviour
 
     private void Start()
     {
-        _nodeView = new NodeView(_renderer, _material);
+        _nodeView = new NodeView(transform, _renderer, _material, _collider);
         _nodeView.OnStart();
     }
 
     private void Update()
     {
         if (!_isChildren) MoveObject();
-        if (_isConnected) _collider.enabled = false;
+        if (_isConnected) _nodeView.EnableColl(false);
     }
 
     private void MoveObject()
@@ -46,10 +46,9 @@ public class ElectricityNode : MonoBehaviour
     {
         if (_isConnected) return;
         
-        _collider.enabled = false;
-        Attach(player.transform, newPos, true);
-
-        transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+        Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
+        
+        Attach(newPos, player.transform, newScale, true);
 
         if (_isChildren && _connectionNode != null)
         {
@@ -63,22 +62,23 @@ public class ElectricityNode : MonoBehaviour
         }
     }
 
-    public void Attach(Transform newParent, Vector3 newPos, bool parentIsPlayer = false)
+    public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
     {
-        if (!parentIsPlayer)
+        if (parentIsPlayer) _nodeView.EnableColl(false);
+        else _nodeView.EnableColl(true);
+
+        if (!parentIsPlayer && newParent != null)
         {
             _connectionNode = newParent.GetComponent<ConnectionNode>();
             _combineMachine = newParent.GetComponent<CombineMachine>();
-            
-            _collider.enabled = true;
-            transform.localScale = Vector3.one;
         }
-        
-        _isChildren = true;
-        
-        transform.SetParent(newParent, false);
-        transform.localPosition = newPos;
-        transform.rotation = Quaternion.LookRotation(newParent.forward);
+
+        if (newParent != null) _isChildren = true;
+        else _isChildren = false;
+
+        if (newParent != null && newScale != default) _nodeView.SetPos(newPos, newParent, newScale);
+        else if (newParent != null && newScale == default) _nodeView.SetPos(newPos, newParent);
+        else if (newParent == null && newScale == default) _nodeView.SetPos(newPos);
     }
 }
 

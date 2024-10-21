@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CombinerView
@@ -17,8 +18,9 @@ public class CombinerView
         _renderer.material.color = _offColor;
     }
 
-    public void Enabled()
+    public void Enabled(bool enable)
     {
-        _renderer.material.color = _onColor;
+        if (enable) _renderer.material.color = _onColor;
+        else _renderer.material.color = _offColor;
     }
 }

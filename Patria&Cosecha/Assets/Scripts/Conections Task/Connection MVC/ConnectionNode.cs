@@ -36,7 +36,7 @@ public class ConnectionNode : MonoBehaviour
     {
         if (_isDisabled || node.NodeType == NodeType.None) return;
 
-        node.Attach(transform, Vector3.zero, false);
+        node.Attach(Vector3.zero, transform);
         _recievedNode = node;
         CheckReceivedNode();
     }

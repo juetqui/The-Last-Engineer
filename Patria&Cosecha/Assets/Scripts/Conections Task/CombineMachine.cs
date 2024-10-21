@@ -33,9 +33,14 @@ public class CombineMachine : MonoBehaviour
 
     public void CombineNodes()
     {
-        _combinedNode.Attach(transform, Vector3.zero);
         Instantiate(_combinedNode, _combinedNodePos);
-        _combinedNode = null;
+
+        Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f);
+        
+        _combinedNode.Attach(_combinedNodePos.position, transform, newScale);
+
+        Destroy(_firstNode.gameObject);
+        Destroy(_secondNode.gameObject);
     }
 
     private bool IsValidCombination(NodeType firstType, NodeType secondType) => (firstType != NodeType.Dash || secondType != NodeType.Dash);
@@ -46,12 +51,12 @@ public class CombineMachine : MonoBehaviour
 
         if (_firstNode == null)
         {
-            node.Attach(transform, _firstNodePos.localPosition);
+            node.Attach(_firstNodePos.localPosition, transform);
             _firstNode = node;
         }
         else if (_firstNode != null && node.NodeType != _firstNode.NodeType)
         {
-            node.Attach(transform, _secondNodePos.localPosition);
+            node.Attach(_secondNodePos.localPosition, transform);
             _secondNode = node;
         }
     }
