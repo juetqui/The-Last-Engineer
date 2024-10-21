@@ -88,8 +88,9 @@ public class PlayerTDController : MonoBehaviour
         {
             if (_connectionNode != null && IsInConnectArea) PlaceNode();
             if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
-            if (_combiner != null && IsInCombinerArea) _combiner.ActivateCombineMachine();
         }
+        
+        if (_combiner != null && IsInCombinerArea) _combiner.ActivateCombineMachine();
     }
 
     private void ChangeNode()
@@ -152,5 +153,11 @@ public class PlayerTDController : MonoBehaviour
         else if (connectionNode != null) _connectionNode = null;
         else if (machine != null) _combineMachine = null;
         else if (combiner != null) _combiner = null;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1);
+        Gizmos.DrawRay(rayDir, Vector3.down * 2);
     }
 }

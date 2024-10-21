@@ -33,7 +33,9 @@ public class CombineMachine : MonoBehaviour
 
     public void CombineNodes()
     {
+        _combinedNode.Attach(transform, Vector3.zero);
         Instantiate(_combinedNode, _combinedNodePos);
+        _combinedNode = null;
     }
 
     private bool IsValidCombination(NodeType firstType, NodeType secondType) => (firstType != NodeType.Dash || secondType != NodeType.Dash);

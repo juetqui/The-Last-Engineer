@@ -22,7 +22,6 @@ public class CombinerController : MonoBehaviour
 
     public void ActivateCombineMachine()
     {
-        Debug.Log("Combine");
         _combineMachine.CombineNodes();
     }
 }
