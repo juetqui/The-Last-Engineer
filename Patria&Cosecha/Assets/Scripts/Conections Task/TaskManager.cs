@@ -42,9 +42,10 @@ public class TaskManager : MonoBehaviour
             if (nodeRenderer != null && energyRenderer != null)
             {
                 nodeRenderer.material = energyRenderer.material;
-                _source.Play();
             }
         }
+
+        _source.Play();
     }
 
     public void AddConnection(NodeType nodeType)

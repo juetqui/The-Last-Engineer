@@ -21,6 +21,8 @@ public class OpenDoor : MonoBehaviour
     {
         _isMoving = true;
 
+        Debug.Log("Open");
+
         while (Mathf.Abs(transform.position.x - targetPos.x) > _stopDist)
         {
             Vector3 newPosX = Vector3.MoveTowards(transform.position, new Vector3(targetPos.x, transform.position.y, transform.position.z), (_speed / 4) * Time.deltaTime);
@@ -33,6 +35,15 @@ public class OpenDoor : MonoBehaviour
         {
             Vector3 newPosZ = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, transform.position.y, targetPos.z), _speed * Time.deltaTime);
             transform.position = newPosZ;
+
+            yield return null;
+        }
+
+
+        while (Mathf.Abs(transform.position.y - targetPos.y) > _stopDist)
+        {
+            Vector3 newPosX = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, targetPos.y, transform.position.z), _speed * Time.deltaTime);
+            transform.position = newPosX;
 
             yield return null;
         }
