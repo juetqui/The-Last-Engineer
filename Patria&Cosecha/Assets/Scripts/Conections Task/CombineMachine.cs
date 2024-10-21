@@ -42,7 +42,6 @@ public class CombineMachine : MonoBehaviour
 
         Vector3 newScale = new Vector3(2, 2, 2);
         _combinedNode.Attach(_combinedNodePos.position, transform, newScale);
-        
     }
 
     private bool IsValidCombination(NodeType firstType, NodeType secondType) => (firstType != NodeType.Dash || secondType != NodeType.Dash);

@@ -87,10 +87,10 @@ public class PlayerTDController : MonoBehaviour
         else if (_node != null && _currentType != NodeType.None)
         {
             if (_connectionNode != null && IsInConnectArea) PlaceNode();
-            if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
-            if (!IsInConnectArea && !IsInCombinationArea && !IsInCombinerArea)
+            else if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
+            else if (!IsInConnectArea && !IsInCombinationArea && !IsInCombinerArea)
             {
-                Vector3 dropPos = new Vector3 (transform.position.x, transform.position.y, transform.position.z + 1);
+                Vector3 dropPos = new Vector3 (transform.position.x, transform.position.y, transform.position.z);
                 _node.Attach(dropPos);
                 ResetNode();
             }
