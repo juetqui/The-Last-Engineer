@@ -1,11 +1,11 @@
 public class NodeChecker
 {
-    private TaskManager _taskManager;
+    private TaskManager[] _taskManagers;
     private NodeType _requiredType;
 
-    public NodeChecker(TaskManager taskManager, NodeType requiredType)
+    public NodeChecker(TaskManager[] taskManagers, NodeType requiredType)
     {
-        _taskManager = taskManager;
+        _taskManagers = taskManagers;
         _requiredType = requiredType;
     }
 
@@ -16,11 +16,11 @@ public class NodeChecker
 
     public void HandleNodeCorrect(NodeType receivedType)
     {
-        _taskManager.AddConnection(receivedType);
+        foreach (var tm in _taskManagers) tm.AddConnection(receivedType);
     }
 
-    public void HandleNodeIncorrect(NodeType receivedType)
+    public void HandleNodeIncorrect()
     {
-        _taskManager.RemoveConnection(_requiredType);
+        foreach (var tm in _taskManagers) tm.RemoveConnection(_requiredType);
     }
 }

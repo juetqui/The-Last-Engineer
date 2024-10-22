@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
 {
-    [SerializeField] private TaskManager _taskManager = default;
+    [SerializeField] private TaskManager[] _taskManagers = default;
     [SerializeField] private NodeType _requiredType = default;
 
     [Header("MVC View")]
@@ -29,7 +29,7 @@ public class ConnectionNode : MonoBehaviour
     {
         _nodeRenderer = new NodeRenderer(_render, _colider, _triggerCollider, _defaultColor, _ps, _audioSrc);
         _nodeRenderer.OnStart();
-        _nodeChecker = new NodeChecker(_taskManager, _requiredType);
+        _nodeChecker = new NodeChecker(_taskManagers, _requiredType);
     }
 
     public void SetNode(ElectricityNode node)
@@ -65,7 +65,7 @@ public class ConnectionNode : MonoBehaviour
             _nodeRenderer.Enable(true);
             _nodeRenderer.PlayClip(_errorClip);
             _nodeRenderer.PlayEffect(true);
-            _nodeChecker.HandleNodeIncorrect(_recievedNode.NodeType);
+            _nodeChecker.HandleNodeIncorrect();
             StartCoroutine(DisableConnection());
         }
     }

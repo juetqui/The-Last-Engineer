@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class OpenDoor : MonoBehaviour
 {
-    [SerializeField] private Transform _openPos = default;
-    [SerializeField] private TaskManager _taskManager = default;
+    [SerializeField] private Transform _openPos;
+    [SerializeField] private TaskManager _taskManager;
 
     private bool _canOpen = false, _isMoving = false;
     private float _stopDist = 0.01f, _speed = 2f;
@@ -20,8 +20,6 @@ public class OpenDoor : MonoBehaviour
     private IEnumerator Open(Vector3 targetPos)
     {
         _isMoving = true;
-
-        Debug.Log("Open");
 
         while (Mathf.Abs(transform.position.x - targetPos.x) > _stopDist)
         {
