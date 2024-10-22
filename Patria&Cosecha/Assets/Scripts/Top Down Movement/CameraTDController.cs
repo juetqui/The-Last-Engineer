@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CameraTDController : MonoBehaviour
 {
+    [SerializeField] private Camera _camera;
+
     [Header("Breath Sin")]
     [SerializeField] private float _breathFrequencySin = 0.75f;
     [SerializeField] private float _breathAmplitudeSin = 0.25f;
@@ -19,7 +21,12 @@ public class CameraTDController : MonoBehaviour
         _basePos = transform.position;
     }
 
-    void LateUpdate()
+    private void Start()
+    {
+        Adjust();
+    }
+
+    private void LateUpdate()
     {
         ApplyBreathEffect();
     }
@@ -40,5 +47,37 @@ public class CameraTDController : MonoBehaviour
         float breathY = Mathf.Lerp(breathCosX + breathCosY, breathSinXY + breathCosXY, 0.5f);
 
         transform.position = _basePos + new Vector3(breathX, breathY, 0f);
+    }
+
+    public void Adjust()
+    {
+        Rect rect = _camera.rect;
+
+        float targetaspect = 16.0f / 9.0f;
+
+        float windowaspect = (float)Screen.width / (float)Screen.height;
+
+        float scaleheight = windowaspect / targetaspect;
+
+        if (scaleheight < 1.0f)
+        {
+            rect.width = 1.0f;
+            rect.height = scaleheight;
+            rect.x = 0;
+            rect.y = (1.0f - scaleheight) / 2.0f;
+
+            _camera.rect = rect;
+        }
+        else
+        {
+            float scalewidth = 1.0f / scaleheight;
+
+            rect.width = scalewidth;
+            rect.height = 1.0f;
+            rect.x = (1.0f - scalewidth) / 2.0f;
+            rect.y = 0;
+
+            _camera.rect = rect;
+        }
     }
 }

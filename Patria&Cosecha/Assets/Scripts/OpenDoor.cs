@@ -14,7 +14,10 @@ public class OpenDoor : MonoBehaviour
         if(_taskManager.Running) _canOpen = true;
         else _canOpen = false;
 
-        if (_canOpen && !_isMoving) StartCoroutine(Open(_openPos.position));
+        if (_canOpen && !_isMoving)
+        {
+            StartCoroutine(Open(_openPos.position));
+        }
     }
 
     private IEnumerator Open(Vector3 targetPos)
