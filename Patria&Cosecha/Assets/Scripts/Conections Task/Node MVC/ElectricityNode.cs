@@ -10,6 +10,8 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private bool _isChildren = false;
 
     private NodeView _nodeView = default;
+    private NodeModel _nodeModel = default;
+
     private ConnectionNode _connectionNode = default;
     private CombineMachine _combineMachine = default;
     
@@ -21,7 +23,8 @@ public class ElectricityNode : MonoBehaviour
 
     private void Start()
     {
-        _nodeView = new NodeView(transform, _renderer, _material, _collider);
+        _nodeModel = new NodeModel(transform);
+        _nodeView = new NodeView(_renderer, _material, _collider);
         _nodeView.OnStart();
     }
 
@@ -76,9 +79,14 @@ public class ElectricityNode : MonoBehaviour
         if (newParent != null) _isChildren = true;
         else _isChildren = false;
 
-        if (newParent != null && newScale != default) _nodeView.SetPos(newPos, newParent, newScale);
-        else if (newParent != null && newScale == default) _nodeView.SetPos(newPos, newParent);
-        else if (newParent == null && newScale == default) _nodeView.SetPos(newPos);
+        if (newParent != null && newScale != default) _nodeModel.SetPos(newPos, newParent, newScale);
+        else if (newParent != null && newScale == default) _nodeModel.SetPos(newPos, newParent);
+        else if (newParent == null && newScale == default) _nodeModel.SetPos(newPos);
+    }
+
+    public void Combine(float deltaTime)
+    {
+        _nodeModel.Combine(deltaTime);
     }
 }
 

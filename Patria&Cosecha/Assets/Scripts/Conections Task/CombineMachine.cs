@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CombineMachine : MonoBehaviour
@@ -10,7 +9,7 @@ public class CombineMachine : MonoBehaviour
     [SerializeField] private Transform _combinedNodePos;
 
     private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode;
-    private bool _isActive = false;
+    private bool _isActive = false, _isCombining = false;
 
     public bool IsActive { get { return _isActive; } }
 
@@ -18,6 +17,12 @@ public class CombineMachine : MonoBehaviour
     {
         if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) Activate();
         else Deactivate();
+
+        if (_isCombining)
+        {
+            _firstNode.Combine(Time.deltaTime);
+            _secondNode.Combine(Time.deltaTime);
+        }
     }
 
     private void Activate()
@@ -34,8 +39,10 @@ public class CombineMachine : MonoBehaviour
 
     public void CombineNodes()
     {
-        Destroy(_firstNode.gameObject);
-        Destroy(_secondNode.gameObject);
+        if (!IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) return;
+
+        //Destroy(_firstNode.gameObject);
+        //Destroy(_secondNode.gameObject);
         GameObject combinedNode = Instantiate(_combinedPrefab, _combinedNodePos);
 
         _combinedNode = combinedNode.GetComponent<ElectricityNode>();
