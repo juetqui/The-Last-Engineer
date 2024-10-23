@@ -3,18 +3,23 @@ using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
 {
-    [SerializeField] private TaskManager[] _taskManagers = default;
-    [SerializeField] private NodeType _requiredType = default;
+    [SerializeField] private TaskManager[] _taskManagers;
+    [SerializeField] private NodeType _requiredType;
 
     [Header("MVC View")]
-    [SerializeField] private Renderer _render = default;
-    [SerializeField] private Collider _colider = default;
-    [SerializeField] private Collider _triggerCollider = default;
-    [SerializeField] private AudioSource _audioSrc = default;
-    [SerializeField] private AudioClip _placedClip = default;
-    [SerializeField] private AudioClip _errorClip = default;
-    [SerializeField] private Color _defaultColor = default;
-    [SerializeField] private ParticleSystem _ps = default;
+    [SerializeField] private Renderer _render;
+    [SerializeField] private Collider _colider;
+    [SerializeField] private Collider _triggerCollider;
+    [SerializeField] private AudioSource _audioSrc;
+    [SerializeField] private AudioClip _placedClip;
+    [SerializeField] private AudioClip _errorClip;
+    [SerializeField] private Color _color;
+    [SerializeField] private Color _secColor;
+
+    [ColorUsage(true, true)]
+    [SerializeField] private Color _fresnelColor;
+
+    [SerializeField] private ParticleSystem _ps;
 
 
     private NodeRenderer _nodeRenderer = default;
@@ -27,7 +32,7 @@ public class ConnectionNode : MonoBehaviour
 
     private void Start()
     {
-        _nodeRenderer = new NodeRenderer(_render, _colider, _triggerCollider, _defaultColor, _ps, _audioSrc);
+        _nodeRenderer = new NodeRenderer(_requiredType, _render, _colider, _triggerCollider, _color, _secColor, _fresnelColor, _ps, _audioSrc);
         _nodeRenderer.OnStart();
         _nodeChecker = new NodeChecker(_taskManagers, _requiredType);
     }
@@ -78,6 +83,6 @@ public class ConnectionNode : MonoBehaviour
         yield return new WaitForSeconds(3f);
 
         _isDisabled = false;
-        _nodeRenderer.ChangeColor(_defaultColor);
+        _nodeRenderer.ChangeColor(_color);
     }
 }

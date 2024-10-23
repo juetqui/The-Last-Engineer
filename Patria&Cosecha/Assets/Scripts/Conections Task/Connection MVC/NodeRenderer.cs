@@ -2,25 +2,35 @@ using UnityEngine;
 
 public class NodeRenderer : INodeEffect, INodeAudio
 {
+    private NodeType _type = default;
     private Renderer _renderer = default;
-    private Collider _collider = default, _triggerCollider = default;
-    private Color _color = default;
     private ParticleSystem _ps = default;
     private AudioSource _source = default;
+    private Collider _collider = default, _triggerCollider = default;
+    private Color _color = default, _secColor = default, _fresnelColor = default;
 
-    public NodeRenderer(Renderer renderer, Collider collider, Collider triggerCollider, Color color, ParticleSystem ps, AudioSource source)
+    public NodeRenderer(NodeType type, Renderer renderer, Collider collider, Collider triggerCollider, Color color, Color secColor, Color fresnelColor, ParticleSystem ps, AudioSource source)
     {
+        _type = type;
         _renderer = renderer;
         _collider = collider;
         _triggerCollider = triggerCollider;
         _color = color;
+        _secColor = secColor;
+        _fresnelColor = fresnelColor;
         _ps = ps;
         _source = source;
     }
 
     public void OnStart()
     {
-        _renderer.material.color = _color;
+        SetTexture();
+        
+        _renderer.material.SetColor("_Color", _color);
+        _renderer.material.SetColor("_SecColor", _secColor);
+        _renderer.material.SetColor("_FresnelColor", _fresnelColor);
+
+
         Enable(true);
         PlayEffect(false);
     }
@@ -38,7 +48,7 @@ public class NodeRenderer : INodeEffect, INodeAudio
 
     public void ChangeColor(Color color)
     {
-        _renderer.material.color = color;
+        _renderer.material.SetColor("Color", color);
     }
 
     public void PlayEffect(bool turnOnOff)
@@ -50,5 +60,12 @@ public class NodeRenderer : INodeEffect, INodeAudio
     {
         _source.clip = audio;
         _source.Play();
+    }
+
+    private void SetTexture()
+    {
+        if (_type == NodeType.Purple) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_PurpleNode"));
+        else if (_type == NodeType.Green) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_GreenNode"));
+        else if (_type == NodeType.Blue) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_BlueNode"));
     }
 }
