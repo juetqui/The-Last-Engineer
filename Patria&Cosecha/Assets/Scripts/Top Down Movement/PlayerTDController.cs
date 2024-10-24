@@ -29,9 +29,11 @@ public class PlayerTDController : MonoBehaviour
     private CombineMachine _combineMachine = default;
     private CombinerController _combiner = default;
 
+    private float _commonSpeed = default;
+
     private NodeType _currentType = NodeType.None;
 
-    private bool CanDash { get { return _currentType == NodeType.Dash; } }
+    private bool CanDash { get { return CheckDashAvialable(); } }
     private bool IsInConnectArea { get { return _connectionNode != null; } }
     private bool IsInCombinationArea { get { return _combineMachine != null; } }
     private bool IsInCombinerArea { get { return _combiner != null; } }
@@ -39,6 +41,7 @@ public class PlayerTDController : MonoBehaviour
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
+        _commonSpeed = _moveSpeed;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
         _playerView = new PlayerTDView(_ps, _animator, _source, _walkClip, _grabClip);
@@ -48,6 +51,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void Update()
     {
+        _playerModel.MoveSpeed = _moveSpeed;
         _playerModel.DashSpeed = _dashSpeed;
         _playerModel.DashDrag = _dashDrag;
 
@@ -81,6 +85,8 @@ public class PlayerTDController : MonoBehaviour
 
     private bool CheckForDash() => CanDash && !_playerModel.IsDashing && Input.GetKeyDown(KeyCode.Space);
 
+    private bool CheckDashAvialable() => _currentType == NodeType.Blue || _currentType == NodeType.Dash;
+
     private void CheckInteraction()
     {
         if (_node != null && _currentType == NodeType.None) ChangeNode();
@@ -88,12 +94,7 @@ public class PlayerTDController : MonoBehaviour
         {
             if (_connectionNode != null && IsInConnectArea) PlaceNode();
             else if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
-            else if (!IsInConnectArea && !IsInCombinationArea && !IsInCombinerArea)
-            {
-                Vector3 dropPos = new Vector3 (transform.position.x, transform.position.y, transform.position.z);
-                _node.Attach(dropPos);
-                ResetNode();
-            }
+            else if (!IsInConnectArea && !IsInCombinationArea && !IsInCombinerArea) DropNode();
         }
         
         if (_combiner != null && IsInCombinerArea) _combiner.ActivateCombineMachine();
@@ -106,6 +107,15 @@ public class PlayerTDController : MonoBehaviour
         Vector3 attachPos = new Vector3(0, 1f, 1.2f);
         _node.Attach(this, attachPos);
         _playerView.GrabNode();
+        CheckCurrentNode();
+    }
+
+    private void DropNode()
+    {
+        Vector3 dropPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        _node.Attach(dropPos);
+        ResetNode();
+        CheckCurrentNode();
     }
 
     private void PlaceNode()
@@ -121,6 +131,14 @@ public class PlayerTDController : MonoBehaviour
     {
         _combineMachine.SetNode(_node);
         ResetNode();
+    }
+
+    private void CheckCurrentNode()
+    {
+        if (_currentType == NodeType.Purple)
+            _moveSpeed += 5;
+        else
+            _moveSpeed = _commonSpeed;
     }
 
     private void ResetNode()
@@ -145,6 +163,7 @@ public class PlayerTDController : MonoBehaviour
         else if (connectionNode != null) _connectionNode = connectionNode;
         else if (machine != null) _combineMachine = machine;
         else if (combiner != null) _combiner = combiner;
+        
         else if (coll.CompareTag("Void")) ResetLevel();
     }
 

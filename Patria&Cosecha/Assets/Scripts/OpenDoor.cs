@@ -5,6 +5,7 @@ public class OpenDoor : MonoBehaviour
 {
     [SerializeField] private Transform _openPos;
     [SerializeField] private TaskManager _taskManager;
+    [SerializeField] private bool _isMenu;
 
     private bool _canOpen = false, _isMoving = false;
     private float _stopDist = 0.01f, _speed = 2f;
@@ -17,7 +18,8 @@ public class OpenDoor : MonoBehaviour
 
     void Update()
     {
-        if(_taskManager.Running) _canOpen = true;
+        if (_taskManager == null && _isMenu) _canOpen = true;
+        else if (_taskManager != null && _taskManager.Running) _canOpen = true;
         else _canOpen = false;
 
         if (_canOpen && !_isMoving) StartCoroutine(Open(_openPos.position));

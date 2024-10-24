@@ -12,6 +12,7 @@ public class PlayerTDModel
     private LayerMask _groundMask = default;
 
     public bool IsDashing {  get { return _isDashing; } }
+    public float MoveSpeed { get { return _moveSpeed; } set { _moveSpeed = value; } }
     public float DashSpeed { get { return _dashSpeed; } set { _dashSpeed = value; } }
     public float DashDrag { get { return _dashDrag; } set { _dashDrag = value; } }
 
