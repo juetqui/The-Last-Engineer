@@ -31,7 +31,7 @@ public class ElectricityNode : MonoBehaviour
     private void Update()
     {
         if (!_isChildren) MoveObject();
-        if (_isConnected) _nodeView.EnableColl(false);
+        //if (_isConnected) _nodeView.EnableColl(false);
     }
 
     private void MoveObject()
@@ -47,8 +47,6 @@ public class ElectricityNode : MonoBehaviour
 
     public void Attach(PlayerTDController player, Vector3 newPos)
     {
-        if (_isConnected) return;
-        
         Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
         
         Attach(newPos, player.transform, newScale, true);

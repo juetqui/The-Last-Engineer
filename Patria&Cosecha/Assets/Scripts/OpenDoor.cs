@@ -8,16 +8,20 @@ public class OpenDoor : MonoBehaviour
 
     private bool _canOpen = false, _isMoving = false;
     private float _stopDist = 0.01f, _speed = 2f;
+    private Vector3 _closedPos = default;
+
+    private void Awake()
+    {
+        _closedPos = transform.position;
+    }
 
     void Update()
     {
         if(_taskManager.Running) _canOpen = true;
         else _canOpen = false;
 
-        if (_canOpen && !_isMoving)
-        {
-            StartCoroutine(Open(_openPos.position));
-        }
+        if (_canOpen && !_isMoving) StartCoroutine(Open(_openPos.position));
+        else if (!_canOpen && !_isMoving) StartCoroutine(Open(_closedPos));
     }
 
     private IEnumerator Open(Vector3 targetPos)

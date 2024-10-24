@@ -50,6 +50,9 @@ public class ConnectionNode : MonoBehaviour
     {
         _recievedNode = null;
         _nodeRenderer.EnableTrigger(true);
+
+        foreach (var tm in _taskManagers)
+            tm.RemoveConnection(_requiredType);
     }
 
     private void CheckReceivedNode()
