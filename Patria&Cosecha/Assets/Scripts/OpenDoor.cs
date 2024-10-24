@@ -44,7 +44,6 @@ public class OpenDoor : MonoBehaviour
             yield return null;
         }
 
-
         while (Mathf.Abs(transform.position.y - targetPos.y) > _stopDist)
         {
             Vector3 newPosX = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, targetPos.y, transform.position.z), _speed * Time.deltaTime);

@@ -51,7 +51,17 @@ public class CombineMachine : MonoBehaviour
         _combinedNode.Attach(_combinedNodePos.position, transform, newScale);
     }
 
-    private bool IsValidCombination(NodeType firstType, NodeType secondType) => (firstType != NodeType.Dash || secondType != NodeType.Dash);
+    private bool IsValidCombination(NodeType firstType, NodeType secondType)
+    {
+        bool firstIsValid = false;
+        bool secondIsValid = false;
+
+        if (firstType == NodeType.Blue || firstType == NodeType.Purple) firstIsValid = true;
+        if (secondType == NodeType.Blue || secondType == NodeType.Purple) secondIsValid = true;
+
+        if (firstIsValid && secondIsValid && firstType != secondType) return true;
+        else return false;
+    }
 
     public void SetNode(ElectricityNode node)
     {
@@ -71,6 +81,8 @@ public class CombineMachine : MonoBehaviour
 
     public void UnsetNode(ElectricityNode node)
     {
+        if (node.NodeType == NodeType.Dash) return;
+
         if (_firstNode != null || _secondNode != null)
         {
             if (node.NodeType == _firstNode.NodeType) _firstNode = null;
