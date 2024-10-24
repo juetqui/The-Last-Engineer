@@ -2,10 +2,17 @@ using UnityEngine;
 
 public class ElectricityNode : MonoBehaviour
 {
+    [Header("View")]
     [SerializeField] private Renderer _renderer;
     [SerializeField] private Material _material;
-    [SerializeField] private NodeType _nodeType;
     [SerializeField] private Collider _collider;
+    
+    [Header("Outline")]
+    [SerializeField] private Outline _outline;
+    [SerializeField] private Color _outlineColor;
+
+    [Header("Model")]
+    [SerializeField] private NodeType _nodeType;
     [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
     [SerializeField] private bool _isChildren = false;
 
@@ -18,13 +25,14 @@ public class ElectricityNode : MonoBehaviour
     private bool _isConnected = false;
 
     public NodeType NodeType { get { return _nodeType; } }
+    public Color OutlineColor { get { return _outlineColor; } }
     public bool IsChildren { get { return _isChildren; } }
     public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } }
 
     private void Start()
     {
         _nodeModel = new NodeModel(transform);
-        _nodeView = new NodeView(_renderer, _material, _collider);
+        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor);
         _nodeView.OnStart();
     }
 

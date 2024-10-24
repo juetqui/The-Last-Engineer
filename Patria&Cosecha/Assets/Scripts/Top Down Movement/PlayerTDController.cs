@@ -14,6 +14,7 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _dashCooldown;
 
     [Header("View")]
+    [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem _ps;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _source;
@@ -44,9 +45,10 @@ public class PlayerTDController : MonoBehaviour
         _commonSpeed = _moveSpeed;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        _playerView = new PlayerTDView(_ps, _animator, _source, _walkClip, _grabClip);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _grabClip);
 
         _playerModel.OnStart();
+        _playerView.GrabNode();
     }
 
     private void Update()
@@ -95,9 +97,13 @@ public class PlayerTDController : MonoBehaviour
             if (_connectionNode != null && IsInConnectArea) PlaceNode();
             else if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
             else if (!IsInConnectArea && !IsInCombinationArea && !IsInCombinerArea) DropNode();
+
+            _playerView.GrabNode();
         }
         
         if (_combiner != null && IsInCombinerArea) _combiner.ActivateCombineMachine();
+
+        CheckCurrentNode();
     }
 
     private void ChangeNode()
@@ -106,8 +112,8 @@ public class PlayerTDController : MonoBehaviour
 
         Vector3 attachPos = new Vector3(0, 1f, 1.2f);
         _node.Attach(this, attachPos);
-        _playerView.GrabNode();
-        CheckCurrentNode();
+
+        _playerView.GrabNode(_node.OutlineColor);
     }
 
     private void DropNode()
@@ -115,7 +121,8 @@ public class PlayerTDController : MonoBehaviour
         Vector3 dropPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         _node.Attach(dropPos);
         ResetNode();
-        CheckCurrentNode();
+
+        _playerView.GrabNode();
     }
 
     private void PlaceNode()
