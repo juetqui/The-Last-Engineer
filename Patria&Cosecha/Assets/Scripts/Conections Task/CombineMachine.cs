@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CombineMachine : MonoBehaviour
@@ -8,7 +10,7 @@ public class CombineMachine : MonoBehaviour
     [SerializeField] private Transform _secondNodePos;
     [SerializeField] private Transform _combinedNodePos;
 
-    private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode;
+    private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode = default;
     private bool _isActive = false, _isCombining = false;
 
     public bool IsActive { get { return _isActive; } }
@@ -41,14 +43,14 @@ public class CombineMachine : MonoBehaviour
     {
         if (!IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) return;
 
-        //Destroy(_firstNode.gameObject);
-        //Destroy(_secondNode.gameObject);
-        GameObject combinedNode = Instantiate(_combinedPrefab, _combinedNodePos);
+        _isCombining = true;
 
-        _combinedNode = combinedNode.GetComponent<ElectricityNode>();
+        StartCoroutine(DestroyNodes());
+
+        _combinedNode = Instantiate(_combinedPrefab).GetComponent<ElectricityNode>();
 
         Vector3 newScale = new Vector3(2, 2, 2);
-        _combinedNode.Attach(_combinedNodePos.position, transform, newScale);
+        _combinedNode.Attach(_combinedNodePos.position, this, newScale);
     }
 
     private bool IsValidCombination(NodeType firstType, NodeType secondType)
@@ -88,5 +90,18 @@ public class CombineMachine : MonoBehaviour
             if (node.NodeType == _firstNode.NodeType) _firstNode = null;
             else if (node.NodeType == _secondNode.NodeType) _secondNode = null;
         }
+    }
+
+    private IEnumerator DestroyNodes()
+    {
+        yield return new WaitForSeconds(2f);
+
+        Destroy(_firstNode.gameObject);
+        Destroy(_secondNode.gameObject);
+
+        _firstNode = null;
+        _secondNode = null;
+
+        _isCombining = false;
     }
 }

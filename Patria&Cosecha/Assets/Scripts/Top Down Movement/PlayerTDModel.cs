@@ -47,7 +47,7 @@ public class PlayerTDModel
         if (!_isDashing && !Physics.Raycast(rayDir, -_transform.up, 2.5f, _groundMask))
         {
             _rb.AddForce(Vector3.down * 200);
-            _transform.localScale -= Vector3.one * 5 * deltaTime;
+            //_transform.localScale -= Vector3.one * 5 * deltaTime;
         }
         else if (_transform.localScale != _oldScale) _transform.localScale = _oldScale;
     }

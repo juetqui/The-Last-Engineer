@@ -100,8 +100,12 @@ public class PlayerTDController : MonoBehaviour
 
             _playerView.GrabNode();
         }
-        
-        if (_combiner != null && IsInCombinerArea) _combiner.ActivateCombineMachine();
+
+        if (_combiner != null && IsInCombinerArea)
+        {
+            _combiner.ActivateCombineMachine();
+            _combiner = null;
+        }
 
         CheckCurrentNode();
     }
@@ -137,6 +141,7 @@ public class PlayerTDController : MonoBehaviour
     private void PlaceInMachine()
     {
         _combineMachine.SetNode(_node);
+        _combineMachine = null;
         ResetNode();
     }
 

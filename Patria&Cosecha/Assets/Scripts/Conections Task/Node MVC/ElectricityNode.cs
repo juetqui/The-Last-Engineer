@@ -82,6 +82,8 @@ public class ElectricityNode : MonoBehaviour
             _combineMachine = newParent.GetComponent<CombineMachine>();
         }
 
+        if (_nodeType == NodeType.Dash) Debug.Log(_combineMachine);
+
         if (newParent != null) _isChildren = true;
         else _isChildren = false;
 
@@ -90,9 +92,21 @@ public class ElectricityNode : MonoBehaviour
         else if (newParent == null && newScale == default) _nodeModel.SetPos(newPos);
     }
 
+    public void Attach(Vector3 newPos, CombineMachine newParent, Vector3 newScale)
+    {
+        _nodeView.EnableColl(true);
+
+        _combineMachine = newParent;
+
+        _isChildren = true;
+
+        if (newParent != null && newScale != default) _nodeModel.SetPos(newPos, newParent.transform, newScale);
+    }
+
     public void Combine(float deltaTime)
     {
         _nodeModel.Combine(deltaTime);
+        _nodeView.EnableColl(false);
     }
 }
 

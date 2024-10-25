@@ -30,6 +30,7 @@ public class AstronautController : MonoBehaviour
         if (randomAnim == 0) _animator.SetTrigger("Flip");
         else if (randomAnim == 1) _animator.SetTrigger("Jump");
         else if (randomAnim == 2) _animator.SetTrigger("Fall");
+        else if (randomAnim == 3) _animator.SetTrigger("Surprise");
 
         _isAnimating = false;
     }
@@ -38,6 +39,7 @@ public class AstronautController : MonoBehaviour
     {
         Flip,
         Jump,
-        Fall
+        Fall,
+        Surprise
     }
 }
