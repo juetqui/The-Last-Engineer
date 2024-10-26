@@ -27,6 +27,8 @@ public class CombinerController : MonoBehaviour
 
     public void ActivateCombineMachine()
     {
+        if (!_combineMachine.IsActive) return;
+
         _combineMachine.CombineNodes();
         _openDoor.Open();
     }

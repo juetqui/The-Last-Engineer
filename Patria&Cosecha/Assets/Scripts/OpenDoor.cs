@@ -4,12 +4,17 @@ using UnityEngine;
 public class OpenDoor : MonoBehaviour
 {
     [SerializeField] private Transform _openPos;
-    [SerializeField] private TaskManager _taskManager;
     [SerializeField] private bool _isMenu;
 
+    private MainTM _mainTM = default;
+    private SecondaryTM _secTM = default;
     private bool _canOpen = false, _isMoving = false;
     private float _stopDist = 0.01f, _speed = 2f;
     private Vector3 _closedPos = default;
+
+    private bool HasMainTM { get { return _mainTM != null && _mainTM.Running; } }
+    private bool HasSecTM { get { return _secTM != null && _secTM.Running; } }
+    private bool IsMenu {  get { return _isMenu && !HasMainTM && !HasSecTM; } }
 
     private void Awake()
     {
@@ -18,12 +23,21 @@ public class OpenDoor : MonoBehaviour
 
     void Update()
     {
-        if (_taskManager == null && _isMenu) _canOpen = true;
-        else if (_taskManager != null && _taskManager.Running) _canOpen = true;
+        if (HasMainTM || HasSecTM || IsMenu) _canOpen = true;
         else _canOpen = false;
 
         if (_canOpen && !_isMoving) StartCoroutine(Open(_openPos.position));
         else if (!_canOpen && !_isMoving) StartCoroutine(Open(_closedPos));
+    }
+
+    public void SetMainTM(MainTM taskManager)
+    {
+        _mainTM = taskManager;
+    }
+
+    public void SetSecTM(SecondaryTM taskManager)
+    {
+        _secTM = taskManager;
     }
 
     public void Open()

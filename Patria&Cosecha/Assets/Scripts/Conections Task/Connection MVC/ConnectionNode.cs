@@ -1,9 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ConnectionNode : MonoBehaviour
 {
-    [SerializeField] private TaskManager[] _taskManagers;
     [SerializeField] private NodeType _requiredType;
 
     [Header("MVC View")]
@@ -21,20 +21,30 @@ public class ConnectionNode : MonoBehaviour
 
     [SerializeField] private ParticleSystem _ps;
 
-
+    private MainTM _mainTM = default;
+    private List<SecondaryTM> _secTaskManagers = new List<SecondaryTM>();
     private NodeRenderer _nodeRenderer = default;
-    private NodeChecker _nodeChecker = default;
     private ElectricityNode _recievedNode = default;
 
-    private bool _isDisabled = false;
+    private bool _isDisabled = false, _isWorking = false;
 
     public bool IsDisabled { get { return _isDisabled; } }
+    public bool IsWorking { get { return _isWorking; } }
 
-    private void Start()
+    private void Awake()
     {
         _nodeRenderer = new NodeRenderer(_requiredType, _render, _colider, _triggerCollider, _color, _secColor, _fresnelColor, _ps, _audioSrc);
         _nodeRenderer.OnStart();
-        _nodeChecker = new NodeChecker(_taskManagers, _requiredType);
+    }
+
+    public void SetMainTM(MainTM taskManager)
+    {
+        _mainTM = taskManager;
+    }
+
+    public void SetSecTM(SecondaryTM secTM)
+    {
+        _secTaskManagers.Add(secTM);
     }
 
     public void SetNode(ElectricityNode node)
@@ -51,31 +61,52 @@ public class ConnectionNode : MonoBehaviour
         _recievedNode = null;
         _nodeRenderer.Enable(true);
         _nodeRenderer.EnableTrigger(true);
-
-        foreach (var tm in _taskManagers)
-            tm.RemoveConnection(_requiredType);
+        HandleTaskManagers(false);
     }
 
     private void CheckReceivedNode()
     {
         _nodeRenderer.EnableTrigger(false);
 
-        if (_nodeChecker.IsNodeCorrect(_recievedNode.NodeType))
+        if (_recievedNode.NodeType == _requiredType) HandleRecievedNode(true, false, _placedClip);
+        else
         {
-            _recievedNode.IsConnected = true;
-            _nodeRenderer.Enable(false);
-            _nodeRenderer.PlayClip(_placedClip);
-            _nodeRenderer.PlayEffect(false);
-            _nodeChecker.HandleNodeCorrect(_recievedNode.NodeType);
+            HandleRecievedNode(false, true, _errorClip);
+            StartCoroutine(DisableConnection());
+        }
+    }
+
+    private void HandleRecievedNode(bool isValid, bool playEffects, AudioClip clip)
+    {
+        if (isValid) HandleTaskManagers(true);
+        else HandleTaskManagers(false);
+
+        _isWorking = isValid;
+        _recievedNode.IsConnected = isValid;
+        _nodeRenderer.Enable(playEffects);
+        _nodeRenderer.PlayEffect(playEffects);
+        _nodeRenderer.PlayClip(_placedClip);
+    }
+
+    private void HandleTaskManagers(bool addOrRemove)
+    {
+        if (addOrRemove)
+        {
+            if (_mainTM != null) _mainTM.AddConnection(_requiredType);
+
+            if (_secTaskManagers.Count > 0)
+            {
+                foreach (var secTM in _secTaskManagers) secTM.AddConnection(_requiredType);
+            }
         }
         else
         {
-            _recievedNode.IsConnected = false;
-            _nodeRenderer.Enable(true);
-            _nodeRenderer.PlayClip(_errorClip);
-            _nodeRenderer.PlayEffect(true);
-            _nodeChecker.HandleNodeIncorrect();
-            StartCoroutine(DisableConnection());
+            if (_mainTM != null) _mainTM.RemoveConnection(_requiredType);
+
+            if (_secTaskManagers.Count > 0)
+            {
+                foreach (var secTM in _secTaskManagers) secTM.RemoveConnection(_requiredType);
+            }
         }
     }
 
