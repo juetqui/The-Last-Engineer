@@ -49,6 +49,7 @@ public class ConnectionNode : MonoBehaviour
     public void UnsetNode()
     {
         _recievedNode = null;
+        _nodeRenderer.Enable(true);
         _nodeRenderer.EnableTrigger(true);
 
         foreach (var tm in _taskManagers)

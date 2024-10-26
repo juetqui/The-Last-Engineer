@@ -29,28 +29,26 @@ public class ElectricityNode : MonoBehaviour
     public bool IsChildren { get { return _isChildren; } }
     public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } }
 
+    private void Awake()
+    {
+        _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
+        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor);
+    }
+
     private void Start()
     {
-        _nodeModel = new NodeModel(transform);
-        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor);
         _nodeView.OnStart();
     }
 
     private void Update()
     {
         if (!_isChildren) MoveObject();
-        //if (_isConnected) _nodeView.EnableColl(false);
     }
 
     private void MoveObject()
     {
-        _collider.enabled = true;
-
-        Vector3 currentPosition = transform.position;
-        float newY = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
-
-        transform.position = new Vector3(currentPosition.x, newY, currentPosition.z);
-        transform.Rotate(0, _rotSpeed * Time.deltaTime, 0);
+        _nodeView.EnableColl(true);
+        _nodeModel.MoveObject(Time.deltaTime);
     }
 
     public void Attach(PlayerTDController player, Vector3 newPos)
@@ -82,8 +80,6 @@ public class ElectricityNode : MonoBehaviour
             _combineMachine = newParent.GetComponent<CombineMachine>();
         }
 
-        if (_nodeType == NodeType.Dash) Debug.Log(_combineMachine);
-
         if (newParent != null) _isChildren = true;
         else _isChildren = false;
 
@@ -92,21 +88,10 @@ public class ElectricityNode : MonoBehaviour
         else if (newParent == null && newScale == default) _nodeModel.SetPos(newPos);
     }
 
-    public void Attach(Vector3 newPos, CombineMachine newParent, Vector3 newScale)
+    public bool Combine(float deltaTime)
     {
-        _nodeView.EnableColl(true);
-
-        _combineMachine = newParent;
-
-        _isChildren = true;
-
-        if (newParent != null && newScale != default) _nodeModel.SetPos(newPos, newParent.transform, newScale);
-    }
-
-    public void Combine(float deltaTime)
-    {
-        _nodeModel.Combine(deltaTime);
         _nodeView.EnableColl(false);
+        return _nodeModel.Combine(deltaTime);
     }
 }
 

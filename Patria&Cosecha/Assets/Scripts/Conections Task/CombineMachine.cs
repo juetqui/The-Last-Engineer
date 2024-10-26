@@ -17,14 +17,10 @@ public class CombineMachine : MonoBehaviour
 
     private void Update()
     {
-        if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) Activate();
+        if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode, _secondNode)) Activate();
         else Deactivate();
 
-        if (_isCombining)
-        {
-            _firstNode.Combine(Time.deltaTime);
-            _secondNode.Combine(Time.deltaTime);
-        }
+        if (_isCombining) DestroyNodes(Time.deltaTime);
     }
 
     private void Activate()
@@ -41,25 +37,36 @@ public class CombineMachine : MonoBehaviour
 
     public void CombineNodes()
     {
-        if (!IsValidCombination(_firstNode.NodeType, _secondNode.NodeType)) return;
+        if (!IsValidCombination(_firstNode, _secondNode)) return;
 
         _isCombining = true;
-
-        StartCoroutine(DestroyNodes());
-
-        _combinedNode = Instantiate(_combinedPrefab).GetComponent<ElectricityNode>();
-
-        Vector3 newScale = new Vector3(2, 2, 2);
-        _combinedNode.Attach(_combinedNodePos.position, this, newScale);
+        _combinedNode = Instantiate(_combinedPrefab, transform.position, Quaternion.identity).GetComponent<ElectricityNode>();
+        _combinedNode.Attach(_combinedNodePos.localPosition, transform);
     }
 
-    private bool IsValidCombination(NodeType firstType, NodeType secondType)
+    private void DestroyNodes(float deltaTime)
     {
+        if (_firstNode.Combine(deltaTime) && _secondNode.Combine(deltaTime))
+        {
+            Destroy(_firstNode.gameObject);
+            Destroy(_secondNode.gameObject);
+
+            _firstNode = null;
+            _secondNode = null;
+            
+            _isCombining = false;
+        }
+    }
+
+    private bool IsValidCombination(ElectricityNode firstType, ElectricityNode secondType)
+    {
+        if (_firstNode == null || _secondNode == null) return false;
+
         bool firstIsValid = false;
         bool secondIsValid = false;
 
-        if (firstType == NodeType.Blue || firstType == NodeType.Purple) firstIsValid = true;
-        if (secondType == NodeType.Blue || secondType == NodeType.Purple) secondIsValid = true;
+        if (firstType.NodeType == NodeType.Blue || firstType.NodeType == NodeType.Purple) firstIsValid = true;
+        if (secondType.NodeType == NodeType.Blue || secondType.NodeType == NodeType.Purple) secondIsValid = true;
 
         if (firstIsValid && secondIsValid && firstType != secondType) return true;
         else return false;
@@ -90,18 +97,5 @@ public class CombineMachine : MonoBehaviour
             if (node.NodeType == _firstNode.NodeType) _firstNode = null;
             else if (node.NodeType == _secondNode.NodeType) _secondNode = null;
         }
-    }
-
-    private IEnumerator DestroyNodes()
-    {
-        yield return new WaitForSeconds(2f);
-
-        Destroy(_firstNode.gameObject);
-        Destroy(_secondNode.gameObject);
-
-        _firstNode = null;
-        _secondNode = null;
-
-        _isCombining = false;
     }
 }

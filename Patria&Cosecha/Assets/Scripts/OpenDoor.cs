@@ -26,6 +26,11 @@ public class OpenDoor : MonoBehaviour
         else if (!_canOpen && !_isMoving) StartCoroutine(Open(_closedPos));
     }
 
+    public void Open()
+    {
+        _isMenu = true;
+    }
+
     private IEnumerator Open(Vector3 targetPos)
     {
         _isMoving = true;
