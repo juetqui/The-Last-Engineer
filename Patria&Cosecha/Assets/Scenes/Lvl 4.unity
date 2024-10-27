@@ -472,19 +472,14 @@ Transform:
   - {fileID: 1716766238}
   - {fileID: 445644218}
   - {fileID: 1771906059}
-  - {fileID: 681362490}
-  - {fileID: 1447558498}
-  - {fileID: 986382786}
-  - {fileID: 1013806063}
-  - {fileID: 922974101}
   - {fileID: 1934130893}
   - {fileID: 1690386954}
   - {fileID: 1296248582}
-  - {fileID: 825449216}
   - {fileID: 605210301}
   - {fileID: 959442846}
   - {fileID: 1596651235}
   - {fileID: 1234549828}
+  - {fileID: 1553170744}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &168034265
@@ -1303,7 +1298,7 @@ PrefabInstance:
     - target: {fileID: 4592192865104965040, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
       propertyPath: _taskManagers.Array.data[0]
       value: 
-      objectReference: {fileID: 580124339}
+      objectReference: {fileID: 0}
     - target: {fileID: 5137010849496806599, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
       propertyPath: m_Name
       value: Purple Connection puerta izq
@@ -1448,7 +1443,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1251378130}
+    m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4103363167094849073, guid: 27efb3b036fa4744292921e39fdfbb71, type: 3}
       propertyPath: m_Name
@@ -1515,22 +1510,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 27efb3b036fa4744292921e39fdfbb71, type: 3}
---- !u!4 &733435310 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7469633388546935593, guid: 27efb3b036fa4744292921e39fdfbb71, type: 3}
-  m_PrefabInstance: {fileID: 733435309}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &733435311 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6710103549632200949, guid: 27efb3b036fa4744292921e39fdfbb71, type: 3}
-  m_PrefabInstance: {fileID: 733435309}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ed34824cf7a57c4e8b1f4869f107df3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &877753747
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1609,17 +1588,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7469633388546935593, guid: 27efb3b036fa4744292921e39fdfbb71, type: 3}
   m_PrefabInstance: {fileID: 877753747}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &877753749 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6710103549632200949, guid: 27efb3b036fa4744292921e39fdfbb71, type: 3}
-  m_PrefabInstance: {fileID: 877753747}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ed34824cf7a57c4e8b1f4869f107df3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &883709495
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1628,6 +1596,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4592192865104965040, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
+      propertyPath: _taskManagers.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5137010849496806599, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
+      propertyPath: m_Name
+      value: Blue Connection puerta der
+      objectReference: {fileID: 0}
     - target: {fileID: 1326745308274462695, guid: 9758d96cd16516a4486a97e65b216e2d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 15.24
@@ -1667,14 +1643,6 @@ PrefabInstance:
     - target: {fileID: 1326745308274462695, guid: 9758d96cd16516a4486a97e65b216e2d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4592192865104965040, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
-      propertyPath: _taskManagers.Array.data[0]
-      value: 
-      objectReference: {fileID: 580124339}
-    - target: {fileID: 5137010849496806599, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
-      propertyPath: m_Name
-      value: Blue Connection puerta der
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1721,7 +1689,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1251378130}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &959442845
 GameObject:
@@ -2217,6 +2185,7 @@ Transform:
   - {fileID: 349128433}
   - {fileID: 1962748365}
   - {fileID: 1710625507}
+  - {fileID: 1522726984}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1296248578
@@ -2474,7 +2443,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e777f8588d85b9648b695bc431173e83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _taskManager: {fileID: 580124339}
   _lvlName: Lvl 7
 --- !u!65 &1385857217
 BoxCollider:
@@ -2497,96 +2465,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 2, z: 5}
   m_Center: {x: -0.25, y: 0, z: 0}
---- !u!1 &1456752969
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1447558498}
-  - component: {fileID: 1447558497}
-  - component: {fileID: 1447558496}
-  - component: {fileID: 1447558495}
-  m_Layer: 0
-  m_Name: Cube (20)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &1447558495
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1447558494}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1447558496
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1447558494}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: abf414ad9856984449a33abd52f3bb58, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1447558497
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1447558494}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1522726983
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2710,7 +2588,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _openPos: {fileID: 1125887020}
-  _taskManager: {fileID: 877753749}
   _isMenu: 0
 --- !u!65 &1522726987
 BoxCollider:
@@ -2907,18 +2784,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 674895046060861587, guid: ba312e14c77cb0849aa4da70568e1f22, type: 3}
-      propertyPath: _taskManagers.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 674895046060861587, guid: ba312e14c77cb0849aa4da70568e1f22, type: 3}
-      propertyPath: _taskManagers.Array.data[0]
-      value: 
-      objectReference: {fileID: 580124339}
-    - target: {fileID: 3403833870199959586, guid: ba312e14c77cb0849aa4da70568e1f22, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 6.0000024
-      objectReference: {fileID: 0}
     - target: {fileID: 1863314582357734657, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
       propertyPath: m_LocalPosition.y
       value: 1.25
@@ -2958,6 +2823,18 @@ PrefabInstance:
     - target: {fileID: 5137010849496806599, guid: aa7ccdca84fbbe7499200328679f5e5a, type: 3}
       propertyPath: m_Name
       value: Purple Connection Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 674895046060861587, guid: ba312e14c77cb0849aa4da70568e1f22, type: 3}
+      propertyPath: _taskManagers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 674895046060861587, guid: ba312e14c77cb0849aa4da70568e1f22, type: 3}
+      propertyPath: _taskManagers.Array.data[0]
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3403833870199959586, guid: ba312e14c77cb0849aa4da70568e1f22, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.0000024
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4641,4 +4518,7 @@ SceneRoots:
   - {fileID: 168034265}
   - {fileID: 1555842810}
   - {fileID: 1295102231}
-  - {fileID: 709933466}
+  - {fileID: 705507995}
+  - {fileID: 733435309}
+  - {fileID: 894945720}
+  - {fileID: 1385857215}
