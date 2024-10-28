@@ -171,11 +171,15 @@ public class PlayerTDController : MonoBehaviour
         CombineMachine machine = coll.GetComponent<CombineMachine>();
         CombinerController combiner = coll.GetComponent<CombinerController>();
 
-        if (node != null && _currentType == NodeType.None) _node = node;
+        if (node != null && _currentType == NodeType.None)
+        {
+            _node = null;
+            _node = node;
+        }
         else if (connectionNode != null) _connectionNode = connectionNode;
         else if (machine != null) _combineMachine = machine;
         else if (combiner != null) _combiner = combiner;
-        
+
         else if (coll.CompareTag("Void")) ResetLevel();
     }
 
