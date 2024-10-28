@@ -8,7 +8,6 @@ public class ConnectionNode : MonoBehaviour
 
     [Header("MVC View")]
     [SerializeField] private Renderer _render;
-    [SerializeField] private Collider _colider;
     [SerializeField] private Collider _triggerCollider;
     [SerializeField] private AudioSource _audioSrc;
     [SerializeField] private AudioClip _placedClip;
@@ -33,7 +32,7 @@ public class ConnectionNode : MonoBehaviour
 
     private void Awake()
     {
-        _nodeRenderer = new NodeRenderer(_requiredType, _render, _colider, _triggerCollider, _color, _secColor, _fresnelColor, _ps, _audioSrc);
+        _nodeRenderer = new NodeRenderer(_requiredType, _render, _triggerCollider, _color, _secColor, _fresnelColor, _ps, _audioSrc);
         _nodeRenderer.OnStart();
     }
 

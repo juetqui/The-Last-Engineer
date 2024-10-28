@@ -6,14 +6,13 @@ public class NodeRenderer : INodeEffect, INodeAudio
     private Renderer _renderer = default;
     private ParticleSystem _ps = default;
     private AudioSource _source = default;
-    private Collider _collider = default, _triggerCollider = default;
+    private Collider _triggerCollider = default;
     private Color _color = default, _secColor = default, _fresnelColor = default;
 
-    public NodeRenderer(NodeType type, Renderer renderer, Collider collider, Collider triggerCollider, Color color, Color secColor, Color fresnelColor, ParticleSystem ps, AudioSource source)
+    public NodeRenderer(NodeType type, Renderer renderer, Collider triggerCollider, Color color, Color secColor, Color fresnelColor, ParticleSystem ps, AudioSource source)
     {
         _type = type;
         _renderer = renderer;
-        _collider = collider;
         _triggerCollider = triggerCollider;
         _color = color;
         _secColor = secColor;
@@ -38,7 +37,6 @@ public class NodeRenderer : INodeEffect, INodeAudio
     public void Enable(bool value)
     {
         _renderer.enabled = value;
-        _collider.enabled = value;
     }
 
     public void EnableTrigger(bool value)

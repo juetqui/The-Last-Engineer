@@ -55,6 +55,8 @@ public class ElectricityNode : MonoBehaviour
     {
         Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
         
+        if (_nodeType == NodeType.Dash) newScale = Vector3.one;
+        
         Attach(newPos, player.transform, newScale, true);
 
         if (_isChildren && _connectionNode != null)

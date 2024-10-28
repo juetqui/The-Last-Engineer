@@ -7,6 +7,7 @@ public class MainTM : TaskManager
 
     [Header("Level")]
     [SerializeField] private LevelChanger _lvlChanger;
+    [SerializeField] private AudioSource _winAS;
 
     private void Start()
     {
@@ -25,6 +26,7 @@ public class MainTM : TaskManager
     {
         _ps.Play();
         _source.Play();
+        _winAS.Play();
     }
 
     protected override void SetUp()

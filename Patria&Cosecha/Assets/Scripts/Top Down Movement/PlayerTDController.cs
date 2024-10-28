@@ -19,8 +19,9 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _source;
     [SerializeField] private AudioClip _walkClip;
-    [SerializeField] private AudioClip _grabClip;
-    
+    [SerializeField] private AudioClip _liftClip;
+    [SerializeField] private AudioClip _putDownClip;
+
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
@@ -45,10 +46,10 @@ public class PlayerTDController : MonoBehaviour
         _commonSpeed = _moveSpeed;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _grabClip);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _liftClip, _putDownClip);
 
         _playerModel.OnStart();
-        _playerView.GrabNode();
+        //_playerView.GrabNode();
     }
 
     private void Update()
@@ -117,7 +118,7 @@ public class PlayerTDController : MonoBehaviour
         Vector3 attachPos = new Vector3(0, 1f, 1.2f);
         _node.Attach(this, attachPos);
 
-        _playerView.GrabNode(_node.OutlineColor);
+        _playerView.GrabNode(true, _node.OutlineColor);
     }
 
     private void DropNode()

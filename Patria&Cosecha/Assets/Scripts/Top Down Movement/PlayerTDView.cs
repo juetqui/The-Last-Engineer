@@ -7,19 +7,20 @@ public class PlayerTDView
 
     private Animator _animator = default;
     private AudioSource _source = default;
-    private AudioClip _walkClip = default, _grabClip = default;
+    private AudioClip _walkClip = default, _liftClip = default, _putDownClip = default;
 
     private float _timer = default, _interval = 0.0125f;
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip grabClip)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip liftClip, AudioClip putDownClip)
     {
         _outline = outline;
         _ps = ps;
         _animator = animator;
         _source = source;
         _walkClip = walkClip;
-        _grabClip = grabClip;
+        _liftClip = liftClip;
+        _putDownClip = putDownClip;
     }
 
     public void Walk(Vector3 moveVector)
@@ -36,6 +37,7 @@ public class PlayerTDView
     {
         if (!_source.isPlaying)
         {
+            _source.volume = 0.6f;
             _timer += Time.deltaTime;
 
             if (_timer >= _interval)
@@ -64,13 +66,13 @@ public class PlayerTDView
         foreach (var ps in _ps) ps.Stop();
     }
 
-    public void GrabNode(Color outlineColor = default)
+    public void GrabNode(bool grab = false, Color outlineColor = default)
     {
-        if (!_source.isPlaying)
-        {
-            _source.clip = _grabClip;
-            _source.Play();
-        }
+        if (grab) _source.clip = _liftClip;
+        else _source.clip = _putDownClip;
+        
+        _source.volume = 1f;
+        _source.Play();
 
         if (outlineColor != Color.black)
         {
