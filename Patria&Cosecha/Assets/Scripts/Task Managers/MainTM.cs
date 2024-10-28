@@ -9,6 +9,11 @@ public class MainTM : TaskManager
     [SerializeField] private LevelChanger _lvlChanger;
     [SerializeField] private AudioSource _winAS;
 
+    private void Awake()
+    {
+        Cursor.visible = false;
+    }
+
     private void Start()
     {
         OnStart();
