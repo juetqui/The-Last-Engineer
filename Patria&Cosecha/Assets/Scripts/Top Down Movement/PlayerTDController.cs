@@ -64,9 +64,9 @@ public class PlayerTDController : MonoBehaviour
         if (CheckForDash())
         {
             _playerModel.Dash(GetMovement());
-            _playerView.PlayDashPS();
+            //_playerView.PlayDashPS();
         }
-        else _playerView.StopDashPS();
+        //else _playerView.StopDashPS();
 
         if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();

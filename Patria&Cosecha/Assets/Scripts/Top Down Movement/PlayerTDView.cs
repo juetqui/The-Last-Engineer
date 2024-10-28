@@ -50,12 +50,13 @@ public class PlayerTDView
         else _timer = 0;
     }
 
-    public void PlayDashPS()
+    public void PlayPS(Color color)
     {
+        _ps.startColor = color;
         _ps.Play();
     }
 
-    public void StopDashPS()
+    public void StopPS()
     {
         _ps.Stop();
     }
@@ -70,11 +71,13 @@ public class PlayerTDView
 
         if (outlineColor != Color.black)
         {
+            PlayPS(outlineColor);
             _outline.OutlineColor = outlineColor;
             _outline.OutlineWidth = 5;
         }
         else
         {
+            StopPS();
             _outline.OutlineColor = _defaultOutline;
             _outline.OutlineWidth = 0;
         }
