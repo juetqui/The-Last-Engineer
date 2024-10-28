@@ -8,6 +8,11 @@ public class MainTM : TaskManager
     [Header("Level")]
     [SerializeField] private LevelChanger _lvlChanger;
 
+    private void Awake()
+    {
+        Cursor.visible = false;
+    }
+
     private void Start()
     {
         OnStart();
