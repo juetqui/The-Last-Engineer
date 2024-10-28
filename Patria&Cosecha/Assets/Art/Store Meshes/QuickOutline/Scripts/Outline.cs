@@ -6,6 +6,9 @@
 //  Copyright © 2018 Chris Nolet. All rights reserved.
 //
 
+// LA VARIABLE renderer[] ES COMENTADA PARA QUE NO SE APLIQUE EL OUTLINE A TODOS LOS MESH DENTRO DEL OBJETO
+// ES REEMPLAZADA POR LA VARIABLE _renderer QUE APLICA EL OUTLINE UNICAMENTE EN EL MESH PRINCIPAL DONDE SE UBICA ESTE MISMO SCRIPT
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +78,8 @@ public class Outline : MonoBehaviour {
   private List<ListVector3> bakeValues = new List<ListVector3>();
 
   private Renderer[] renderers;
-  private Material outlineMaskMaterial;
+  private Renderer _renderer;
+    private Material outlineMaskMaterial;
   private Material outlineFillMaterial;
 
   private bool needsUpdate;
@@ -83,7 +87,8 @@ public class Outline : MonoBehaviour {
   void Awake() {
 
     // Cache renderers
-    renderers = GetComponentsInChildren<Renderer>();
+    //renderers = GetComponentsInChildren<Renderer>();
+    _renderer = GetComponent<Renderer>();
 
     // Instantiate outline materials
     outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
@@ -100,17 +105,24 @@ public class Outline : MonoBehaviour {
   }
 
   void OnEnable() {
-    foreach (var renderer in renderers) {
+    //foreach (var renderer in renderers) {
 
-      // Append outline shaders
-      var materials = renderer.sharedMaterials.ToList();
+    //  // Append outline shaders
+    //  var materials = renderer.sharedMaterials.ToList();
 
-      materials.Add(outlineMaskMaterial);
-      materials.Add(outlineFillMaterial);
+    //  materials.Add(outlineMaskMaterial);
+    //  materials.Add(outlineFillMaterial);
 
-      renderer.materials = materials.ToArray();
+    //  renderer.materials = materials.ToArray();
+    //}
+
+        var materials = _renderer.sharedMaterials.ToList();
+
+        materials.Add(outlineMaskMaterial);
+        materials.Add(outlineFillMaterial);
+
+        _renderer.materials = materials.ToArray();
     }
-  }
 
   void OnValidate() {
 
@@ -138,17 +150,24 @@ public class Outline : MonoBehaviour {
   }
 
   void OnDisable() {
-    foreach (var renderer in renderers) {
+        //foreach (var renderer in renderers) {
 
-      // Remove outline shaders
-      var materials = renderer.sharedMaterials.ToList();
+        //  // Remove outline shaders
+        //  var materials = renderer.sharedMaterials.ToList();
 
-      materials.Remove(outlineMaskMaterial);
-      materials.Remove(outlineFillMaterial);
+        //  materials.Remove(outlineMaskMaterial);
+        //  materials.Remove(outlineFillMaterial);
 
-      renderer.materials = materials.ToArray();
+        //  renderer.materials = materials.ToArray();
+        //}
+
+        var materials = _renderer.sharedMaterials.ToList();
+
+        materials.Remove(outlineMaskMaterial);
+        materials.Remove(outlineFillMaterial);
+
+        _renderer.materials = materials.ToArray();
     }
-  }
 
   void OnDestroy() {
 

@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerTDView
 {
     private Outline _outline = default;
-    private ParticleSystem _ps = default;
+    private ParticleSystem[] _ps = default;
 
     private Animator _animator = default;
     private AudioSource _source = default;
@@ -12,7 +12,7 @@ public class PlayerTDView
     private float _timer = default, _interval = 0.0125f;
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip grabClip)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip grabClip)
     {
         _outline = outline;
         _ps = ps;
@@ -52,13 +52,16 @@ public class PlayerTDView
 
     public void PlayPS(Color color)
     {
-        _ps.startColor = color;
-        _ps.Play();
+        foreach (var ps in _ps)
+        {
+            ps.startColor = color;
+            ps.Play();
+        }
     }
 
     public void StopPS()
     {
-        _ps.Stop();
+        foreach (var ps in _ps) ps.Stop();
     }
 
     public void GrabNode(Color outlineColor = default)

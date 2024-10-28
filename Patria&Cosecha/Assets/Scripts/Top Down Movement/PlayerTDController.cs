@@ -15,7 +15,7 @@ public class PlayerTDController : MonoBehaviour
 
     [Header("View")]
     [SerializeField] private Outline _outline;
-    [SerializeField] private ParticleSystem _ps;
+    [SerializeField] private ParticleSystem[] _ps;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _source;
     [SerializeField] private AudioClip _walkClip;

@@ -14,10 +14,11 @@ public class CombineMachine : MonoBehaviour
     private bool _isActive = false, _isCombining = false;
 
     public bool IsActive { get { return _isActive; } }
+    public bool HasNodes { get { return IsFilled(); } }
 
     private void Update()
     {
-        if (_firstNode != null && _secondNode != null && IsValidCombination(_firstNode, _secondNode)) Activate();
+        if (IsFilled() && IsValidCombination()) Activate();
         else Deactivate();
 
         if (_isCombining) DestroyNodes(Time.deltaTime);
@@ -37,7 +38,7 @@ public class CombineMachine : MonoBehaviour
 
     public void CombineNodes()
     {
-        if (!IsValidCombination(_firstNode, _secondNode)) return;
+        if (!IsValidCombination() || !IsFilled()) return;
 
         _isCombining = true;
         _combinedNode = Instantiate(_combinedPrefab, transform.position, Quaternion.identity).GetComponent<ElectricityNode>();
@@ -58,18 +59,23 @@ public class CombineMachine : MonoBehaviour
         }
     }
 
-    private bool IsValidCombination(ElectricityNode firstType, ElectricityNode secondType)
+    private bool IsValidCombination()
     {
-        if (_firstNode == null || _secondNode == null) return false;
-
         bool firstIsValid = false;
         bool secondIsValid = false;
 
-        if (firstType.NodeType == NodeType.Blue || firstType.NodeType == NodeType.Purple) firstIsValid = true;
-        if (secondType.NodeType == NodeType.Blue || secondType.NodeType == NodeType.Purple) secondIsValid = true;
+        if (_firstNode.NodeType == NodeType.Blue || _firstNode.NodeType == NodeType.Purple) firstIsValid = true;
+        if (_secondNode.NodeType == NodeType.Blue || _secondNode.NodeType == NodeType.Purple) secondIsValid = true;
 
-        if (firstIsValid && secondIsValid && firstType != secondType) return true;
+        if (firstIsValid && secondIsValid && _firstNode != _secondNode) return true;
         else return false;
+    }
+
+    private bool IsFilled()
+    {
+        if (_firstNode == null || _secondNode == null) return false;
+        
+        return true;
     }
 
     public void SetNode(ElectricityNode node)

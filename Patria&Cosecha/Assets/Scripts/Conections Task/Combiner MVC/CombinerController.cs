@@ -6,13 +6,16 @@ public class CombinerController : MonoBehaviour
     [SerializeField] private OpenDoor _openDoor;
 
     [SerializeField] private Renderer _renderer;
-    [SerializeField] private Color _onColor, _offColor;
+    [SerializeField] private Renderer _shield;
+
+    [ColorUsage(true, true)]
+    [SerializeField] private Color _noColor, _onColor, _offColor;
 
     private CombinerView _view = default;
 
     private void Awake()
     {
-        _view = new CombinerView(_renderer, _onColor, _offColor);
+        _view = new CombinerView(_renderer, _shield, _noColor, _onColor, _offColor);
     }
 
     private void Start()
