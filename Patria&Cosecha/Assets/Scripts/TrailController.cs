@@ -30,7 +30,7 @@ public class TrailController : MonoBehaviour
         {
             if (_index == _movePoints.Length) _goUp = false;
             else if (_index == 0) _goUp = true;
-            
+
             if (_goUp) _index++;
             else _index--;
 
@@ -41,6 +41,6 @@ public class TrailController : MonoBehaviour
 
     private Vector3 UpdateTargetPos()
     {
-        return new Vector3(_currentTarget.position.x, _currentTarget.position.y + 1, _currentTarget.position.z);
+        return new Vector3(_currentTarget.position.x, transform.position.y, _currentTarget.position.z);
     }
 }
