@@ -17,6 +17,10 @@ public class ScreenPause : MonoBehaviour, IScreen
             button.interactable = false;
         }
 
+    }
+
+    public void Start()
+    {
         Cursor.visible = true;
     }
 
@@ -37,9 +41,10 @@ public class ScreenPause : MonoBehaviour, IScreen
     public void BTN_Menu()
     {
         _result = "Menu Button";
-        ScreenManager.Instance.Pop();
 
+        ScreenManager.Instance.Pop();
         SceneManager.LoadScene("Menu");
+        Cursor.visible = true;
     }
 
     public void BTN_ResetLevel()
