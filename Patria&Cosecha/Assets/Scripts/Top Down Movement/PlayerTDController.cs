@@ -69,7 +69,6 @@ public class PlayerTDController : MonoBehaviour
         }
         //else _playerView.StopDashPS();
 
-        if (Input.GetKeyDown(KeyCode.L)) ResetLevel();
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
     }
 
@@ -160,11 +159,6 @@ public class PlayerTDController : MonoBehaviour
         _currentType = NodeType.None;
     }
 
-    private void ResetLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
     private void OnTriggerEnter(Collider coll)
     {
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
@@ -178,6 +172,11 @@ public class PlayerTDController : MonoBehaviour
         else if (combiner != null) _combiner = combiner;
 
         else if (coll.CompareTag("Void")) ResetLevel();
+    }
+
+    public void ResetLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // THIS METHOD IS USED TO GRAB A NODE WHEN ANOTHER ONE WAS DROP NEAR
