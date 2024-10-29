@@ -13,7 +13,7 @@ public abstract class TaskManager : MonoBehaviour
     protected int _workingNodes = default, _totalToFinish = default;
     protected bool _running = false;
 
-    protected HashSet<NodeType> _nodesSet = new HashSet<NodeType>();
+    protected Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
 
     public bool Running { get { return _running; } }
 
@@ -28,7 +28,7 @@ public abstract class TaskManager : MonoBehaviour
 
     protected void ValidateAllConnections()
     {
-        if (_workingNodes == _totalToFinish && _nodesSet.Count == _totalToFinish)
+        if (_workingNodes == _totalToFinish)
         {
             _running = true;
             OnAllNodesConnected();
@@ -38,19 +38,23 @@ public abstract class TaskManager : MonoBehaviour
 
     public void AddConnection(NodeType nodeType)
     {
-        if (_nodesSet.Add(nodeType))
-        {
-            _workingNodes++;
-            ValidateAllConnections();
-        }
+        if (_nodesSet.ContainsKey(nodeType)) _nodesSet[nodeType]++;
+        else _nodesSet.Add(nodeType, 1);
+
+        _workingNodes++;
+        ValidateAllConnections();
     }
 
     public void RemoveConnection(NodeType nodeType)
     {
-        if (_nodesSet.Remove(nodeType))
+        if (_nodesSet.ContainsKey(nodeType))
         {
-            _workingNodes--;
-            ValidateAllConnections();
+            _nodesSet[nodeType]--;
+
+            if (_nodesSet[nodeType] <= 0) _nodesSet.Remove(nodeType);
         }
+
+        _workingNodes--;
+        ValidateAllConnections();
     }
 }
