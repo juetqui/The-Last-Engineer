@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ScreenPause : MonoBehaviour, IScreen
@@ -15,6 +16,8 @@ public class ScreenPause : MonoBehaviour, IScreen
         {
             button.interactable = false;
         }
+
+        Cursor.visible = true;
     }
 
     public void BTN_Back()
@@ -33,9 +36,18 @@ public class ScreenPause : MonoBehaviour, IScreen
 
     public void BTN_Menu()
     {
-        _result = "Pause Button";
+        _result = "Menu Button";
+        ScreenManager.Instance.Pop();
 
-        ScreenManager.Instance.Push("Pause_Menu");
+        SceneManager.LoadScene("Menu");
+    }
+
+    public void BTN_ResetLevel()
+    {
+        _result = "Reset Button";
+        ScreenManager.Instance.Pop();
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void Activate()
@@ -57,6 +69,7 @@ public class ScreenPause : MonoBehaviour, IScreen
     public string Free()
     {
         Destroy(gameObject);
+        Cursor.visible = false;
 
         return _result;
     }
