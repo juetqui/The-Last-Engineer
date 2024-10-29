@@ -64,7 +64,7 @@ public class PlayerTDController : MonoBehaviour
 
         if (CheckForDash())
         {
-            _playerModel.Dash(GetMovement());
+            _playerModel.Dash(_currentType, GetMovement());
             //_playerView.PlayDashPS();
         }
         //else _playerView.StopDashPS();
@@ -148,7 +148,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckCurrentNode()
     {
-        if (_currentType == NodeType.Purple)
+        if (_currentType == NodeType.Purple || _currentType == NodeType.Dash)
             _moveSpeed += 5;
         else
             _moveSpeed = _commonSpeed;
@@ -173,8 +173,8 @@ public class PlayerTDController : MonoBehaviour
         CombinerController combiner = coll.GetComponent<CombinerController>();
 
         if (node != null && _currentType == NodeType.None)
-        {
-            _node = null;
+        {   
+            Debug.Log("EnterTrigger");
             _node = node;
         }
         else if (connectionNode != null) _connectionNode = connectionNode;
@@ -184,6 +184,14 @@ public class PlayerTDController : MonoBehaviour
         else if (coll.CompareTag("Void")) ResetLevel();
     }
 
+    // THIS METHOD IS USED TO GRAB A NODE WHEN ANOTHER ONE WAS DROP NEAR
+    private void OnTriggerStay(Collider coll)
+    {
+        ElectricityNode node = coll.GetComponent<ElectricityNode>();
+
+        if (node != null && _currentType == NodeType.None) _node = node;
+    }
+
     private void OnTriggerExit(Collider coll)
     {
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
@@ -191,7 +199,11 @@ public class PlayerTDController : MonoBehaviour
         CombineMachine machine = coll.GetComponent<CombineMachine>();
         CombinerController combiner = coll.GetComponent<CombinerController>();
 
-        if (node != null && _currentType == NodeType.None) _node = null;
+        if (node != null && _currentType == NodeType.None)
+        {
+            Debug.Log("ExitTrigger");
+            _node = null;
+        }
         else if (connectionNode != null) _connectionNode = null;
         else if (machine != null) _combineMachine = null;
         else if (combiner != null) _combiner = null;

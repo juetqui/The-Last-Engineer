@@ -7,6 +7,7 @@ public class MainTM : TaskManager
 
     [Header("Level")]
     [SerializeField] private LevelChanger _lvlChanger;
+    [SerializeField] private DoorLights _doorLights;
     [SerializeField] private AudioSource _winAS;
 
     private void Awake()
@@ -40,5 +41,6 @@ public class MainTM : TaskManager
         foreach (var door in _doors) door.SetMainTM(this);
 
         _lvlChanger.SetTM(this);
+        _doorLights.SetTM(this);
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerTDModel
 {
-    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _dashCooldown = default, _dashTimer = default;
+    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _upgradedDashSpeed = default, _dashCooldown = default, _dashTimer = default;
     private bool _isDashing = false;
     private Vector3 _oldScale = default;
     
@@ -24,6 +24,7 @@ public class PlayerTDModel
         _moveSpeed = moveSpeed;
         _rotSpeed = rotSpeed;
         _dashSpeed = dashSpeed;
+        _upgradedDashSpeed = _dashSpeed + 20f;
         _dashDrag = dashDrag;
         _dashCooldown = dashCooldown;
     }
@@ -67,14 +68,17 @@ public class PlayerTDModel
         _transform.rotation = Quaternion.Lerp(_transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
     }
 
-    public void Dash(Vector3 moveDir)
+    public void Dash(NodeType nodeType, Vector3 moveDir)
     {
         if (_isDashing) return;
 
         RotatePlayer(moveDir);
 
-        Vector3 dir = moveDir.normalized * _dashSpeed;
-        
+        Vector3 dir = Vector3.zero;
+
+        if (nodeType == NodeType.Dash) dir = moveDir.normalized * _upgradedDashSpeed;
+        else dir = moveDir.normalized * _dashSpeed;
+
         _rb.useGravity = false;
         _rb.drag = _dashDrag;
         _rb.AddForce(dir, ForceMode.VelocityChange);

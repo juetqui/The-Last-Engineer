@@ -34,7 +34,6 @@ public class TrailController : MonoBehaviour
             if (_goUp) _index++;
             else _index--;
 
-
             _currentTarget = _movePoints[_index];
         }
     }
