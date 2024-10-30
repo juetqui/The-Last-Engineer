@@ -179,7 +179,7 @@ public class PlayerTDController : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // THIS METHOD IS USED TO GRAB A NODE WHEN ANOTHER ONE WAS DROP NEAR
+    // THIS METHOD IS USED TO GRAB A NODE WHEN ANOTHER ONE WAS DROP NEARBY
     private void OnTriggerStay(Collider coll)
     {
         ElectricityNode node = coll.GetComponent<ElectricityNode>();

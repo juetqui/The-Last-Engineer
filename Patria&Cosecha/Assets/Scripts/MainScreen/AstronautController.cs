@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class AstronautController : MonoBehaviour
 {
@@ -12,7 +11,7 @@ public class AstronautController : MonoBehaviour
     private Array _anims = default;
     private Transform _currentTarget = default;
     private int _index = -1;
-    private bool _isAnimating = false;
+    private bool _isAnimating = false, _canMove = true;
 
     void Start()
     {
@@ -57,6 +56,11 @@ public class AstronautController : MonoBehaviour
     private Vector3 UpdateTargetPos()
     {
         return new Vector3(_currentTarget.position.x, transform.position.y, _currentTarget.position.z);
+    }
+
+    public void SetTarget()
+    {
+        _hasTarget = true;
     }
 
     private IEnumerator SetRandomAnim()

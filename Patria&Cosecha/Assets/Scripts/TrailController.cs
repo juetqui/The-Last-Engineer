@@ -23,18 +23,29 @@ public class TrailController : MonoBehaviour
     {
         if (Vector3.Distance(transform.position, UpdateTargetPos()) > _minDist)
         {
-            Vector3 direction = (UpdateTargetPos() - transform.position).normalized;
-            transform.position += direction * _speed * Time.deltaTime;
+            Vector3 dir = (UpdateTargetPos() - transform.position).normalized;
+            transform.position += dir * _speed * Time.deltaTime;
         }
-        else if (_index < _movePoints.Length)
+        else
         {
             if (_goUp) _index++;
             else _index--;
 
+            if (_index >= _movePoints.Length)
+            {
+                _index--;
+                _goUp = false;
+                return;
+            }
+            else if (_index <= 0)
+            {
+                _index = 0;
+                _goUp = true;
+            }
+            else _goUp = true;
+
             _currentTarget = _movePoints[_index];
         }
-        else  if (_index >= _movePoints.Length) _goUp = false;
-        else if (_index == 0) _goUp = true;
     }
 
     private Vector3 UpdateTargetPos()

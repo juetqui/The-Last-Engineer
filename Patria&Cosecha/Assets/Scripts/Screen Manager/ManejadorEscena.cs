@@ -3,13 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class ManejadorEscena : MonoBehaviour
 {
+    [SerializeField] AstronautController _astronautController;
+
     public void Menu()
     {
         SceneManager.LoadScene("Menu");
     }
     public void Game()
     {
-        SceneManager.LoadScene("Lvl 1");
+        gameObject.SetActive(false);
+        _astronautController.SetTarget();
     }
     public void Credits()
     {
