@@ -9,6 +9,7 @@ public class Config : MonoBehaviour
         {
             if (screenPause != null)
             {
+                Cursor.visible = false;
                 ScreenManager.Instance.Pop();
             }
             else
