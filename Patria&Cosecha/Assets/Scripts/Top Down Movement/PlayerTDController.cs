@@ -49,7 +49,6 @@ public class PlayerTDController : MonoBehaviour
         _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _liftClip, _putDownClip);
 
         _playerModel.OnStart();
-        //_playerView.GrabNode();
     }
 
     private void Update()
@@ -61,13 +60,9 @@ public class PlayerTDController : MonoBehaviour
         _playerView.Walk(GetMovement());
 
         _playerModel.UpdateDashTimer(Time.deltaTime);
-
+        
         if (CheckForDash())
-        {
             _playerModel.Dash(_currentType, GetMovement());
-            //_playerView.PlayDashPS();
-        }
-        //else _playerView.StopDashPS();
 
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
     }

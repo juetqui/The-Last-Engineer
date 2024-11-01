@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Config : MonoBehaviour
 {
-    ScreenPause screenPause = new ScreenPause();
+    ScreenPause screenPause = default;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))

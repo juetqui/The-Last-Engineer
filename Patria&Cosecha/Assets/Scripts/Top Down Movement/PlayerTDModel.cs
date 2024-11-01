@@ -74,10 +74,7 @@ public class PlayerTDModel
 
         RotatePlayer(moveDir);
 
-        Vector3 dir = Vector3.zero;
-
-        if (nodeType == NodeType.Dash) dir = moveDir.normalized * _upgradedDashSpeed;
-        else dir = moveDir.normalized * _dashSpeed;
+        Vector3 dir = moveDir.normalized * (nodeType == NodeType.Dash ? _upgradedDashSpeed : _dashSpeed);
 
         _rb.useGravity = false;
         _rb.drag = _dashDrag;
