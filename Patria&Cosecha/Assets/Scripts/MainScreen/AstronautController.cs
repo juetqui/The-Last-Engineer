@@ -27,6 +27,8 @@ public class AstronautController : MonoBehaviour
 
     private void Move()
     {
+        if (_isAnimating) _isAnimating = false;
+
         if (Vector3.Distance(transform.position, UpdateTargetPos()) > 0.1f)
         {
             _animator.SetBool("IsWalking", true);
