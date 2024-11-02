@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class ManejadorEscena : MonoBehaviour
 {
     [SerializeField] AstronautController _astronautController;
+    [SerializeField] MenuCamera _menuCamera;
 
     public void Menu()
     {
@@ -13,6 +14,7 @@ public class ManejadorEscena : MonoBehaviour
     {
         gameObject.SetActive(false);
         _astronautController.SetTarget();
+        _menuCamera.PlayAnimation();
     }
     public void Credits()
     {
