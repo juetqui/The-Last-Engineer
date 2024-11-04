@@ -1,7 +1,10 @@
-using UnityEngine;
-
 public class SecondaryTM : TaskManager
 {
+    private void Awake()
+    {
+        OnAwake();
+    }
+
     private void Start()
     {
         OnStart();

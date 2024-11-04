@@ -8,10 +8,12 @@ public class AstronautController : MonoBehaviour
     [SerializeField] private Transform[] _targetPos;
     [SerializeField] private bool _hasTarget = false;
 
+    [SerializeField] private float _moveSpeed;
+
     private Array _anims = default;
     private Transform _currentTarget = default;
     private int _index = -1;
-    private bool _isAnimating = false, _canMove = true;
+    private bool _isAnimating = false;
 
     void Start()
     {
@@ -36,9 +38,9 @@ public class AstronautController : MonoBehaviour
             Vector3 dir = (UpdateTargetPos() - transform.position).normalized;
 
             Quaternion toRotation = Quaternion.LookRotation(dir, Vector3.up);
-            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, 5f * Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, _moveSpeed * Time.deltaTime);
 
-            transform.position += dir * 5 * Time.deltaTime;
+            transform.position += dir * _moveSpeed * Time.deltaTime;
         }
         else
         {

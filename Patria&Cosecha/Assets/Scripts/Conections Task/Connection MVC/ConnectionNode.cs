@@ -77,8 +77,7 @@ public class ConnectionNode : MonoBehaviour
 
     private void HandleRecievedNode(bool isValid, bool playEffects, AudioClip clip)
     {
-        if (isValid) HandleTaskManagers(true);
-        else HandleTaskManagers(false);
+        if (isValid) HandleTaskManagers(isValid);
 
         _isWorking = isValid;
         _recievedNode.IsConnected = isValid;
@@ -87,19 +86,22 @@ public class ConnectionNode : MonoBehaviour
         _nodeRenderer.PlayClip(_placedClip);
     }
 
-    private void HandleTaskManagers(bool addOrRemove)
+    private void HandleTaskManagers(bool addConnection)
     {
-        if (addOrRemove)
+        if (addConnection)
         {
+            Debug.Log("Add");
             if (_mainTM != null) _mainTM.AddConnection(_requiredType);
 
             if (_secTaskManagers.Count > 0)
             {
+                Debug.Log("Add SecTM");
                 foreach (var secTM in _secTaskManagers) secTM.AddConnection(_requiredType);
             }
         }
         else
         {
+            Debug.Log("Remove");
             if (_mainTM != null) _mainTM.RemoveConnection(_requiredType);
 
             if (_secTaskManagers.Count > 0)

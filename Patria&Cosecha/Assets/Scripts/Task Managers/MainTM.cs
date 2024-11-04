@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class MainTM : TaskManager
 {
@@ -9,9 +10,14 @@ public class MainTM : TaskManager
     [SerializeField] private LevelChanger _lvlChanger;
     [SerializeField] private DoorLights _doorLights;
     [SerializeField] private AudioSource _winAS;
+    [SerializeField] private ElectricityController _elecController;
+    [SerializeField] private ConnectionModuleController _moduleController;
+    [SerializeField] private SplineAnimate _animate;
 
     private void Awake()
     {
+        OnAwake();
+        Debug.Log(_totalForDictionary);
         Cursor.visible = false;
     }
 
@@ -25,7 +31,11 @@ public class MainTM : TaskManager
 
     private void Update()
     {
-        if (_running) if (_light.intensity < 100) _light.intensity += 25 * Time.deltaTime;
+        if (_running)
+        {
+            _animate.Play();
+            if (_light.intensity < 100) _light.intensity += 25 * Time.deltaTime;
+        }
     }
 
     protected override void OnAllNodesConnected()
@@ -42,5 +52,7 @@ public class MainTM : TaskManager
 
         _lvlChanger.SetTM(this);
         _doorLights.SetTM(this);
+        _moduleController.SetTM(this);
+        _elecController.SetTM(this);
     }
 }

@@ -10,7 +10,7 @@ public abstract class TaskManager : MonoBehaviour
     [Header("MVC View")]
     [SerializeField] protected AudioSource _source;
 
-    protected int _workingNodes = default, _totalToFinish = default;
+    protected int _workingNodes = default, _totalToFinish = default, _totalForDictionary = default;
     protected bool _running = false;
 
     protected Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
@@ -19,6 +19,11 @@ public abstract class TaskManager : MonoBehaviour
 
     protected abstract void OnAllNodesConnected();
     protected abstract void SetUp();
+
+    protected void OnAwake()
+    {
+        _totalForDictionary = _nodesSet.Count;
+    }
 
     protected void OnStart()
     {
