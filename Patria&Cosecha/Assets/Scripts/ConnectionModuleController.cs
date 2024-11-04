@@ -3,22 +3,33 @@ using UnityEngine.Splines;
 
 public class ConnectionModuleController : MonoBehaviour
 {
-    [SerializeField] private ParticleSystem[] _ps;
+    [SerializeField] private ParticleSystem _orbitPs;
+    [SerializeField] private ParticleSystem _completedPs;
     [SerializeField] private SplineAnimate _animator;
 
     private MainTM _mainTM = default;
 
-    void Update()
+    private void Start()
     {
-        if (_mainTM.Running)
-        {
-            foreach (var ps in _ps)
-            {
-                ps.Play();
-            }
-            
-            _animator.Play();
-        }
+        StopFX();
+    }
+
+    private void Update()
+    {
+        if (_mainTM.Running) PlayFX();
+    }
+
+    private void StopFX()
+    {
+        _orbitPs.Stop();
+        _completedPs.Stop();
+    }
+
+    private void PlayFX()
+    {
+        if (!_orbitPs.isPlaying) _orbitPs.Play();
+        if (!_completedPs.isPlaying) _completedPs.Play();
+        _animator.Play();
     }
 
     public void SetTM(MainTM mainTM)

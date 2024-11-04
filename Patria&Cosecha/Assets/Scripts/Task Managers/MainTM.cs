@@ -12,12 +12,10 @@ public class MainTM : TaskManager
     [SerializeField] private AudioSource _winAS;
     [SerializeField] private ElectricityController _elecController;
     [SerializeField] private ConnectionModuleController _moduleController;
-    [SerializeField] private SplineAnimate _animate;
 
     private void Awake()
     {
         OnAwake();
-        Debug.Log(_totalForDictionary);
         Cursor.visible = false;
     }
 
@@ -33,7 +31,6 @@ public class MainTM : TaskManager
     {
         if (_running)
         {
-            _animate.Play();
             if (_light.intensity < 100) _light.intensity += 25 * Time.deltaTime;
         }
     }
@@ -52,7 +49,7 @@ public class MainTM : TaskManager
 
         _lvlChanger.SetTM(this);
         _doorLights.SetTM(this);
-        _moduleController.SetTM(this);
         _elecController.SetTM(this);
+        _moduleController.SetTM(this);
     }
 }

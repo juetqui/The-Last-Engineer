@@ -90,18 +90,15 @@ public class ConnectionNode : MonoBehaviour
     {
         if (addConnection)
         {
-            Debug.Log("Add");
             if (_mainTM != null) _mainTM.AddConnection(_requiredType);
 
             if (_secTaskManagers.Count > 0)
             {
-                Debug.Log("Add SecTM");
                 foreach (var secTM in _secTaskManagers) secTM.AddConnection(_requiredType);
             }
         }
         else
         {
-            Debug.Log("Remove");
             if (_mainTM != null) _mainTM.RemoveConnection(_requiredType);
 
             if (_secTaskManagers.Count > 0)
