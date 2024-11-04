@@ -21,6 +21,7 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private AudioClip _walkClip;
     [SerializeField] private AudioClip _liftClip;
     [SerializeField] private AudioClip _putDownClip;
+    [SerializeField] private AudioClip _emptyHand;
 
     private Rigidbody _rb = default;
     private PlayerTDModel _playerModel = default;
@@ -62,7 +63,12 @@ public class PlayerTDController : MonoBehaviour
         _playerModel.UpdateDashTimer(Time.deltaTime);
         
         if (CheckForDash())
-            _playerModel.Dash(_currentType, GetMovement());
+        {
+            if (CanDash && !_playerModel.IsDashing)
+                _playerModel.Dash(_currentType, GetMovement());
+            else
+                _playerView.PlayErrorSound(_emptyHand);
+        }
 
         if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
     }
@@ -80,7 +86,7 @@ public class PlayerTDController : MonoBehaviour
         return new Vector3(horizontalInput, 0, verticalInput);
     }
 
-    private bool CheckForDash() => CanDash && !_playerModel.IsDashing && Input.GetKeyDown(KeyCode.Space);
+    private bool CheckForDash() => Input.GetKeyDown(KeyCode.Space);
 
     private bool CheckDashAvialable() => _currentType == NodeType.Blue || _currentType == NodeType.Dash;
 

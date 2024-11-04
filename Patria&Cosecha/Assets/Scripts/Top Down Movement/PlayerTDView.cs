@@ -87,4 +87,10 @@ public class PlayerTDView
             _outline.OutlineWidth = 0;
         }
     }
+
+    public void PlayErrorSound(AudioClip clip)
+    {
+        _source.clip = clip;
+        _source.Play();
+    }
 }
