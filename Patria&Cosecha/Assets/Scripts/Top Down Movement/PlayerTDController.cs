@@ -7,6 +7,7 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _rotSpeed;
     [SerializeField] private LayerMask _groundMask;
+    [SerializeField] private LayerMask _wallMask;
 
     [Header("Dash")]
     [SerializeField] private float _dashSpeed;
@@ -92,7 +93,7 @@ public class PlayerTDController : MonoBehaviour
 
     private void CheckInteraction()
     {
-        if (_node != null && _currentType == NodeType.None) ChangeNode();
+        if (_node != null && _currentType == NodeType.None && !CheckForWalls()) ChangeNode();
         else if (_node != null && _currentType != NodeType.None)
         {
             if (_connectionNode != null && IsInConnectArea) PlaceNode();
@@ -158,6 +159,14 @@ public class PlayerTDController : MonoBehaviour
     {
         _node = null;
         _currentType = NodeType.None;
+    }
+
+    private bool CheckForWalls()
+    {
+        if (Physics.Raycast(transform.position, _node.transform.position, 7f, _wallMask))
+            return true;
+        
+        return false;
     }
 
     private void OnTriggerEnter(Collider coll)

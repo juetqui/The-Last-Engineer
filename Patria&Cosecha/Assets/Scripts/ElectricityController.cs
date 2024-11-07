@@ -4,8 +4,8 @@ using UnityEngine.Splines;
 public class ElectricityController : MonoBehaviour
 {
     [SerializeField] private SplineContainer[] _splines;
-    [SerializeField] private SplineAnimate _animator;
-
+    
+    private SplineAnimate _animator = default;
     private MainTM _mainTM = default;
     private int _index = default;
 
@@ -25,6 +25,7 @@ public class ElectricityController : MonoBehaviour
         if (_mainTM.Running)
         {
             _index++;
+            _animator.Duration = 1f;
             _animator.Container = _splines[1];
         }
     }

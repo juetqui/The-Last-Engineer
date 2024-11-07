@@ -19,7 +19,7 @@ public class LevelChanger : MonoBehaviour
         AstronautController menuPlayer = coll.GetComponent<AstronautController>();
 
         if (menuPlayer != null && _isMenu) SceneManager.LoadScene(_lvlName);
-        else if (player != null && _mainTM.Running) SceneManager.LoadScene(_lvlName);
+        else if (player != null) SceneManager.LoadScene(_lvlName);
 
     }
 }
