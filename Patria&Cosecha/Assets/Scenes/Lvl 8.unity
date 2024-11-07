@@ -852,7 +852,7 @@ PrefabInstance:
     - target: {fileID: 5008731767692936171, guid: d4a0e3349e5004c43b5f044c4bf2bdc9, type: 3}
       propertyPath: connections.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1517511953}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3614,7 +3614,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618963, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.76
+      value: 5.82
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618963, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3622,19 +3622,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618963, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 26.6
+      value: 33.06
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618989, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -15
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618989, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.61
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618989, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -18.16
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618991, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3642,7 +3642,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618991, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13.14
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 4107978417728618991, guid: a9361bb343808924d8f07d6299cb7fb7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4522,10 +4522,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3350517339337066709, guid: 95b620507cb43ef46b3295b93d74d05c, type: 3}
-      propertyPath: _combinedPrefab
-      value: 
-      objectReference: {fileID: 386148299800845151, guid: 1ac5866b7f0285d44a425b3e11c04f28, type: 3}
     - target: {fileID: 7724716735538676512, guid: 3c8117c60bb037f47b70cc04aac18261, type: 3}
       propertyPath: m_LocalPosition.x
       value: -29.52
@@ -4574,6 +4570,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 1.25
       objectReference: {fileID: 0}
+    - target: {fileID: 3350517339337066709, guid: 95b620507cb43ef46b3295b93d74d05c, type: 3}
+      propertyPath: _combinedPrefab
+      value: 
+      objectReference: {fileID: 386148299800845151, guid: 1ac5866b7f0285d44a425b3e11c04f28, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5237,7 +5237,7 @@ PrefabInstance:
     - target: {fileID: 5008731767692936171, guid: d4a0e3349e5004c43b5f044c4bf2bdc9, type: 3}
       propertyPath: connections.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2070681436}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5248,6 +5248,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2189635614294786296, guid: d4a0e3349e5004c43b5f044c4bf2bdc9, type: 3}
   m_PrefabInstance: {fileID: 1435595949}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1517511953 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3749500114558474070, guid: 9758d96cd16516a4486a97e65b216e2d, type: 3}
+  m_PrefabInstance: {fileID: 574011118}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 845d4cb351f0afd498616beee39ed885, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1523772910
 GameObject:
   m_ObjectHideFlags: 0
@@ -6903,8 +6914,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.005666496
         T: 0.03448276
       - Distance: 0.022211885
@@ -6966,8 +6977,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.16597381
         T: 0.03448276
       - Distance: 0.3413363
@@ -7029,8 +7040,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.68689597
         T: 0.03448276
       - Distance: 1.4404538
@@ -7092,8 +7103,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.20126438
         T: 0.03448276
       - Distance: 0.4031005
@@ -7155,8 +7166,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.095256194
         T: 0.03448276
       - Distance: 0.18904656
@@ -7218,8 +7229,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.19088893
         T: 0.03448276
       - Distance: 0.40549558
@@ -7281,8 +7292,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.12290028
         T: 0.03448276
       - Distance: 0.24595863
@@ -7344,8 +7355,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.20551303
         T: 0.03448276
       - Distance: 0.42105436
@@ -7407,8 +7418,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.5063617
         T: 0.03448276
       - Distance: 1.0544909
@@ -7470,8 +7481,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.039050326
         T: 0.03448276
       - Distance: 0.15331459
@@ -7533,8 +7544,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.3898722
         T: 0.03448276
       - Distance: 0.7865945
@@ -7596,8 +7607,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.122218
         T: 0.03448276
       - Distance: 0.24420895
@@ -7659,8 +7670,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.2020747
         T: 0.03448276
       - Distance: 0.42653477
@@ -7722,8 +7733,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.102580145
         T: 0.03448276
       - Distance: 0.20302135
@@ -7785,8 +7796,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.14024419
         T: 0.03448276
       - Distance: 0.29019773
@@ -7848,8 +7859,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.43924427
         T: 0.03448276
       - Distance: 0.9346031
@@ -7911,8 +7922,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.38272008
         T: 0.03448276
       - Distance: 0.7659369
@@ -7974,8 +7985,8 @@ MonoBehaviour:
     - Mode: 0
       Tension: 0.5
       m_DistanceToInterpolation:
-      - Distance: 0
-        T: 0
+      - Distance: -1
+        T: -1
       - Distance: 0.081391886
         T: 0.03448276
       - Distance: 0.1647809
@@ -8234,12 +8245,12 @@ PrefabInstance:
       objectReference: {fileID: 1967842335}
     - target: {fileID: 6706807291071488176, guid: fd39a48175e103d44b8228ff8345b1b1, type: 3}
       propertyPath: connections.Array.size
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6706807291071488176, guid: fd39a48175e103d44b8228ff8345b1b1, type: 3}
       propertyPath: connections.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1992481912}
     - target: {fileID: 6706807291071488176, guid: fd39a48175e103d44b8228ff8345b1b1, type: 3}
       propertyPath: connections.Array.data[1]
       value: 
@@ -8251,7 +8262,7 @@ PrefabInstance:
     - target: {fileID: 6706807291071488176, guid: fd39a48175e103d44b8228ff8345b1b1, type: 3}
       propertyPath: connections.Array.data[3]
       value: 
-      objectReference: {fileID: 1992481912}
+      objectReference: {fileID: 0}
     - target: {fileID: 6724180037257232047, guid: fd39a48175e103d44b8228ff8345b1b1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -8566,6 +8577,17 @@ PrefabInstance:
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -8939619095151269143, guid: bc504c2d0f50c424ba407dc5ccf03953, type: 3}
   m_PrefabInstance: {fileID: 1992481911}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 845d4cb351f0afd498616beee39ed885, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2070681436 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3749500114558474070, guid: 9758d96cd16516a4486a97e65b216e2d, type: 3}
+  m_PrefabInstance: {fileID: 578074589}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
