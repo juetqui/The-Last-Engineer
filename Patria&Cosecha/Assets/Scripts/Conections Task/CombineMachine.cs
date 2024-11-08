@@ -40,9 +40,11 @@ public class CombineMachine : MonoBehaviour
     {
         if (!IsValidCombination() || !IsFilled()) return;
 
+        Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f);
+
         _isCombining = true;
         _combinedNode = Instantiate(_combinedPrefab, transform.position, Quaternion.identity).GetComponent<ElectricityNode>();
-        _combinedNode.Attach(_combinedNodePos.localPosition, transform);
+        _combinedNode.Attach(_combinedNodePos.localPosition, transform, newScale);
     }
 
     private void DestroyNodes(float deltaTime)

@@ -3,7 +3,6 @@ using UnityEngine;
 public class CombinerController : MonoBehaviour
 {
     [SerializeField] private CombineMachine _combineMachine;
-    [SerializeField] private OpenDoor _openDoor;
 
     [SerializeField] private Renderer _renderer;
     [SerializeField] private Renderer _shield;
@@ -33,6 +32,5 @@ public class CombinerController : MonoBehaviour
         if (!_combineMachine.IsActive) return;
 
         _combineMachine.CombineNodes();
-        _openDoor.Open();
     }
 }
