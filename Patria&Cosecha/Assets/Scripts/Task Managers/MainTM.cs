@@ -42,6 +42,12 @@ public class MainTM : TaskManager
         _winAS.Play();
     }
 
+    public override void AddConnection(NodeType nodeType)
+    {
+        base.AddConnection(nodeType);
+        _elecController.MoveSpline();
+    }
+
     protected override void SetUp()
     {
         foreach (var connection in connections) connection.SetMainTM(this);

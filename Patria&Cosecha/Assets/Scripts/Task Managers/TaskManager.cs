@@ -41,7 +41,7 @@ public abstract class TaskManager : MonoBehaviour
         else _running = false;
     }
 
-    public void AddConnection(NodeType nodeType)
+    public virtual void AddConnection(NodeType nodeType)
     {
         if (_nodesSet.ContainsKey(nodeType)) _nodesSet[nodeType]++;
         else _nodesSet.Add(nodeType, 1);

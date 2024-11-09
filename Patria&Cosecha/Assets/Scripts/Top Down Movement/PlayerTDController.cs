@@ -19,6 +19,8 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private ParticleSystem[] _ps;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _source;
+
+    [Header("Audio")]
     [SerializeField] private AudioClip _walkClip;
     [SerializeField] private AudioClip _liftClip;
     [SerializeField] private AudioClip _putDownClip;

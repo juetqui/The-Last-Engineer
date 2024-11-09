@@ -77,9 +77,10 @@ public class ConnectionNode : MonoBehaviour
 
     private void HandleRecievedNode(bool isValid, bool playEffects, AudioClip clip)
     {
+        _isWorking = isValid;
+        
         if (isValid) HandleTaskManagers(isValid);
 
-        _isWorking = isValid;
         _recievedNode.IsConnected = isValid;
         _nodeRenderer.Enable(playEffects);
         _nodeRenderer.PlayEffect(playEffects);

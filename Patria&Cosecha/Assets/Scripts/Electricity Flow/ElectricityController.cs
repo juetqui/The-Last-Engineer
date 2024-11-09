@@ -4,30 +4,32 @@ using UnityEngine.Splines;
 public class ElectricityController : MonoBehaviour
 {
     [SerializeField] private SplineContainer[] _splines;
-    
-    private SplineAnimate _animator = default;
+    [SerializeField] private ConnectionNode[] _connections;
+
+    private TrailController _trailController = default;
     private MainTM _mainTM = default;
-    private int _index = default;
 
     private void Awake()
     {
-        _animator = GetComponent<SplineAnimate>();
+        SplineAnimate animator = GetComponent<SplineAnimate>();
+        ISplinePathProvider splinePathProvider = new SplinePP(_splines);
+
+        _trailController = new TrailController(animator, splinePathProvider);
     }
 
     private void Start()
     {
-        _index = 0;
-        _animator.Container = _splines[0];
+        _trailController.OnStart();
     }
 
-    private void Update()
+    public void MoveSpline()
     {
-        if (_mainTM.Running)
+        Debug.Log(_connections[_trailController.CurrentIndex].IsWorking);
+        if (_connections[_trailController.CurrentIndex].IsWorking)
         {
-            _index++;
-            _animator.Duration = 1f;
-            _animator.Container = _splines[1];
+            _trailController.MoveToNextSpline();
         }
+        else return;
     }
 
     public void SetTM(MainTM mainTM)
