@@ -18,7 +18,7 @@ public class TrailController
 
     public void OnStart()
     {
-        _animator.Container = _pathProvider.GetNextSpline(_currentIndex);
+        _animator.Container = _pathProvider.GetNextSpline(0);
     }
 
     public void MoveToNextSpline()

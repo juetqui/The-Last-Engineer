@@ -10,7 +10,6 @@ public class MainTM : TaskManager
     [SerializeField] private LevelChanger _lvlChanger;
     [SerializeField] private DoorLights _doorLights;
     [SerializeField] private AudioSource _winAS;
-    [SerializeField] private ElectricityController _elecController;
     [SerializeField] private ConnectionModuleController _moduleController;
 
     private void Awake()
@@ -42,12 +41,6 @@ public class MainTM : TaskManager
         _winAS.Play();
     }
 
-    public override void AddConnection(NodeType nodeType)
-    {
-        base.AddConnection(nodeType);
-        _elecController.MoveSpline();
-    }
-
     protected override void SetUp()
     {
         foreach (var connection in connections) connection.SetMainTM(this);
@@ -55,7 +48,6 @@ public class MainTM : TaskManager
 
         _lvlChanger.SetTM(this);
         _doorLights.SetTM(this);
-        _elecController.SetTM(this);
         _moduleController.SetTM(this);
     }
 }

@@ -6,6 +6,7 @@ public abstract class TaskManager : MonoBehaviour
     [Header("Lists")]
     public List<ConnectionNode> connections;
     [SerializeField] protected List<OpenDoor> _doors;
+    [SerializeField] protected ElectricityController _elecController;
 
     [Header("MVC View")]
     [SerializeField] protected AudioSource _source;
@@ -41,10 +42,13 @@ public abstract class TaskManager : MonoBehaviour
         else _running = false;
     }
 
-    public virtual void AddConnection(NodeType nodeType)
+    public void AddConnection(NodeType nodeType)
     {
         if (_nodesSet.ContainsKey(nodeType)) _nodesSet[nodeType]++;
         else _nodesSet.Add(nodeType, 1);
+
+        if (_elecController != null)
+            _elecController.MoveSpline();
 
         _workingNodes++;
         ValidateAllConnections();

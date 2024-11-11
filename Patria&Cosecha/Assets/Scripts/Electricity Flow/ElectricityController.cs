@@ -7,7 +7,6 @@ public class ElectricityController : MonoBehaviour
     [SerializeField] private ConnectionNode[] _connections;
 
     private TrailController _trailController = default;
-    private MainTM _mainTM = default;
 
     private void Awake()
     {
@@ -24,16 +23,8 @@ public class ElectricityController : MonoBehaviour
 
     public void MoveSpline()
     {
-        Debug.Log(_connections[_trailController.CurrentIndex].IsWorking);
-        if (_connections[_trailController.CurrentIndex].IsWorking)
-        {
+        if (_trailController.CurrentIndex < _connections.Length && _connections[_trailController.CurrentIndex].IsWorking)
             _trailController.MoveToNextSpline();
-        }
         else return;
-    }
-
-    public void SetTM(MainTM mainTM)
-    {
-        _mainTM = mainTM;
     }
 }
