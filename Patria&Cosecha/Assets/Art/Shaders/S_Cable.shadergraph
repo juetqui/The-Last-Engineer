@@ -31,9 +31,6 @@
             "m_Id": "5e9c01b84ecd4a9bbb7988b5cd329072"
         },
         {
-            "m_Id": "7e94f3b0a1014c8cb61b78a72dd430d3"
-        },
-        {
             "m_Id": "a0093a9756c74376bdc1eb760f37fb28"
         },
         {
@@ -50,6 +47,9 @@
         },
         {
             "m_Id": "e5445321207440e29f034a6b6b051aa5"
+        },
+        {
+            "m_Id": "69062500dd6d425784354a39b586f417"
         }
     ],
     "m_GroupDatas": [],
@@ -128,9 +128,6 @@
                 "m_Id": "5e9c01b84ecd4a9bbb7988b5cd329072"
             },
             {
-                "m_Id": "7e94f3b0a1014c8cb61b78a72dd430d3"
-            },
-            {
                 "m_Id": "a0093a9756c74376bdc1eb760f37fb28"
             },
             {
@@ -141,6 +138,9 @@
             },
             {
                 "m_Id": "6d101de39b0e4ea9ae35edf3afff3a6f"
+            },
+            {
+                "m_Id": "69062500dd6d425784354a39b586f417"
             }
         ]
     },
@@ -281,7 +281,7 @@
     "m_SGVersion": 2,
     "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalLitSubTarget",
     "m_ObjectId": "4394dbfa322b428ba4fb058109a26e07",
-    "m_WorkflowMode": 1,
+    "m_WorkflowMode": 0,
     "m_NormalDropOffSpace": 0,
     "m_ClearCoat": false,
     "m_BlendModePreserveSpecular": true
@@ -423,6 +423,40 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.BlockNode",
+    "m_ObjectId": "69062500dd6d425784354a39b586f417",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "SurfaceDescription.Specular",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "e900c185cc3f4ab7ac1dab62ca11003d"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SerializedDescriptor": "SurfaceDescription.Specular"
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
     "m_ObjectId": "6d101de39b0e4ea9ae35edf3afff3a6f",
     "m_Group": {
         "m_Id": ""
@@ -501,40 +535,6 @@
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
-    "m_ObjectId": "7e94f3b0a1014c8cb61b78a72dd430d3",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "SurfaceDescription.Metallic",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 0.0,
-            "height": 0.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "f1af85e131dc402b8a5dbe935c5d4332"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedDescriptor": "SurfaceDescription.Metallic"
 }
 
 {
@@ -973,16 +973,31 @@
 
 {
     "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "f1af85e131dc402b8a5dbe935c5d4332",
+    "m_Type": "UnityEditor.ShaderGraph.ColorRGBMaterialSlot",
+    "m_ObjectId": "e900c185cc3f4ab7ac1dab62ca11003d",
     "m_Id": 0,
-    "m_DisplayName": "Metallic",
+    "m_DisplayName": "Specular Color",
     "m_SlotType": 0,
     "m_Hidden": false,
-    "m_ShaderOutputName": "Metallic",
+    "m_ShaderOutputName": "Specular",
     "m_StageCapability": 2,
-    "m_Value": 0.0,
-    "m_DefaultValue": 0.0,
-    "m_Labels": []
+    "m_Value": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "m_Labels": [],
+    "m_ColorMode": 0,
+    "m_DefaultColor": {
+        "r": 0.5,
+        "g": 0.5,
+        "b": 0.5,
+        "a": 1.0
+    }
 }
 

@@ -8,6 +8,8 @@ public class ElectricityController : MonoBehaviour
 
     private TrailController _trailController = default;
 
+    [SerializeField] private int _index = default;
+
     private void Awake()
     {
         SplineAnimate animator = GetComponent<SplineAnimate>();
@@ -19,6 +21,11 @@ public class ElectricityController : MonoBehaviour
     private void Start()
     {
         _trailController.OnStart();
+    }
+
+    private void Update()
+    {
+        _index = _trailController.CurrentIndex;
     }
 
     public void MoveSpline()

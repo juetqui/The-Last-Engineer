@@ -30,7 +30,7 @@ public class MainTM : TaskManager
     {
         if (_running)
         {
-            if (_light.intensity < 100) _light.intensity += 25 * Time.deltaTime;
+            if (_light.intensity < 30) _light.intensity += 5 * Time.deltaTime;
         }
     }
 

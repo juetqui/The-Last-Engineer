@@ -166,9 +166,17 @@ public class PlayerTDController : MonoBehaviour
     private bool CheckForWalls()
     {
         if (Physics.Raycast(transform.position, _node.transform.position, 7f, _wallMask))
+        {
+            Debug.Log("Wall");
             return true;
+        }
         
         return false;
+    }
+
+    public void ResetLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -184,11 +192,6 @@ public class PlayerTDController : MonoBehaviour
         else if (combiner != null) _combiner = combiner;
 
         else if (coll.CompareTag("Void")) ResetLevel();
-    }
-
-    public void ResetLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // THIS METHOD IS USED TO GRAB A NODE WHEN ANOTHER ONE WAS DROP NEARBY
@@ -214,6 +217,8 @@ public class PlayerTDController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (_node != null) Gizmos.DrawLine(transform.position, _node.transform.position);
+
         Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1);
         Gizmos.DrawRay(rayDir, Vector3.down * 2);
     }

@@ -48,7 +48,7 @@ public class ConnectionNode : MonoBehaviour
 
     public void SetNode(ElectricityNode node)
     {
-        if (_isDisabled || node.NodeType == NodeType.None) return;
+        if (_isDisabled || node == null) return;
 
         node.Attach(Vector3.zero, transform);
         _recievedNode = node;
@@ -57,10 +57,12 @@ public class ConnectionNode : MonoBehaviour
 
     public void UnsetNode()
     {
+        if (_recievedNode.NodeType == _requiredType)
+            HandleTaskManagers(false);
+
         _recievedNode = null;
         _nodeRenderer.Enable(true);
         _nodeRenderer.EnableTrigger(true);
-        HandleTaskManagers(false);
     }
 
     private void CheckReceivedNode()

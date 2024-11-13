@@ -37,20 +37,7 @@ public class PlayerTDModel
 
     public void OnUpdate(Vector3 moveDir, float deltaTime)
     {
-        CheckFloor(deltaTime);
         MovePlayer(moveDir);
-    }
-
-    private void CheckFloor(float deltaTime)
-    {
-        Vector3 rayDir = new Vector3(_transform.position.x, _transform.position.y, _transform.position.z - 1);
-
-        if (!_isDashing && !Physics.Raycast(rayDir, -_transform.up, 2.5f, _groundMask))
-        {
-            _rb.AddForce(Vector3.down * 200);
-            //_transform.localScale -= Vector3.one * 5 * deltaTime;
-        }
-        else if (_transform.localScale != _oldScale) _transform.localScale = _oldScale;
     }
 
     private void MovePlayer(Vector3 moveDir)
