@@ -14,14 +14,18 @@ public class ManejadorEscena : MonoBehaviour
     {
         gameObject.SetActive(false);
         _astronautController.SetTarget();
-        _menuCamera.PlayAnimation();
+        _menuCamera.PlayAnimationPlay();
     }
     public void Credits()
     {
-        SceneManager.LoadScene("Credits");
+        //SceneManager.LoadScene("Credits");
+        gameObject.SetActive(false);
+        _menuCamera.PlayAnimationCredits();
     }
     public void Exit()
     {
-        Application.Quit();
+        gameObject.SetActive(false);
+        _astronautController.SetTarget();
+        _menuCamera.PlayAnimationExit();
     }
 }
