@@ -28,4 +28,10 @@ public class ManejadorEscena : MonoBehaviour
         _astronautController.SetTarget();
         _menuCamera.PlayAnimationExit();
     }
+
+    public void Back()
+    {
+        gameObject.SetActive(true);
+        _menuCamera.PlayAnimationBack();
+    }
 }
