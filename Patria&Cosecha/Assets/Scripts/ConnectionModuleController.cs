@@ -8,27 +8,12 @@ public class ConnectionModuleController : MonoBehaviour
     [SerializeField] private ParticleSystem _completedPs;
     [SerializeField] private SplineAnimate _animator;
 
-    [Header("Emissive Management")]
-    [SerializeField] private float _onSpeed;
-    [SerializeField] private float _offSpeed;
-
-    [ColorUsage(true, true)]
-    [SerializeField] private Color _onColor;
-
-    [ColorUsage(true, true)]
-    [SerializeField] private Color _offColor;
+    [Header("Light Management")]
+    [SerializeField] private Light _light;
+    [SerializeField] private float _turnTime;
+    [SerializeField] private float _maxLight;
 
     private MainTM _mainTM = default;
-    private Renderer _renderer = default;
-    
-    private float _currentIntensity = default;
-    private bool _canAdd = true;
-
-    private void Awake()
-    {
-        _renderer = GetComponent<Renderer>();
-        _renderer.material.EnableKeyword("_EMISSION");
-    }
 
     private void Start()
     {
@@ -38,45 +23,41 @@ public class ConnectionModuleController : MonoBehaviour
     private void Update()
     {
         if (_mainTM.Running) PlayFX();
+        else StopFX();
     }
 
     private void StopFX()
     {
         _orbitPs.Stop();
         _completedPs.Stop();
-        EnableEmission(_offColor, _offSpeed);
+        DisableLight();
     }
 
     private void PlayFX()
     {
         if (!_orbitPs.isPlaying) _orbitPs.Play();
         if (!_completedPs.isPlaying) _completedPs.Play();
-        EnableEmission(_onColor, _onSpeed);
+        EnableLight();
         _animator.Play();
     }
 
-    private void EnableEmission(Color color, float emissive)
+    private void EnableLight()
     {
-        if (_currentIntensity < 10 && _canAdd)
-        {
-            _currentIntensity += emissive * Time.deltaTime;
-            StartCoroutine(EmissiveCD());
-        }
-        
-        Color emissiveColor = color * _currentIntensity;
+        if (_light.intensity < _maxLight)
+            _light.intensity += _turnTime * Time.deltaTime;
+        else
+            _light.intensity = Mathf.Floor(_light.intensity);
+    }
 
-        _renderer.material.SetColor("_EmissionColor", emissiveColor);
+    private void DisableLight()
+    {
+        if (_light.intensity > 0)
+            _light.intensity -= _turnTime * Time.deltaTime;
+        else _light.intensity = Mathf.Floor(_light.intensity);
     }
 
     public void SetTM(MainTM mainTM)
     {
         _mainTM = mainTM;
-    }
-
-    private IEnumerator EmissiveCD()
-    {
-        _canAdd = false;
-        yield return new WaitForSeconds(0.5f);
-        _canAdd = true;
     }
 }

@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6610032090738409693
 Transform:
@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 245436568679752128}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.3, z: 5.7}
+  m_LocalPosition: {x: 0, y: 0, z: 5.0000005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136,7 +136,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4865444853547792517
 Transform:
@@ -243,10 +243,9 @@ MonoBehaviour:
   _orbitPs: {fileID: 4364052576740114983}
   _completedPs: {fileID: 6183841104046091703}
   _animator: {fileID: 8509488413447766016}
-  _onSpeed: 10
-  _offSpeed: -10
-  _onColor: {r: 0, g: 1024, b: 1024, a: 1}
-  _offColor: {r: 0, g: 0.0009765625, b: 0.0009765625, a: 1}
+  _light: {fileID: 9116537114922868229}
+  _turnTime: 25
+  _maxLight: 50
 --- !u!1 &3112705149863869404
 GameObject:
   m_ObjectHideFlags: 0
@@ -263,7 +262,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6707857763075836462
 Transform:
@@ -5364,8 +5363,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.7
-      minScalar: 0.3
+      scalar: 0.25
+      minScalar: 0.125
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -9079,7 +9078,7 @@ ParticleSystem:
     inheritParticleColor: 1
     generateLightingData: 0
     splitSubEmitterRibbons: 0
-    attachRibbonsToTransform: 0
+    attachRibbonsToTransform: 1
     colorOverLifetime:
       serializedVersion: 2
       minMaxState: 0
@@ -9854,7 +9853,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 915bf2f019fe00d449315ba5d7192b6f, type: 2}
   - {fileID: 2100000, guid: c1eb2c55c7a0007498dedba8627fc122, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -9940,6 +9939,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: 7f14939db768c9f41a86e14e5cb27273, type: 3}
       propertyPath: m_Name
       value: Crate01
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 7f14939db768c9f41a86e14e5cb27273, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 7f14939db768c9f41a86e14e5cb27273, type: 3}
       propertyPath: m_LocalScale.x
