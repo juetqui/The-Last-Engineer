@@ -80,13 +80,18 @@ public class ConnectionNode : MonoBehaviour
     private void HandleRecievedNode(bool isValid, bool playEffects, AudioClip clip)
     {
         _isWorking = isValid;
-        
-        if (isValid) HandleTaskManagers(isValid);
+
+        if (isValid)
+        {
+            HandleTaskManagers(isValid);
+            _nodeRenderer.PlayClip(_placedClip, 3f);
+        }
+        else
+            _nodeRenderer.PlayClip(_placedClip, 1f);
 
         _recievedNode.IsConnected = isValid;
         _nodeRenderer.Enable(playEffects);
         _nodeRenderer.PlayEffect(playEffects);
-        _nodeRenderer.PlayClip(_placedClip);
     }
 
     private void HandleTaskManagers(bool addConnection)

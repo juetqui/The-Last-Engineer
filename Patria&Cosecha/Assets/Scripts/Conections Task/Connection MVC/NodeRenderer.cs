@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NodeRenderer : INodeEffect, INodeAudio
+public class NodeRenderer : INodeEffect
 {
     private NodeType _type = default;
     private Renderer _renderer = default;
@@ -54,9 +54,10 @@ public class NodeRenderer : INodeEffect, INodeAudio
         _ps.gameObject.SetActive(turnOnOff);
     }
 
-    public void PlayClip(AudioClip audio)
+    public void PlayClip(AudioClip audio, float speed)
     {
         _source.clip = audio;
+        _source.pitch = speed;
         _source.Play();
     }
 
