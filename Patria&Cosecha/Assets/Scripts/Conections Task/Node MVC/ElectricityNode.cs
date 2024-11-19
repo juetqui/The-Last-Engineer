@@ -85,9 +85,9 @@ public class ElectricityNode : MonoBehaviour
         if (newParent != null) _isChildren = true;
         else _isChildren = false;
 
-        if (newParent != null && newScale != default) _nodeModel.SetPos(newPos, newParent, newScale);
-        else if (newParent != null && newScale == default) _nodeModel.SetPos(newPos, newParent);
-        else if (newParent == null && newScale == default) _nodeModel.SetPos(newPos);
+        if (newParent != null && newScale != default) _nodeModel.SetPos(newPos, NodeType, newParent, newScale);
+        else if (newParent != null && newScale == default) _nodeModel.SetPos(newPos, NodeType, newParent);
+        else if (newParent == null && newScale == default) _nodeModel.SetPos(newPos, NodeType);
     }
 
     public bool Combine(float deltaTime)

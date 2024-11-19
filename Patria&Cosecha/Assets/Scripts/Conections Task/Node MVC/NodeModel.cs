@@ -24,7 +24,7 @@ public class NodeModel
         _transform.Rotate(0, _rotSpeed * deltaTime, 0);
     }
 
-    public void SetPos(Vector3 newPos, Transform newParent = null, Vector3 newScale = default)
+    public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
     {
         if (newParent != null)
         {
@@ -34,6 +34,9 @@ public class NodeModel
         }
         else
         {
+            if (nodeType == NodeType.Dash)
+                newScale = Vector3.one * 2;
+
             _transform.SetParent(null);
             _transform.localPosition = newPos;
         }

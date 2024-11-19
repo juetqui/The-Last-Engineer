@@ -127,6 +127,7 @@ public class PlayerTDController : MonoBehaviour
     private void DropNode()
     {
         Vector3 dropPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+
         _node.Attach(dropPos);
         ResetNode();
 

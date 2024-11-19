@@ -5,11 +5,12 @@ public class OpenDoor : MonoBehaviour
 {
     [SerializeField] private Transform _openPos;
     [SerializeField] private bool _isMenu;
+    [SerializeField] private float _speed = 5f;
 
     private MainTM _mainTM = default;
     private SecondaryTM _secTM = default;
     private bool _canOpen = false, _isMoving = false;
-    private float _stopDist = 0.01f, _speed = 2f;
+    private float _stopDist = 0.01f;
     private Vector3 _closedPos = default;
 
     private bool HasMainTM { get { return _mainTM != null && _mainTM.Running; } }
