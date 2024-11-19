@@ -167,10 +167,7 @@ public class PlayerTDController : MonoBehaviour
     private bool CheckForWalls()
     {
         if (Physics.Raycast(transform.position, _node.transform.position, 7f, _wallMask))
-        {
-            Debug.Log("Wall");
             return true;
-        }
         
         return false;
     }
