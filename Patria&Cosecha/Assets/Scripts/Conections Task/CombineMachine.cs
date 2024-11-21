@@ -6,8 +6,8 @@ public class CombineMachine : MonoBehaviour
 {
     [SerializeField] private GameObject _combinedPrefab;
     [SerializeField] private Collider _trigger;
-    [SerializeField] private Transform _firstNodePos;
-    [SerializeField] private Transform _secondNodePos;
+    [SerializeField] private GameObject _firstNodePos;
+    [SerializeField] private GameObject _secondNodePos;
     [SerializeField] private Transform _combinedNodePos;
 
     private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode = default;
@@ -86,12 +86,14 @@ public class CombineMachine : MonoBehaviour
 
         if (_firstNode == null)
         {
-            node.Attach(_firstNodePos.localPosition, transform);
+            node.Attach(_firstNodePos.transform.localPosition, transform);
+            _firstNodePos.SetActive(false);
             _firstNode = node;
         }
         else if (_firstNode != null && node.NodeType != _firstNode.NodeType)
         {
-            node.Attach(_secondNodePos.localPosition, transform);
+            node.Attach(_secondNodePos.transform.localPosition, transform);
+            _secondNodePos.SetActive(false);
             _secondNode = node;
         }
     }
@@ -102,8 +104,16 @@ public class CombineMachine : MonoBehaviour
 
         if (_firstNode != null || _secondNode != null)
         {
-            if (node.NodeType == _firstNode.NodeType) _firstNode = null;
-            else if (node.NodeType == _secondNode.NodeType) _secondNode = null;
+            if (node.NodeType == _firstNode.NodeType)
+            {
+                _firstNode = null;
+                _firstNodePos.SetActive(true);
+            }
+            else if (node.NodeType == _secondNode.NodeType)
+            {
+                _secondNode = null;
+                _secondNodePos.SetActive(true);
+            }
         }
     }
 }

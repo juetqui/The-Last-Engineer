@@ -32,6 +32,6 @@ public class ManejadorEscena : MonoBehaviour
     public void Back()
     {
         gameObject.SetActive(true);
-        _menuCamera.PlayAnimationBack();
+        //_menuCamera.PlayAnimationBack();
     }
 }
