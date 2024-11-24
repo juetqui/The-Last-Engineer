@@ -18,7 +18,6 @@ public class ManejadorEscena : MonoBehaviour
     }
     public void Credits()
     {
-        //SceneManager.LoadScene("Credits");
         gameObject.SetActive(false);
         _menuCamera.PlayAnimationCredits();
     }
@@ -32,6 +31,6 @@ public class ManejadorEscena : MonoBehaviour
     public void Back()
     {
         gameObject.SetActive(true);
-        //_menuCamera.PlayAnimationBack();
+        SceneManager.LoadScene("Menu");
     }
 }

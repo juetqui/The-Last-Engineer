@@ -17,13 +17,7 @@ public class MenuCamera : BaseCamera
 
     private void Start()
     {
-        //_sAnimatePlay.enabled = true;
-        //_sAnimateCredits.enabled = false;
-        //_sAnimateExit.enabled = false;
-        //_sAnimateBack.enabled = false;
-
         _sAnimatePlay.Restart(false);
-
         Adjust();
     }
 
@@ -35,33 +29,23 @@ public class MenuCamera : BaseCamera
     public void PlayAnimationPlay()
     {
         _animSet = true;
-        //_sAnimateCredits.enabled = false;
-        //_sAnimateExit.enabled = false;
-        //_sAnimatePlay.enabled = true;
         _sAnimatePlay.Play();
     }
 
     public void PlayAnimationCredits()
     {
         _animSet = true;
-        //_sAnimatePlay.enabled = false;
-        //_sAnimateExit.enabled = false;
-        //_sAnimateCredits.enabled = true;
         _sAnimateCredits.Play();
     }
 
     public void PlayAnimationExit()
     {
         _animSet = true;
-        //_sAnimatePlay.enabled = false;
-        //_sAnimateCredits.enabled = false;
-        //_sAnimateExit.enabled = true;
         _sAnimateExit.Play();
     }
     //public void PlayAnimationBack()
     //{
     //    _animSet = true;
-    //    _sAnimateBack.enabled = true;
     //    _sAnimateBack.Play();
     //}
 }
