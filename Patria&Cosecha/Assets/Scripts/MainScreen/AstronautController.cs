@@ -29,6 +29,7 @@ public class AstronautController : MonoBehaviour
 
     private void Move()
     {
+        if (_animator == null) return;
         if (_isAnimating) _isAnimating = false;
 
         if (Vector3.Distance(transform.position, UpdateTargetPos()) > 0.1f)
