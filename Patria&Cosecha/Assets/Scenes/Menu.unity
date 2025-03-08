@@ -5260,7 +5260,9 @@ MonoBehaviour:
   _targetPos:
   - {fileID: 1578932228}
   - {fileID: 1940177497}
+  - {fileID: 978910579}
   _hasTarget: 0
+  _isExit: 0
   _moveSpeed: 7
 --- !u!82 &565773762
 AudioSource:
@@ -8037,6 +8039,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 978910579}
+  - component: {fileID: 978910580}
+  - component: {fileID: 978910581}
   m_Layer: 0
   m_Name: PlayPos (2)
   m_TagString: Untagged
@@ -8053,12 +8057,47 @@ Transform:
   m_GameObject: {fileID: 978910578}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.0000029504295}
-  m_LocalPosition: {x: 4.129925, y: 2.347046, z: -28.76817}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.31825, y: 2.347046, z: -28.768}
+  m_LocalScale: {x: 21.803774, y: 7.0275993, z: 0.21027066}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!65 &978910580
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978910578}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5, y: 2, z: 5}
+  m_Center: {x: -0.25, y: 0, z: 0}
+--- !u!114 &978910581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 978910578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1e819f089dcb9f438928fd96f633e2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _astronautController: {fileID: 565773760}
+  _menuCamera: {fileID: 289824292}
 --- !u!1 &1002520688
 GameObject:
   m_ObjectHideFlags: 0

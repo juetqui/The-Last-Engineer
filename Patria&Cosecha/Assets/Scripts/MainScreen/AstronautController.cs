@@ -6,7 +6,7 @@ public class AstronautController : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     [SerializeField] private Transform[] _targetPos;
-    [SerializeField] private bool _hasTarget = false;
+    [SerializeField] private bool _hasTarget = false, _isExit;
 
     [SerializeField] private float _moveSpeed;
 
@@ -24,10 +24,11 @@ public class AstronautController : MonoBehaviour
     void Update()
     {
         if (!_isAnimating && !_hasTarget) StartCoroutine(SetRandomAnim());
-        else if (_hasTarget) Move();
+        else if (_hasTarget && !_isExit) Move();
+        else if (_hasTarget && _isExit) Move(1);
     }
 
-    private void Move()
+    private void Move(int buttom = 0)
     {
         if (_animator == null) return;
         if (_isAnimating) _isAnimating = false;
@@ -53,8 +54,10 @@ public class AstronautController : MonoBehaviour
                 _animator.SetBool("IsWalking", false);
                 return;
             }
-            
-            _currentTarget = _targetPos[_index];
+            if(buttom == 1 && _index == 1)
+                _currentTarget = _targetPos[_index + 1];
+            else
+                _currentTarget = _targetPos[_index];
         }
     }
 
@@ -63,9 +66,10 @@ public class AstronautController : MonoBehaviour
         return new Vector3(_currentTarget.position.x, transform.position.y, _currentTarget.position.z);
     }
 
-    public void SetTarget()
+    public void SetTarget(bool exit = false)
     {
         _hasTarget = true;
+        _isExit = exit;
     }
 
     private IEnumerator SetRandomAnim()

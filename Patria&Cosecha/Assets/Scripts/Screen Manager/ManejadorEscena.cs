@@ -24,7 +24,7 @@ public class ManejadorEscena : MonoBehaviour
     public void Exit()
     {
         gameObject.SetActive(false);
-        _astronautController.SetTarget();
+        _astronautController.SetTarget(true);
         _menuCamera.PlayAnimationExit();
     }
 
@@ -32,5 +32,11 @@ public class ManejadorEscena : MonoBehaviour
     {
         gameObject.SetActive(true);
         SceneManager.LoadScene("Menu");
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Trigger de salir app");
+        Application.Quit();
     }
 }
