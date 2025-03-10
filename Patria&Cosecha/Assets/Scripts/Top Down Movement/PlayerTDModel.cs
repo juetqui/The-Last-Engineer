@@ -5,11 +5,10 @@ public class PlayerTDModel
     private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _upgradedDashSpeed = default, _dashCooldown = default, _dashTimer = default;
     private bool _isDashing = false;
     private Vector3 _oldScale = default;
+    private LayerMask _groundMask;
     
     private Rigidbody _rb = default;
     private Transform _transform = default;
-    
-    private LayerMask _groundMask = default;
 
     public bool IsDashing {  get { return _isDashing; } }
     public float MoveSpeed { get { return _moveSpeed; } set { _moveSpeed = value; } }
@@ -40,6 +39,17 @@ public class PlayerTDModel
         MovePlayer(moveDir);
     }
 
+    public bool IsGrounded()
+    {
+        Vector3 frontCheck = new Vector3(_transform.position.x, _transform.position.y, _transform.position.z + 0.3f);
+        Vector3 backCheck = new Vector3(_transform.position.x, _transform.position.y, _transform.position.z - 0.3f);
+
+        bool isGroundedFront = Physics.Raycast(frontCheck, Vector3.down, 0.3f, _groundMask);
+        bool isGroundedBack = Physics.Raycast(backCheck, Vector3.down, 0.3f, _groundMask);
+
+        return isGroundedFront && isGroundedBack;
+    }
+
     private void MovePlayer(Vector3 moveDir)
     {
         if (moveDir.magnitude > 0.1f) RotatePlayer(moveDir);
@@ -47,6 +57,11 @@ public class PlayerTDModel
         Vector3 dir = moveDir.normalized * _moveSpeed;
         
         _rb.velocity = new Vector3(dir.x, _rb.velocity.y, dir.z);
+    }
+
+    public void ApplyGravity()
+    {
+        _rb.velocity = new Vector3(_rb.velocity.x, -9.81f, _rb.velocity.z);
     }
 
     private void RotatePlayer(Vector3 rotDir)
@@ -64,7 +79,7 @@ public class PlayerTDModel
         Vector3 dir = moveDir.normalized * (nodeType == NodeType.Dash ? _upgradedDashSpeed : _dashSpeed);
         Vector3 dashVelocity = Vector3.Lerp(_rb.velocity, dir, 0.5f);
 
-        _rb.useGravity = false;
+        //_rb.useGravity = false;
         _rb.drag = _dashDrag;
         _rb.velocity = dashVelocity;
 
@@ -89,8 +104,8 @@ public class PlayerTDModel
     private void EndDash()
     {
         _isDashing = false;
-        _rb.useGravity = true;
+        //_rb.useGravity = true;
         _rb.drag = 0f;
-        _rb.velocity *= 0.5f;
+        //_rb.velocity *= 0.5f;
     }
 }

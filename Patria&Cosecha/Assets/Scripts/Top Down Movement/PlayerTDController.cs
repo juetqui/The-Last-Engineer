@@ -22,6 +22,7 @@ public class PlayerTDController : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private AudioClip _walkClip;
+    [SerializeField] private AudioClip _dashClip;
     [SerializeField] private AudioClip _liftClip;
     [SerializeField] private AudioClip _putDownClip;
     [SerializeField] private AudioClip _emptyHand;
@@ -50,7 +51,7 @@ public class PlayerTDController : MonoBehaviour
         _commonSpeed = _moveSpeed;
 
         _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _liftClip, _putDownClip);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _dashClip, _liftClip, _putDownClip);
 
         _playerModel.OnStart();
     }
@@ -62,13 +63,15 @@ public class PlayerTDController : MonoBehaviour
         _playerModel.DashDrag = _dashDrag;
 
         _playerView.Walk(GetMovement());
-
         _playerModel.UpdateDashTimer(Time.deltaTime);
-        
+
         if (CheckForDash())
         {
             if (CanDash && !_playerModel.IsDashing)
+            {
                 _playerModel.Dash(_currentType, GetMovement());
+                _playerView.DashSound();
+            }
             else
                 _playerView.PlayErrorSound(_emptyHand);
         }
@@ -78,7 +81,13 @@ public class PlayerTDController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!_playerModel.IsDashing) _playerModel.OnUpdate(GetMovement(), Time.deltaTime);
+        if (!_playerModel.IsDashing)
+        {
+            _playerModel.OnUpdate(GetMovement(), Time.deltaTime);
+
+            if (!_playerModel.IsGrounded()) _playerModel.ApplyGravity();
+        }
+
     }
 
     private Vector3 GetMovement()
@@ -87,6 +96,12 @@ public class PlayerTDController : MonoBehaviour
         float verticalInput = Input.GetAxisRaw("Vertical");
         
         return new Vector3(horizontalInput, 0, verticalInput);
+    }
+
+    private void WalkSound()
+    {
+        if (!_playerModel.IsDashing)
+            _playerView.WalkSound();
     }
 
     private bool CheckForDash() => Input.GetKeyDown(KeyCode.Space);
@@ -217,7 +232,7 @@ public class PlayerTDController : MonoBehaviour
     {
         if (_node != null) Gizmos.DrawLine(transform.position, _node.transform.position);
 
-        Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z - 1);
+        Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.7f);
         Gizmos.DrawRay(rayDir, Vector3.down * 2);
     }
 }

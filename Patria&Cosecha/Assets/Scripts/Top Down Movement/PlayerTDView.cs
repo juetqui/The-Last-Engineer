@@ -7,49 +7,45 @@ public class PlayerTDView
 
     private Animator _animator = default;
     private AudioSource _source = default;
-    private AudioClip _walkClip = default, _liftClip = default, _putDownClip = default;
+    private AudioClip _walkClip = default, _dashClip = default, _liftClip = default, _putDownClip = default;
 
     private float _timer = default, _interval = 0.0125f;
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip liftClip, AudioClip putDownClip)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip dashClip, AudioClip liftClip, AudioClip putDownClip)
     {
         _outline = outline;
         _ps = ps;
         _animator = animator;
         _source = source;
         _walkClip = walkClip;
+        _dashClip = dashClip;
         _liftClip = liftClip;
         _putDownClip = putDownClip;
     }
 
     public void Walk(Vector3 moveVector)
     {
-        if (moveVector.x != 0 || moveVector.z != 0)
-        {
-            _animator.SetBool("IsWalking", true);
-            WalkSound();
-        }
+        if (moveVector.x != 0 || moveVector.z != 0) _animator.SetBool("IsWalking", true);
         else _animator.SetBool("IsWalking", false);
     }
 
-    private void WalkSound()
+    public void DashSound()
     {
-        if (!_source.isPlaying)
-        {
-            _source.volume = 0.6f;
-            _timer += Time.deltaTime;
+        float pitch = Random.Range(1f, 1.5f);
 
-            if (_timer >= _interval)
-            {
-                float pitch = Random.Range(1f, 1.5f);
+        _source.clip = _dashClip;
+        _source.pitch = pitch;
+        _source.Play();
+    }
 
-                _source.clip = _walkClip;
-                _source.pitch = pitch;
-                _source.Play();
-            }
-        }
-        else _timer = 0;
+    public void WalkSound()
+    {
+        float pitch = Random.Range(1f, 1.5f);
+
+        _source.clip = _walkClip;
+        _source.pitch = pitch;
+        _source.Play();
     }
 
     public void PlayPS(Color color)
