@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using MaskTransitions;
 
 public class LevelChanger : MonoBehaviour
 {
@@ -12,7 +13,12 @@ public class LevelChanger : MonoBehaviour
         AstronautController menuPlayer = coll.GetComponent<AstronautController>();
 
         if (menuPlayer != null && _isMenu) SceneManager.LoadScene(_lvlName);
-        else if (player != null) SceneManager.LoadScene(_lvlName);
+        else if (player != null) SwitchScene();
 
+    }
+
+    public void SwitchScene()
+    {
+        TransitionManager.Instance.LoadLevel(_lvlName);
     }
 }

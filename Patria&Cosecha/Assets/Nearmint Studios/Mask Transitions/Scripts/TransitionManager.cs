@@ -1,6 +1,6 @@
 namespace MaskTransitions
 {
-//    using DG.Tweening;
+    using DG.Tweening;
     using System.Collections;
     using UnityEngine;
     using UnityEngine.SceneManagement;
@@ -68,31 +68,31 @@ namespace MaskTransitions
             maskRect.sizeDelta = Vector2.zero;
             parentMaskRect.sizeDelta = Vector2.zero;
 
-            //maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
-            //if (rotation)
-            //    maskRect.DORotate(new Vector3(0, 0, 180), animationTime, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad);
+            maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            if (rotation)
+                maskRect.DORotate(new Vector3(0, 0, 180), animationTime, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad);
         }
 
-        //Tween StartAnimationForLoad(float? totalTime = null)
-        //{
-        //    float animationTime = totalTime ?? individualTransitionTime;
+        Tween StartAnimationForLoad(float? totalTime = null)
+        {
+            float animationTime = totalTime ?? individualTransitionTime;
 
-        //    maskRect.sizeDelta = Vector2.zero;
-        //    parentMaskRect.sizeDelta = Vector2.zero;
-        //    maskRect.rotation = Quaternion.identity;
+            maskRect.sizeDelta = Vector2.zero;
+            parentMaskRect.sizeDelta = Vector2.zero;
+            maskRect.rotation = Quaternion.identity;
 
-        //    Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
 
-        //    Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize);
+            Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize);
 
-        //    if (rotation)
-        //    {
-        //        Tween blueTweenRotate = maskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
-        //        animationSequence.Join(blueTweenRotate);
-        //    }
+            if (rotation)
+            {
+                Tween blueTweenRotate = maskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
+                animationSequence.Join(blueTweenRotate);
+            }
 
-        //    return animationSequence;
-        //}
+            return animationSequence;
+        }
 
 
         void EndAnimation(float? totalTime = null)
@@ -103,9 +103,9 @@ namespace MaskTransitions
             parentMaskRect.sizeDelta = Vector2.zero;
             parentMaskRect.rotation = Quaternion.identity;
 
-            //parentMaskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
-            //if (rotation)
-            //    parentMaskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
+            parentMaskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            if (rotation)
+                parentMaskRect.DORotate(new Vector3(0, 0, 180), animationTime).SetEase(Ease.InOutQuad);
         }
         #endregion
 
@@ -119,7 +119,7 @@ namespace MaskTransitions
         {
             float dividedTime = transitionTime / 3;
 
-            //Optional Delay
+            // Optional Delay
             yield return new WaitForSeconds(startDelay);
 
             StartAnimation(dividedTime);
@@ -138,10 +138,10 @@ namespace MaskTransitions
         {
             yield return new WaitForSeconds(delay);
 
-            //Tween animationTween = StartAnimationForLoad();
+            Tween animationTween = StartAnimationForLoad();
 
             // Wait for the animation to complete
-            //yield return animationTween.WaitForCompletion();
+            yield return animationTween.WaitForCompletion();
 
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
 
