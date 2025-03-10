@@ -12,7 +12,7 @@ public class LevelChanger : MonoBehaviour
         PlayerTDController player = coll.GetComponent<PlayerTDController>();
         AstronautController menuPlayer = coll.GetComponent<AstronautController>();
 
-        if (menuPlayer != null && _isMenu) SceneManager.LoadScene(_lvlName);
+        if (menuPlayer != null && _isMenu) SwitchScene();
         else if (player != null) SwitchScene();
 
     }
