@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using MaskTransitions;
 
 public class PlayerTDController : MonoBehaviour
 {
@@ -189,7 +190,8 @@ public class PlayerTDController : MonoBehaviour
 
     public void ResetLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log(SceneManager.GetActiveScene().name);
+        TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
 
     private void OnTriggerEnter(Collider coll)
