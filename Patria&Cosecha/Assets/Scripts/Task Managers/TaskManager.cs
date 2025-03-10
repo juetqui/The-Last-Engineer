@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static TaskManager;
 
 public abstract class TaskManager : MonoBehaviour
 {

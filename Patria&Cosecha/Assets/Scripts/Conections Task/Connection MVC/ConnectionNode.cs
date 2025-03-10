@@ -21,6 +21,7 @@ public class ConnectionNode : MonoBehaviour
     [SerializeField] private ParticleSystem _ps;
 
     private List<SecondaryTM> _secTaskManagers = new List<SecondaryTM>();
+    private MainTM _mainTM = default;
     private NodeRenderer _nodeRenderer = default;
     private ElectricityNode _recievedNode = default;
 
@@ -33,6 +34,11 @@ public class ConnectionNode : MonoBehaviour
     {
         _nodeRenderer = new NodeRenderer(_requiredType, _render, _triggerCollider, _color, _secColor, _fresnelColor, _ps, _audioSrc);
         _nodeRenderer.OnStart();
+    }
+
+    public void SetMainTM(MainTM mainTM)
+    {
+        _mainTM = mainTM;
     }
 
     public void SetSecTM(SecondaryTM secTM)
@@ -92,7 +98,8 @@ public class ConnectionNode : MonoBehaviour
     {
         if (addConnection)
         {
-            MainTM.Instance?.AddConnection(_requiredType);
+            if (_mainTM != null)
+                MainTM.Instance?.AddConnection(_requiredType);
 
             if (_secTaskManagers.Count > 0)
             {
@@ -101,7 +108,8 @@ public class ConnectionNode : MonoBehaviour
         }
         else
         {
-            MainTM.Instance?.RemoveConnection(_requiredType);
+            if (_mainTM != null)
+                MainTM.Instance?.RemoveConnection(_requiredType);
 
             if (_secTaskManagers.Count > 0)
             {

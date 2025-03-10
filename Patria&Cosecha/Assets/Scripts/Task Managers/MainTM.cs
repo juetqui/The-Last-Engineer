@@ -51,5 +51,6 @@ public class MainTM : TaskManager
     protected override void SetUp()
     {
         foreach (var door in _doors) door.SetMainTM(this);
+        foreach (var c in connections) c.SetMainTM(this);
     }
 }
