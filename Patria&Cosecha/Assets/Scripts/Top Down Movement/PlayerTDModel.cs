@@ -62,18 +62,27 @@ public class PlayerTDModel
         RotatePlayer(moveDir);
 
         Vector3 dir = moveDir.normalized * (nodeType == NodeType.Dash ? _upgradedDashSpeed : _dashSpeed);
+        Vector3 dashVelocity = Vector3.Lerp(_rb.velocity, dir, 0.5f);
 
         _rb.useGravity = false;
         _rb.drag = _dashDrag;
-        _rb.AddForce(dir, ForceMode.VelocityChange);
-        
+        _rb.velocity = dashVelocity;
+
         _isDashing = true;
         _dashTimer = _dashCooldown;
     }
 
     public void UpdateDashTimer(float deltaTime)
     {
-        if (_dashTimer > 0f && _isDashing) _dashTimer -= deltaTime;
+        if (_dashTimer > 0f && _isDashing)
+        {
+            _dashTimer -= deltaTime;
+            
+            Vector3 velocityDir = _rb.velocity.normalized;
+            
+            if (velocityDir.magnitude > 0.1f)
+                RotatePlayer(velocityDir);
+        }
         else EndDash();
     }
 
@@ -82,5 +91,6 @@ public class PlayerTDModel
         _isDashing = false;
         _rb.useGravity = true;
         _rb.drag = 0f;
+        _rb.velocity *= 0.5f;
     }
 }

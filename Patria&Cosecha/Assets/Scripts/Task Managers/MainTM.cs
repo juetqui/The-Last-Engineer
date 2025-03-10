@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Splines;
 
 public class MainTM : TaskManager
 {
@@ -12,8 +11,19 @@ public class MainTM : TaskManager
     [SerializeField] private AudioSource _winAS;
     [SerializeField] private ConnectionModuleController _moduleController;
 
+    public static MainTM Instance { get; private set; }
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        
         OnAwake();
         Cursor.visible = false;
     }
@@ -28,10 +38,7 @@ public class MainTM : TaskManager
 
     private void Update()
     {
-        if (_running)
-        {
-            if (_light.intensity < 30) _light.intensity += 5 * Time.deltaTime;
-        }
+        if (_running && _light.intensity < 30) _light.intensity += 5 * Time.deltaTime;
     }
 
     protected override void OnAllNodesConnected()
@@ -43,11 +50,6 @@ public class MainTM : TaskManager
 
     protected override void SetUp()
     {
-        foreach (var connection in connections) connection.SetMainTM(this);
         foreach (var door in _doors) door.SetMainTM(this);
-
-        _lvlChanger.SetTM(this);
-        _doorLights.SetTM(this);
-        _moduleController.SetTM(this);
     }
 }

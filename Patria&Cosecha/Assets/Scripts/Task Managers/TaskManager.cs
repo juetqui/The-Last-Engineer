@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static TaskManager;
 
 public abstract class TaskManager : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public abstract class TaskManager : MonoBehaviour
 
     protected int _workingNodes = default, _totalToFinish = default, _totalForDictionary = default;
     protected bool _running = false;
+    
+    public delegate void OnRunning(bool isRunning);
+    public event OnRunning onRunning = default;
 
     protected Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
 
@@ -39,7 +43,10 @@ public abstract class TaskManager : MonoBehaviour
             _running = true;
             OnAllNodesConnected();
         }
-        else _running = false;
+        else
+            _running = false;
+
+        onRunning?.Invoke(_running);
     }
 
     public void AddConnection(NodeType nodeType)

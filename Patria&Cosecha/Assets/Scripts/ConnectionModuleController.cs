@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -13,16 +12,15 @@ public class ConnectionModuleController : MonoBehaviour
     [SerializeField] private float _turnTime;
     [SerializeField] private float _maxLight;
 
-    private MainTM _mainTM = default;
-
     private void Start()
     {
+        MainTM.Instance.onRunning += SetFX;
         StopFX();
     }
 
-    private void Update()
+    private void SetFX(bool isRunning)
     {
-        if (_mainTM.Running) PlayFX();
+        if (isRunning) PlayFX();
         else StopFX();
     }
 
@@ -54,10 +52,5 @@ public class ConnectionModuleController : MonoBehaviour
         if (_light.intensity > 0)
             _light.intensity -= _turnTime * Time.deltaTime;
         else _light.intensity = Mathf.Floor(_light.intensity);
-    }
-
-    public void SetTM(MainTM mainTM)
-    {
-        _mainTM = mainTM;
     }
 }
