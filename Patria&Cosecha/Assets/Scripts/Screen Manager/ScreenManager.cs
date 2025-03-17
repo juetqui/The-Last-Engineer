@@ -33,15 +33,14 @@ public class ScreenManager : MonoBehaviour
     public void Push(IScreen screen)
     {
         Time.timeScale = 0;
+        
         if (_stack.Count > 0)
         {
-            Debug.Log("Hay algo en Stack");
             _stack.Peek().Deactivate();
             Pop();
         }
 
         _stack.Push(screen);
-
         screen.Activate();
     }
 

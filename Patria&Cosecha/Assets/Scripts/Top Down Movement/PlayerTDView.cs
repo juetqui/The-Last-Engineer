@@ -6,18 +6,19 @@ public class PlayerTDView
     private ParticleSystem[] _ps = default;
 
     private Animator _animator = default;
-    private AudioSource _source = default;
+    private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _liftClip = default, _putDownClip = default;
 
     private float _timer = default, _interval = 0.0125f;
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource source, AudioClip walkClip, AudioClip dashClip, AudioClip liftClip, AudioClip putDownClip)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, AudioClip walkClip, AudioClip dashClip, AudioClip liftClip, AudioClip putDownClip)
     {
         _outline = outline;
         _ps = ps;
         _animator = animator;
-        _source = source;
+        _walkSource = walkSource;
+        _fxSource = fxSource;
         _walkClip = walkClip;
         _dashClip = dashClip;
         _liftClip = liftClip;
@@ -34,18 +35,18 @@ public class PlayerTDView
     {
         float pitch = Random.Range(1f, 1.5f);
 
-        _source.clip = _dashClip;
-        _source.pitch = pitch;
-        _source.Play();
+        _fxSource.clip = _dashClip;
+        _fxSource.pitch = pitch;
+        _fxSource.Play();
     }
 
     public void WalkSound()
     {
         float pitch = Random.Range(1f, 1.5f);
 
-        _source.clip = _walkClip;
-        _source.pitch = pitch;
-        _source.Play();
+        _walkSource.clip = _walkClip;
+        _walkSource.pitch = pitch;
+        _walkSource.Play();
     }
 
     public void PlayPS(Color color)
@@ -64,11 +65,11 @@ public class PlayerTDView
 
     public void GrabNode(bool grab = false, Color outlineColor = default)
     {
-        if (grab) _source.clip = _liftClip;
-        else _source.clip = _putDownClip;
-        
-        _source.volume = 1f;
-        _source.Play();
+        if (grab) _fxSource.clip = _liftClip;
+        else _fxSource.clip = _putDownClip;
+
+        _fxSource.volume = 1f;
+        _fxSource.Play();
 
         if (outlineColor != Color.black)
         {
@@ -86,7 +87,7 @@ public class PlayerTDView
 
     public void PlayErrorSound(AudioClip clip)
     {
-        _source.clip = clip;
-        _source.Play();
+        _fxSource.clip = clip;
+        _fxSource.Play();
     }
 }

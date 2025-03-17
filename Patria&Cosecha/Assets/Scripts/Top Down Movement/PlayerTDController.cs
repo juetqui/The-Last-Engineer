@@ -7,19 +7,19 @@ public class PlayerTDController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _rotSpeed;
-    [SerializeField] private LayerMask _groundMask;
     [SerializeField] private LayerMask _wallMask;
 
     [Header("Dash")]
     [SerializeField] private float _dashSpeed;
-    [SerializeField] private float _dashDrag;
-    [SerializeField] private float _dashCooldown;
+    [SerializeField] private float _dashDuration;
+    [SerializeField] private float _dashCD;
 
     [Header("View")]
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem[] _ps;
     [SerializeField] private Animator _animator;
-    [SerializeField] private AudioSource _source;
+    [SerializeField] private AudioSource _walkSource;
+    [SerializeField] private AudioSource _fxSource;
 
     [Header("Audio")]
     [SerializeField] private AudioClip _walkClip;
@@ -28,7 +28,8 @@ public class PlayerTDController : MonoBehaviour
     [SerializeField] private AudioClip _putDownClip;
     [SerializeField] private AudioClip _emptyHand;
 
-    private Rigidbody _rb = default;
+    private CharacterController _cc = default;
+
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
 
@@ -37,8 +38,7 @@ public class PlayerTDController : MonoBehaviour
     private CombineMachine _combineMachine = default;
     private CombinerController _combiner = default;
 
-    private float _commonSpeed = default;
-
+    private float _commonSpeed = default, _verticalInput = default, _horizontalInput = default;
     private NodeType _currentType = NodeType.None;
 
     private bool CanDash { get { return CheckDashAvialable(); } }
@@ -48,64 +48,48 @@ public class PlayerTDController : MonoBehaviour
 
     private void Start()
     {
-        _rb = GetComponent<Rigidbody>();
+        _cc = GetComponent<CharacterController>();
+
         _commonSpeed = _moveSpeed;
 
-        _playerModel = new PlayerTDModel(_rb, transform, _groundMask, _moveSpeed, _rotSpeed, _dashSpeed, _dashDrag, _dashCooldown);
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _source, _walkClip, _dashClip, _liftClip, _putDownClip);
-
-        _playerModel.OnStart();
+        _playerModel = new PlayerTDModel(_cc, transform, _moveSpeed, _rotSpeed, _dashSpeed, _dashDuration, _dashCD);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _walkClip, _dashClip, _liftClip, _putDownClip);
     }
 
     private void Update()
     {
-        _playerModel.MoveSpeed = _moveSpeed;
-        _playerModel.DashSpeed = _dashSpeed;
-        _playerModel.DashDrag = _dashDrag;
-
+        _playerModel.OnUpdate(GetMovement(), _moveSpeed);
         _playerView.Walk(GetMovement());
-        _playerModel.UpdateDashTimer(Time.deltaTime);
 
-        if (CheckForDash())
+        if (GetDashKey())
         {
-            if (CanDash && !_playerModel.IsDashing)
+            if (CanDash && _playerModel.CanDash)
             {
-                _playerModel.Dash(_currentType, GetMovement());
+                StartCoroutine(_playerModel.Dash(GetMovement(), _currentType));
                 _playerView.DashSound();
+                StartCoroutine(_playerModel.DashCD());
             }
             else
                 _playerView.PlayErrorSound(_emptyHand);
         }
 
-        if (Input.GetKeyDown(KeyCode.E)) CheckInteraction();
-    }
-
-    private void FixedUpdate()
-    {
-        if (!_playerModel.IsDashing)
-        {
-            _playerModel.OnUpdate(GetMovement(), Time.deltaTime);
-
-            if (!_playerModel.IsGrounded()) _playerModel.ApplyGravity();
-        }
-
+        if (Input.GetKeyDown(KeyCode.E) && _cc.isGrounded) CheckInteraction();
     }
 
     private Vector3 GetMovement()
     {
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
-        
-        return new Vector3(horizontalInput, 0, verticalInput);
+        _verticalInput = Input.GetAxisRaw("Vertical");
+        _horizontalInput = Input.GetAxisRaw("Horizontal");
+        return new Vector3(_horizontalInput, 0, _verticalInput);
     }
 
     private void WalkSound()
     {
-        if (!_playerModel.IsDashing)
+        if (!_playerModel.IsDashing && _cc.isGrounded)
             _playerView.WalkSound();
     }
 
-    private bool CheckForDash() => Input.GetKeyDown(KeyCode.Space);
+    private bool GetDashKey() => Input.GetKeyDown(KeyCode.Space);
 
     private bool CheckDashAvialable() => _currentType == NodeType.Blue || _currentType == NodeType.Dash;
 
@@ -190,7 +174,6 @@ public class PlayerTDController : MonoBehaviour
 
     public void ResetLevel()
     {
-        Debug.Log(SceneManager.GetActiveScene().name);
         TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
 
@@ -228,13 +211,5 @@ public class PlayerTDController : MonoBehaviour
         else if (connectionNode != null) _connectionNode = null;
         else if (machine != null) _combineMachine = null;
         else if (combiner != null) _combiner = null;
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (_node != null) Gizmos.DrawLine(transform.position, _node.transform.position);
-
-        Vector3 rayDir = new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.7f);
-        Gizmos.DrawRay(rayDir, Vector3.down * 2);
     }
 }

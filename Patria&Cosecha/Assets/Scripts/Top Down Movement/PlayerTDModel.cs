@@ -1,67 +1,55 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerTDModel
 {
-    private float _moveSpeed = default, _rotSpeed = default, _dashSpeed = default, _dashDrag = default, _upgradedDashSpeed = default, _dashCooldown = default, _dashTimer = default;
-    private bool _isDashing = false;
-    private Vector3 _oldScale = default;
-    private LayerMask _groundMask;
-    
-    private Rigidbody _rb = default;
+    private CharacterController _cc = default;
     private Transform _transform = default;
 
-    public bool IsDashing {  get { return _isDashing; } }
-    public float MoveSpeed { get { return _moveSpeed; } set { _moveSpeed = value; } }
-    public float DashSpeed { get { return _dashSpeed; } set { _dashSpeed = value; } }
-    public float DashDrag { get { return _dashDrag; } set { _dashDrag = value; } }
+    private float _moveSpeed = default, _rotSpeed = default;
+    private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
 
-    public PlayerTDModel(Rigidbody rb, Transform transform, LayerMask groundMask, float moveSpeed, float rotSpeed, float dashSpeed, float dashDrag, float dashCooldown)
+    private float _gravity = -9.81f, _dashTimer = 0f;
+    private float _rayDistance = 0.5f, _rayOffset = 0.5f;
+    private bool _isDashing = false, _canDash = true;
+
+    private Vector3 _velocity = default;
+
+    public bool IsDashing { get { return _isDashing; } }
+    public bool CanDash { get { return _canDash; } }
+
+    public PlayerTDModel(CharacterController cc, Transform transform, float moveSpeed, float rotSpeed, float dashSpeed, float dashDuration, float dashCD)
     {
-        _rb = rb;
+        _cc = cc;
         _transform = transform;
-        _groundMask = groundMask;
         _moveSpeed = moveSpeed;
         _rotSpeed = rotSpeed;
         _dashSpeed = dashSpeed;
-        _upgradedDashSpeed = _dashSpeed + 20f;
-        _dashDrag = dashDrag;
-        _dashCooldown = dashCooldown;
+        _dashDuration = dashDuration;
+        _dashCD = dashCD;
     }
 
-    public void OnStart()
+    public void OnUpdate(Vector3 moveDir, float moveSpeed)
     {
-        _oldScale = _transform.localScale;
-        
-    }
-
-    public void OnUpdate(Vector3 moveDir, float deltaTime)
-    {
+        _moveSpeed = moveSpeed;
         MovePlayer(moveDir);
-    }
-
-    public bool IsGrounded()
-    {
-        Vector3 frontCheck = new Vector3(_transform.position.x, _transform.position.y, _transform.position.z + 0.3f);
-        Vector3 backCheck = new Vector3(_transform.position.x, _transform.position.y, _transform.position.z - 0.3f);
-
-        bool isGroundedFront = Physics.Raycast(frontCheck, Vector3.down, 0.3f, _groundMask);
-        bool isGroundedBack = Physics.Raycast(backCheck, Vector3.down, 0.3f, _groundMask);
-
-        return isGroundedFront && isGroundedBack;
     }
 
     private void MovePlayer(Vector3 moveDir)
     {
-        if (moveDir.magnitude > 0.1f) RotatePlayer(moveDir);
+        if (moveDir.magnitude > 0.1f)
+            RotatePlayer(moveDir);
 
-        Vector3 dir = moveDir.normalized * _moveSpeed;
-        
-        _rb.velocity = new Vector3(dir.x, _rb.velocity.y, dir.z);
-    }
+        if (!_isDashing)
+        {
+            if (_cc.isGrounded)
+                _velocity.y = -1f;
+            else
+                _velocity.y -= _gravity * -2f * Time.deltaTime;
+        }
 
-    public void ApplyGravity()
-    {
-        _rb.velocity = new Vector3(_rb.velocity.x, -9.81f, _rb.velocity.z);
+        _cc.Move(moveDir.normalized * _moveSpeed * Time.deltaTime);
+        _cc.Move(_velocity * Time.deltaTime);
     }
 
     private void RotatePlayer(Vector3 rotDir)
@@ -70,42 +58,26 @@ public class PlayerTDModel
         _transform.rotation = Quaternion.Lerp(_transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
     }
 
-    public void Dash(NodeType nodeType, Vector3 moveDir)
+    public IEnumerator Dash(Vector3 dashDir, NodeType currentNode)
     {
-        if (_isDashing) return;
-
-        RotatePlayer(moveDir);
-
-        Vector3 dir = moveDir.normalized * (nodeType == NodeType.Dash ? _upgradedDashSpeed : _dashSpeed);
-        Vector3 dashVelocity = Vector3.Lerp(_rb.velocity, dir, 0.5f);
-
-        //_rb.useGravity = false;
-        _rb.drag = _dashDrag;
-        _rb.velocity = dashVelocity;
-
+        float dashTimer = Time.time;
         _isDashing = true;
-        _dashTimer = _dashCooldown;
-    }
+        _canDash = false;
 
-    public void UpdateDashTimer(float deltaTime)
-    {
-        if (_dashTimer > 0f && _isDashing)
+        _dashSpeed = currentNode == NodeType.Blue ? _dashSpeed : _dashSpeed * 1.25f;
+
+        while (Time.time < dashTimer + _dashDuration)
         {
-            _dashTimer -= deltaTime;
-            
-            Vector3 velocityDir = _rb.velocity.normalized;
-            
-            if (velocityDir.magnitude > 0.1f)
-                RotatePlayer(velocityDir);
+            _cc.Move(dashDir.normalized * _dashSpeed * Time.deltaTime);
+            yield return null;
         }
-        else EndDash();
+        
+        _isDashing = false;
     }
 
-    private void EndDash()
+    public IEnumerator DashCD()
     {
-        _isDashing = false;
-        //_rb.useGravity = true;
-        _rb.drag = 0f;
-        //_rb.velocity *= 0.5f;
+        yield return new WaitForSeconds(_dashCD);
+        _canDash = true;
     }
 }
