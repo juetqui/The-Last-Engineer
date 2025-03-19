@@ -27,26 +27,18 @@ public class PlayerTDView
 
     public void Walk(Vector3 moveVector)
     {
-        if (moveVector.x != 0 || moveVector.z != 0) _animator.SetBool("IsWalking", true);
+        if (moveVector.magnitude > 0.1f) _animator.SetBool("IsWalking", true);
         else _animator.SetBool("IsWalking", false);
     }
 
     public void DashSound()
     {
-        float pitch = Random.Range(1f, 1.5f);
-
-        _fxSource.clip = _dashClip;
-        _fxSource.pitch = pitch;
-        _fxSource.Play();
+        PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
 
     public void WalkSound()
     {
-        float pitch = Random.Range(1f, 1.5f);
-
-        _walkSource.clip = _walkClip;
-        _walkSource.pitch = pitch;
-        _walkSource.Play();
+        PlayAudioWithRandomPitch(_walkSource, _walkClip);
     }
 
     public void PlayPS(Color color)
@@ -65,11 +57,12 @@ public class PlayerTDView
 
     public void GrabNode(bool grab = false, Color outlineColor = default)
     {
-        if (grab) _fxSource.clip = _liftClip;
-        else _fxSource.clip = _putDownClip;
-
         _fxSource.volume = 1f;
-        _fxSource.Play();
+
+        if (grab)
+            PlayAudioWithRandomPitch(_fxSource, _liftClip);
+        else
+            PlayAudioWithRandomPitch(_fxSource, _putDownClip);
 
         if (outlineColor != Color.black)
         {
@@ -87,7 +80,17 @@ public class PlayerTDView
 
     public void PlayErrorSound(AudioClip clip)
     {
-        _fxSource.clip = clip;
-        _fxSource.Play();
+        if (_fxSource.isPlaying) return;
+        
+        PlayAudioWithRandomPitch(_fxSource, clip);
+    }
+
+    private void PlayAudioWithRandomPitch(AudioSource source, AudioClip clip)
+    {
+        float pitch = Random.Range(0.95f, 1.125f);
+
+        source.clip = clip;
+        source.pitch = pitch;
+        source.Play();
     }
 }

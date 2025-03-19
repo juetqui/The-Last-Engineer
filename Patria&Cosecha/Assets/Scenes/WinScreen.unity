@@ -2463,7 +2463,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -3311,7 +3311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e819f089dcb9f438928fd96f633e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _astronautController: {fileID: 565773760}
+  _astronautController: {fileID: 0}
   _menuCamera: {fileID: 289824292}
 --- !u!1 &455165830
 GameObject:
@@ -5214,9 +5214,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: 2577311b62989b448b6b3ee114c64473, type: 3}
+    - target: {fileID: 9500000, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 9966b5485de603b49810d1e020f35606, type: 2}
+      objectReference: {fileID: 9100000, guid: abaf537fd6d78da41a6a2e1c46f10f69, type: 2}
+    - target: {fileID: 9500000, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -5232,9 +5240,6 @@ PrefabInstance:
       addedObject: {fileID: 565773766}
     - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 565773760}
-    - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 565773762}
   m_SourcePrefab: {fileID: 100100000, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
 --- !u!1 &565773758 stripped
@@ -5242,30 +5247,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
   m_PrefabInstance: {fileID: 565773757}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &565773759 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 9500000, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
-  m_PrefabInstance: {fileID: 565773757}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &565773760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 565773758}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 811027d77bc21444eb4467c4e40ab4fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 565773759}
-  _targetPos:
-  - {fileID: 1578932228}
-  - {fileID: 1940177497}
-  _hasTarget: 0
-  _isExit: 0
-  _moveSpeed: 7
 --- !u!82 &565773762
 AudioSource:
   m_ObjectHideFlags: 0
@@ -12284,7 +12265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e819f089dcb9f438928fd96f633e2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _astronautController: {fileID: 565773760}
+  _astronautController: {fileID: 0}
   _menuCamera: {fileID: 289824292}
 --- !u!1 &1672787141
 GameObject:

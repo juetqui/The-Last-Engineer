@@ -7,6 +7,17 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private Material _material;
     [SerializeField] private Collider _collider;
     
+    [Header("Emissive")]
+    [SerializeField] PlayerTDController _player;
+    [SerializeField] private float _resetTime;
+
+    [ColorUsageAttribute(true, true)]
+    [SerializeField] private Color _unaviable;
+
+    [ColorUsageAttribute(true, true)]
+    [SerializeField] private Color _aviable;
+
+
     [Header("Outline")]
     [SerializeField] private Outline _outline;
     [SerializeField] private Color _outlineColor;
@@ -32,12 +43,14 @@ public class ElectricityNode : MonoBehaviour
     private void Awake()
     {
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
-        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor);
+        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _unaviable, _aviable, _resetTime);
     }
 
     private void Start()
     {
         _nodeView.OnStart();
+
+        if (_player != null && _nodeType == NodeType.Blue) _player.onDash += UseHability;
     }
 
     private void Update()
@@ -95,13 +108,9 @@ public class ElectricityNode : MonoBehaviour
         _nodeView.EnableColl(false);
         return _nodeModel.Combine(deltaTime);
     }
-}
 
-public enum NodeType
-{
-    None,
-    Purple,
-    Green,
-    Blue,
-    Dash
+    public void UseHability()
+    {
+        StartCoroutine(_nodeView.ResetHability());
+    }
 }

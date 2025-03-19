@@ -1,25 +1,26 @@
 using UnityEngine;
 
-public class SecDoorLights : MonoBehaviour
+public class MainDoorLights : MonoBehaviour
 {
-    [SerializeField] SecondaryTM _secTM;
-    [SerializeField] private Renderer _renderer;
     [SerializeField] private float _lerpTime;
 
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _closedColor;
-    
+
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _openedColor;
 
+    private MeshRenderer _renderer;
     private Color _currentColor = default, _startColor = default, _targetColor = default;
+    private int _index = 0;
     private float _time = 0;
-    private bool _isLerping = false, _isRunning = false;
+    private bool _isLerping = false;
 
     void Start()
     {
+        _renderer = GetComponent<MeshRenderer>();
         _renderer.material.SetColor("_EmissionColor", _closedColor);
-        _secTM.onRunning += StartLerp;
+        MainTM.Instance.onRunning += StartLerp;
     }
 
     void Update()
@@ -29,8 +30,15 @@ public class SecDoorLights : MonoBehaviour
 
     private void StartLerp(bool isRunning)
     {
+        if (!isRunning && _index == 0)
+        {
+            _index++;
+            return;
+        }
+
         _startColor = isRunning ? _closedColor : _openedColor;
         _targetColor = isRunning ? _openedColor : _closedColor;
+
         _time = 0;
         _isLerping = true;
     }
