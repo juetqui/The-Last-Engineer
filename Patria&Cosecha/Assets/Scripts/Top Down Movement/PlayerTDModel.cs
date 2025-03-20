@@ -18,6 +18,9 @@ public class PlayerTDModel
     public bool IsDashing { get { return _isDashing; } }
     public bool CanDash { get { return _canDash; } }
 
+    public delegate void OnDashCDFinished();
+    public OnDashCDFinished onDashCDFinished = default;
+
     public PlayerTDModel(CharacterController cc, Transform transform, float moveSpeed, float rotSpeed, float dashSpeed, float dashDuration, float dashCD)
     {
         _cc = cc;
@@ -78,6 +81,7 @@ public class PlayerTDModel
     public IEnumerator DashCD()
     {
         yield return new WaitForSeconds(_dashCD);
+        onDashCDFinished?.Invoke();
         _canDash = true;
     }
 }

@@ -7,15 +7,9 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private Material _material;
     [SerializeField] private Collider _collider;
     
-    [Header("Emissive")]
-    [SerializeField] PlayerTDController _player;
-    [SerializeField] private float _resetTime;
-
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _unaviable;
-
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _aviable;
+    [Header("Emissive (For Player's Dash Hability Only)")]
+    [SerializeField] private PlayerTDController _player;
+    [SerializeField] private float _emissionIntensity = 4f;
 
 
     [Header("Outline")]
@@ -43,14 +37,12 @@ public class ElectricityNode : MonoBehaviour
     private void Awake()
     {
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
-        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _unaviable, _aviable, _resetTime);
+        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _emissionIntensity);
     }
 
     private void Start()
     {
         _nodeView.OnStart();
-
-        if (_player != null && _nodeType == NodeType.Blue) _player.onDash += UseHability;
     }
 
     private void Update()
@@ -66,6 +58,8 @@ public class ElectricityNode : MonoBehaviour
 
     public void Attach(PlayerTDController player, Vector3 newPos)
     {
+        if (_player != null && _nodeType == NodeType.Blue) _player.onDash += UseHability;
+
         Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
         
         if (_nodeType == NodeType.Dash) newScale = Vector3.one;
@@ -87,7 +81,12 @@ public class ElectricityNode : MonoBehaviour
     public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
     {
         if (parentIsPlayer) _nodeView.EnableColl(false);
-        else _nodeView.EnableColl(true);
+        else
+        {
+            if (_player != null && _nodeType == NodeType.Blue) _player.onDash -= UseHability;
+
+            _nodeView.EnableColl(true);
+        }
 
         if (!parentIsPlayer && newParent != null)
         {
@@ -109,8 +108,8 @@ public class ElectricityNode : MonoBehaviour
         return _nodeModel.Combine(deltaTime);
     }
 
-    public void UseHability()
+    public void UseHability(float dashDuration, float dashCD)
     {
-        StartCoroutine(_nodeView.ResetHability());
+        StartCoroutine(_nodeView.ResetHability(dashDuration, dashCD));
     }
 }

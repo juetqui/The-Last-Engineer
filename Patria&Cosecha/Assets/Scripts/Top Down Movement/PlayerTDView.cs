@@ -7,12 +7,12 @@ public class PlayerTDView
 
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
-    private AudioClip _walkClip = default, _dashClip = default, _liftClip = default, _putDownClip = default;
+    private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default;
 
     private float _timer = default, _interval = 0.0125f;
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, AudioClip walkClip, AudioClip dashClip, AudioClip liftClip, AudioClip putDownClip)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, AudioClip walkClip, AudioClip dashClip, AudioClip chargedDashClip, AudioClip liftClip, AudioClip putDownClip)
     {
         _outline = outline;
         _ps = ps;
@@ -21,6 +21,7 @@ public class PlayerTDView
         _fxSource = fxSource;
         _walkClip = walkClip;
         _dashClip = dashClip;
+        _chargedDashClip = chargedDashClip;
         _liftClip = liftClip;
         _putDownClip = putDownClip;
     }
@@ -34,6 +35,10 @@ public class PlayerTDView
     public void DashSound()
     {
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
+    }
+    public void DashChargedSound()
+    {
+        PlayAudioWithRandomPitch(_fxSource, _chargedDashClip, 3f);
     }
 
     public void WalkSound()
@@ -85,9 +90,9 @@ public class PlayerTDView
         PlayAudioWithRandomPitch(_fxSource, clip);
     }
 
-    private void PlayAudioWithRandomPitch(AudioSource source, AudioClip clip)
+    private void PlayAudioWithRandomPitch(AudioSource source, AudioClip clip, float pitch = 0)
     {
-        float pitch = Random.Range(0.95f, 1.125f);
+        if (pitch == 0) pitch = Random.Range(0.95f, 1.125f);
 
         source.clip = clip;
         source.pitch = pitch;
