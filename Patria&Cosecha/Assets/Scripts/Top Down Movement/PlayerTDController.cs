@@ -44,25 +44,40 @@ public class PlayerTDController : MonoBehaviour
     private CombinerController _combiner = default;
 
     private float _commonSpeed = default, _verticalInput = default, _horizontalInput = default;
-    private bool _dashKeyPressed = false, _interactKeyPressed = false;
     private Vector3 _movement = default;
 
-    private PlayerState _playerState = PlayerState.Empty;
     private NodeType _currentNodeType = NodeType.None;
+    
+    private IPlayerState _currentState = default;
+    private PlayerEmptyState _playerEmptyState = default;
+    private PlayerGrabState _playerGrabState = default;
+
+    public PlayerEmptyState EmptyState { get { return _playerEmptyState; } }
+    public PlayerGrabState GrabState { get { return _playerGrabState; } }
 
     private bool CanDash { get { return CheckDashAvialable(); } }
-    private bool IsInConnectArea { get { return _connectionNode != null; } }
-    private bool IsInCombinationArea { get { return _combineMachine != null; } }
-    private bool IsInCombinerArea { get { return _combiner != null; } }
+    public PlayerTDView View { get { return _playerView; } }
 
     public delegate void OnDash(float dashDuration, float dashCD);
     public event OnDash onDash = default;
 
+    #region -----CHECKERS FOR PLAYER ACTIONS-----
+    public bool IsInCombinerArea => _combiner != null;
+    public bool IsInConnectionArea => _connectionNode != null;
+    public bool IsInCombinationArea => _combineMachine != null;
+    public bool HasNode() => _node != null && _currentNodeType == NodeType.None;
+    private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
+    public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
+    #endregion
+
     private void Awake()
     {
         _playerInputs = new PlayerInputs();
+        _playerEmptyState = new PlayerEmptyState();
+        _playerGrabState = new PlayerGrabState();
     }
 
+    #region -----INPUTS MANAGEMENT-----
     private void OnEnable()
     {
         _moveInput = _playerInputs.Player.Move;
@@ -86,6 +101,7 @@ public class PlayerTDController : MonoBehaviour
         _interactInput.Disable();
         _dashInput.Disable();
     }
+    #endregion
 
     private void Start()
     {
@@ -97,33 +113,14 @@ public class PlayerTDController : MonoBehaviour
         _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _walkClip, _dashClip, _chargedDashClip, _liftClip, _putDownClip);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
+        
+        SetState(_playerEmptyState);
     }
 
     private void Update()
     {
         _playerModel.OnUpdate(GetMovement(), _moveSpeed);
         _playerView.Walk(GetMovement());
-
-        if (_dashKeyPressed)
-        {
-            if (CanDash && _playerModel.CanDash)
-            {
-                StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
-                _playerView.DashSound();
-                onDash?.Invoke(_dashDuration, _dashCD);
-                StartCoroutine(_playerModel.DashCD());
-            }
-            else
-                _playerView.PlayErrorSound(_emptyHand);
-
-            _dashKeyPressed = false;
-        }
-
-        if (_interactKeyPressed && _cc.isGrounded && !_playerModel.IsDashing)
-        {
-            CheckInteraction();
-            _interactKeyPressed = false;
-        }
     }
 
     private Vector3 GetMovement()
@@ -139,39 +136,38 @@ public class PlayerTDController : MonoBehaviour
             _playerView.WalkSound();
     }
 
+    #region -----INPUTS-----
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        _dashKeyPressed = true;
+        if (CanDash && _playerModel.CanDash)
+        {
+            StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
+            _playerView.DashSound();
+            onDash?.Invoke(_dashDuration, _dashCD);
+            StartCoroutine(_playerModel.DashCD());
+        }
+        else
+            _playerView.PlayErrorSound(_emptyHand);
     }
+    
     private void GetInteractKey(InputAction.CallbackContext context)
     {
-        _interactKeyPressed = true;
+        if (_cc.isGrounded && !_playerModel.IsDashing)
+        {
+            _currentState?.HandleInteraction();
+        }
     }
+    #endregion
 
-    private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
-
-    private void CheckInteraction()
+    public void SetState(IPlayerState newState)
     {
-        if (_node != null && _currentNodeType == NodeType.None && _playerState == PlayerState.Empty && !CheckForWalls()) ChangeNode();
-        else if (_node != null && _currentNodeType != NodeType.None && _playerState == PlayerState.Grab)
-        {
-            if (_connectionNode != null && IsInConnectArea) PlaceNode();
-            else if (_combineMachine != null && IsInCombinationArea) PlaceInMachine();
-            else if (!IsInConnectArea && !IsInCombinationArea && !IsInCombinerArea) DropNode();
-
-            _playerView.GrabNode();
-        }
-
-        if (_combiner != null && IsInCombinerArea)
-        {
-            _combiner.ActivateCombineMachine();
-            _combiner = null;
-        }
-        
-        CheckCurrentNode();
+        _currentState?.Exit();
+        _currentState = newState;
+        _currentState?.Enter(this);
     }
 
-    private void ChangeNode()
+    #region -----NODE MANAGEMENT-----
+    public void ChangeNode()
     {
         _currentNodeType = _node.NodeType;
 
@@ -179,10 +175,9 @@ public class PlayerTDController : MonoBehaviour
         _node.Attach(this, attachPos);
 
         _playerView.GrabNode(true, _node.OutlineColor);
-        _playerState = PlayerState.Grab;
     }
 
-    private void DropNode()
+    public void DropNode()
     {
         Vector3 dropPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
 
@@ -192,7 +187,7 @@ public class PlayerTDController : MonoBehaviour
         _playerView.GrabNode();
     }
 
-    private void PlaceNode()
+    public void PlaceNode()
     {
         if (_connectionNode.IsDisabled) return;
 
@@ -201,15 +196,20 @@ public class PlayerTDController : MonoBehaviour
         ResetNode();
     }
 
-    private void PlaceInMachine()
+    public void PlaceInMachine()
     {
         _combineMachine.SetNode(_node);
         _combineMachine = null;
         ResetNode();
-        _playerState = PlayerState.Empty;
     }
 
-    private void CheckCurrentNode()
+    public void ActivateCombiner()
+    {
+        _combiner.ActivateCombineMachine();
+        _combiner = null;
+    }
+
+    public void CheckCurrentNode()
     {
         if (_currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash)
             _moveSpeed += 5;
@@ -221,10 +221,10 @@ public class PlayerTDController : MonoBehaviour
     {
         _node = null;
         _currentNodeType = NodeType.None;
-        _playerState = PlayerState.Empty;
     }
+    #endregion
 
-    private bool CheckForWalls()
+    public bool CheckForWalls()
     {
         if (Physics.Raycast(transform.position, _node.transform.position, 7f, _wallMask))
             return true;
@@ -237,6 +237,7 @@ public class PlayerTDController : MonoBehaviour
         TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
 
+    #region -----TRIGGERS MANAGEMENT-----
     private void OnTriggerEnter(Collider coll)
     {
         ElectricityNode node = coll.GetComponent<ElectricityNode>();
@@ -272,4 +273,5 @@ public class PlayerTDController : MonoBehaviour
         else if (machine != null) _combineMachine = null;
         else if (combiner != null) _combiner = null;
     }
+    #endregion
 }

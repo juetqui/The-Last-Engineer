@@ -82,7 +82,7 @@ public class CombineMachine : MonoBehaviour
 
     public void SetNode(ElectricityNode node)
     {
-        if (node == null) return;
+        if (node == null || node.NodeType == NodeType.Dash) return;
 
         if (_firstNode == null)
         {
