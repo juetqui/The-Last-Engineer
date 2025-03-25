@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using MaskTransitions;
+using System.Collections.Generic;
+using System.Linq;
 
 public class PlayerTDController : MonoBehaviour
 {
@@ -38,11 +40,10 @@ public class PlayerTDController : MonoBehaviour
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
 
+    private List<IInteractable> _interactables = default;
+    
     private ElectricityNode _node = default;
-    private ConnectionNode _connectionNode = default;
-    private CombineMachine _combineMachine = default;
-    private CombinerController _combiner = default;
-
+    
     private float _commonSpeed = default, _verticalInput = default, _horizontalInput = default;
     private Vector3 _movement = default;
 
@@ -56,18 +57,17 @@ public class PlayerTDController : MonoBehaviour
     public PlayerGrabState GrabState { get { return _playerGrabState; } }
 
     private bool CanDash { get { return CheckDashAvialable(); } }
-    public PlayerTDView View { get { return _playerView; } }
 
     public delegate void OnDash(float dashDuration, float dashCD);
     public event OnDash onDash = default;
 
+    [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
+
     #region -----CHECKERS FOR PLAYER ACTIONS-----
-    public bool IsInCombinerArea => _combiner != null;
-    public bool IsInConnectionArea => _connectionNode != null;
-    public bool IsInCombinationArea => _combineMachine != null;
-    public bool HasNode() => _node != null && _currentNodeType == NodeType.None;
-    private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
+    public bool HasNode() => _node != null;
+    public ElectricityNode GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
+    private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
     #endregion
 
     private void Awake()
@@ -75,6 +75,7 @@ public class PlayerTDController : MonoBehaviour
         _playerInputs = new PlayerInputs();
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
+        _interactables = new List<IInteractable>();
     }
 
     #region -----INPUTS MANAGEMENT-----
@@ -141,7 +142,7 @@ public class PlayerTDController : MonoBehaviour
     {
         if (CanDash && _playerModel.CanDash)
         {
-            StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
+            StartCoroutine(_playerModel.Dash (GetMovement(), _currentNodeType));
             _playerView.DashSound();
             onDash?.Invoke(_dashDuration, _dashCD);
             StartCoroutine(_playerModel.DashCD());
@@ -154,10 +155,20 @@ public class PlayerTDController : MonoBehaviour
     {
         if (_cc.isGrounded && !_playerModel.IsDashing)
         {
-            _currentState?.HandleInteraction();
+            var interactableTarget = GetClosestInteractable();
+            _currentState?.HandleInteraction(interactableTarget);
         }
     }
     #endregion
+
+    private IInteractable GetClosestInteractable()
+    {
+        return _interactables
+            .Where(i => i.CanInteract(this))
+            .OrderByDescending(i => i.Priority)
+            .ThenBy(i => Vector3.Distance(transform.position, i.Transform.position))
+            .FirstOrDefault();
+    }
 
     public void SetState(IPlayerState newState)
     {
@@ -167,46 +178,28 @@ public class PlayerTDController : MonoBehaviour
     }
 
     #region -----NODE MANAGEMENT-----
-    public void ChangeNode()
+    public void PickUpNode(ElectricityNode node)
     {
+        if (_node != null || node == null) return;
+
+        _node = node;
         _currentNodeType = _node.NodeType;
-
-        Vector3 attachPos = new Vector3(0, 1f, 1.2f);
-        _node.Attach(this, attachPos);
-
         _playerView.GrabNode(true, _node.OutlineColor);
+        RemoveInteractable(node);
+    }
+
+    public void ReleaseNode(IInteractable interactable)
+    {
+        ResetNode();
+        RemoveInteractable(interactable);
     }
 
     public void DropNode()
     {
-        Vector3 dropPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        if (_node == null) return;
 
-        _node.Attach(dropPos);
+        _node.Attach(transform.position);
         ResetNode();
-
-        _playerView.GrabNode();
-    }
-
-    public void PlaceNode()
-    {
-        if (_connectionNode.IsDisabled) return;
-
-        _connectionNode.SetNode(_node);
-        _connectionNode = null;
-        ResetNode();
-    }
-
-    public void PlaceInMachine()
-    {
-        _combineMachine.SetNode(_node);
-        _combineMachine = null;
-        ResetNode();
-    }
-
-    public void ActivateCombiner()
-    {
-        _combiner.ActivateCombineMachine();
-        _combiner = null;
     }
 
     public void CheckCurrentNode()
@@ -221,8 +214,17 @@ public class PlayerTDController : MonoBehaviour
     {
         _node = null;
         _currentNodeType = NodeType.None;
+        _playerView.GrabNode();
     }
     #endregion
+
+    public void RemoveInteractable(IInteractable interactable)
+    {
+        if (_interactables.Contains(interactable))
+        {
+            _interactables.Remove(interactable);
+        }
+    }
 
     public bool CheckForWalls()
     {
@@ -240,38 +242,20 @@ public class PlayerTDController : MonoBehaviour
     #region -----TRIGGERS MANAGEMENT-----
     private void OnTriggerEnter(Collider coll)
     {
-        ElectricityNode node = coll.GetComponent<ElectricityNode>();
-        ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
-        CombineMachine machine = coll.GetComponent<CombineMachine>();
-        CombinerController combiner = coll.GetComponent<CombinerController>();
-
-        if (node != null && _currentNodeType == NodeType.None) _node = node;
-        else if (connectionNode != null) _connectionNode = connectionNode;
-        else if (machine != null) _combineMachine = machine;
-        else if (combiner != null) _combiner = combiner;
+        if (coll.TryGetComponent<IInteractable>(out var interactable))
+        {
+            _interactables.Add(interactable);
+        }
 
         else if (coll.CompareTag("Void")) ResetLevel();
     }
 
-    // THIS METHOD IS USED TO GRAB A NODE WHEN ANOTHER ONE WAS DROP NEARBY
-    private void OnTriggerStay(Collider coll)
-    {
-        ElectricityNode node = coll.GetComponent<ElectricityNode>();
-
-        if (node != null && _currentNodeType == NodeType.None) _node = node;
-    }
-
     private void OnTriggerExit(Collider coll)
     {
-        ElectricityNode node = coll.GetComponent<ElectricityNode>();
-        ConnectionNode connectionNode = coll.GetComponent<ConnectionNode>();
-        CombineMachine machine = coll.GetComponent<CombineMachine>();
-        CombinerController combiner = coll.GetComponent<CombinerController>();
-
-        if (node != null && _currentNodeType == NodeType.None) _node = null;
-        else if (connectionNode != null) _connectionNode = null;
-        else if (machine != null) _combineMachine = null;
-        else if (combiner != null) _combiner = null;
+        if (coll.TryGetComponent<IInteractable>(out var interactable))
+        {
+            _interactables.Remove(interactable);
+        }
     }
     #endregion
 }

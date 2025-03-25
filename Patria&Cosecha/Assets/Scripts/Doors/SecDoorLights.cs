@@ -34,8 +34,6 @@ public class SecDoorLights : MonoBehaviour
 
     private void StartLerp(bool isRunning)
     {
-        Debug.Log(gameObject.name + " " + _index);
-
         if (_index == 0)
         {
             _index++;

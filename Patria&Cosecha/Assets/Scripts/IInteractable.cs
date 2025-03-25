@@ -1,7 +1,9 @@
+using UnityEngine;
+
 public interface IInteractable
 {
-    public void Interact()
-    {
-        
-    }
+    public InteractablePriority Priority { get; }
+    public Transform Transform {  get; }
+    public bool CanInteract(PlayerTDController player);
+    public void Interact(PlayerTDController player, out bool succededInteraction);
 }

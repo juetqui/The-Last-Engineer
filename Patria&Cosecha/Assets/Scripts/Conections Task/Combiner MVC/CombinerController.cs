@@ -1,7 +1,10 @@
 using UnityEngine;
 
-public class CombinerController : MonoBehaviour
+public class CombinerController : MonoBehaviour, IInteractable
 {
+    public InteractablePriority Priority => InteractablePriority.Low;
+    public Transform Transform => transform;
+
     [SerializeField] private CombineMachine _combineMachine;
 
     [SerializeField] private Renderer _renderer;
@@ -27,10 +30,29 @@ public class CombinerController : MonoBehaviour
         _view.Enabled(_combineMachine.IsActive);
     }
 
-    public void ActivateCombineMachine()
+    public bool CanInteract(PlayerTDController player)
     {
-        if (!_combineMachine.IsActive) return;
-
-        _combineMachine.CombineNodes();
+        return !player.HasNode() && _combineMachine.IsActive;
     }
+
+    public void Interact(PlayerTDController player, out bool succededInteraction)
+    {
+        if (CanInteract(player))
+        {
+            _combineMachine.CombineNodes();
+            succededInteraction = true;
+        }
+        else
+        {
+            succededInteraction = false;
+        }
+
+    }
+
+    //public void ActivateCombineMachine()
+    //{
+    //    if (!_combineMachine.IsActive) return;
+
+    //    _combineMachine.CombineNodes();
+    //}
 }

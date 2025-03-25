@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class PlayerGrabState : IPlayerState
 {
     private PlayerTDController _playerController = default;
@@ -8,23 +10,26 @@ public class PlayerGrabState : IPlayerState
         _playerController.CheckCurrentNode();
     }
 
-    public void HandleInteraction()
+    public void HandleInteraction(IInteractable interactable)
     {
-        if (_playerController.IsInConnectionArea)
+        Debug.Log(interactable);
+        if (interactable != null && interactable.CanInteract(_playerController))
         {
-            _playerController.PlaceNode();
-        }
-        else if (_playerController.IsInCombinationArea)
-        {
-            _playerController.PlaceInMachine();
+            bool succededInteraction = default;
+            interactable.Interact(_playerController, out succededInteraction);
+
+            if (succededInteraction)
+            {
+                _playerController.ReleaseNode(interactable);
+                _playerController.SetState(_playerController.EmptyState);
+            }
         }
         else
         {
+            Debug.Log("DROP");
             _playerController.DropNode();
+            _playerController.SetState(_playerController.EmptyState);
         }
-
-        _playerController.View.GrabNode();
-        _playerController.SetState(_playerController.EmptyState);
     }
 
     public void Exit()

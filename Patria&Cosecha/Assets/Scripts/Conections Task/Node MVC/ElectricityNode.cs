@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ElectricityNode : MonoBehaviour
+public class ElectricityNode : MonoBehaviour, IInteractable
 {
     [Header("View")]
     [SerializeField] private Renderer _renderer;
@@ -20,6 +20,9 @@ public class ElectricityNode : MonoBehaviour
     [SerializeField] private NodeType _nodeType;
     [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
     [SerializeField] private bool _isChildren = false;
+
+    public InteractablePriority Priority => InteractablePriority.Highest;
+    public Transform Transform => transform;
 
     private NodeView _nodeView = default;
     private NodeModel _nodeModel = default;
@@ -50,13 +53,31 @@ public class ElectricityNode : MonoBehaviour
         if (!_isChildren) MoveObject();
     }
 
+    public bool CanInteract(PlayerTDController player)
+    {
+        return !player.HasNode();
+    }
+
+    public void Interact(PlayerTDController player, out bool succededInteraction)
+    {
+        if (CanInteract(player))
+        {
+            Attach(player, player.attachPos);
+            succededInteraction = true;
+        }
+        else
+        {
+            succededInteraction = false;
+        }
+    }
+
     private void MoveObject()
     {
         _nodeView.EnableColl(true);
         _nodeModel.MoveObject(Time.deltaTime);
     }
 
-    public void Attach(PlayerTDController player, Vector3 newPos)
+    private void Attach(PlayerTDController player, Vector3 newPos)
     {
         if (_player != null && _nodeType == NodeType.Blue) _player.onDash += UseHability;
 

@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CombineMachine : MonoBehaviour
+public class CombineMachine : MonoBehaviour, IInteractable
 {
     [SerializeField] private GameObject _combinedPrefab;
     [SerializeField] private Collider _trigger;
@@ -10,11 +8,13 @@ public class CombineMachine : MonoBehaviour
     [SerializeField] private GameObject _secondNodePos;
     [SerializeField] private Transform _combinedNodePos;
 
+    public InteractablePriority Priority => InteractablePriority.Medium;
+    public Transform Transform => transform;
+
     private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode = default;
     private bool _isActive = false, _isCombining = false;
 
     public bool IsActive { get { return _isActive; } }
-    public bool HasNodes { get { return IsFilled(); } }
 
     private void Update()
     {
@@ -22,6 +22,25 @@ public class CombineMachine : MonoBehaviour
         else Deactivate();
 
         if (_isCombining) DestroyNodes(Time.deltaTime);
+    }
+
+    public bool CanInteract(PlayerTDController player)
+    {
+        return player.HasNode() && !_isActive && !IsFilled();
+    }
+
+    public void Interact(PlayerTDController player, out bool succededInteraction)
+    {
+        if (CanInteract(player) && player.GetCurrentNode() != null)
+        {
+            ElectricityNode node = player.GetCurrentNode();
+            SetNode(node);
+            succededInteraction = true;
+        }
+        else
+        {
+            succededInteraction = false;
+        }
     }
 
     private void Activate()
@@ -75,12 +94,10 @@ public class CombineMachine : MonoBehaviour
 
     private bool IsFilled()
     {
-        if (_firstNode == null || _secondNode == null) return false;
-        
-        return true;
+        return _firstNode != null && _secondNode != null;
     }
 
-    public void SetNode(ElectricityNode node)
+    private void SetNode(ElectricityNode node)
     {
         if (node == null || node.NodeType == NodeType.Dash) return;
 

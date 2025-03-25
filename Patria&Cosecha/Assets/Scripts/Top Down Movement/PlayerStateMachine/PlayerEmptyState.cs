@@ -8,16 +8,17 @@ public class PlayerEmptyState : IPlayerState
         _playerController.CheckCurrentNode();
     }
 
-    public void HandleInteraction()
+    public void HandleInteraction(IInteractable interactable)
     {
-        if (_playerController.HasNode() && !_playerController.CheckForWalls())
+        if (interactable == null) return;
+
+        bool succededInteraction = default;
+        interactable.Interact(_playerController, out succededInteraction);
+
+        if (succededInteraction && interactable is ElectricityNode node)
         {
-            _playerController.ChangeNode();
+            _playerController.PickUpNode(node);
             _playerController.SetState(_playerController.GrabState);
-        }
-        else if (_playerController.IsInCombinerArea)
-        {
-            _playerController.ActivateCombiner();
         }
     }
 

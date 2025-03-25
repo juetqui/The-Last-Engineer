@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ConnectionNode : MonoBehaviour
+public class ConnectionNode : MonoBehaviour, IInteractable
 {
     [SerializeField] private NodeType _requiredType;
 
@@ -19,6 +19,9 @@ public class ConnectionNode : MonoBehaviour
     [SerializeField] private Color _fresnelColor;
 
     [SerializeField] private ParticleSystem _ps;
+
+    public InteractablePriority Priority => InteractablePriority.High;
+    public Transform Transform => transform;
 
     private List<SecondaryTM> _secTaskManagers = new List<SecondaryTM>();
     private MainTM _mainTM = default;
@@ -46,7 +49,26 @@ public class ConnectionNode : MonoBehaviour
         _secTaskManagers.Add(secTM);
     }
 
-    public void SetNode(ElectricityNode node)
+    public bool CanInteract(PlayerTDController player)
+    {
+        return player.HasNode() && !_isDisabled;
+    }
+    
+    public void Interact(PlayerTDController player, out bool succededInteraction)
+    {
+        if (CanInteract(player) && player.GetCurrentNode() != null)
+        {
+            ElectricityNode node = player.GetCurrentNode();
+            SetNode(node);
+            succededInteraction = true;
+        }
+        else
+        {
+            succededInteraction = false;
+        }
+    }
+
+    private void SetNode(ElectricityNode node)
     {
         if (_isDisabled || node == null) return;
 
