@@ -20,6 +20,10 @@ public class PlayerEmptyState : IPlayerState
             _playerController.PickUpNode(node);
             _playerController.SetState(_playerController.GrabState);
         }
+        else
+        {
+            InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
+        }
     }
 
     public void Exit()

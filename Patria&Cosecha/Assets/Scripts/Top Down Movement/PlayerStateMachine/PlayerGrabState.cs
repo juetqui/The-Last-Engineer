@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class PlayerGrabState : IPlayerState
 {
     private PlayerTDController _playerController = default;
@@ -12,7 +10,6 @@ public class PlayerGrabState : IPlayerState
 
     public void HandleInteraction(IInteractable interactable)
     {
-        Debug.Log(interactable);
         if (interactable != null && interactable.CanInteract(_playerController))
         {
             bool succededInteraction = default;
@@ -22,14 +19,15 @@ public class PlayerGrabState : IPlayerState
             {
                 _playerController.ReleaseNode(interactable);
                 _playerController.SetState(_playerController.EmptyState);
+                InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
             }
         }
         else
         {
-            Debug.Log("DROP");
             _playerController.DropNode();
             _playerController.SetState(_playerController.EmptyState);
         }
+
     }
 
     public void Exit()

@@ -21,6 +21,10 @@ public class SecondaryTM : TaskManager
     protected override void SetUp()
     {
         foreach (var connection in connections) connection.SetSecTM(this);
-        foreach (var door in _doors) door.SetSecTM(this);
+
+        if (_doors.Count > 0)
+        {
+            foreach (var door in _doors) door.SetSecTM(this);
+        }
     }
 }

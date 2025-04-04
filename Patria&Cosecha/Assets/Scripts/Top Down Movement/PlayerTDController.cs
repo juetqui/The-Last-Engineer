@@ -7,54 +7,35 @@ using System.Linq;
 
 public class PlayerTDController : MonoBehaviour
 {
-    [Header("Movement")]
-    [SerializeField] private float _moveSpeed;
-    [SerializeField] private float _rotSpeed;
-    [SerializeField] private LayerMask _wallMask;
+    [SerializeField] private PlayerData _playerData;
 
-    [Header("Dash")]
-    [SerializeField] private float _dashSpeed;
-    [SerializeField] private float _dashDuration;
-    [SerializeField] private float _dashCD;
-
-    [Header("View")]
+    [Header("MVC Player View")]
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem[] _ps;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _walkSource;
     [SerializeField] private AudioSource _fxSource;
 
-    [Header("Audio")]
-    [SerializeField] private AudioClip _walkClip;
-    [SerializeField] private AudioClip _dashClip;
-    [SerializeField] private AudioClip _chargedDashClip;
-    [SerializeField] private AudioClip _liftClip;
-    [SerializeField] private AudioClip _putDownClip;
-    [SerializeField] private AudioClip _emptyHand;
-
-    private PlayerInputs _playerInputs = default;
-    private InputAction _moveInput = default, _interactInput = default, _dashInput = default;
-
     private CharacterController _cc = default;
-
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
+    private ElectricityNode _node = default;
 
     private List<IInteractable> _interactables = default;
     
-    private ElectricityNode _node = default;
-    
-    private float _commonSpeed = default, _verticalInput = default, _horizontalInput = default;
+    private float _currentSpeed = default;
     private Vector3 _movement = default;
-
     private NodeType _currentNodeType = NodeType.None;
-    
+
+
+    #region -----STATES VARIABLES-----
     private IPlayerState _currentState = default;
     private PlayerEmptyState _playerEmptyState = default;
     private PlayerGrabState _playerGrabState = default;
 
     public PlayerEmptyState EmptyState { get { return _playerEmptyState; } }
     public PlayerGrabState GrabState { get { return _playerGrabState; } }
+    #endregion
 
     private bool CanDash { get { return CheckDashAvialable(); } }
 
@@ -68,50 +49,27 @@ public class PlayerTDController : MonoBehaviour
     public ElectricityNode GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
     private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
+    private bool UpgradedSpeedAvailable() => _currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash;
     #endregion
 
     private void Awake()
     {
-        _playerInputs = new PlayerInputs();
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();
+        
+        InputManager.Instance.onInputsEnabled += OnEnableInputs;
+        InputManager.Instance.onInputsDisabled += OnDisableInputs;
     }
-
-    #region -----INPUTS MANAGEMENT-----
-    private void OnEnable()
-    {
-        _moveInput = _playerInputs.Player.Move;
-        _interactInput = _playerInputs.Player.Interact;
-        _dashInput = _playerInputs.Player.Dash;
-
-        _moveInput.Enable();
-        _interactInput.Enable();
-        _dashInput.Enable();
-
-        _dashInput.performed += GetDashKey;
-        _interactInput.performed += GetInteractKey;
-    }
-
-    private void OnDisable()
-    {
-        _dashInput.performed -= GetDashKey;
-        _interactInput.performed -= GetInteractKey;
-
-        _moveInput.Disable();
-        _interactInput.Disable();
-        _dashInput.Disable();
-    }
-    #endregion
 
     private void Start()
     {
         _cc = GetComponent<CharacterController>();
+        
+        _currentSpeed = _playerData.moveSpeed;
 
-        _commonSpeed = _moveSpeed;
-
-        _playerModel = new PlayerTDModel(_cc, transform, _moveSpeed, _rotSpeed, _dashSpeed, _dashDuration, _dashCD);
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _walkClip, _dashClip, _chargedDashClip, _liftClip, _putDownClip);
+        _playerModel = new PlayerTDModel(_cc, transform, _playerData.moveSpeed, _playerData.rotSpeed, _playerData.dashSpeed, _playerData.dashDuration, _playerData.dashCD);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData.walkClip, _playerData.dashClip, _playerData.chargedDashClip, _playerData.liftClip, _playerData.putDownClip);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         
@@ -120,13 +78,13 @@ public class PlayerTDController : MonoBehaviour
 
     private void Update()
     {
-        _playerModel.OnUpdate(GetMovement(), _moveSpeed);
+        _playerModel.OnUpdate(GetMovement(), _currentSpeed);
         _playerView.Walk(GetMovement());
     }
 
     private Vector3 GetMovement()
     {
-        _movement = _moveInput.ReadValue<Vector2>();
+        _movement = InputManager.Instance.moveInput.ReadValue<Vector2>();
 
         return new Vector3(_movement.x, 0, _movement.y);
     }
@@ -137,18 +95,31 @@ public class PlayerTDController : MonoBehaviour
             _playerView.WalkSound();
     }
 
-    #region -----INPUTS-----
+    #region -----INPUTS MANAGEMENT-----
+    public void OnEnableInputs()
+    {
+        InputManager.Instance.dashInput.performed += GetDashKey;
+        InputManager.Instance.interactInput.performed += GetInteractKey;
+    }
+
+    public void OnDisableInputs()
+    {
+        InputManager.Instance.dashInput.performed -= GetDashKey;
+        InputManager.Instance.interactInput.performed -= GetInteractKey;
+    }
+
     private void GetDashKey(InputAction.CallbackContext context)
     {
         if (CanDash && _playerModel.CanDash)
         {
-            StartCoroutine(_playerModel.Dash (GetMovement(), _currentNodeType));
+            InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
+            StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
             _playerView.DashSound();
-            onDash?.Invoke(_dashDuration, _dashCD);
+            onDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
         }
         else
-            _playerView.PlayErrorSound(_emptyHand);
+            _playerView.PlayErrorSound(_playerData.emptyHand);
     }
     
     private void GetInteractKey(InputAction.CallbackContext context)
@@ -204,10 +175,14 @@ public class PlayerTDController : MonoBehaviour
 
     public void CheckCurrentNode()
     {
-        if (_currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash)
-            _moveSpeed += 5;
+        if (UpgradedSpeedAvailable())
+        {
+            _currentSpeed = _playerData.upgradedMoveSpeed;
+        }
         else
-            _moveSpeed = _commonSpeed;
+        {
+            _currentSpeed = _playerData.moveSpeed;
+        }
     }
 
     private void ResetNode()
@@ -228,7 +203,7 @@ public class PlayerTDController : MonoBehaviour
 
     public bool CheckForWalls()
     {
-        if (Physics.Raycast(transform.position, _node.transform.position, 7f, _wallMask))
+        if (Physics.Raycast(transform.position, _node.transform.position, 7f, _playerData.wallMask))
             return true;
         
         return false;

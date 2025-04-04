@@ -12,7 +12,7 @@ public class NodeView
 
     private Color _baseColor = Color.white;
     private float _time = 0, _currentIntensity = 0f;
-    private bool _isRunning = false, _isReseting = false;
+    private bool _isReseting = false;
 
     public bool IsReseting { get { return _isReseting; } }
 

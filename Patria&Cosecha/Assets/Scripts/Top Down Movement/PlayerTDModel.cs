@@ -9,8 +9,7 @@ public class PlayerTDModel
     private float _moveSpeed = default, _rotSpeed = default;
     private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
 
-    private float _gravity = -9.81f, _dashTimer = 0f;
-    private float _rayDistance = 0.5f, _rayOffset = 0.5f;
+    private float _gravity = -9.81f;
     private bool _isDashing = false, _canDash = true;
 
     private Vector3 _velocity = default;
@@ -67,7 +66,7 @@ public class PlayerTDModel
         _isDashing = true;
         _canDash = false;
 
-        float dashSpeed = currentNode == NodeType.Blue ? _dashSpeed : _dashSpeed * 1.25f;
+        float dashSpeed = currentNode == NodeType.Blue ? _dashSpeed : _dashSpeed * 1.5f;
 
         while (Time.time < dashTimer + _dashDuration)
         {

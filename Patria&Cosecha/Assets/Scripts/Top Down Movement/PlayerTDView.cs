@@ -9,7 +9,6 @@ public class PlayerTDView
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default;
 
-    private float _timer = default, _interval = 0.0125f;
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
     public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, AudioClip walkClip, AudioClip dashClip, AudioClip chargedDashClip, AudioClip liftClip, AudioClip putDownClip)
@@ -50,7 +49,9 @@ public class PlayerTDView
     {
         foreach (var ps in _ps)
         {
-            ps.startColor = color;
+            ParticleSystem.MainModule psMain = ps.main;
+
+            psMain.startColor = color;
             ps.Play();
         }
     }

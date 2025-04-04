@@ -14799,15 +14799,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -11.290842
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.2742157
+      value: -18.12
       objectReference: {fileID: 0}
     - target: {fileID: 400014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -15013,6 +15013,9 @@ PrefabInstance:
       addedObject: {fileID: 1870816041742522971}
     - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 2216695849372731520}
+    - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 3123958304518109464}
     - targetCorrespondingSourceObject: {fileID: 100050, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
@@ -15117,14 +15120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97ea7675d388e24ab7074c26e62e9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 10
-  _rotSpeed: 10
-  _wallMask:
-    serializedVersion: 2
-    m_Bits: 64
-  _dashSpeed: 30
-  _dashDuration: 0.3
-  _dashCD: 1.5
+  _playerData: {fileID: 11400000, guid: 034d45afae0886c4ea7b2880e04fc2a9, type: 2}
   _outline: {fileID: 3695308875843583011}
   _ps:
   - {fileID: 8607820957874910226}
@@ -15132,12 +15128,7 @@ MonoBehaviour:
   _animator: {fileID: 4107978417720880641}
   _walkSource: {fileID: 799766619159577487}
   _fxSource: {fileID: 1870816041742522971}
-  _walkClip: {fileID: 8300000, guid: 37bf2627bb1141b4a93c495817a35e9f, type: 3}
-  _dashClip: {fileID: 8300000, guid: 4fc89274b2b36a24687cb2034eff17f7, type: 3}
-  _chargedDashClip: {fileID: 8300000, guid: 68e474b9fbe36a04aad22fed6a190b06, type: 3}
-  _liftClip: {fileID: 8300000, guid: 5ea74a53d4ce8854986233e50815eb01, type: 3}
-  _putDownClip: {fileID: 8300000, guid: b967ccfd444dda04998b608225419c86, type: 3}
-  _emptyHand: {fileID: 8300000, guid: 378776eeab5706c45b33e82f78ec5aed, type: 3}
+  attachPos: {x: 0, y: 1, z: 1.2}
 --- !u!82 &799766619159577487
 AudioSource:
   m_ObjectHideFlags: 0
@@ -15330,6 +15321,46 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2216695849372731520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107978417728134607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1926cbbdd5c6cc947be7bcb91636d115, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInput: {fileID: 0}
+  moveInput:
+    m_Name: Move Input
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8811917a-4cd8-48cf-873f-25c265509759
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  interactInput:
+    m_Name: Interact Input
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 4af3982e-51fa-460a-9c5a-2397939305e2
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  dashInput:
+    m_Name: Dash Input
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: dab9a19c-c98b-4078-98e0-65ad4272492f
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &3123958304518109464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15343,7 +15374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: c6bd034fb97a5ba4fa58e06be9e819ee, type: 3}
-  m_NotificationBehavior: 0
+  m_NotificationBehavior: 3
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
