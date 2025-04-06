@@ -27,7 +27,7 @@ public class MainTM : TaskManager
     private void Start()
     {
         OnStart();
-        SetUp();
+        //SetUp();
         _ps.Stop();
         _light.intensity = 0;
     }
@@ -46,7 +46,7 @@ public class MainTM : TaskManager
 
     protected override void SetUp()
     {
-        foreach (var door in _doors) door.SetMainTM(this);
-        foreach (var c in connections) c.SetMainTM(this);
+        //foreach (var door in _doors) door.SetMainTM(this);
+        //foreach (var c in connections) c.SetMainTM(this);
     }
 }

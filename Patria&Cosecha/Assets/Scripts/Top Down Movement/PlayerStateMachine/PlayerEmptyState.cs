@@ -1,6 +1,13 @@
+using System.Collections;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+
 public class PlayerEmptyState : IPlayerState
 {
     private PlayerTDController _playerController = default;
+    private Coroutine _interactionCoroutine = null;
+    
+    private float _interactionTimer = 0f;
 
     public void Enter(PlayerTDController playerController)
     {
@@ -15,12 +22,14 @@ public class PlayerEmptyState : IPlayerState
         bool succededInteraction = default;
         interactable.Interact(_playerController, out succededInteraction);
 
-        if (succededInteraction && interactable is ElectricityNode node)
+        if (interactable is ElectricityNode node)
         {
-            _playerController.PickUpNode(node);
-            _playerController.SetState(_playerController.GrabState);
+            if (_interactionCoroutine == null)
+            {
+                _interactionCoroutine = _playerController.StartCoroutine(StartInteraction(node));
+            }
         }
-        else
+        else if (!succededInteraction)
         {
             InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
         }
@@ -29,5 +38,36 @@ public class PlayerEmptyState : IPlayerState
     public void Exit()
     {
         _playerController = null;
+    }
+
+    public IEnumerator StartInteraction(ElectricityNode node)
+    {
+        _interactionTimer = 0f;
+
+        while (_interactionTimer < _playerController.GetHoldInteractionTime())
+        {
+            _interactionTimer += Time.deltaTime;
+            yield return null;
+        }
+
+        bool succededInteraction = default;
+        node.Interact(_playerController, out succededInteraction);
+        
+        if (succededInteraction)
+        {
+            _playerController.PickUpNode(node);
+            _playerController.SetState(_playerController.GrabState);
+        }
+
+        _interactionCoroutine = null;
+    }
+
+    public void CancelInteraction()
+    {
+        if (_interactionCoroutine != null)
+        {
+            _playerController.StopCoroutine(_interactionCoroutine);
+            _interactionCoroutine = null;
+        }
     }
 }

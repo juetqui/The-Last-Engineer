@@ -14,6 +14,9 @@ public class PlayerData : ScriptableObject
     public float dashDuration = default;
     public float dashCD = default;
 
+    [Header("Gamepad Interactions")]
+    public float holdInteractionTime = default;
+
     [Header("Gamepad Rumble")]
     public float lowRumbleFrequency = default;
     public float highRumbleFrequency = default;

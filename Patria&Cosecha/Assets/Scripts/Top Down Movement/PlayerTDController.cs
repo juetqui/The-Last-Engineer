@@ -45,11 +45,12 @@ public class PlayerTDController : MonoBehaviour
     [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
 
     #region -----CHECKERS FOR PLAYER ACTIONS-----
+    public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public bool HasNode() => _node != null;
-    public ElectricityNode GetCurrentNode() => _node;
-    public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
     private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
     private bool UpgradedSpeedAvailable() => _currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash;
+    public ElectricityNode GetCurrentNode() => _node;
+    public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
     #endregion
 
     private void Awake()
@@ -68,8 +69,8 @@ public class PlayerTDController : MonoBehaviour
         
         _currentSpeed = _playerData.moveSpeed;
 
-        _playerModel = new PlayerTDModel(_cc, transform, _playerData.moveSpeed, _playerData.rotSpeed, _playerData.dashSpeed, _playerData.dashDuration, _playerData.dashCD);
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData.walkClip, _playerData.dashClip, _playerData.chargedDashClip, _playerData.liftClip, _playerData.putDownClip);
+        _playerModel = new PlayerTDModel(_cc, transform, _playerData);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         
@@ -89,6 +90,7 @@ public class PlayerTDController : MonoBehaviour
         return new Vector3(_movement.x, 0, _movement.y);
     }
 
+    //----- WalkSound() IS ONLY USED IN ANIMATIONS TO REPRODUCE WALK SOUND EFFECT -----//
     private void WalkSound()
     {
         if (!_playerModel.IsDashing && _cc.isGrounded)
@@ -99,13 +101,19 @@ public class PlayerTDController : MonoBehaviour
     public void OnEnableInputs()
     {
         InputManager.Instance.dashInput.performed += GetDashKey;
-        InputManager.Instance.interactInput.performed += GetInteractKey;
+        //InputManager.Instance.interactInput.performed += GetInteractKey;
+
+        InputManager.Instance.interactInput.started += GetInteractionKey;
+        InputManager.Instance.interactInput.canceled += CanceledHoldIInteraction;
     }
 
     public void OnDisableInputs()
     {
         InputManager.Instance.dashInput.performed -= GetDashKey;
-        InputManager.Instance.interactInput.performed -= GetInteractKey;
+        //InputManager.Instance.interactInput.performed -= GetInteractKey;
+
+        InputManager.Instance.interactInput.started -= GetInteractionKey;
+        InputManager.Instance.interactInput.canceled -= CanceledHoldIInteraction;
     }
 
     private void GetDashKey(InputAction.CallbackContext context)
@@ -121,14 +129,28 @@ public class PlayerTDController : MonoBehaviour
         else
             _playerView.PlayErrorSound(_playerData.emptyHand);
     }
-    
-    private void GetInteractKey(InputAction.CallbackContext context)
+
+    //private void GetInteractKey(InputAction.CallbackContext context)
+    //{
+    //    if (_cc.isGrounded && !_playerModel.IsDashing)
+    //    {
+    //        var interactableTarget = GetClosestInteractable();
+    //        _currentState?.HandleInteraction(interactableTarget);
+    //    }
+    //}
+
+    private void GetInteractionKey(InputAction.CallbackContext context)
     {
         if (_cc.isGrounded && !_playerModel.IsDashing)
         {
             var interactableTarget = GetClosestInteractable();
             _currentState?.HandleInteraction(interactableTarget);
         }
+    }
+
+    private void CanceledHoldIInteraction(InputAction.CallbackContext context)
+    {
+        _playerEmptyState.CancelInteraction();
     }
     #endregion
 

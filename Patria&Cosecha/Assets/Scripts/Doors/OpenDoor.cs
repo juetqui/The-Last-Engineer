@@ -22,6 +22,11 @@ public class OpenDoor : MonoBehaviour
         _closedPos = transform.position;
     }
 
+    private void Start()
+    {
+        _mainTM = MainTM.Instance;
+    }
+
     void Update()
     {
         if (HasMainTM || HasSecTM || IsMenu) _canOpen = true;
@@ -31,10 +36,10 @@ public class OpenDoor : MonoBehaviour
         else if (!_canOpen && !_isMoving) StartCoroutine(Open(_closedPos));
     }
 
-    public void SetMainTM(MainTM taskManager)
-    {
-        _mainTM = taskManager;
-    }
+    //public void SetMainTM(MainTM taskManager)
+    //{
+    //    _mainTM = taskManager;
+    //}
 
     public void SetSecTM(SecondaryTM taskManager)
     {

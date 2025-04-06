@@ -11,18 +11,18 @@ public class PlayerTDView
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, AudioClip walkClip, AudioClip dashClip, AudioClip chargedDashClip, AudioClip liftClip, AudioClip putDownClip)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData)
     {
         _outline = outline;
         _ps = ps;
         _animator = animator;
         _walkSource = walkSource;
         _fxSource = fxSource;
-        _walkClip = walkClip;
-        _dashClip = dashClip;
-        _chargedDashClip = chargedDashClip;
-        _liftClip = liftClip;
-        _putDownClip = putDownClip;
+        _walkClip = playerData.walkClip;
+        _dashClip = playerData.dashClip;
+        _chargedDashClip = playerData.chargedDashClip;
+        _liftClip = playerData.liftClip;
+        _putDownClip = playerData.putDownClip;
     }
 
     public void Walk(Vector3 moveVector)

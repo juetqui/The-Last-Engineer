@@ -20,15 +20,15 @@ public class PlayerTDModel
     public delegate void OnDashCDFinished();
     public OnDashCDFinished onDashCDFinished = default;
 
-    public PlayerTDModel(CharacterController cc, Transform transform, float moveSpeed, float rotSpeed, float dashSpeed, float dashDuration, float dashCD)
+    public PlayerTDModel(CharacterController cc, Transform transform, PlayerData playerData)
     {
         _cc = cc;
         _transform = transform;
-        _moveSpeed = moveSpeed;
-        _rotSpeed = rotSpeed;
-        _dashSpeed = dashSpeed;
-        _dashDuration = dashDuration;
-        _dashCD = dashCD;
+        _moveSpeed = playerData.moveSpeed;
+        _rotSpeed = playerData.rotSpeed;
+        _dashSpeed = playerData.dashSpeed;
+        _dashDuration = playerData.dashDuration;
+        _dashCD = playerData.dashCD;
     }
 
     public void OnUpdate(Vector3 moveDir, float moveSpeed)

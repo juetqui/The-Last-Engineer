@@ -39,10 +39,15 @@ public class ConnectionNode : MonoBehaviour, IInteractable
         _nodeRenderer.OnStart();
     }
 
-    public void SetMainTM(MainTM mainTM)
+    private void Start()
     {
-        _mainTM = mainTM;
+        _mainTM = MainTM.Instance;
     }
+
+    //public void SetMainTM(MainTM mainTM)
+    //{
+    //    _mainTM = mainTM;
+    //}
 
     public void SetSecTM(SecondaryTM secTM)
     {
