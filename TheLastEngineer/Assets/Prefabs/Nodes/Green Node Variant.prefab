@@ -128,19 +128,63 @@ PrefabInstance:
       propertyPath: outlineColor.r
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3649011374998030725, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2962310700278587659, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 2359386316179698206}
   m_SourcePrefab: {fileID: 100100000, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
+--- !u!23 &2385856800731547971 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8078163122834032516, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
+  m_PrefabInstance: {fileID: 5838673452279729863}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2626596471213347747 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8463575429957311844, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
   m_PrefabInstance: {fileID: 5838673452279729863}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 8654545687550275532}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &3875645897795075085 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 7263793796731990730, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
+  m_PrefabInstance: {fileID: 5838673452279729863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8654545687550275532 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2962310700278587659, guid: 653e7ab27a7ca0f43b10b9e989a64fcf, type: 3}
+  m_PrefabInstance: {fileID: 5838673452279729863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2359386316179698206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8654545687550275532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 413c4f80959ee05468123921591842fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _renderer: {fileID: 2385856800731547971}
+  _material: {fileID: 2100000, guid: 1a63d72c6152ef54493960acf859fc4a, type: 2}
+  _collider: {fileID: 3875645897795075085}
+  _player: {fileID: 0}
+  _emissionIntensity: 4
+  _outline: {fileID: 2626596471213347747}
+  _outlineColor: {r: 0, g: 1, b: 0, a: 1}
+  _nodeType: 2
+  _rotSpeed: 75
+  _minY: 1
+  _maxY: 2
+  _moveSpeed: 2
+  _isChildren: 0

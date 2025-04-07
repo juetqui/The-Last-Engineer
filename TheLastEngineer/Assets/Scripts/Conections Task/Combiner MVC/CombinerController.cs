@@ -8,7 +8,6 @@ public class CombinerController : MonoBehaviour, IInteractable
     [SerializeField] private CombineMachine _combineMachine;
 
     [SerializeField] private Renderer _renderer;
-    [SerializeField] private Renderer _shield;
 
     [ColorUsage(true, true)]
     [SerializeField] private Color _noColor, _onColor, _offColor;
@@ -17,7 +16,7 @@ public class CombinerController : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        _view = new CombinerView(_renderer, _shield, _noColor, _onColor, _offColor);
+        _view = new CombinerView(_renderer, _noColor, _onColor, _offColor);
     }
 
     private void Start()
@@ -46,13 +45,5 @@ public class CombinerController : MonoBehaviour, IInteractable
         {
             succededInteraction = false;
         }
-
     }
-
-    //public void ActivateCombineMachine()
-    //{
-    //    if (!_combineMachine.IsActive) return;
-
-    //    _combineMachine.CombineNodes();
-    //}
 }

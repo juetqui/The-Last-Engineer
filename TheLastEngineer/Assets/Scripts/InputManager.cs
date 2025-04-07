@@ -8,20 +8,22 @@ public class InputManager : MonoBehaviour
     public static InputManager Instance = default;
     [HideInInspector] public PlayerInput playerInput = default;
     [HideInInspector] public PlayerInputs playerInputs = default;
-    [HideInInspector] public InputAction moveInput = default, interactInput = default, dashInput = default;
+    [HideInInspector] public InputAction moveInput = default, interactInput = default, dashInput = default, shieldInput = default;
 
     private Gamepad _gamepad = default;
 
     public delegate void OnInputsEnabled();
     public event OnInputsEnabled onInputsEnabled;
 
-
     public delegate void OnInputsDisabled();
     public event OnInputsDisabled onInputsDisabled;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
 
         playerInputs = new PlayerInputs();
         playerInput = GetComponent<PlayerInput>();
@@ -31,18 +33,24 @@ public class InputManager : MonoBehaviour
     {
         playerInputs.Player.Move.Enable();
         playerInputs.Player.Dash.Enable();
+        playerInputs.Player.Shield.Enable();
         playerInputs.Player.Interact.Enable();
 
         moveInput = playerInputs.Player.Move;
         dashInput = playerInputs.Player.Dash;
+        shieldInput = playerInputs.Player.Shield;
         interactInput = playerInputs.Player.Interact;
+        
+        onInputsEnabled?.Invoke();
     }
 
     public void OnDisable()
     {
         onInputsDisabled?.Invoke();
+
         playerInputs.Player.Move.Disable();
         playerInputs.Player.Dash.Disable();
+        playerInputs.Player.Interact.Disable();
         playerInputs.Player.Interact.Disable();
     }
 

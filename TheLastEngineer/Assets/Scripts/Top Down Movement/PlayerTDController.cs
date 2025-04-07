@@ -5,7 +5,7 @@ using MaskTransitions;
 using System.Collections.Generic;
 using System.Linq;
 
-public class PlayerTDController : MonoBehaviour
+public class PlayerTDController : MonoBehaviour, IMovablePassenger
 {
     [SerializeField] private PlayerData _playerData;
 
@@ -19,7 +19,7 @@ public class PlayerTDController : MonoBehaviour
     private CharacterController _cc = default;
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
-    private ElectricityNode _node = default;
+    private NodeController _node = default;
 
     private List<IInteractable> _interactables = default;
     
@@ -37,19 +37,21 @@ public class PlayerTDController : MonoBehaviour
     public PlayerGrabState GrabState { get { return _playerGrabState; } }
     #endregion
 
-    private bool CanDash { get { return CheckDashAvialable(); } }
-
     public delegate void OnDash(float dashDuration, float dashCD);
     public event OnDash onDash = default;
+    
+    public delegate void OnShieldActive(bool isActive);
+    public event OnShieldActive onShieldActive = default;
 
     [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
 
     #region -----CHECKERS FOR PLAYER ACTIONS-----
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public bool HasNode() => _node != null;
+    private bool CheckShieldAvialable() => _currentNodeType == NodeType.Green;
     private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
     private bool UpgradedSpeedAvailable() => _currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash;
-    public ElectricityNode GetCurrentNode() => _node;
+    public NodeController GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
     #endregion
 
@@ -58,9 +60,6 @@ public class PlayerTDController : MonoBehaviour
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();
-        
-        InputManager.Instance.onInputsEnabled += OnEnableInputs;
-        InputManager.Instance.onInputsDisabled += OnDisableInputs;
     }
 
     private void Start()
@@ -75,6 +74,7 @@ public class PlayerTDController : MonoBehaviour
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         
         SetState(_playerEmptyState);
+        StartInputs();
     }
 
     private void Update()
@@ -90,7 +90,13 @@ public class PlayerTDController : MonoBehaviour
         return new Vector3(_movement.x, 0, _movement.y);
     }
 
-    //----- WalkSound() IS ONLY USED IN ANIMATIONS TO REPRODUCE WALK SOUND EFFECT -----//
+    //----- OnPlatformMoving MAKES THE PLAYER MOVE IN THE DIRECTION OF THE PLATFORM THAT HAS AS A TRANSFORM PARENT -----//
+    public void OnPlatformMoving(Vector3 displacement)
+    {
+        _playerModel.OnPlatformMoving(displacement);
+    }
+
+    //----- WalkSound IS ONLY USED IN ANIMATIONS TO REPRODUCE WALK SOUND EFFECT -----//
     private void WalkSound()
     {
         if (!_playerModel.IsDashing && _cc.isGrounded)
@@ -98,27 +104,54 @@ public class PlayerTDController : MonoBehaviour
     }
 
     #region -----INPUTS MANAGEMENT-----
+    private void OnDestroy()
+    {
+        InputManager.Instance.onInputsEnabled -= OnEnableInputs;
+        InputManager.Instance.onInputsDisabled -= OnDisableInputs;
+    }
+
+    private void StartInputs()
+    {
+        InputManager.Instance.onInputsEnabled += OnEnableInputs;
+        InputManager.Instance.onInputsDisabled += OnDisableInputs;
+
+        if (InputManager.Instance.playerInputs.Player.enabled) OnEnableInputs();
+    }
+
     public void OnEnableInputs()
     {
         InputManager.Instance.dashInput.performed += GetDashKey;
-        //InputManager.Instance.interactInput.performed += GetInteractKey;
-
         InputManager.Instance.interactInput.started += GetInteractionKey;
         InputManager.Instance.interactInput.canceled += CanceledHoldIInteraction;
+        InputManager.Instance.shieldInput.started += GetShieldKey;
+        InputManager.Instance.shieldInput.canceled += CancelledShield;
     }
 
     public void OnDisableInputs()
     {
         InputManager.Instance.dashInput.performed -= GetDashKey;
-        //InputManager.Instance.interactInput.performed -= GetInteractKey;
-
         InputManager.Instance.interactInput.started -= GetInteractionKey;
         InputManager.Instance.interactInput.canceled -= CanceledHoldIInteraction;
+        InputManager.Instance.shieldInput.started -= GetShieldKey;
+        InputManager.Instance.shieldInput.canceled -= CancelledShield;
+    }
+
+    private void GetShieldKey(InputAction.CallbackContext context)
+    {
+        if (CheckShieldAvialable())
+            onShieldActive?.Invoke(true);
+        else
+            _playerView.PlayErrorSound(_playerData.emptyHand);
+    }
+
+    private void CancelledShield(InputAction.CallbackContext context)
+    {
+        onShieldActive?.Invoke(false);
     }
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (CanDash && _playerModel.CanDash)
+        if (CheckDashAvialable() && _playerModel.CanDash)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
@@ -129,15 +162,6 @@ public class PlayerTDController : MonoBehaviour
         else
             _playerView.PlayErrorSound(_playerData.emptyHand);
     }
-
-    //private void GetInteractKey(InputAction.CallbackContext context)
-    //{
-    //    if (_cc.isGrounded && !_playerModel.IsDashing)
-    //    {
-    //        var interactableTarget = GetClosestInteractable();
-    //        _currentState?.HandleInteraction(interactableTarget);
-    //    }
-    //}
 
     private void GetInteractionKey(InputAction.CallbackContext context)
     {
@@ -171,7 +195,7 @@ public class PlayerTDController : MonoBehaviour
     }
 
     #region -----NODE MANAGEMENT-----
-    public void PickUpNode(ElectricityNode node)
+    public void PickUpNode(NodeController node)
     {
         if (_node != null || node == null) return;
 
@@ -198,13 +222,9 @@ public class PlayerTDController : MonoBehaviour
     public void CheckCurrentNode()
     {
         if (UpgradedSpeedAvailable())
-        {
             _currentSpeed = _playerData.upgradedMoveSpeed;
-        }
         else
-        {
             _currentSpeed = _playerData.moveSpeed;
-        }
     }
 
     private void ResetNode()
@@ -212,20 +232,19 @@ public class PlayerTDController : MonoBehaviour
         _node = null;
         _currentNodeType = NodeType.None;
         _playerView.GrabNode();
+        onShieldActive?.Invoke(false);
     }
     #endregion
 
     public void RemoveInteractable(IInteractable interactable)
     {
         if (_interactables.Contains(interactable))
-        {
             _interactables.Remove(interactable);
-        }
     }
 
-    public bool CheckForWalls()
+    public bool CheckForWalls(NodeController node)
     {
-        if (Physics.Raycast(transform.position, _node.transform.position, 7f, _playerData.wallMask))
+        if (Physics.Raycast(transform.position, node.transform.position, 7f, _playerData.wallMask))
             return true;
         
         return false;
@@ -240,9 +259,7 @@ public class PlayerTDController : MonoBehaviour
     private void OnTriggerEnter(Collider coll)
     {
         if (coll.TryGetComponent<IInteractable>(out var interactable))
-        {
             _interactables.Add(interactable);
-        }
 
         else if (coll.CompareTag("Void")) ResetLevel();
     }
@@ -250,9 +267,7 @@ public class PlayerTDController : MonoBehaviour
     private void OnTriggerExit(Collider coll)
     {
         if (coll.TryGetComponent<IInteractable>(out var interactable))
-        {
             _interactables.Remove(interactable);
-        }
     }
     #endregion
 }

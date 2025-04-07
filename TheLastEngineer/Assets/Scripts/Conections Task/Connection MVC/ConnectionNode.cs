@@ -26,7 +26,7 @@ public class ConnectionNode : MonoBehaviour, IInteractable
     private List<SecondaryTM> _secTaskManagers = new List<SecondaryTM>();
     private MainTM _mainTM = default;
     private NodeRenderer _nodeRenderer = default;
-    private ElectricityNode _recievedNode = default;
+    private NodeController _recievedNode = default;
 
     private bool _isDisabled = false, _isWorking = false;
 
@@ -39,15 +39,10 @@ public class ConnectionNode : MonoBehaviour, IInteractable
         _nodeRenderer.OnStart();
     }
 
-    private void Start()
+    public void SetMainTM(MainTM mainTM)
     {
-        _mainTM = MainTM.Instance;
+        _mainTM = mainTM;
     }
-
-    //public void SetMainTM(MainTM mainTM)
-    //{
-    //    _mainTM = mainTM;
-    //}
 
     public void SetSecTM(SecondaryTM secTM)
     {
@@ -63,7 +58,7 @@ public class ConnectionNode : MonoBehaviour, IInteractable
     {
         if (CanInteract(player) && player.GetCurrentNode() != null)
         {
-            ElectricityNode node = player.GetCurrentNode();
+            NodeController node = player.GetCurrentNode();
             SetNode(node);
             succededInteraction = true;
         }
@@ -73,7 +68,7 @@ public class ConnectionNode : MonoBehaviour, IInteractable
         }
     }
 
-    private void SetNode(ElectricityNode node)
+    private void SetNode(NodeController node)
     {
         if (_isDisabled || node == null) return;
 

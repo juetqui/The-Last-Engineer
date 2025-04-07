@@ -51,7 +51,7 @@ public class NodeModel
 
         if (_transform.localScale.magnitude > scaleVector.magnitude)
         {
-            _transform.localScale -= Vector3.one * 2f * deltaTime;
+            _transform.localScale += -(Vector3.one * 2f * deltaTime);
             result = false;
         }
         else result = true;

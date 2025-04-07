@@ -11,7 +11,7 @@ public class CombineMachine : MonoBehaviour, IInteractable
     public InteractablePriority Priority => InteractablePriority.Medium;
     public Transform Transform => transform;
 
-    private ElectricityNode _firstNode = default, _secondNode = default, _combinedNode = default;
+    private NodeController _firstNode = default, _secondNode = default, _combinedNode = default;
     private bool _isActive = false, _isCombining = false;
 
     public bool IsActive { get { return _isActive; } }
@@ -33,7 +33,7 @@ public class CombineMachine : MonoBehaviour, IInteractable
     {
         if (CanInteract(player) && player.GetCurrentNode() != null)
         {
-            ElectricityNode node = player.GetCurrentNode();
+            NodeController node = player.GetCurrentNode();
             SetNode(node);
             succededInteraction = true;
         }
@@ -62,7 +62,7 @@ public class CombineMachine : MonoBehaviour, IInteractable
         Vector3 newScale = new Vector3(1.5f, 1.5f, 1.5f);
 
         _isCombining = true;
-        _combinedNode = Instantiate(_combinedPrefab, transform.position, Quaternion.identity).GetComponent<ElectricityNode>();
+        _combinedNode = Instantiate(_combinedPrefab, transform.position, Quaternion.identity).GetComponent<NodeController>();
         _combinedNode.Attach(_combinedNodePos.localPosition, transform, newScale);
     }
 
@@ -97,7 +97,7 @@ public class CombineMachine : MonoBehaviour, IInteractable
         return _firstNode != null && _secondNode != null;
     }
 
-    private void SetNode(ElectricityNode node)
+    private void SetNode(NodeController node)
     {
         if (node == null || node.NodeType == NodeType.Dash) return;
 
@@ -115,7 +115,7 @@ public class CombineMachine : MonoBehaviour, IInteractable
         }
     }
 
-    public void UnsetNode(ElectricityNode node)
+    public void UnsetNode(NodeController node)
     {
         if (node.NodeType == NodeType.Dash) return;
 

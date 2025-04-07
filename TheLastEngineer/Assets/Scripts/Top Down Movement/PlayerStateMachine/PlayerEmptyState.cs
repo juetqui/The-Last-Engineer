@@ -1,5 +1,4 @@
 using System.Collections;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlayerEmptyState : IPlayerState
@@ -19,19 +18,14 @@ public class PlayerEmptyState : IPlayerState
     {
         if (interactable == null) return;
 
-        bool succededInteraction = default;
-        interactable.Interact(_playerController, out succededInteraction);
-
-        if (interactable is ElectricityNode node)
+        if (interactable is NodeController node && _interactionCoroutine == null && !_playerController.CheckForWalls(node))
         {
-            if (_interactionCoroutine == null)
-            {
-                _interactionCoroutine = _playerController.StartCoroutine(StartInteraction(node));
-            }
+            _interactionCoroutine = _playerController.StartCoroutine(StartInteraction(node));
         }
-        else if (!succededInteraction)
+        else
         {
-            InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
+            bool succededInteraction = default;
+            interactable.Interact(_playerController, out succededInteraction);
         }
     }
 
@@ -40,7 +34,7 @@ public class PlayerEmptyState : IPlayerState
         _playerController = null;
     }
 
-    public IEnumerator StartInteraction(ElectricityNode node)
+    public IEnumerator StartInteraction(NodeController node)
     {
         _interactionTimer = 0f;
 
@@ -68,6 +62,8 @@ public class PlayerEmptyState : IPlayerState
         {
             _playerController.StopCoroutine(_interactionCoroutine);
             _interactionCoroutine = null;
+
+            InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
         }
     }
 }

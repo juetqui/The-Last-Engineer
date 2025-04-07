@@ -12,7 +12,7 @@ public class PlayerTDModel
     private float _gravity = -9.81f;
     private bool _isDashing = false, _canDash = true;
 
-    private Vector3 _velocity = default;
+    private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
 
     public bool IsDashing { get { return _isDashing; } }
     public bool CanDash { get { return _canDash; } }
@@ -50,8 +50,14 @@ public class PlayerTDModel
                 _velocity.y -= _gravity * -2f * Time.deltaTime;
         }
 
-        _cc.Move(moveDir.normalized * _moveSpeed * Time.deltaTime);
+        Vector3 totalMovement = (moveDir.normalized * _moveSpeed * Time.deltaTime) + _platformDisplacement;
+        _cc.Move(totalMovement);
         _cc.Move(_velocity * Time.deltaTime);
+    }
+
+    public void OnPlatformMoving(Vector3 displacement)
+    {
+        _platformDisplacement = displacement;
     }
 
     private void RotatePlayer(Vector3 rotDir)
