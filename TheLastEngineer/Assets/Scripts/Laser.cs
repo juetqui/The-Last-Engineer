@@ -1,0 +1,72 @@
+using MaskTransitions;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class Laser : MonoBehaviour
+{
+    [SerializeField] private Transform _startPoint;
+    [SerializeField] private string _reflectableTag;
+    [SerializeField] private int _maxBounces;
+    [SerializeField] private float _maxDist;
+    [SerializeField] private bool _onlyReflectables;
+
+    private LineRenderer _lineRenderer = default;
+    private bool _playerDetected = false, _isResetting = false;
+
+    private void Start()
+    {
+        _lineRenderer = GetComponent<LineRenderer>();
+        _lineRenderer.SetPosition(0, _startPoint.position);
+    }
+
+    private void Update()
+    {
+        if (_isResetting) return;
+
+        if (!_playerDetected)
+            CastLaser(_startPoint.position, -transform.forward);
+        else
+            ResetLevel();
+    }
+
+    private void CastLaser(Vector3 position, Vector3 direction)
+    {
+        _lineRenderer.SetPosition(0, _startPoint.position);
+
+        for (int i = 0; i < _maxBounces; i++)
+        {
+            Ray ray = new Ray(position, direction);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, _maxDist, 1))
+            {
+                if (hit.transform.GetComponent<PlayerTDController>() != null)
+                {
+                    _playerDetected = true;
+                    return;
+                }
+
+                position = hit.point;
+                direction = Vector3.Reflect(direction, hit.normal);
+
+                _lineRenderer.SetPosition(i + 1, position);
+
+                if (hit.transform.tag != _reflectableTag && _onlyReflectables)
+                {
+                    for (int j = (i + 1); j <= _maxBounces; j++)
+                    {
+                        _lineRenderer.SetPosition(j, position);
+                    }
+                    
+                    break;
+                }
+            }
+        }
+    }
+
+    public void ResetLevel()
+    {
+        _isResetting = true;
+        TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
+    }
+}

@@ -90,13 +90,17 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         return new Vector3(_movement.x, 0, _movement.y);
     }
 
-    //----- OnPlatformMoving MAKES THE PLAYER MOVE IN THE DIRECTION OF THE PLATFORM THAT HAS AS A TRANSFORM PARENT -----//
+    //-----
+    //  OnPlatformMoving MAKES THE PLAYER MOVE IN THE DIRECTION OF THE PLATFORM THAT HAS AS A TRANSFORM PARENT
+    //  -----//
     public void OnPlatformMoving(Vector3 displacement)
     {
         _playerModel.OnPlatformMoving(displacement);
     }
 
-    //----- WalkSound IS ONLY USED IN ANIMATIONS TO REPRODUCE WALK SOUND EFFECT -----//
+    //-----
+    //  WalkSound IS ONLY USED IN ANIMATIONS TO REPRODUCE WALK SOUND EFFECT
+    //  -----//
     private void WalkSound()
     {
         if (!_playerModel.IsDashing && _cc.isGrounded)
@@ -187,6 +191,12 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             .FirstOrDefault();
     }
 
+    public void RemoveInteractable(IInteractable interactable)
+    {
+        if (_interactables.Contains(interactable))
+            _interactables.Remove(interactable);
+    }
+
     public void SetState(IPlayerState newState)
     {
         _currentState?.Exit();
@@ -235,12 +245,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         onShieldActive?.Invoke(false);
     }
     #endregion
-
-    public void RemoveInteractable(IInteractable interactable)
-    {
-        if (_interactables.Contains(interactable))
-            _interactables.Remove(interactable);
-    }
 
     public bool CheckForWalls(NodeController node)
     {

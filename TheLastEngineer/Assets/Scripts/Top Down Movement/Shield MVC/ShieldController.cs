@@ -8,7 +8,7 @@ public class ShieldController : MonoBehaviour
     [SerializeField] private AudioClip _chargedFX;
 
     private Renderer _renderer;
-    private BoxCollider _collider;
+    private SphereCollider _collider;
     private AudioSource _audioSource;
 
     private float _durationCounter = 0f;
@@ -22,7 +22,7 @@ public class ShieldController : MonoBehaviour
     {
 
         _renderer = GetComponent<MeshRenderer>();
-        _collider = GetComponent<BoxCollider>();
+        _collider = GetComponent<SphereCollider>();
         _audioSource = GetComponent<AudioSource>();
         _player.onShieldActive += ActivateShield;
         

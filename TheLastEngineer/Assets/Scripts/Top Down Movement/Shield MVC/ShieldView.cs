@@ -5,10 +5,10 @@ using UnityEngine;
 public class ShieldView
 {
     private Renderer _renderer = default;
-    private BoxCollider _collider = default;
+    private SphereCollider _collider = default;
     private AudioSource _audioSource = default;
 
-    public ShieldView(Renderer renderer, BoxCollider collider, AudioSource audioSource, AudioClip chargedFX)
+    public ShieldView(Renderer renderer, SphereCollider collider, AudioSource audioSource, AudioClip chargedFX)
     {
         _renderer = renderer;
         _collider = collider;

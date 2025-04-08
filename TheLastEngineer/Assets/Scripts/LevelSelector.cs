@@ -5,7 +5,11 @@ public class LevelSelector : MonoBehaviour
 {
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            SceneManager.LoadScene("TESTING");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             SceneManager.LoadScene("Lvl 1");
         }
