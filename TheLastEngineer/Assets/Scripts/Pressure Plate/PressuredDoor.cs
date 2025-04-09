@@ -29,8 +29,6 @@ public class PressuredDoor : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Door :" + _taskFinished);
-
         if (_pressedPlates == _plates.Length && !_taskFinished)
         {
             OnTaskFinished?.Invoke(true);
@@ -54,8 +52,6 @@ public class PressuredDoor : MonoBehaviour
             
             if (_pressedPlates < 0) _pressedPlates = 0;
         }
-
-        Debug.Log("PRESSED PLATES: " + _pressedPlates);
     }
 
     private IEnumerator RestartTask()
