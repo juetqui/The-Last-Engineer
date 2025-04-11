@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class TaskManager : MonoBehaviour
 {
     [Header("Lists")]
-    public List<ConnectionNode> connections;
+    public List<SpecificConnectionController> connections;
     [SerializeField] protected List<OpenDoor> _doors;
     [SerializeField] protected ElectricityController _elecController;
 

@@ -4,7 +4,7 @@ using UnityEngine.Splines;
 public class ElectricityController : MonoBehaviour
 {
     [SerializeField] private SplineContainer[] _splines;
-    [SerializeField] private ConnectionNode[] _connections;
+    [SerializeField] private SpecificConnectionController[] _connections;
 
     private TrailController _trailController = default;
 

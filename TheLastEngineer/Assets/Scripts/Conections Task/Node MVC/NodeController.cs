@@ -27,8 +27,7 @@ public class NodeController : MonoBehaviour, IInteractable
     private NodeView _nodeView = default;
     private NodeModel _nodeModel = default;
 
-    private ConnectionNode _connectionNode = default;
-    private CombineMachine _combineMachine = default;
+    private IConnectable _connectable = default;
     
     private bool _isConnected = false;
 
@@ -87,15 +86,10 @@ public class NodeController : MonoBehaviour, IInteractable
         
         Attach(newPos, player.transform, newScale, true);
 
-        if (_isChildren && _connectionNode != null)
+        if (_isChildren && _connectable != null)
         {
-            _connectionNode.UnsetNode();
-            _connectionNode = null;
-        }
-        else if (_isChildren && _combineMachine != null)
-        {
-            _combineMachine.UnsetNode(this);
-            _combineMachine = null;
+            _connectable.UnsetNode(this);
+            _connectable = null;
         }
     }
 
@@ -111,8 +105,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
         if (!parentIsPlayer && newParent != null)
         {
-            _connectionNode = newParent.GetComponent<ConnectionNode>();
-            _combineMachine = newParent.GetComponent<CombineMachine>();
+            _connectable = newParent.GetComponent<IConnectable>();
         }
 
         if (newParent != null) _isChildren = true;

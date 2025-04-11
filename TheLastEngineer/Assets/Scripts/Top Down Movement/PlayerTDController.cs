@@ -27,7 +27,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private Vector3 _movement = default;
     private NodeType _currentNodeType = NodeType.None;
 
-
     #region -----STATES VARIABLES-----
     private IPlayerState _currentState = default;
     private PlayerEmptyState _playerEmptyState = default;

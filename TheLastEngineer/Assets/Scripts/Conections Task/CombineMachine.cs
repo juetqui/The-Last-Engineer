@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CombineMachine : MonoBehaviour, IInteractable
+public class CombineMachine : MonoBehaviour, IInteractable, IConnectable
 {
     [SerializeField] private GameObject _combinedPrefab;
     [SerializeField] private Collider _trigger;

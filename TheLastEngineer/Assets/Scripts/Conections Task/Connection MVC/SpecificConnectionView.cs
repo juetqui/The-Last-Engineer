@@ -1,15 +1,15 @@
 using UnityEngine;
 
-public class NodeRenderer : INodeEffect
+public class SpecificConnectionView
 {
     private NodeType _type = default;
-    private Renderer _renderer = default;
+    private MeshRenderer _renderer = default;
     private ParticleSystem _ps = default;
     private AudioSource _source = default;
     private Collider _triggerCollider = default;
     private Color _color = default, _secColor = default, _fresnelColor = default;
 
-    public NodeRenderer(NodeType type, Renderer renderer, Collider triggerCollider, Color color, Color secColor, Color fresnelColor, ParticleSystem ps, AudioSource source)
+    public SpecificConnectionView(NodeType type, MeshRenderer renderer, Collider triggerCollider, Color color, Color secColor, Color fresnelColor, ParticleSystem ps, AudioSource source)
     {
         _type = type;
         _renderer = renderer;

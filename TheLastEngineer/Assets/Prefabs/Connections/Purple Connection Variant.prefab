@@ -172,13 +172,52 @@ PrefabInstance:
       propertyPath: m_Shadows.m_Type
       value: 2
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7042764185482838604, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5194122202325062217, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
     - {fileID: 7190576294595558313, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1822840214636452667, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+      insertIndex: 5
+      addedObject: {fileID: 203612760616286853}
   m_SourcePrefab: {fileID: 100100000, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+--- !u!65 &4340985157655173204 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 7077429503137544104, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+  m_PrefabInstance: {fileID: 6775194648838565884}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5137010849496806599 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1822840214636452667, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+  m_PrefabInstance: {fileID: 6775194648838565884}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &203612760616286853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5137010849496806599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b6eebbfb42fc3142b59c4d543928057, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredType: 1
+  _triggerCollider: {fileID: 4340985157655173204}
+  _placedClip: {fileID: 8300000, guid: 6d2ba893ecb8e0b4f986f0e68515ff83, type: 3}
+  _errorClip: {fileID: 8300000, guid: 484bb4b1764914b409cf63924f0eb044, type: 3}
+  _color: {r: 1, g: 0, b: 1, a: 1}
+  _secColor: {r: 1, g: 0.3529412, b: 1, a: 1}
+  _fresnelColor: {r: 4, g: 1.4117647, b: 4, a: 1}
+  _ps: {fileID: 5265846418889443760}
+--- !u!198 &5265846418889443760 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 1662488836783826508, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
+  m_PrefabInstance: {fileID: 6775194648838565884}
+  m_PrefabAsset: {fileID: 0}
 --- !u!23 &5963585239108977144 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 920065348525157892, guid: 002d7708562be0143b5a3aa19ef3429e, type: 3}
