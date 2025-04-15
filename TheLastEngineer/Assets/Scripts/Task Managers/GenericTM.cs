@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SecTM : MonoBehaviour
+public class GenericTM : MonoBehaviour
 {
     [Header("Lists")]
     [SerializeField] private List<GenericConnectionController> _connections;

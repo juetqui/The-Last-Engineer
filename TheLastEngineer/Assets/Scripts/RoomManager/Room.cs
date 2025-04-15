@@ -7,14 +7,9 @@ public class Room : MonoBehaviour
     [SerializeField] private NodeType _roomType;
 
     public NodeType RoomType {  get { return _roomType; } }
-    
-    void Start()
-    {
-        
-    }
 
-    void Update()
+    public void Enable(bool enable)
     {
-        
+        gameObject.SetActive(enable);
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlatformController : MonoBehaviour
 {
-    [SerializeField] private SecondaryTM _secTM;
+    [SerializeField] private GenericConnectionController _connection;
     [SerializeField] private Transform[] _positions;
     [SerializeField] private BoxCollider _topCollider;
     [SerializeField] private BoxCollider _bottomCollider;
@@ -13,6 +13,7 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private float _waitCD;
     [SerializeField] private LayerMask _floorMask;
 
+    private NodeType _requiredNode = NodeType.Blue;
     private PlayerTDController _player = default;
     private IMovablePassenger _passenger = default;
     private Vector3 _targetPos = default;
@@ -27,7 +28,7 @@ public class PlatformController : MonoBehaviour
     void Awake()
     {
         _targetPos = _positions[0].position;
-        _secTM.onRunning += AvailableToMove;
+        _connection.OnNodeConnected += AvailableToMove;
     }
 
     private void Start()
@@ -84,9 +85,16 @@ public class PlatformController : MonoBehaviour
         }
     }
 
-    public void AvailableToMove(bool isActive)
+    public void AvailableToMove(NodeType node, bool isActive)
     {
-        _canMove = isActive;
+        if (node == _requiredNode && isActive || node == NodeType.Dash && isActive)
+        {
+            _canMove = true;
+        }
+        else
+        {
+            _canMove = false;
+        }
     }
 
     private void CheckColliders()

@@ -16,7 +16,6 @@ public class RoomsTM : MonoBehaviour
     private void Awake()
     {
         _connection.OnNodeConnected += RecievedNode;
-
     }
 
     void Start()
@@ -27,32 +26,43 @@ public class RoomsTM : MonoBehaviour
             {
                 _roomsDic.Add(room.RoomType, room);
             }
-        }
-    }
 
-    void Update()
-    {
-        
+            if (room.RoomType == NodeType.None)
+            {
+                room.Enable(true);
+            }
+            else
+            {
+                room.Enable(false);
+            }
+        }
     }
 
     private void RecievedNode(NodeType node, bool connected)
     {
-        if (!connected)
+        if (!_roomsDic.ContainsKey(node) && connected)
         {
             return;
         }
 
-        UnableRooms();
+        if (!connected)
+        {
+            _connectedRoom = _roomsDic.Where(r => r.Key == NodeType.None).FirstOrDefault().Value;
+        }
+        else
+        {
+            _connectedRoom = _roomsDic.Where(r => r.Key == node).FirstOrDefault().Value;
+        }
 
-        _connectedRoom = _roomsDic.Where(r => r.Key == node).FirstOrDefault().Value;
-        _connectedRoom.gameObject.SetActive(true);
+        UnableRooms();
+        _connectedRoom.Enable(true);
     }
 
     private void UnableRooms()
     {
         foreach (Room room in _rooms)
         {
-            room.gameObject.SetActive(false);
+            room.Enable(false);
         }
     }
 }

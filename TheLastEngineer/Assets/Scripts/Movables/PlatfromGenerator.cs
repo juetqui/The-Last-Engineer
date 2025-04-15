@@ -2,29 +2,33 @@ using UnityEngine;
 
 public class PlatfromGenerator : MonoBehaviour
 {
-    [SerializeField] Material _ActiveMat;
-    [SerializeField] Material _DisabledMat;
+    [SerializeField] private GenericConnectionController _connection = default;
+    [SerializeField] private Material _ActiveMat;
+    [SerializeField] private Material _DisabledMat;
 
-    private SecondaryTM _secTM = default;
+    private NodeType _requiredNode = NodeType.Green;
     private MeshRenderer _renderer = default;
     private BoxCollider _collider = default;
 
-    void Start()
+    private void Awake()
     {
         _renderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<BoxCollider>();
-        _secTM = GetComponent<SecondaryTM>();
 
-        _secTM.onRunning += GeneratePlatform;
-        GeneratePlatform(false);
+        _connection.OnNodeConnected += GeneratePlatform;
     }
 
-    private void GeneratePlatform(bool isRunning)
+    private void GeneratePlatform(NodeType node, bool isRunning)
     {
-        if (isRunning)
+        if (node == _requiredNode && isRunning || node == NodeType.Dash && isRunning)
+        {
             _renderer.material = _ActiveMat;
-        else _renderer.material = _DisabledMat;
-
-        _collider.enabled = isRunning;
+            _collider.enabled = true;
+        }
+        else
+        {
+            _renderer.material = _DisabledMat;
+            _collider.enabled = false;
+        }
     }
 }

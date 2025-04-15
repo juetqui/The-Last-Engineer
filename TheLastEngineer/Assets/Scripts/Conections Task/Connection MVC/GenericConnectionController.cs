@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GenericConnectionController : Connection<SecTM>
+public class GenericConnectionController : Connection<GenericTM>
 {
-    private List<SecTM> _secTaskManagers = new List<SecTM>();
+    private List<GenericTM> _secTaskManagers = new List<GenericTM>();
     
     private NodeController _recievedNode = default;
 
     public Action<NodeType, bool> OnNodeConnected;
 
-    public override void SetSecTM(SecTM secTM)
+    public override void SetSecTM(GenericTM secTM)
     {
         _secTaskManagers.Add(secTM);
     }
