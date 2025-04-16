@@ -17,7 +17,7 @@ public class GenericConnectionController : Connection<GenericTM>
 
     public override bool CanInteract(PlayerTDController player)
     {
-        return player.HasNode();
+        return player.HasNode() && _recievedNode == null;
     }
 
     protected override void SetNode(NodeController node)

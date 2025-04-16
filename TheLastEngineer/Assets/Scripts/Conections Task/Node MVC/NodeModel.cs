@@ -1,3 +1,4 @@
+using UnityEditor.Search;
 using UnityEngine;
 
 public class NodeModel
@@ -37,8 +38,16 @@ public class NodeModel
             if (nodeType == NodeType.Dash)
                 newScale = Vector3.one * 2;
 
-            _transform.SetParent(null);
-            _transform.localPosition = newPos;
+            if (CheckForRoom(out newParent))
+            {
+                _transform.SetParent(newParent);
+                _transform.position = newPos;
+            }
+            else
+            {
+                _transform.SetParent(null);
+                _transform.localPosition = newPos;
+            }
         }
 
         if (newScale != default) _transform.localScale = newScale;
@@ -57,5 +66,19 @@ public class NodeModel
         else result = true;
 
         return result;
+    }
+
+    public bool CheckForRoom(out Transform newParent)
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(_transform.position, -_transform.up, out hit, 5f) && hit.transform.gameObject.GetComponentInParent<Room>() != null)
+        {
+            newParent = hit.transform.gameObject.GetComponentInParent<Room>().transform;
+            return true;
+        }
+
+        newParent = null;
+        return false;
     }
 }

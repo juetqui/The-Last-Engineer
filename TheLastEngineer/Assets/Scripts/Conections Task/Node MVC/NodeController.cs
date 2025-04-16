@@ -111,9 +111,18 @@ public class NodeController : MonoBehaviour, IInteractable
         if (newParent != null) _isChildren = true;
         else _isChildren = false;
 
-        if (newParent != null && newScale != default) _nodeModel.SetPos(newPos, NodeType, newParent, newScale);
-        else if (newParent != null && newScale == default) _nodeModel.SetPos(newPos, NodeType, newParent);
-        else if (newParent == null && newScale == default) _nodeModel.SetPos(newPos, NodeType);
+        if (newParent != null && newScale != default)
+        {
+            _nodeModel.SetPos(newPos, NodeType, newParent, newScale);
+        }
+        else if (newParent != null && newScale == default)
+        {
+            _nodeModel.SetPos(newPos, NodeType, newParent);
+        }
+        else if (newParent == null && newScale == default)
+        {
+            _nodeModel.SetPos(newPos, NodeType);
+        }
     }
 
     public bool Combine(float deltaTime)
@@ -125,5 +134,11 @@ public class NodeController : MonoBehaviour, IInteractable
     public void UseHability(float dashDuration, float dashCD)
     {
         StartCoroutine(_nodeView.ResetHability(dashDuration, dashCD));
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position, -transform.up * 2f);
     }
 }
