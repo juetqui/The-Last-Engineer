@@ -2,9 +2,14 @@ using UnityEngine;
 
 public class SecondaryTM : TaskManager
 {
+    private Animator _animator = default;
+
     private void Awake()
     {
         OnAwake();
+        _animator = GetComponent<Animator>();
+
+        onRunning += OpenDoor;
     }
 
     private void Start()
@@ -21,10 +26,10 @@ public class SecondaryTM : TaskManager
     protected override void SetUp()
     {
         foreach (var connection in connections) connection.SetSecTM(this);
+    }
 
-        if (_doors.Count > 0)
-        {
-            foreach (var door in _doors) door.SetSecTM(this);
-        }
+    private void OpenDoor(bool isRunning)
+    {
+        _animator.SetBool("Open", isRunning);
     }
 }

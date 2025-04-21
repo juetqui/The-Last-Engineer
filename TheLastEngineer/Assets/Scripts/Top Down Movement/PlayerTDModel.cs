@@ -47,7 +47,7 @@ public class PlayerTDModel
             if (_cc.isGrounded)
                 _velocity.y = -1f;
             else
-                _velocity.y -= _gravity * -2f * Time.deltaTime;
+                _velocity.y -= _gravity * -5f * Time.deltaTime;
         }
 
         Vector3 totalMovement = (moveDir.normalized * _moveSpeed * Time.deltaTime) + _platformDisplacement;

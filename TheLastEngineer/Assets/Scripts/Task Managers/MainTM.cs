@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class MainTM : TaskManager
@@ -6,10 +8,9 @@ public class MainTM : TaskManager
     [SerializeField] private Light _light;
 
     [Header("Level")]
-    [SerializeField] private LevelChanger _lvlChanger;
-    [SerializeField] private DoorLights _doorLights;
     [SerializeField] private AudioSource _winAS;
-    [SerializeField] private ConnectionModuleController _moduleController;
+
+    private Animator _animator = default;
 
     public static MainTM Instance { get; private set; }
 
@@ -22,6 +23,9 @@ public class MainTM : TaskManager
 
         OnAwake();
         Cursor.visible = false;
+
+        _animator = GetComponent<Animator>();
+        onRunning += OpenDoor;
     }
 
     private void Start()
@@ -46,6 +50,11 @@ public class MainTM : TaskManager
 
     protected override void SetUp()
     {
-        foreach (var c in connections) c.SetMainTM(this);
+        foreach (var c in connections) c.SetMainTM();
+    }
+
+    private void OpenDoor(bool isRunning)
+    {
+        _animator.SetBool("Open", isRunning);
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using MaskTransitions;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class PlayerTDController : MonoBehaviour, IMovablePassenger
 {
@@ -36,11 +37,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     public PlayerGrabState GrabState { get { return _playerGrabState; } }
     #endregion
 
-    public delegate void OnDash(float dashDuration, float dashCD);
-    public event OnDash onDash = default;
-    
-    public delegate void OnShieldActive(bool isActive);
-    public event OnShieldActive onShieldActive = default;
+    public Action<float, float> OnDash;
+    public Action OnChangeActiveShield;
+    public Action<bool> OnNodeGrabed;
 
     [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
 
@@ -126,8 +125,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         InputManager.Instance.dashInput.performed += GetDashKey;
         InputManager.Instance.interactInput.started += GetInteractionKey;
         InputManager.Instance.interactInput.canceled += CanceledHoldIInteraction;
-        InputManager.Instance.shieldInput.started += GetShieldKey;
-        InputManager.Instance.shieldInput.canceled += CancelledShield;
+        InputManager.Instance.shieldInput.performed += GetShieldKey;
     }
 
     public void OnDisableInputs()
@@ -135,21 +133,16 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         InputManager.Instance.dashInput.performed -= GetDashKey;
         InputManager.Instance.interactInput.started -= GetInteractionKey;
         InputManager.Instance.interactInput.canceled -= CanceledHoldIInteraction;
-        InputManager.Instance.shieldInput.started -= GetShieldKey;
-        InputManager.Instance.shieldInput.canceled -= CancelledShield;
+        InputManager.Instance.shieldInput.performed -= GetShieldKey;
     }
 
     private void GetShieldKey(InputAction.CallbackContext context)
     {
         if (CheckShieldAvialable())
-            onShieldActive?.Invoke(true);
+            OnChangeActiveShield?.Invoke();
+            //onShieldActive?.Invoke(true);
         else
             _playerView.PlayErrorSound(_playerData.emptyHand);
-    }
-
-    private void CancelledShield(InputAction.CallbackContext context)
-    {
-        onShieldActive?.Invoke(false);
     }
 
     private void GetDashKey(InputAction.CallbackContext context)
@@ -159,7 +152,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
             _playerView.DashSound();
-            onDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
+            OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
         }
         else
@@ -241,7 +234,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _node = null;
         _currentNodeType = NodeType.None;
         _playerView.GrabNode();
-        onShieldActive?.Invoke(false);
     }
     #endregion
 

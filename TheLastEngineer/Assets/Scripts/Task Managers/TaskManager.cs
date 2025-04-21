@@ -4,9 +4,8 @@ using UnityEngine;
 public abstract class TaskManager : MonoBehaviour
 {
     [Header("Lists")]
-    public List<SpecificConnectionController> connections;
-    [SerializeField] protected List<OpenDoor> _doors;
-    [SerializeField] protected ElectricityController _elecController;
+    [SerializeField] protected List<SpecificConnectionController> connections;
+    //[SerializeField] protected ElectricityController _elecController;
 
     [Header("MVC View")]
     [SerializeField] protected AudioSource _source;
@@ -53,8 +52,8 @@ public abstract class TaskManager : MonoBehaviour
         if (_nodesSet.ContainsKey(nodeType)) _nodesSet[nodeType]++;
         else _nodesSet.Add(nodeType, 1);
 
-        if (_elecController != null)
-            _elecController.MoveSpline();
+        //if (_elecController != null)
+        //    _elecController.MoveSpline();
 
         _workingNodes++;
         ValidateAllConnections();

@@ -73,12 +73,12 @@ public class NodeController : MonoBehaviour, IInteractable
     private void MoveObject()
     {
         _nodeView.EnableColl(true);
-        _nodeModel.MoveObject(Time.deltaTime);
+        _nodeModel.MoveObject();
     }
 
     private void Attach(PlayerTDController player, Vector3 newPos)
     {
-        if (_player != null && _nodeType == NodeType.Blue) _player.onDash += UseHability;
+        if (_player != null && _nodeType == NodeType.Blue) _player.OnDash += UseHability;
 
         Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
         
@@ -98,7 +98,7 @@ public class NodeController : MonoBehaviour, IInteractable
         if (parentIsPlayer) _nodeView.EnableColl(false);
         else
         {
-            if (_player != null && _nodeType == NodeType.Blue) _player.onDash -= UseHability;
+            if (_player != null && _nodeType == NodeType.Blue) _player.OnDash -= UseHability;
 
             _nodeView.EnableColl(true);
         }

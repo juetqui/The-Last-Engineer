@@ -27,11 +27,11 @@ public class PlayerGrabState : IPlayerState
             _playerController.DropNode();
             _playerController.SetState(_playerController.EmptyState);
         }
-
     }
 
     public void Exit()
     {
+        _playerController.OnNodeGrabed?.Invoke(true);
         _playerController = null;
     }
 }

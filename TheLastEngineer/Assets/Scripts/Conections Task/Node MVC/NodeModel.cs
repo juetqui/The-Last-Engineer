@@ -4,25 +4,28 @@ using UnityEngine;
 public class NodeModel
 {
     private Transform _transform = default;
-    private float _minY = default, _maxY = default, _moveSpeed = default, _rotSpeed = default;
+    private float _minY = default, _maxY = default, _moveSpeed = default, _rotSpeed = default, _initialY = default;
     private Vector3 scaleVector = new Vector3(0.0125f, 0.0125f, 0.0125f);
 
     public NodeModel(Transform transform, float minY, float maxY, float moveSpeed, float rotSpeed)
     {
         _transform = transform;
+        _initialY = transform.position.y;
         _minY = minY;
         _maxY = maxY;
         _moveSpeed = moveSpeed;
         _rotSpeed = rotSpeed;
     }
 
-    public void MoveObject(float deltaTime)
+    public void MoveObject()
     {
         Vector3 currentPosition = _transform.position;
-        float newY = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
+
+        float offset = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
+        float newY = _initialY + offset;
 
         _transform.position = new Vector3(currentPosition.x, newY, currentPosition.z);
-        _transform.Rotate(0, _rotSpeed * deltaTime, 0);
+        _transform.Rotate(0, _rotSpeed * Time.deltaTime, 0);
     }
 
     public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
@@ -49,6 +52,8 @@ public class NodeModel
                 _transform.localPosition = newPos;
             }
         }
+
+        _initialY = _transform.position.y;
 
         if (newScale != default) _transform.localScale = newScale;
         else _transform.localScale = Vector3.one;

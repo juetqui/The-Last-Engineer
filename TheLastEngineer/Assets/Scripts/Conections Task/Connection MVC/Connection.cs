@@ -13,9 +13,9 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
     protected abstract void SetNode(NodeController node);
     public abstract void UnsetNode(NodeController node = null);
 
-    public void SetMainTM(MainTM mainTM)
+    public void SetMainTM()
     {
-        _mainTM = mainTM;
+        _mainTM = MainTM.Instance;
     }
 
     public abstract bool CanInteract(PlayerTDController player);

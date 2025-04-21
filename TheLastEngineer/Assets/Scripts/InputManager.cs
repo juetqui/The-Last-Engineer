@@ -51,7 +51,6 @@ public class InputManager : MonoBehaviour
         playerInputs.Player.Move.Disable();
         playerInputs.Player.Dash.Disable();
         playerInputs.Player.Interact.Disable();
-        playerInputs.Player.Interact.Disable();
     }
 
     private void Start()

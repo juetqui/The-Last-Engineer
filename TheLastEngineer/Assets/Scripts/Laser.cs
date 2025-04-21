@@ -24,7 +24,7 @@ public class Laser : MonoBehaviour
         if (_isResetting) return;
 
         if (!_playerDetected)
-            CastLaser(_startPoint.position, -transform.forward);
+            CastLaser(_startPoint.position, _startPoint.forward);
         else
             ResetLevel();
     }
@@ -35,6 +35,8 @@ public class Laser : MonoBehaviour
 
         for (int i = 0; i < _maxBounces; i++)
         {
+            direction = new Vector3(direction.x, 0, direction.z);
+
             Ray ray = new Ray(position, direction);
             RaycastHit hit;
 

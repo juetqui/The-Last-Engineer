@@ -55,7 +55,11 @@ public class RoomsTM : MonoBehaviour
         }
 
         UnableRooms();
-        _connectedRoom.Enable(true);
+
+        if (_connectedRoom != null)
+        {
+            _connectedRoom.Enable(true);
+        }
     }
 
     private void UnableRooms()

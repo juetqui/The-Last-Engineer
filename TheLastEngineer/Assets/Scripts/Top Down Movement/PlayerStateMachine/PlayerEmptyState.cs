@@ -31,6 +31,7 @@ public class PlayerEmptyState : IPlayerState
 
     public void Exit()
     {
+        _playerController.OnNodeGrabed?.Invoke(false);
         _playerController = null;
     }
 

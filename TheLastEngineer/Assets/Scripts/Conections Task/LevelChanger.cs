@@ -1,11 +1,26 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using MaskTransitions;
 
 public class LevelChanger : MonoBehaviour
 {
     [SerializeField] private string _lvlName = default;
     [SerializeField] private bool _isMenu = false;
+
+    private BoxCollider _collider;
+
+
+    private void Start()
+    {
+        _collider = GetComponent<BoxCollider>();
+        MainTM.Instance.onRunning += EnableCollider;
+        
+        EnableCollider(false);
+    }
+
+    private void EnableCollider(bool isRunning)
+    {
+        _collider.enabled = isRunning;
+    }
 
     private void OnTriggerEnter(Collider coll)
     {
