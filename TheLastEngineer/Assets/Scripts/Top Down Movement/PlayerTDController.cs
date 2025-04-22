@@ -27,6 +27,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private float _currentSpeed = default;
     private Vector3 _movement = default;
     private NodeType _currentNodeType = NodeType.None;
+    private bool _dropAvailable = true;
+
+    public bool DropAvailable { get => _dropAvailable; }
 
     #region -----STATES VARIABLES-----
     private IPlayerState _currentState = default;
@@ -58,6 +61,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();
+
+        Materializer.OnPlayerInsideTrigger += CheckDropAvailable;
     }
 
     private void Start()
@@ -243,6 +248,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             return true;
         
         return false;
+    }
+
+    public void CheckDropAvailable(bool available)
+    {
+        _dropAvailable = !available;
     }
 
     public void ResetLevel()

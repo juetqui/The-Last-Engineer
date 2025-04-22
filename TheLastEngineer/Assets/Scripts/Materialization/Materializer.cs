@@ -1,10 +1,13 @@
+using System;
 using UnityEngine;
 
-public class Materilizer : MonoBehaviour, IMaterializable
+public class Materializer : MonoBehaviour, IMaterializable
 {
     private Collider _collider = default;
     private MeshRenderer _renderer = default;
     private Material _originalMat = default, _newMat = default, _currentMat = default;
+
+    public static event Action<bool> OnPlayerInsideTrigger;
 
     private void Start()
     {
@@ -17,7 +20,7 @@ public class Materilizer : MonoBehaviour, IMaterializable
 
     public void Materialize(bool materialize, Material material)
     {
-        _collider.enabled = materialize;
+        _collider.isTrigger = !materialize;
 
 
         if (!materialize)
@@ -35,5 +38,25 @@ public class Materilizer : MonoBehaviour, IMaterializable
         }
 
         _renderer.material = _currentMat;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        PlayerTDController player = null;
+
+        if (other.TryGetComponent<PlayerTDController>(out player))
+        {
+            OnPlayerInsideTrigger?.Invoke(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        PlayerTDController player = null;
+
+        if (other.TryGetComponent<PlayerTDController>(out player))
+        {
+            OnPlayerInsideTrigger?.Invoke(false);
+        }
     }
 }
