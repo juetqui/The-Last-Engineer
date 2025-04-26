@@ -42,6 +42,16 @@ public class Laser : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, _maxDist, 1))
             {
+                
+                Materializer materializer = null;
+                
+                if (hit.transform.TryGetComponent<Materializer>(out materializer) && materializer.IsTrigger())
+                {
+                    position = hit.point + direction * 0.1f;
+                    _lineRenderer.SetPosition(i + 1, hit.point);
+                    continue;
+                }
+
                 if (hit.transform.GetComponent<PlayerTDController>() != null)
                 {
                     _playerDetected = true;

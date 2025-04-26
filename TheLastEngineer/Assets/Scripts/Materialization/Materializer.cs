@@ -40,6 +40,11 @@ public class Materializer : MonoBehaviour, IMaterializable
         _renderer.material = _currentMat;
     }
 
+    public bool IsTrigger()
+    {
+        return _collider.isTrigger;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         PlayerTDController player = null;
