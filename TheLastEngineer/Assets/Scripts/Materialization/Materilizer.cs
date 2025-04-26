@@ -22,11 +22,7 @@ public class Materilizer : MonoBehaviour, IMaterializable
 
         if (!materialize)
         {
-            if (_newMat == null)
-            {
-                _newMat = material;
-            }
-
+            _newMat = material;
             _currentMat = _newMat;
         }
         else
