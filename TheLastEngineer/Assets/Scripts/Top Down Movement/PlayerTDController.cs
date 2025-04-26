@@ -27,6 +27,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private float _currentSpeed = default;
     private Vector3 _movement = default;
     private NodeType _currentNodeType = NodeType.None;
+    private bool _dropAvailable = true;
+
+    public bool DropAvailable { get => _dropAvailable; }
 
     #region -----STATES VARIABLES-----
     private IPlayerState _currentState = default;
@@ -58,6 +61,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();
+
+        Materializer.OnPlayerInsideTrigger += CheckDropAvailable;
     }
 
     private void Start()
@@ -245,6 +250,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         return false;
     }
 
+    public void CheckDropAvailable(bool available)
+    {
+        _dropAvailable = !available;
+    }
+
     public void ResetLevel()
     {
         TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
@@ -253,7 +263,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     #region -----TRIGGERS MANAGEMENT-----
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent<IInteractable>(out var interactable))
+        if (coll.TryGetComponent(out IInteractable interactable))
             _interactables.Add(interactable);
 
         else if (coll.CompareTag("Void")) ResetLevel();
@@ -261,7 +271,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent<IInteractable>(out var interactable))
+        if (coll.TryGetComponent(out IInteractable interactable))
             _interactables.Remove(interactable);
     }
     #endregion

@@ -10,6 +10,8 @@ public class PlayerGrabState : IPlayerState
 
     public void HandleInteraction(IInteractable interactable)
     {
+        if (!_playerController.DropAvailable) return;
+
         if (interactable != null && interactable.CanInteract(_playerController))
         {
             bool succededInteraction = default;
