@@ -47,9 +47,7 @@ public class Materializer : MonoBehaviour, IMaterializable
 
     private void OnTriggerEnter(Collider other)
     {
-        PlayerTDController player = null;
-
-        if (other.TryGetComponent<PlayerTDController>(out player))
+        if (other.TryGetComponent(out PlayerTDController player))
         {
             OnPlayerInsideTrigger?.Invoke(true);
         }
@@ -57,9 +55,7 @@ public class Materializer : MonoBehaviour, IMaterializable
 
     private void OnTriggerExit(Collider other)
     {
-        PlayerTDController player = null;
-
-        if (other.TryGetComponent<PlayerTDController>(out player))
+        if (other.TryGetComponent(out PlayerTDController player))
         {
             OnPlayerInsideTrigger?.Invoke(false);
         }

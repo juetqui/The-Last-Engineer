@@ -91,7 +91,7 @@ public class PlatformController : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent<IMovablePassenger>(out IMovablePassenger passenger))
+        if (coll.TryGetComponent(out IMovablePassenger passenger))
         {
             _passenger = passenger;
         }
@@ -99,7 +99,7 @@ public class PlatformController : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent<IMovablePassenger>(out IMovablePassenger passenger) && _passenger == passenger)
+        if (coll.TryGetComponent(out IMovablePassenger passenger) && _passenger == passenger)
         {
             if (_passenger != null)
             {

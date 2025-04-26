@@ -263,7 +263,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     #region -----TRIGGERS MANAGEMENT-----
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent<IInteractable>(out var interactable))
+        if (coll.TryGetComponent(out IInteractable interactable))
             _interactables.Add(interactable);
 
         else if (coll.CompareTag("Void")) ResetLevel();
@@ -271,7 +271,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent<IInteractable>(out var interactable))
+        if (coll.TryGetComponent(out IInteractable interactable))
             _interactables.Remove(interactable);
     }
     #endregion
