@@ -7,9 +7,10 @@ public class NodeController : MonoBehaviour, IInteractable
     [SerializeField] private Material _material;
     [SerializeField] private Collider _collider;
     
-    [Header("Emissive (For Player's Dash Hability Only)")]
-    [SerializeField] private PlayerTDController _player;
+    [Header("For Player's Dash hability only<br>(if node is of <color=#14a3c7>BLUE</color> type set bool TRUE)")]
+    [SerializeField] private bool _isDashNode = false;
     [SerializeField] private float _emissionIntensity = 4f;
+    private PlayerTDController _player = null;
 
 
     [Header("Outline")]
@@ -44,6 +45,8 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        if (_isDashNode) _player = PlayerTDController.Instance;
+
         _nodeView.OnStart();
     }
 
@@ -139,6 +142,6 @@ public class NodeController : MonoBehaviour, IInteractable
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position, -transform.up * 2f);
+        Gizmos.DrawRay(transform.position, -transform.up * 5f);
     }
 }

@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class MaterializeController : MonoBehaviour
 {
-    [SerializeField] private PlayerTDController _player;
     [SerializeField] private Material _material;
 
-    public static MaterializeController Instance;
-    public Action<bool, Material> OnMaterialize;
+    public static MaterializeController Instance = null;
+    private PlayerTDController _player = null;
+    
+    public Action<bool> OnMaterialize;
 
     private void Awake()
     {
@@ -16,12 +17,17 @@ public class MaterializeController : MonoBehaviour
             Instance = this;
         }
 
+        OnMaterialize?.Invoke(false);
+    }
+
+    private void Start()
+    {
+        _player = PlayerTDController.Instance;
         _player.OnNodeGrabed += Materialize;
-        OnMaterialize?.Invoke(false, _material);
     }
 
     private void Materialize(bool materialize)
     {
-        OnMaterialize?.Invoke(materialize, _material);
+        OnMaterialize?.Invoke(materialize);
     }
 }

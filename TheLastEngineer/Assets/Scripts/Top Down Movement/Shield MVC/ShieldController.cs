@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class ShieldController : MonoBehaviour
 {
-    [SerializeField] private PlayerTDController _player;
     [SerializeField] private float _shieldCD = default;
     [SerializeField] private AudioClip _chargedFX;
 
+    PlayerTDController _player = null;
     private Transform _parent = default;
     private Renderer _renderer = default;
     private SphereCollider _collider = default;
@@ -23,7 +23,6 @@ public class ShieldController : MonoBehaviour
         _renderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<SphereCollider>();
         _audioSource = GetComponent<AudioSource>();
-        _player.OnChangeActiveShield += ActivateShield;
         
         //_shieldModel = new ShieldModel();
         _shieldView = new ShieldView(_renderer, _collider, _audioSource, _chargedFX);
@@ -33,6 +32,9 @@ public class ShieldController : MonoBehaviour
     {
         _renderer.enabled = false;
         _collider.enabled = false;
+        
+        _player = PlayerTDController.Instance;
+        _player.OnChangeActiveShield += ActivateShield;
     }
 
     public void ActivateShield()

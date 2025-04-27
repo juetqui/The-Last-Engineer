@@ -17,6 +17,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     [SerializeField] private AudioSource _walkSource;
     [SerializeField] private AudioSource _fxSource;
 
+    public static PlayerTDController Instance = null;
+
     private CharacterController _cc = default;
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
@@ -58,6 +60,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();

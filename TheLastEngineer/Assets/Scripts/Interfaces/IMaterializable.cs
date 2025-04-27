@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IMaterializable
 {
-    void Materialize(bool materialize, Material material);
+    void Materialize(bool materialize);
 }

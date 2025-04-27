@@ -24,7 +24,7 @@ public class LevelChanger : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        PlayerTDController player = coll.GetComponent<PlayerTDController>();
+        PlayerTDController player = PlayerTDController.Instance;
         AstronautController menuPlayer = coll.GetComponent<AstronautController>();
 
         if (menuPlayer != null && _isMenu) SwitchScene();
