@@ -16,9 +16,9 @@ public class PlayerEmptyState : IPlayerState
 
     public void HandleInteraction(IInteractable interactable)
     {
-        if (interactable == null) return;
+        if (interactable == null || _playerController.CheckForWalls()) return;
 
-        if (interactable is NodeController node && _interactionCoroutine == null && !_playerController.CheckForWalls(node))
+        if (interactable is NodeController node && _interactionCoroutine == null)
         {
             _interactionCoroutine = _playerController.StartCoroutine(StartInteraction(node));
         }

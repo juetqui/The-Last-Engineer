@@ -7,6 +7,7 @@ public class PlayerData : ScriptableObject
     public float moveSpeed = default;
     public float upgradedMoveSpeed = default;
     public float rotSpeed = default;
+    public float fovAngle = default;
     public LayerMask wallMask = default;
 
     [Header("Dash")]

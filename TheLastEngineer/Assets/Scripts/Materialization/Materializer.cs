@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Materializer : MonoBehaviour, IMaterializable
 {
-    [Header("<color=#FF00FF>UNCHEK TO START OBJECT UN-MATERIALIZED</color>")]
+    [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
     [SerializeField] private Color _outlineColor;
 

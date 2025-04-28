@@ -52,6 +52,8 @@ public class NodeModel
 
     public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
     {
+        _initialGlobalPosition = newPos;
+
         if (newParent != null)
         {
             _transform.SetParent(newParent, false);
@@ -66,12 +68,12 @@ public class NodeModel
             if (CheckForRoom(out newParent))
             {
                 _transform.SetParent(newParent);
-                _transform.position = newPos;
+                _transform.localPosition = newPos;
             }
             else
             {
                 _transform.SetParent(null);
-                _transform.localPosition = newPos;
+                _transform.position = newPos;
             }
         }
 

@@ -189,7 +189,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private IInteractable GetClosestInteractable()
     {
         return _interactables
-            .Where(i => i.CanInteract(this))
+            .Where(i => i.CanInteract(this) && IsInFOV(i.Transform))
             .OrderByDescending(i => i.Priority)
             .ThenBy(i => Vector3.Distance(transform.position, i.Transform.position))
             .FirstOrDefault();
@@ -229,7 +229,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         if (_node == null) return;
 
-        _node.Attach(transform.position);
+        _node.Attach(_node.transform.position);
         ResetNode();
     }
 
@@ -249,12 +249,32 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     }
     #endregion
 
+    public bool CheckForWalls()
+    {
+        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z);
+
+        if (Physics.Raycast(rayPos, transform.forward, 3f, _playerData.wallMask))
+            return true;
+
+        return false;
+    }
+
     public bool CheckForWalls(NodeController node)
     {
         if (Physics.Raycast(transform.position, node.transform.position, 7f, _playerData.wallMask))
             return true;
         
         return false;
+    }
+
+    public bool IsInFOV(Transform interactable)
+    {
+        Vector3 playerPos = new Vector3(transform.position.x - 1f, transform.position.y + 2f, transform.position.z) - transform.forward * 0.5f;
+
+        Vector3 dir = (interactable.position - playerPos).normalized;
+        float angle = Vector3.Angle(transform.forward, dir);
+        
+        return angle <= _playerData.fovAngle * 0.5f;
     }
 
     public void CheckDropAvailable(bool available)
@@ -282,4 +302,23 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             _interactables.Remove(interactable);
     }
     #endregion
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+
+        Vector3 playerPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z) - transform.forward * 0.5f;
+
+        Gizmos.DrawRay(playerPos, transform.forward * 3f);
+        
+        Gizmos.color = Color.yellow;
+        
+        float halfFOV = _playerData.fovAngle * 0.5f;
+
+        Vector3 leftBoundary = Quaternion.Euler(0, -halfFOV, 0) * transform.forward * 5f;
+        Vector3 rightBoundary = Quaternion.Euler(0, halfFOV, 0) * transform.forward * 5f;
+        
+        Gizmos.DrawRay(playerPos, leftBoundary);
+        Gizmos.DrawRay(playerPos, rightBoundary);
+    }
 }
