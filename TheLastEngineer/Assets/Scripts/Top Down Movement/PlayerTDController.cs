@@ -18,6 +18,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     [SerializeField] private AudioSource _fxSource;
 
     public static PlayerTDController Instance = null;
+    [SerializeField] private NodeEffectController _nodeEffectController;
 
     private CharacterController _cc = default;
     private PlayerTDModel _playerModel = default;
@@ -52,7 +53,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public bool HasNode() => _node != null;
     private bool CheckShieldAvialable() => _currentNodeType == NodeType.Green;
-    private bool CheckDashAvialable() => _currentNodeType == NodeType.Blue || _currentNodeType == NodeType.Dash;
+    private bool CheckDashAvialable() => _playerModel.CanDash;
     private bool UpgradedSpeedAvailable() => _currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash;
     public NodeController GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
@@ -159,7 +160,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (CheckDashAvialable() && _playerModel.CanDash)
+        if (_playerModel.CanDash)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
@@ -215,9 +216,14 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
         _node = node;
         _currentNodeType = _node.NodeType;
+
+        MoveNodeObjectsWorld(_currentNodeType);
+
         _playerView.GrabNode(true, _node.OutlineColor);
         RemoveInteractable(node);
     }
+
+
 
     public void ReleaseNode(IInteractable interactable)
     {
@@ -243,6 +249,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void ResetNode()
     {
+        if (_node != null) _nodeEffectController?.OnNodeDeactivated(_currentNodeType);
         _node = null;
         _currentNodeType = NodeType.None;
         _playerView.GrabNode();
@@ -303,22 +310,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     }
     #endregion
 
-    private void OnDrawGizmosSelected()
+    private void MoveNodeObjectsWorld(NodeType currentNodeType)
     {
-        Gizmos.color = Color.red;
-
-        Vector3 playerPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z) - transform.forward * 0.5f;
-
-        Gizmos.DrawRay(playerPos, transform.forward * 3f);
-        
-        Gizmos.color = Color.yellow;
-        
-        float halfFOV = _playerData.fovAngle * 0.5f;
-
-        Vector3 leftBoundary = Quaternion.Euler(0, -halfFOV, 0) * transform.forward * 5f;
-        Vector3 rightBoundary = Quaternion.Euler(0, halfFOV, 0) * transform.forward * 5f;
-        
-        Gizmos.DrawRay(playerPos, leftBoundary);
-        Gizmos.DrawRay(playerPos, rightBoundary);
+        _nodeEffectController?.OnNodeActivated(currentNodeType);
     }
 }

@@ -72,14 +72,14 @@ public class PlayerTDModel
         _isDashing = true;
         _canDash = false;
 
-        float dashSpeed = currentNode == NodeType.Blue ? _dashSpeed : _dashSpeed * 1.5f;
+        float dashSpeed = _dashSpeed; // Ya no importa el tipo de Node
 
         while (Time.time < dashTimer + _dashDuration)
         {
             _cc.Move(dashDir.normalized * dashSpeed * Time.deltaTime);
             yield return null;
         }
-        
+
         _isDashing = false;
     }
 
