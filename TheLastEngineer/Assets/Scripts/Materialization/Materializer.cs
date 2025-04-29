@@ -1,6 +1,6 @@
 using System;
-using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Materializer : MonoBehaviour, IMaterializable
 {
@@ -51,11 +51,13 @@ public class Materializer : MonoBehaviour, IMaterializable
 
         if (!materialize)
         {
+            _renderer.shadowCastingMode = ShadowCastingMode.Off;
             _currentMat = _disabledMat;
             SetOutline(false);
         }
         else
         {
+            _renderer.shadowCastingMode = ShadowCastingMode.On;
             _currentMat = _enabledMat;
             SetOutline(true);
         }
