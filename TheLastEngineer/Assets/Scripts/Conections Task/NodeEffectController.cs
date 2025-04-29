@@ -3,54 +3,59 @@ using UnityEngine;
 
 public class NodeEffectController : MonoBehaviour
 {
-    public List<Transform> objectsToMove;
-    public List<Transform> newPositions;
+    [SerializeField] private NodeType _requiredType;
+    [SerializeField] private List<Transform> _objectsToMove;
+    [SerializeField] private List<Transform> _newPositions;
 
-    private List<Vector3> originalPositions = new List<Vector3>();
-    private List<Quaternion> originalRotations = new List<Quaternion>();
+    private List<Vector3> _originalPositions = new List<Vector3>();
+    private List<Quaternion> _originalRotations = new List<Quaternion>();
 
     private void Start()
     {
-        originalPositions.Clear();
-        originalRotations.Clear();
+        PlayerTDController.Instance.OnNodeGrabed += ToggleObjects;
 
-        foreach (var obj in objectsToMove)
+        _originalPositions.Clear();
+        _originalRotations.Clear();
+
+        foreach (var obj in _objectsToMove)
         {
-            originalPositions.Add(obj.position);
-            originalRotations.Add(obj.rotation);
+            _originalPositions.Add(obj.position);
+            _originalRotations.Add(obj.rotation);
         }
     }
 
-    public void OnNodeActivated(NodeType nodeType)
+    private void ToggleObjects(bool toggle, NodeType nodeType)
     {
-        if (nodeType == NodeType.Green)
-            MoveObjects();
-    }
+        if (nodeType != _requiredType) return;
 
-    public void OnNodeDeactivated(NodeType nodeType)
-    {
-        if (nodeType == NodeType.Green)
+        if (toggle)
+        {
+            MoveObjects();
+        }
+        else
+        {
             ResetObjects();
+        }
     }
 
     private void MoveObjects()
     {
-        for (int i = 0; i < objectsToMove.Count; i++)
+        for (int i = 0; i < _objectsToMove.Count; i++)
         {
-            if (i < newPositions.Count && newPositions[i] != null)
+            if (i < _newPositions.Count && _newPositions[i] != null)
             {
-                objectsToMove[i].position = newPositions[i].position;
-                objectsToMove[i].rotation = newPositions[i].rotation;
+                _objectsToMove[i].position = _newPositions[i].position;
+                _objectsToMove[i].rotation = _newPositions[i].rotation;
             }
         }
     }
 
     private void ResetObjects()
     {
-        for (int i = 0; i < objectsToMove.Count; i++)
+        for (int i = 0; i < _objectsToMove.Count; i++)
         {
-            objectsToMove[i].position = originalPositions[i];
-            objectsToMove[i].rotation = originalRotations[i];
+            _objectsToMove[i].position = _originalPositions[i];
+            _objectsToMove[i].rotation = _originalRotations[i];
         }
     }
 }

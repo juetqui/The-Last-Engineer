@@ -1,16 +1,14 @@
 using UnityEngine;
 
-public class NodeController : MonoBehaviour, IInteractable
+public abstract class NodeController : MonoBehaviour, IInteractable
 {
     [Header("View")]
     [SerializeField] private Renderer _renderer;
     [SerializeField] private Material _material;
     [SerializeField] private Collider _collider;
     
-    [Header("For Player's Dash hability only<br>(if node is of <color=#14a3c7>BLUE</color> type set bool TRUE)")]
-    [SerializeField] private bool _isDashNode = false;
-    [SerializeField] private float _emissionIntensity = 4f;
-    private PlayerTDController _player = null;
+    [Header("For Player's Dash hability only<br>(if this script is <color=#14a3c7>MaterializerNode</color> set value greater than 0)")]
+    [SerializeField] protected float _emissionIntensity = 4f;
 
 
     [Header("Outline")]
@@ -18,7 +16,7 @@ public class NodeController : MonoBehaviour, IInteractable
     [SerializeField] private Color _outlineColor;
 
     [Header("Model")]
-    [SerializeField] private NodeType _nodeType;
+    [SerializeField] protected NodeType _nodeType;
     [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
     [SerializeField] private bool _isChildren = false;
 
@@ -37,20 +35,18 @@ public class NodeController : MonoBehaviour, IInteractable
     public bool IsChildren { get { return _isChildren; } }
     public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } }
 
-    private void Awake()
+    protected void OnAwake()
     {
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
         _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _emissionIntensity);
     }
 
-    private void Start()
+    protected void OnStart()
     {
-        if (_isDashNode) _player = PlayerTDController.Instance;
-
         _nodeView.OnStart();
     }
 
-    private void Update()
+    protected void OnUpdate()
     {
         if (!_isChildren) MoveObject();
     }
@@ -60,7 +56,7 @@ public class NodeController : MonoBehaviour, IInteractable
         return !player.HasNode();
     }
 
-    public void Interact(PlayerTDController player, out bool succededInteraction)
+    public virtual void Interact(PlayerTDController player, out bool succededInteraction)
     {
         if (CanInteract(player))
         {
@@ -79,13 +75,9 @@ public class NodeController : MonoBehaviour, IInteractable
         _nodeModel.MoveObject();
     }
 
-    private void Attach(PlayerTDController player, Vector3 newPos)
+    protected virtual void Attach(PlayerTDController player, Vector3 newPos)
     {
-        if (_player != null && _nodeType == NodeType.Blue) _player.OnDash += UseHability;
-
         Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
-        
-        if (_nodeType == NodeType.Dash) newScale = Vector3.one;
         
         Attach(newPos, player.transform, newScale, true);
 
@@ -96,15 +88,10 @@ public class NodeController : MonoBehaviour, IInteractable
         }
     }
 
-    public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
+    public virtual void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
     {
         if (parentIsPlayer) _nodeView.EnableColl(false);
-        else
-        {
-            if (_player != null && _nodeType == NodeType.Blue) _player.OnDash -= UseHability;
-
-            _nodeView.EnableColl(true);
-        }
+        else _nodeView.EnableColl(true);
 
         if (!parentIsPlayer && newParent != null)
         {
@@ -126,12 +113,6 @@ public class NodeController : MonoBehaviour, IInteractable
         {
             _nodeModel.SetPos(newPos, NodeType);
         }
-    }
-
-    public bool Combine(float deltaTime)
-    {
-        _nodeView.EnableColl(false);
-        return _nodeModel.Combine(deltaTime);
     }
 
     public void UseHability(float dashDuration, float dashCD)

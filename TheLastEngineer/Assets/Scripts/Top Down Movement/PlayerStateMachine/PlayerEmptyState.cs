@@ -11,7 +11,6 @@ public class PlayerEmptyState : IPlayerState
     public void Enter(PlayerTDController playerController)
     {
         _playerController = playerController;
-        _playerController.CheckCurrentNode();
     }
 
     public void HandleInteraction(IInteractable interactable)
@@ -31,7 +30,6 @@ public class PlayerEmptyState : IPlayerState
 
     public void Exit()
     {
-        _playerController.OnNodeGrabed?.Invoke(false);
         _playerController = null;
     }
 

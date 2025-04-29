@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 150517889913984463}
   - component: {fileID: 6780995477048435280}
   - component: {fileID: 8310705788573480185}
-  - component: {fileID: 4969373364633213442}
   - component: {fileID: -481702011397498186}
   m_Layer: 0
   m_Name: Dash-Node
@@ -111,31 +110,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 2, z: 4}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4969373364633213442
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386148299800845151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 413c4f80959ee05468123921591842fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _renderer: {fileID: 6780995477048435280}
-  _material: {fileID: 2100000, guid: 9b3dce333a0d97f4e9702996e311b0fb, type: 2}
-  _collider: {fileID: 8310705788573480185}
-  _isDashNode: 0
-  _emissionIntensity: 4
-  _outline: {fileID: -481702011397498186}
-  _outlineColor: {r: 0.49019608, g: 0, b: 1, a: 1}
-  _nodeType: 4
-  _rotSpeed: 75
-  _minY: -0.5
-  _maxY: 1
-  _moveSpeed: 2
-  _isChildren: 0
 --- !u!114 &-481702011397498186
 MonoBehaviour:
   m_ObjectHideFlags: 0

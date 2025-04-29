@@ -1,13 +1,10 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class NodeModel
 {
     private Transform _transform = default;
     private float _minY = default, _maxY = default, _moveSpeed = default, _rotSpeed = default, _initialY = default;
-    private Vector3 scaleVector = new Vector3(0.0125f, 0.0125f, 0.0125f);
-    private Quaternion _initialGlobalRotation = default;
-
+    private Vector3 _scaleVector = new Vector3(0.0125f, 0.0125f, 0.0125f);
     private Vector3 _initialGlobalPosition;
 
     public NodeModel(Transform transform, float minY, float maxY, float moveSpeed, float rotSpeed)
@@ -19,26 +16,8 @@ public class NodeModel
         _moveSpeed = moveSpeed;
         _rotSpeed = rotSpeed;
         
-        _initialGlobalRotation = transform.rotation;
         _initialGlobalPosition = transform.position;
     }
-
-    //public void MoveObject()
-    //{
-    //    if (CheckForRoom(out Transform roomParent))
-    //    {
-    //        Quaternion parentRotation = roomParent.rotation;
-    //        _transform.rotation = _initialGlobalRotation;
-    //    }
-
-    //    Vector3 currentPosition = _transform.localPosition;
-
-    //    float offset = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
-    //    float newY = _initialY + offset;
-
-    //    _transform.localPosition = new Vector3(currentPosition.x, newY, currentPosition.z);
-    //    _transform.Rotate(0, _rotSpeed * Time.deltaTime, 0);
-    //}
 
     public void MoveObject()
     {
@@ -60,41 +39,21 @@ public class NodeModel
             _transform.localPosition = newPos;
             _transform.rotation = Quaternion.LookRotation(newParent.forward);
         }
+        else if (CheckForRoom(out newParent))
+        {
+            _transform.SetParent(newParent);
+            _transform.localPosition = newPos;
+        }
         else
         {
-            if (nodeType == NodeType.Dash)
-                newScale = Vector3.one * 2;
-
-            if (CheckForRoom(out newParent))
-            {
-                _transform.SetParent(newParent);
-                _transform.localPosition = newPos;
-            }
-            else
-            {
-                _transform.SetParent(null);
-                _transform.position = newPos;
-            }
+            _transform.SetParent(null);
+            _transform.position = newPos;
         }
 
         _initialY = _transform.position.y;
 
         if (newScale != default) _transform.localScale = newScale;
         else _transform.localScale = Vector3.one;
-    }
-
-    public bool Combine(float deltaTime)
-    {
-        bool result = false;
-
-        if (_transform.localScale.magnitude > scaleVector.magnitude)
-        {
-            _transform.localScale += -(Vector3.one * 2f * deltaTime);
-            result = false;
-        }
-        else result = true;
-
-        return result;
     }
 
     public bool CheckForRoom(out Transform newParent)

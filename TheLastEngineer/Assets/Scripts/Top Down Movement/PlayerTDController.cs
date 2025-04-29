@@ -44,8 +44,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     #endregion
 
     public Action<float, float> OnDash;
-    public Action OnChangeActiveShield;
-    public Action<bool> OnNodeGrabed;
+    public Action<NodeController> OnChangeActiveShield;
+    public Action<bool, NodeType> OnNodeGrabed;
 
     [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
 
@@ -54,7 +54,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     public bool HasNode() => _node != null;
     private bool CheckShieldAvialable() => _currentNodeType == NodeType.Green;
     private bool CheckDashAvialable() => _playerModel.CanDash;
-    private bool UpgradedSpeedAvailable() => _currentNodeType == NodeType.Purple || _currentNodeType == NodeType.Dash;
     public NodeController GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
     #endregion
@@ -152,8 +151,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private void GetShieldKey(InputAction.CallbackContext context)
     {
         if (CheckShieldAvialable())
-            OnChangeActiveShield?.Invoke();
-            //onShieldActive?.Invoke(true);
+            OnChangeActiveShield?.Invoke(_node);
         else
             _playerView.PlayErrorSound(_playerData.emptyHand);
     }
@@ -210,20 +208,20 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     }
 
     #region -----NODE MANAGEMENT-----
+    public void DropOrGrabNode(bool grabbed)
+    {
+        OnNodeGrabed?.Invoke(grabbed, _node.NodeType);
+    }
+
     public void PickUpNode(NodeController node)
     {
         if (_node != null || node == null) return;
 
         _node = node;
         _currentNodeType = _node.NodeType;
-
-        MoveNodeObjectsWorld(_currentNodeType);
-
         _playerView.GrabNode(true, _node.OutlineColor);
         RemoveInteractable(node);
     }
-
-
 
     public void ReleaseNode(IInteractable interactable)
     {
@@ -239,17 +237,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         ResetNode();
     }
 
-    public void CheckCurrentNode()
-    {
-        if (UpgradedSpeedAvailable())
-            _currentSpeed = _playerData.upgradedMoveSpeed;
-        else
-            _currentSpeed = _playerData.moveSpeed;
-    }
-
     private void ResetNode()
     {
-        if (_node != null) _nodeEffectController?.OnNodeDeactivated(_currentNodeType);
         _node = null;
         _currentNodeType = NodeType.None;
         _playerView.GrabNode();
@@ -276,7 +265,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     public bool IsInFOV(Transform interactable)
     {
-        Vector3 playerPos = new Vector3(transform.position.x - 1f, transform.position.y + 2f, transform.position.z) - transform.forward * 0.5f;
+        Vector3 playerPos = new Vector3(transform.position.x - 1f, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f); 
 
         Vector3 dir = (interactable.position - playerPos).normalized;
         float angle = Vector3.Angle(transform.forward, dir);
@@ -310,8 +299,19 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     }
     #endregion
 
-    private void MoveNodeObjectsWorld(NodeType currentNodeType)
+    private void OnDrawGizmosSelected()
     {
-        _nodeEffectController?.OnNodeActivated(currentNodeType);
+        Gizmos.color = Color.red;
+
+        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f);
+        Gizmos.DrawRay(rayPos, transform.forward * 3f);
+
+        // Dibujar el cono de FOV
+        Gizmos.color = Color.yellow;
+        float halfFOV = _playerData.fovAngle * 0.5f;
+        Vector3 leftBoundary = Quaternion.Euler(0, -halfFOV, 0) * transform.forward * 5f;
+        Vector3 rightBoundary = Quaternion.Euler(0, halfFOV, 0) * transform.forward * 5f;
+        Gizmos.DrawRay(rayPos, leftBoundary);
+        Gizmos.DrawRay(rayPos, rightBoundary);
     }
 }

@@ -71,7 +71,7 @@ public class PlatformController : MonoBehaviour
 
     public void AvailableToMove(NodeType node, bool isActive)
     {
-        if (node == _requiredNode && isActive || node == NodeType.Dash && isActive)
+        if (node == _requiredNode && isActive)
         {
             _canMove = true;
         }

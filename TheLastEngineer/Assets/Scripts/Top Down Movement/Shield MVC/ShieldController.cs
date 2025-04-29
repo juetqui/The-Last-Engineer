@@ -7,22 +7,22 @@ public class ShieldController : MonoBehaviour
     [SerializeField] private AudioClip _chargedFX;
 
     PlayerTDController _player = null;
-    private Transform _parent = default;
     private Renderer _renderer = default;
     private SphereCollider _collider = default;
     private AudioSource _audioSource = default;
 
     private bool _isActive = false, _canUse = true;
 
+    private TransporterNode _transporterNode = null;
     //private ShieldModel _shieldModel = default;
     private ShieldView _shieldView = default;
 
     private void Awake()
     {
-        _parent = GetComponentInParent<Transform>();
         _renderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<SphereCollider>();
         _audioSource = GetComponent<AudioSource>();
+        _transporterNode = GetComponentInParent<TransporterNode>();
         
         //_shieldModel = new ShieldModel();
         _shieldView = new ShieldView(_renderer, _collider, _audioSource, _chargedFX);
@@ -37,19 +37,25 @@ public class ShieldController : MonoBehaviour
         _player.OnChangeActiveShield += ActivateShield;
     }
 
-    public void ActivateShield()
+    public void ActivateShield(NodeController node)
     {
-        _isActive = !_isActive;
-
-        if (_isActive && _canUse)
-        {
-            _shieldView.SetActive(true);
-        }
+        if (node != _transporterNode) return;
+        
         else
         {
-            _shieldView.SetActive(false);
-            StartCoroutine(ShieldCD());
+            _isActive = !_isActive;
+
+            if (_isActive && _canUse)
+            {
+                _shieldView.SetActive(true);
+            }
+            else
+            {
+                _shieldView.SetActive(false);
+                StartCoroutine(ShieldCD());
+            }
         }
+
     }
 
     private IEnumerator ShieldCD()

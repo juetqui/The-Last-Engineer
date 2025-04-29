@@ -5,7 +5,7 @@ public class PlayerGrabState : IPlayerState
     public void Enter(PlayerTDController playerController)
     {
         _playerController = playerController;
-        _playerController.CheckCurrentNode();
+        _playerController.DropOrGrabNode(true);
     }
 
     public void HandleInteraction(IInteractable interactable)
@@ -19,6 +19,7 @@ public class PlayerGrabState : IPlayerState
 
             if (succededInteraction)
             {
+                _playerController.DropOrGrabNode(false);
                 _playerController.ReleaseNode(interactable);
                 _playerController.SetState(_playerController.EmptyState);
                 InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
@@ -26,6 +27,7 @@ public class PlayerGrabState : IPlayerState
         }
         else
         {
+            _playerController.DropOrGrabNode(false);
             _playerController.DropNode();
             _playerController.SetState(_playerController.EmptyState);
         }
@@ -33,7 +35,6 @@ public class PlayerGrabState : IPlayerState
 
     public void Exit()
     {
-        _playerController.OnNodeGrabed?.Invoke(true);
         _playerController = null;
     }
 }
