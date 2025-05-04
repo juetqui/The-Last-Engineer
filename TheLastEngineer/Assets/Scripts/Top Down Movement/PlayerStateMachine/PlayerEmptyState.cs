@@ -17,9 +17,9 @@ public class PlayerEmptyState : IPlayerState
     {
         if (interactable == null || _playerController.CheckForWalls()) return;
 
-        if (interactable is NodeController node && _interactionCoroutine == null)
+        if (interactable.RequiresHoldInteraction && _interactionCoroutine == null)
         {
-            _interactionCoroutine = _playerController.StartCoroutine(StartInteraction(node));
+            _interactionCoroutine = _playerController.StartCoroutine(StartInteraction(interactable));
         }
         else
         {
@@ -33,7 +33,7 @@ public class PlayerEmptyState : IPlayerState
         _playerController = null;
     }
 
-    public IEnumerator StartInteraction(NodeController node)
+    public IEnumerator StartInteraction(IInteractable interactable)
     {
         _interactionTimer = 0f;
 
@@ -44,9 +44,9 @@ public class PlayerEmptyState : IPlayerState
         }
 
         bool succededInteraction = default;
-        node.Interact(_playerController, out succededInteraction);
+        interactable.Interact(_playerController, out succededInteraction);
         
-        if (succededInteraction)
+        if (succededInteraction && interactable is NodeController node)
         {
             _playerController.PickUpNode(node);
             _playerController.SetState(_playerController.GrabState);

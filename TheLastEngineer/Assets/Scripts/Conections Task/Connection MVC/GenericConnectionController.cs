@@ -5,9 +5,6 @@ using UnityEngine;
 public class GenericConnectionController : Connection<GenericTM>
 {
     private List<GenericTM> _secTaskManagers = new List<GenericTM>();
-    
-    private NodeController _recievedNode = default;
-
     public Action<NodeType, bool> OnNodeConnected;
 
     public override void SetSecTM(GenericTM secTM)

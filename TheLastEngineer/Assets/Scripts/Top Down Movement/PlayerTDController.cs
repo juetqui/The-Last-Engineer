@@ -18,7 +18,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     [SerializeField] private AudioSource _fxSource;
 
     public static PlayerTDController Instance = null;
-    [SerializeField] private NodeEffectController _nodeEffectController;
 
     private CharacterController _cc = default;
     private PlayerTDModel _playerModel = default;
@@ -158,7 +157,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (_playerModel.CanDash)
+        if (_playerModel.CanDash && GetMovement() != Vector3.zero)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
@@ -166,8 +165,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
         }
-        else
-            _playerView.PlayErrorSound(_playerData.emptyHand);
+        //else
+        //    _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 
     private void GetInteractionKey(InputAction.CallbackContext context)
@@ -223,10 +222,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         RemoveInteractable(node);
     }
 
-    public void ReleaseNode(IInteractable interactable)
+    public void ReleaseNode()
     {
         ResetNode();
-        RemoveInteractable(interactable);
     }
 
     public void DropNode()

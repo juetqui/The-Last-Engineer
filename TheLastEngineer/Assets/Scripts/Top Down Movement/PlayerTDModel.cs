@@ -49,6 +49,7 @@ public class PlayerTDModel
             else
                 _velocity.y -= _gravity * -5f * Time.deltaTime;
         }
+        else return;
 
         Vector3 totalMovement = (moveDir.normalized * _moveSpeed * Time.deltaTime) + _platformDisplacement;
         _cc.Move(totalMovement);

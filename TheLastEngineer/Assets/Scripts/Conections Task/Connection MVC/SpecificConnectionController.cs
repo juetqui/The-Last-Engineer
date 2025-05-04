@@ -23,7 +23,6 @@ public class SpecificConnectionController : Connection<SecondaryTM>
 
     private List<SecondaryTM> _secTaskManagers = new List<SecondaryTM>();
     private SpecificConnectionView _connectionView = default;
-    private NodeController _recievedNode = default;
 
     private bool _isDisabled = false, _isWorking = false;
 

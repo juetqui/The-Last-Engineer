@@ -22,6 +22,7 @@ public abstract class NodeController : MonoBehaviour, IInteractable
 
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Transform Transform => transform;
+    public bool RequiresHoldInteraction => true;
 
     private NodeView _nodeView = default;
     private NodeModel _nodeModel = default;
