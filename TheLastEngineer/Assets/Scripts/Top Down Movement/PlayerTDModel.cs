@@ -39,7 +39,7 @@ public class PlayerTDModel
 
     private void MovePlayer(Vector3 moveDir)
     {
-        if (moveDir.magnitude > 0.1f)
+        if (moveDir.magnitude > 0f)
             RotatePlayer(moveDir);
 
         if (!_isDashing)
