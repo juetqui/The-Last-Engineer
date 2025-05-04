@@ -29,7 +29,6 @@ public class MaterializeController : MonoBehaviour
     private void Materialize(bool materialize, NodeType nodeType)
     {
         if (nodeType != _requiredType) return;
-
-        OnMaterialize?.Invoke(materialize);
+        OnMaterialize?.Invoke(!materialize);
     }
 }
