@@ -7,8 +7,9 @@ public class Materializer : MonoBehaviour, IMaterializable
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
     [SerializeField] private Color _outlineColor;
-
+    private Rigidbody _myrb = default;
     private Collider _collider = default;
+    private bool _isTrigger;
     private MeshRenderer _renderer = default;
     private Material _enabledMat = default, _disabledMat = default, _currentMat = default;
     private Outline _outline = default;
@@ -19,14 +20,17 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         _collider = GetComponent<Collider>();
         _renderer = GetComponent<MeshRenderer>();
-        
+        _isTrigger = _collider.isTrigger;
         _enabledMat = _renderer.material;
         _disabledMat = Resources.Load<Material>("Materials/M_Shield");
 
         _outline = gameObject.AddComponent<Outline>();
         _outline.OutlineColor = _outlineColor;
         _outline.OutlineWidth = 3;
-
+        if(TryGetComponent(out Rigidbody rigidbody))
+        {
+            _myrb = rigidbody;
+        }
         if (!_startsEnabled)
         {
             Materialize(!_startsEnabled);
@@ -53,12 +57,21 @@ public class Materializer : MonoBehaviour, IMaterializable
         {
             _renderer.shadowCastingMode = ShadowCastingMode.Off;
             _currentMat = _disabledMat;
+            if (_myrb)
+            {
+                _myrb.useGravity = false;
+            }
             SetOutline(false);
         }
         else
         {
             _renderer.shadowCastingMode = ShadowCastingMode.On;
             _currentMat = _enabledMat;
+            if (_myrb)
+            {
+                _myrb.useGravity = true;
+
+            }
             SetOutline(true);
         }
 
@@ -86,7 +99,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         if (other.TryGetComponent(out PlayerTDController player))
         {
-            OnPlayerInsideTrigger?.Invoke(true);
+            OnPlayerInsideTrigger?.Invoke(_isTrigger);
         }
     }
 
@@ -94,7 +107,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         if (other.TryGetComponent(out PlayerTDController player))
         {
-            OnPlayerInsideTrigger?.Invoke(false);
+            OnPlayerInsideTrigger?.Invoke(_isTrigger);
         }
     }
 }
