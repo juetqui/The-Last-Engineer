@@ -40,7 +40,7 @@ public class Laser : MonoBehaviour
             Ray ray = new Ray(position, direction);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, _maxDist, 1))
+            if (Physics.Raycast(ray, out hit, _maxDist))
             {
                 if (hit.transform.TryGetComponent(out Materializer materializer) && materializer.IsTrigger())
                 {
