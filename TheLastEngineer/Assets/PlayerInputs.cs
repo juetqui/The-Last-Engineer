@@ -71,6 +71,24 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ModoDetectiveIzq"",
+                    ""type"": ""Button"",
+                    ""id"": ""f787f215-d5af-4b74-9b3c-1249e26ae90e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ModoDetectiveDer"",
+                    ""type"": ""Button"",
+                    ""id"": ""8231da77-b6d4-4e18-b20f-ef0be9e76206"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -269,6 +287,50 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Shield"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ac37abd3-66cf-4684-9d0d-b991124d1064"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ModoDetectiveIzq"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""539eda2d-28c8-446f-97e7-e3f2025ca4eb"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ModoDetectiveIzq"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b6dd4e3b-428c-4d7e-a30a-21a8e11a8308"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""ModoDetectiveDer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""447d4b79-4574-48b3-9d19-7bb01aae5e68"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ModoDetectiveDer"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -861,6 +923,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Shield = m_Player.FindAction("Shield", throwIfNotFound: true);
+        m_Player_ModoDetectiveIzq = m_Player.FindAction("ModoDetectiveIzq", throwIfNotFound: true);
+        m_Player_ModoDetectiveDer = m_Player.FindAction("ModoDetectiveDer", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -939,6 +1003,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Shield;
+    private readonly InputAction m_Player_ModoDetectiveIzq;
+    private readonly InputAction m_Player_ModoDetectiveDer;
     public struct PlayerActions
     {
         private @PlayerInputs m_Wrapper;
@@ -948,6 +1014,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         public InputAction @Dash => m_Wrapper.m_Player_Dash;
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
         public InputAction @Shield => m_Wrapper.m_Player_Shield;
+        public InputAction @ModoDetectiveIzq => m_Wrapper.m_Player_ModoDetectiveIzq;
+        public InputAction @ModoDetectiveDer => m_Wrapper.m_Player_ModoDetectiveDer;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -972,6 +1040,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Shield.started += instance.OnShield;
             @Shield.performed += instance.OnShield;
             @Shield.canceled += instance.OnShield;
+            @ModoDetectiveIzq.started += instance.OnModoDetectiveIzq;
+            @ModoDetectiveIzq.performed += instance.OnModoDetectiveIzq;
+            @ModoDetectiveIzq.canceled += instance.OnModoDetectiveIzq;
+            @ModoDetectiveDer.started += instance.OnModoDetectiveDer;
+            @ModoDetectiveDer.performed += instance.OnModoDetectiveDer;
+            @ModoDetectiveDer.canceled += instance.OnModoDetectiveDer;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -991,6 +1065,12 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @Shield.started -= instance.OnShield;
             @Shield.performed -= instance.OnShield;
             @Shield.canceled -= instance.OnShield;
+            @ModoDetectiveIzq.started -= instance.OnModoDetectiveIzq;
+            @ModoDetectiveIzq.performed -= instance.OnModoDetectiveIzq;
+            @ModoDetectiveIzq.canceled -= instance.OnModoDetectiveIzq;
+            @ModoDetectiveDer.started -= instance.OnModoDetectiveDer;
+            @ModoDetectiveDer.performed -= instance.OnModoDetectiveDer;
+            @ModoDetectiveDer.canceled -= instance.OnModoDetectiveDer;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1178,6 +1258,8 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         void OnDash(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnShield(InputAction.CallbackContext context);
+        void OnModoDetectiveIzq(InputAction.CallbackContext context);
+        void OnModoDetectiveDer(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

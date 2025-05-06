@@ -28,7 +28,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     
     private float _currentSpeed = default;
     private Vector3 _movement = default;
-    private NodeType _currentNodeType = NodeType.None;
+    public NodeType _currentNodeType = NodeType.None;
     private bool _dropAvailable = true;
 
     public bool DropAvailable { get => _dropAvailable; }

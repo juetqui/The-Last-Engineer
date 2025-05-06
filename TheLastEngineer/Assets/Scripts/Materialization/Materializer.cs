@@ -6,6 +6,7 @@ public class Materializer : MonoBehaviour, IMaterializable
 {
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
+    [SerializeField] private bool _currentEnabled = true;
     [SerializeField] private Color _outlineColor;
     private Rigidbody _myrb = default;
     private Collider _collider = default;
@@ -13,9 +14,32 @@ public class Materializer : MonoBehaviour, IMaterializable
     private MeshRenderer _renderer = default;
     private Material _enabledMat = default, _disabledMat = default, _currentMat = default;
     private Outline _outline = default;
-
+    public bool IsAble;//Gabi
+    public bool IsSelected; //Gabi
+    public bool Activated; //Gabi
     public static event Action<bool> OnPlayerInsideTrigger;
+    public Material mySelectedMaterial; // El objeto al que le queremos cambiar el color
+    public Material myAbleMaterial; // El objeto al que le queremos cambiar el color
 
+ 
+    private void Update()
+    {
+        if (IsSelected)
+        {
+            GetComponent<Renderer>().material = mySelectedMaterial;
+
+        }
+        else if (IsAble)
+        {
+            GetComponent<Renderer>().material = myAbleMaterial;
+
+        }
+    }
+    public void ResetSelection()
+    {
+        GetComponent<Renderer>().material = _enabledMat;
+
+    }
     private void Start()
     {
         _collider = GetComponent<Collider>();
@@ -23,7 +47,7 @@ public class Materializer : MonoBehaviour, IMaterializable
         _isTrigger = _collider.isTrigger;
         _enabledMat = _renderer.material;
         _disabledMat = Resources.Load<Material>("Materials/M_Shield");
-
+        _currentEnabled = _startsEnabled;
         _outline = gameObject.AddComponent<Outline>();
         _outline.OutlineColor = _outlineColor;
         _outline.OutlineWidth = 3;
@@ -43,9 +67,33 @@ public class Materializer : MonoBehaviour, IMaterializable
 
         MaterializeController.Instance.OnMaterialize += Materialize;
     }
+    public void ArtificialMaterialize()
+    {
+        if (!Activated)
+        {
+            Activated = true;
+            _startsEnabled = !_currentEnabled;
+            RangeWorldPowers.Instance.WorldChange += DesActivate;
+        }
+        //else
+        //{
+        //    Activated = false;
+        //    _startsEnabled = _currentEnabled;
+        //}
+    }
+    public void DesActivate()
+    {
+        if (Activated)
+        {
+            Activated = false;
+            _startsEnabled = _currentEnabled;
+        }
+        RangeWorldPowers.Instance.WorldChange -= DesActivate;
 
+    }
     public void Materialize(bool materialize)
     {
+        
         if (!_startsEnabled)
         {
             materialize = !materialize;

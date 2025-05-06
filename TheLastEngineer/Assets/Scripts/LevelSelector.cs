@@ -11,19 +11,19 @@ public class LevelSelector : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SceneManager.LoadScene("Lvl 1");
+            SceneManager.LoadScene("Lvl 9");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            SceneManager.LoadScene("Lvl 2");
+            SceneManager.LoadScene("Lvl 10 B");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            SceneManager.LoadScene("Lvl 3");
+            SceneManager.LoadScene("Lvl 11");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            SceneManager.LoadScene("Lvl 4");
+            SceneManager.LoadScene("Lvl 12");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {

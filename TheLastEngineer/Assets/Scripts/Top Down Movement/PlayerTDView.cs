@@ -27,7 +27,7 @@ public class PlayerTDView
 
     public void Walk(Vector3 moveVector)
     {
-        Debug.Log(moveVector.magnitude);
+        //Debug.Log(moveVector.magnitude);
 
         if (moveVector.magnitude > 0f) _animator.SetBool("IsWalking", true);
         else _animator.SetBool("IsWalking", false);
