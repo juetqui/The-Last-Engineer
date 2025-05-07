@@ -32,6 +32,10 @@ public class Materializer : MonoBehaviour, IMaterializable
         else if (IsAble)
         {
             GetComponent<Renderer>().material = myAbleMaterial;
+        }
+        else
+        {
+            GetComponent<Renderer>().material = _currentMat;
 
         }
     }
@@ -73,7 +77,8 @@ public class Materializer : MonoBehaviour, IMaterializable
         {
             Activated = true;
             _startsEnabled = !_currentEnabled;
-            RangeWorldPowers.Instance.WorldChange += DesActivate;
+           // Materialize(false);
+            RangeWorldPowers.Instance.MaterializeReset += DesActivate;
         }
         //else
         //{
@@ -87,8 +92,9 @@ public class Materializer : MonoBehaviour, IMaterializable
         {
             Activated = false;
             _startsEnabled = _currentEnabled;
+            //Materialize(true);
         }
-        RangeWorldPowers.Instance.WorldChange -= DesActivate;
+        RangeWorldPowers.Instance.MaterializeReset -= DesActivate;
 
     }
     public void Materialize(bool materialize)

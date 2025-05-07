@@ -10,11 +10,11 @@ public class RangeWorldPowers : MonoBehaviour
     [SerializeField] private float _teleportSphereRange;
 
     PlayerTDController _player = null;
-    private List<Materializer> _materializables = new List<Materializer>();
+    public List<Materializer> _materializables = new List<Materializer>();
     private int _selectedItem = default;
     private bool _isActivated = false;
     
-    public event Action WorldChange;
+    public event Action MaterializeReset;
     
     private void Awake()
     {
@@ -40,17 +40,19 @@ public class RangeWorldPowers : MonoBehaviour
     public void OnEnableInputs()
     {
         InputManager.Instance.dashInput.performed += Select;
-        InputManager.Instance.shieldInput.performed += ModoDetective;
+        InputManager.Instance.shieldInput.performed += OnModoDetective;
+        InputManager.Instance.shieldInput.canceled += OffModoDetective;
         InputManager.Instance.modoIzq.performed += ModoDetectiveIzq;
         InputManager.Instance.modoDer.performed += ModoDetectiveDer;
+        print("aaaa");
     }
     public void OnDisableInputs()
     {
         InputManager.Instance.dashInput.performed -= Select;
-        InputManager.Instance.shieldInput.performed -= ModoDetective;
+        InputManager.Instance.shieldInput.performed -= OnModoDetective;
+        InputManager.Instance.shieldInput.canceled -= OffModoDetective;
         InputManager.Instance.modoIzq.performed -= ModoDetectiveIzq;
         InputManager.Instance.modoDer.performed -= ModoDetectiveDer;
-
     }
     private void OnDestroy()
     {
@@ -60,7 +62,7 @@ public class RangeWorldPowers : MonoBehaviour
 
     private void Select(InputAction.CallbackContext context)
     {
-        WorldChange?.Invoke();
+        MaterializeReset?.Invoke();
 
         foreach (var item in _materializables)
         {
@@ -76,8 +78,26 @@ public class RangeWorldPowers : MonoBehaviour
         _materializables.Clear();
         _isActivated = false;
     }
+    public void OffModoDetective(InputAction.CallbackContext context)
+    {
+        print("wachin");
+        MaterializeReset?.Invoke();
 
-    public void ModoDetective(InputAction.CallbackContext context)
+        foreach (var item in _materializables)
+        {
+            if (item.IsSelected)
+            {
+                item.ArtificialMaterialize();
+            }
+
+            item.IsSelected = false;
+            item.IsAble = false;
+        }
+
+        _materializables.Clear();
+        _isActivated = false;
+    }
+    public void OnModoDetective(InputAction.CallbackContext context)
     {
         _isActivated = true;
 
@@ -90,7 +110,6 @@ public class RangeWorldPowers : MonoBehaviour
 
             if (hit.TryGetComponent(out Materializer materializer))
             {
-                print("s");
                 DetectionHits.Add(materializer);
             }
         }
@@ -126,7 +145,7 @@ public class RangeWorldPowers : MonoBehaviour
             }
         }
     }
-    
+
     public void ModoDetectiveIzq(InputAction.CallbackContext context)
     {
         if (_materializables.Count <= 0 || !_isActivated) return;
