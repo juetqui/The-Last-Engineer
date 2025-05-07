@@ -20,7 +20,7 @@ public class MainTM : TaskManager
         }
 
         OnAwake();
-        Cursor.visible = false;
+        //Cursor.visible = false;
 
         _animator = GetComponent<Animator>();
         onRunning += OpenDoor;

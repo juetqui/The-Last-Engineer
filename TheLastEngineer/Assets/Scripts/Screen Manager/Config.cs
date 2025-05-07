@@ -1,11 +1,18 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Config : MonoBehaviour
 {
     ScreenPause screenPause = default;
+    string menuName = default;
+
+    private void Awake()
+    {
+        menuName = SceneManager.GetActiveScene().name;
+    }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && menuName != "Menu")
         {
             if (screenPause != null)
             {
