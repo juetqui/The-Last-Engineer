@@ -1,144 +1,52 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
-using UnityEngine.Events;
 
 public class RangeWorldPowers : MonoBehaviour
 {
-
-    public Transform Spawnpoint;
-    int SelectedItem = 0;
-    PlayerTDController playerTDController;
-    public List<Materializer> ObjetosIntecambiables; // Editable desde el Inspector
     public static RangeWorldPowers Instance;
+    
+    [SerializeField] private float _teleportSphereRange;
+
+    PlayerTDController _player = null;
+    private List<Materializer> _materializables = new List<Materializer>();
+    private int _selectedItem = default;
+    private bool _isActivated = false;
+    
     public event Action WorldChange;
-    //public Camera Camera;
-    public Transform plyaertransform;
-    public LayerMask LayerMask;
-    public float TeleportSphereRange;
+    
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
     }
+
     private void Start()
     {
         StartInputs();
-        playerTDController = GetComponent<PlayerTDController>();
+        _player = PlayerTDController.Instance;
     }
-    // Start is called before the first frame update
-    public void Update()
-    {
 
-        if (Input.GetKey(KeyCode.Space) && playerTDController._currentNodeType == NodeType.Blue)
-        {
-            List<Materializer> DetectionHits = new List<Materializer>(); // Editable desde el Inspector
-            Collider[] hitColliders = Physics.OverlapSphere(plyaertransform.position, TeleportSphereRange, LayerMask);
-            foreach (Collider hit in hitColliders)
-            {
-                print(hit.gameObject.name);
-
-                if (hit.GetComponent<Materializer>() != null)
-                {
-                    print("s");
-
-                    DetectionHits.Add(hit.GetComponent<Materializer>());
-                }
-
-            }
-            if (ObjetosIntecambiables.Count != 0)
-            {
-                foreach (var item in ObjetosIntecambiables)
-                {
-                    if (!DetectionHits.Contains(item))
-                    {
-                        item.IsAble = false;
-                        ObjetosIntecambiables.Remove(item);
-                        if (ObjetosIntecambiables.Count - 1 <= 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-            foreach (var item in DetectionHits)
-            {
-                if (ObjetosIntecambiables.Count == 0)
-                {
-                    ObjetosIntecambiables.Add(item);
-                    item.IsAble = true;
-
-
-                }
-                else if (!ObjetosIntecambiables.Contains(item))
-                {
-                    ObjetosIntecambiables.Add(item);
-                    item.IsAble = true;
-
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                ObjetosIntecambiables[SelectedItem].IsSelected = false;
-                SelectedItem++;
-                if (SelectedItem >= ObjetosIntecambiables.Count)
-                {
-                    SelectedItem = 0;
-                }
-                ObjetosIntecambiables[SelectedItem].IsSelected = true;
-            }
-            if (Input.GetKeyDown(KeyCode.Mouse1))
-            {
-                ObjetosIntecambiables[SelectedItem].IsSelected = false;
-                SelectedItem--;
-                if (SelectedItem < 0)
-                {
-                    SelectedItem = ObjetosIntecambiables.Count - 1;
-                }
-                ObjetosIntecambiables[SelectedItem].IsSelected = true;
-            }
-
-        }
-        else if (Input.GetKeyUp(KeyCode.Space) && playerTDController._currentNodeType == NodeType.Blue)
-        {
-            if (WorldChange != null)
-
-            {
-                WorldChange.Invoke();
-
-            }
-            foreach (var item in ObjetosIntecambiables)
-            {
-                if (item.IsSelected)
-                {
-                   
-                    item.ArtificialMaterialize();
-
-                }
-                item.IsSelected = false;
-
-                item.IsAble = false;
-
-            }
-            ObjetosIntecambiables.Clear();
-        }
-    }
     public void StartInputs()
     {
         InputManager.Instance.onInputsEnabled += OnEnableInputs;
         InputManager.Instance.onInputsDisabled += OnDisableInputs;
+        
         if (InputManager.Instance.playerInputs.Player.enabled) OnEnableInputs();
     }
     public void OnEnableInputs()
     {
+        InputManager.Instance.dashInput.performed += Select;
         InputManager.Instance.shieldInput.performed += ModoDetective;
-        InputManager.Instance.modoIzq.performed += ModoDetective;
-        InputManager.Instance.modoDer.performed += ModoDetective;
+        InputManager.Instance.modoIzq.performed += ModoDetectiveIzq;
+        InputManager.Instance.modoDer.performed += ModoDetectiveDer;
     }
     public void OnDisableInputs()
     {
+        InputManager.Instance.dashInput.performed -= Select;
         InputManager.Instance.shieldInput.performed -= ModoDetective;
         InputManager.Instance.modoIzq.performed -= ModoDetectiveIzq;
         InputManager.Instance.modoDer.performed -= ModoDetectiveDer;
@@ -150,16 +58,103 @@ public class RangeWorldPowers : MonoBehaviour
         InputManager.Instance.onInputsDisabled -= OnDisableInputs;
     }
 
+    private void Select(InputAction.CallbackContext context)
+    {
+        WorldChange?.Invoke();
+
+        foreach (var item in _materializables)
+        {
+            if (item.IsSelected)
+            {
+                item.ArtificialMaterialize();
+            }
+
+            item.IsSelected = false;
+            item.IsAble = false;
+        }
+
+        _materializables.Clear();
+        _isActivated = false;
+    }
+
     public void ModoDetective(InputAction.CallbackContext context)
     {
+        _isActivated = true;
 
+        List<Materializer> DetectionHits = new List<Materializer>();
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _teleportSphereRange);
+
+        foreach (Collider hit in hitColliders)
+        {
+            print(hit.gameObject.name);
+
+            if (hit.TryGetComponent(out Materializer materializer))
+            {
+                print("s");
+                DetectionHits.Add(materializer);
+            }
+        }
+
+        if (_materializables.Count != 0)
+        {
+            foreach (var item in _materializables)
+            {
+                if (!DetectionHits.Contains(item))
+                {
+                    item.IsAble = false;
+                    _materializables.Remove(item);
+
+                    if (_materializables.Count - 1 <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        foreach (var item in DetectionHits)
+        {
+            if (_materializables.Count == 0)
+            {
+                _materializables.Add(item);
+                item.IsAble = true;
+            }
+            else if (!_materializables.Contains(item))
+            {
+                _materializables.Add(item);
+                item.IsAble = true;
+            }
+        }
     }
+    
     public void ModoDetectiveIzq(InputAction.CallbackContext context)
     {
+        if (_materializables.Count <= 0 || !_isActivated) return;
+
         print("hola");
+        _materializables[_selectedItem].IsSelected = false;
+        _selectedItem++;
+
+        if (_selectedItem >= _materializables.Count)
+        {
+            _selectedItem = 0;
+        }
+
+        _materializables[_selectedItem].IsSelected = true;
     }
+    
     public void ModoDetectiveDer(InputAction.CallbackContext context)
     {
+        if (_materializables.Count <= 0 || !_isActivated) return;
 
+        _materializables[_selectedItem].IsSelected = false;
+        _selectedItem--;
+
+        if (_selectedItem < 0)
+        {
+            _selectedItem = _materializables.Count - 1;
+        }
+
+        _materializables[_selectedItem].IsSelected = true;
     }
 }
