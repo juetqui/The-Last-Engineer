@@ -17,7 +17,6 @@ public class Materializer : MonoBehaviour, IMaterializable
     private Outline _outline = default;
     public bool IsAble;//Gabi
     public bool IsSelected; //Gabi
-    public bool Activated; //Gabi
     public bool IsMaterializeChanged;
     public bool isMaterialized;
     public static event Action<bool> OnPlayerInsideTrigger;
