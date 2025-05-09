@@ -8,6 +8,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     [SerializeField] private bool _startsEnabled = true;
     [SerializeField] private bool _currentEnabled = true;
     [SerializeField] private Color _outlineColor;
+    [SerializeField] private Color _outlineActiveColor;
     private Rigidbody _myrb = default;
     private Collider _collider = default;
     private bool _isTrigger;
@@ -17,6 +18,8 @@ public class Materializer : MonoBehaviour, IMaterializable
     public bool IsAble;//Gabi
     public bool IsSelected; //Gabi
     public bool Activated; //Gabi
+    public bool IsMaterializeChanged;
+    public bool isMaterialized;
     public static event Action<bool> OnPlayerInsideTrigger;
     public Material mySelectedMaterial; // El objeto al que le queremos cambiar el color
     public Material myAbleMaterial; // El objeto al que le queremos cambiar el color
@@ -64,7 +67,7 @@ public class Materializer : MonoBehaviour, IMaterializable
             Materialize(!_startsEnabled);
         }
         else
-        {
+{
             Materialize(_startsEnabled);
         }
 
@@ -73,51 +76,73 @@ public class Materializer : MonoBehaviour, IMaterializable
     }
     public void ArtificialMaterialize()
     {
-        if (!Activated)
-        {
-            Activated = true;
-            _startsEnabled = !_currentEnabled;
-           // Materialize(false);
-            RangeWorldPowers.Instance.MaterializeReset += DesActivate;
-        }
-        //else
-        //{
-        //    Activated = false;
-        //    _startsEnabled = _currentEnabled;
-        //}
+        IsMaterializeChanged = true;
+        ChangeMaterialize(!isMaterialized);
+
+        RangeWorldPowers.Instance.MaterializeReset += DesActivate;
     }
     public void DesActivate()
     {
-        if (Activated)
-        {
-            Activated = false;
-            _startsEnabled = _currentEnabled;
-            //Materialize(true);
-        }
+        IsMaterializeChanged = false;
+        ChangeMaterialize(!isMaterialized);
         RangeWorldPowers.Instance.MaterializeReset -= DesActivate;
 
     }
-    public void Materialize(bool materialize)
+    public void ChangeMaterialize(bool SetMaterialized)
     {
-        
-        if (!_startsEnabled)
+        _collider.isTrigger = !SetMaterialized;
+        if (SetMaterialized)
         {
-            materialize = !materialize;
+            _renderer.shadowCastingMode = ShadowCastingMode.On;
+            _currentMat = _enabledMat;
+            isMaterialized = true;
+            if (_myrb)
+            {
+                _myrb.useGravity = true;
+
+            }
+            SetOutline(true);
         }
-
-        _collider.isTrigger = !materialize;
-
-        if (!materialize)
+        else
         {
             _renderer.shadowCastingMode = ShadowCastingMode.Off;
             _currentMat = _disabledMat;
+            isMaterialized = false;
+
             if (_myrb)
             {
                 _myrb.useGravity = false;
             }
             SetOutline(false);
         }
-        else
+        _renderer.material = _currentMat;
+    }
+    public void Materialize(bool materialize)
+    {
+
+        if (!_startsEnabled)
+        {
+            materialize = !materialize;
+        }
+        if (IsMaterializeChanged)
+        {
+            materialize = !materialize;
+        }
+       // _collider.isTrigger = !materialize;
+        ChangeMaterialize(materialize);
+    }
+    public void Materialize2(bool materialize)
+    {
+
+        if (!_startsEnabled)
+        {
+            materialize = !materialize;
+        }
+
+        print(materialize);
+        _collider.isTrigger = !materialize;
+        if (materialize)
+
         {
             _renderer.shadowCastingMode = ShadowCastingMode.On;
             _currentMat = _enabledMat;
@@ -128,6 +153,17 @@ public class Materializer : MonoBehaviour, IMaterializable
             }
             SetOutline(true);
         }
+        else
+        {
+            _renderer.shadowCastingMode = ShadowCastingMode.Off;
+            _currentMat = _disabledMat;
+            if (_myrb)
+            {
+                _myrb.useGravity = false;
+            }
+            SetOutline(false);
+        }
+        
 
         _renderer.material = _currentMat;
     }

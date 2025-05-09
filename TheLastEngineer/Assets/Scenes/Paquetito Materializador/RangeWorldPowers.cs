@@ -39,16 +39,15 @@ public class RangeWorldPowers : MonoBehaviour
     }
     public void OnEnableInputs()
     {
-        InputManager.Instance.dashInput.performed += Select;
+        //InputManager.Instance.dashInput.performed += Select;
         InputManager.Instance.shieldInput.performed += OnModoDetective;
         InputManager.Instance.shieldInput.canceled += OffModoDetective;
         InputManager.Instance.modoIzq.performed += ModoDetectiveIzq;
         InputManager.Instance.modoDer.performed += ModoDetectiveDer;
-        print("aaaa");
     }
     public void OnDisableInputs()
     {
-        InputManager.Instance.dashInput.performed -= Select;
+        //InputManager.Instance.dashInput.performed -= Select;
         InputManager.Instance.shieldInput.performed -= OnModoDetective;
         InputManager.Instance.shieldInput.canceled -= OffModoDetective;
         InputManager.Instance.modoIzq.performed -= ModoDetectiveIzq;
@@ -62,6 +61,7 @@ public class RangeWorldPowers : MonoBehaviour
 
     private void Select(InputAction.CallbackContext context)
     {
+        print("ADdsdsa");
         MaterializeReset?.Invoke();
 
         foreach (var item in _materializables)
@@ -80,7 +80,7 @@ public class RangeWorldPowers : MonoBehaviour
     }
     public void OffModoDetective(InputAction.CallbackContext context)
     {
-        print("wachin");
+
         MaterializeReset?.Invoke();
 
         foreach (var item in _materializables)
@@ -99,58 +99,65 @@ public class RangeWorldPowers : MonoBehaviour
     }
     public void OnModoDetective(InputAction.CallbackContext context)
     {
-        _isActivated = true;
+        _materializables.Clear();
+        MaterializeReset?.Invoke();
 
-        List<Materializer> DetectionHits = new List<Materializer>();
-        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _teleportSphereRange);
-
-        foreach (Collider hit in hitColliders)
+        if (PlayerTDController.Instance._currentNodeType == NodeType.Blue)
         {
-            print(hit.gameObject.name);
+            print("ADS");
+            print(PlayerTDController.Instance._currentNodeType.ToString());
 
-            if (hit.TryGetComponent(out Materializer materializer))
-            {
-                DetectionHits.Add(materializer);
-            }
-        }
+            _isActivated = true;
 
-        if (_materializables.Count != 0)
-        {
-            foreach (var item in _materializables)
+            List<Materializer> DetectionHits = new List<Materializer>();
+            Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _teleportSphereRange);
+
+            foreach (Collider hit in hitColliders)
             {
-                if (!DetectionHits.Contains(item))
+                if (hit.TryGetComponent(out Materializer materializer))
                 {
-                    item.IsAble = false;
-                    _materializables.Remove(item);
+                    DetectionHits.Add(materializer);
+                }
+            }
 
-                    if (_materializables.Count - 1 <= 0)
+            if (_materializables.Count != 0)
+            {
+                foreach (var item in _materializables)
+                {
+                    if (!DetectionHits.Contains(item))
                     {
-                        break;
+                        item.IsAble = false;
+                        _materializables.Remove(item);
+
+                        if (_materializables.Count - 1 <= 0)
+                        {
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        foreach (var item in DetectionHits)
-        {
-            if (_materializables.Count == 0)
+            foreach (var item in DetectionHits)
             {
-                _materializables.Add(item);
-                item.IsAble = true;
+                if (_materializables.Count == 0)
+                {
+                    _materializables.Add(item);
+                    item.IsAble = true;
+                }
+                else if (!_materializables.Contains(item))
+                {
+                    _materializables.Add(item);
+                    item.IsAble = true;
+                }
             }
-            else if (!_materializables.Contains(item))
-            {
-                _materializables.Add(item);
-                item.IsAble = true;
-            }
+
         }
+        
     }
 
     public void ModoDetectiveIzq(InputAction.CallbackContext context)
     {
         if (_materializables.Count <= 0 || !_isActivated) return;
-
-        print("hola");
         _materializables[_selectedItem].IsSelected = false;
         _selectedItem++;
 
