@@ -263,11 +263,17 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     public bool IsInFOV(Transform interactable)
     {
-        Vector3 playerPos = new Vector3(transform.position.x - 1f, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f); 
+        Vector3 playerPos = new Vector3(transform.position.x - 1f, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f);
+        Vector3 grabPos = new Vector3(transform.forward.x, transform.forward.y, transform.forward.z - 0.25f);
+
+        if (Vector3.Distance(playerPos, interactable.position) > 6f)
+        {
+            return false;
+        }
 
         Vector3 dir = (interactable.position - playerPos).normalized;
-        float angle = Vector3.Angle(transform.forward, dir);
-        
+        float angle = Vector3.Angle(grabPos, dir);
+
         return angle <= _playerData.fovAngle * 0.5f;
     }
 
