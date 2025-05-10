@@ -6,23 +6,25 @@ public class Materializer : MonoBehaviour, IMaterializable
 {
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
-    [SerializeField] private bool _currentEnabled = true;
     [SerializeField] private Color _outlineColor;
     [SerializeField] private Color _outlineActiveColor;
+    
     private Rigidbody _myrb = default;
     private Collider _collider = default;
-    private bool _isTrigger;
+    private bool _isTrigger = default;
     private MeshRenderer _renderer = default;
     private Material _enabledMat = default, _disabledMat = default, _currentMat = default;
     private Outline _outline = default;
+
+    [SerializeField] private bool _currentEnabled = true;
     public bool IsAble;//Gabi
     public bool IsSelected; //Gabi
     public bool IsMaterializeChanged;
     public bool isMaterialized;
-    public static event Action<bool> OnPlayerInsideTrigger;
     public Material mySelectedMaterial; // El objeto al que le queremos cambiar el color
     public Material myAbleMaterial; // El objeto al que le queremos cambiar el color
 
+    public static event Action<bool> OnPlayerInsideTrigger;
  
     private void Update()
     {
@@ -41,11 +43,12 @@ public class Materializer : MonoBehaviour, IMaterializable
 
         }
     }
+    
     public void ResetSelection()
     {
         GetComponent<Renderer>().material = _enabledMat;
-
     }
+
     private void Start()
     {
         _collider = GetComponent<Collider>();
@@ -57,22 +60,28 @@ public class Materializer : MonoBehaviour, IMaterializable
         _outline = gameObject.AddComponent<Outline>();
         _outline.OutlineColor = _outlineColor;
         _outline.OutlineWidth = 3;
+        
         if(TryGetComponent(out Rigidbody rigidbody))
         {
             _myrb = rigidbody;
         }
-        if (!_startsEnabled)
-        {
-            Materialize(!_startsEnabled);
-        }
-        else
-{
-            Materialize(_startsEnabled);
-        }
 
+
+        Materialize(_startsEnabled);
+        
+        //if (!_startsEnabled)
+        //{
+        //    Debug.Log(_startsEnabled);
+        //    Materialize(!_startsEnabled);
+        //}
+        //else
+        //{
+        //    Materialize(_startsEnabled);
+        //}
 
         MaterializeController.Instance.OnMaterialize += Materialize;
     }
+    
     public void ArtificialMaterialize()
     {
         IsMaterializeChanged = true;
@@ -80,6 +89,7 @@ public class Materializer : MonoBehaviour, IMaterializable
 
         RangeWorldPowers.Instance.MaterializeReset += DesActivate;
     }
+    
     public void DesActivate()
     {
         IsMaterializeChanged = false;
@@ -90,6 +100,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     public void ChangeMaterialize(bool SetMaterialized)
     {
         _collider.isTrigger = !SetMaterialized;
+        
         if (SetMaterialized)
         {
             _renderer.shadowCastingMode = ShadowCastingMode.On;
@@ -116,20 +127,22 @@ public class Materializer : MonoBehaviour, IMaterializable
         }
         _renderer.material = _currentMat;
     }
+    
     public void Materialize(bool materialize)
     {
 
-        if (!_startsEnabled)
-        {
-            materialize = !materialize;
-        }
-        if (IsMaterializeChanged)
-        {
-            materialize = !materialize;
-        }
+        //if (!_startsEnabled)
+        //{
+        //    materialize = !materialize;
+        //}
+        //if (IsMaterializeChanged)
+        //{
+        //    materialize = !materialize;
+        //}
        // _collider.isTrigger = !materialize;
         ChangeMaterialize(materialize);
     }
+    
     public void Materialize2(bool materialize)
     {
 
