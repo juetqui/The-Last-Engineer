@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
+using System.Linq;
 
 public class RangeWorldPowers : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class RangeWorldPowers : MonoBehaviour
     private bool _isActivated = false;
     
     public event Action MaterializeReset;
+    public event Action<Transform> MaterializeSelection;
     
     private void Awake()
     {
@@ -95,6 +97,8 @@ public class RangeWorldPowers : MonoBehaviour
 
         _materializables.Clear();
         _isActivated = false;
+
+        MaterializeSelection?.Invoke(PlayerTDController.Instance.transform);
     }
     public void OnModoDetective(InputAction.CallbackContext context)
     {
@@ -148,7 +152,8 @@ public class RangeWorldPowers : MonoBehaviour
                     item.IsAble = true;
                 }
             }
-
+            
+            _materializables.OrderBy(m => Vector3.Distance(transform.position, m.transform.position));
         }
         
     }
@@ -165,6 +170,7 @@ public class RangeWorldPowers : MonoBehaviour
         }
 
         _materializables[_selectedItem].IsSelected = true;
+        MaterializeSelection?.Invoke(_materializables[_selectedItem].transform);
     }
     
     public void ModoDetectiveDer(InputAction.CallbackContext context)
@@ -180,5 +186,6 @@ public class RangeWorldPowers : MonoBehaviour
         }
 
         _materializables[_selectedItem].IsSelected = true;
+        MaterializeSelection?.Invoke(_materializables[_selectedItem].transform);
     }
 }
