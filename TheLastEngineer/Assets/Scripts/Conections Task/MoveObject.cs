@@ -4,7 +4,7 @@ using UnityEngine;
 public class MoveObject : MonoBehaviour
 {
     [SerializeField] Transform _targetTransform;
-    [SerializeField] float _moveSpeed = 5f;
+    [SerializeField] float _moveSpeed = 20f;
     [SerializeField] bool _debug = false;
 
     private Vector3 _originalPos = default, _currentPos = default, _targetPos = default;

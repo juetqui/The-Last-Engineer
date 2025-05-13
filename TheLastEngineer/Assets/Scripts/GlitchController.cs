@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class GlitchController : MonoBehaviour
 {
-    [SerializeField] private float _minCD;
-    [SerializeField] private float _maxCD;
+    [SerializeField] private float _minCD = 0.125f;
+    [SerializeField] private float _maxCD = 0.5f;
 
-    [SerializeField] private float _minDist;
-    [SerializeField] private float _maxDist;
+    [SerializeField] private float _minDist = -0.5f;
+    [SerializeField] private float _maxDist = 0.5f;
 
     private Material _material;
     private bool _enabled = true;
