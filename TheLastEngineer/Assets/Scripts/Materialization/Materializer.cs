@@ -66,18 +66,14 @@ public class Materializer : MonoBehaviour, IMaterializable
             _myrb = rigidbody;
         }
 
-
-        Materialize(_startsEnabled);
-        
-        //if (!_startsEnabled)
-        //{
-        //    Debug.Log(_startsEnabled);
-        //    Materialize(!_startsEnabled);
-        //}
-        //else
-        //{
-        //    Materialize(_startsEnabled);
-        //}
+        if (!_startsEnabled)
+        {
+            Materialize(!_startsEnabled);
+        }
+        else
+        {
+            Materialize(_startsEnabled);
+        }
 
         MaterializeController.Instance.OnMaterialize += Materialize;
     }
@@ -106,11 +102,12 @@ public class Materializer : MonoBehaviour, IMaterializable
             _renderer.shadowCastingMode = ShadowCastingMode.On;
             _currentMat = _enabledMat;
             isMaterialized = true;
+            
             if (_myrb)
             {
                 _myrb.useGravity = true;
-
             }
+            
             SetOutline(true);
         }
         else
@@ -123,6 +120,7 @@ public class Materializer : MonoBehaviour, IMaterializable
             {
                 _myrb.useGravity = false;
             }
+            
             SetOutline(false);
         }
         _renderer.material = _currentMat;
@@ -131,15 +129,15 @@ public class Materializer : MonoBehaviour, IMaterializable
     public void Materialize(bool materialize)
     {
 
-        //if (!_startsEnabled)
-        //{
-        //    materialize = !materialize;
-        //}
-        //if (IsMaterializeChanged)
-        //{
-        //    materialize = !materialize;
-        //}
-       // _collider.isTrigger = !materialize;
+        if (!_startsEnabled)
+        {
+            materialize = !materialize;
+        }
+        if (IsMaterializeChanged)
+        {
+            materialize = !materialize;
+        }
+        
         ChangeMaterialize(materialize);
     }
     

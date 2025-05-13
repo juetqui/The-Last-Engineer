@@ -61,7 +61,6 @@ public class RangeWorldPowers : MonoBehaviour
 
     private void Select(InputAction.CallbackContext context)
     {
-        print("ADdsdsa");
         MaterializeReset?.Invoke();
 
         foreach (var item in _materializables)
@@ -104,7 +103,6 @@ public class RangeWorldPowers : MonoBehaviour
 
         if (PlayerTDController.Instance._currentNodeType == NodeType.Blue)
         {
-            print("ADS");
             print(PlayerTDController.Instance._currentNodeType.ToString());
 
             _isActivated = true;
