@@ -4,13 +4,17 @@ using UnityEngine.VFX;
 
 public class SolvingController : MonoBehaviour
 {
-    public SkinnedMeshRenderer SkinnedMeshRenderer;
+    public SkinnedMeshRenderer MySkinnedMeshRenderer;
+    public float MaxBound;
+    public float MinBound;
+
     public VisualEffect VFXGraph;
     // en el tutorial los materiales estaban privados pero si no no funciona 
     public Material[] skinnedMaterials;
     [SerializeField] Transform startKillerTransform, endKillerTransform;
     float _rateQty;
-    public float refreshRate = 0.25f;
+    public Shader MyShader;
+    public float refreshRate;
     [SerializeField] float duration;
     [SerializeField] Vector3 killerSize;
     [SerializeField] Vector3 particleSpeed;
@@ -21,9 +25,9 @@ public class SolvingController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        skinnedMaterials = SkinnedMeshRenderer.materials;
-        
-        _totalDissolve = skinnedMaterials[0].GetFloat("_DisolveProgress");
+        skinnedMaterials = MySkinnedMeshRenderer.materials;
+        //_totalDissolve = skinnedMaterials[0].GetFloat("_DisolveProgress");
+
 
 
         //if (skinnedMaterials != null)
@@ -53,9 +57,20 @@ public class SolvingController : MonoBehaviour
     
     IEnumerator DissolveCo()
     {
+        skinnedMaterials = MySkinnedMeshRenderer.materials;
+
         if (skinnedMaterials != null)
         {
+
+            foreach (var item in skinnedMaterials)
+            {
+                item.shader = MyShader;
+                //item.SetFloat("MaxBounds", MaxBound);
+                //item.SetFloat("MinBounds", MinBound);
+            }
             _rateQty = duration/refreshRate;
+            _totalDissolve = skinnedMaterials[0].GetFloat("_DisolveProgress");
+
             skinnedMaterials[0].SetFloat("_DisolveProgress", _totalDissolve);
         }
         if (VFXGraph != null)
@@ -70,7 +85,6 @@ public class SolvingController : MonoBehaviour
 
 
         }
-        print(_rateQty);
         if (skinnedMaterials.Length > 0)
         {
             Vector3 vector3 = Vector3.zero;
@@ -81,15 +95,15 @@ public class SolvingController : MonoBehaviour
             int particlesCount = VFXGraph.GetInt("initialParticleRate");
             while (skinnedMaterials[0].GetFloat("_DisolveProgress") > 0)
             {
-                vector3 += Vector3.up * _killerDistance/ _rateQty;
+                vector3 += Vector3.up * (_killerDistance / _rateQty);
                 VFXGraph.SetInt("initialParticleRate", particlesCount += particleIncreaseRate);
-                VFXGraph.SetVector3("StartKillerSize", (killerSize + vector3)*2);
+                VFXGraph.SetVector3("StartKillerSize", (killerSize + vector3 * 1.5f));
                 print(vector3);
                 print(killerSize + vector3);
-                counter += _totalDissolve/_rateQty;
+                counter += _totalDissolve / _rateQty;
                 for (int i = 0; i < skinnedMaterials.Length; i++)
                 {
-                    skinnedMaterials[i].SetFloat("_DisolveProgress", _totalDissolve- counter);
+                    skinnedMaterials[i].SetFloat("_DisolveProgress", _totalDissolve - counter);
                 }
                 yield return new WaitForSeconds(refreshRate);
                 //decrease
