@@ -5,16 +5,17 @@ public class MoveObject : MonoBehaviour
 {
     [SerializeField] Transform _targetTransform;
     [SerializeField] float _moveSpeed = 20f;
-    [SerializeField] bool _debug = false;
 
     private Vector3 _originalPos = default, _currentPos = default, _targetPos = default;
     private Quaternion _originalRot = default, _currentRot = default, _targetRot = default;
-    
+
+    private Collider _collider = default;
     private string _tag = "";
     private bool _isMoving = false, _toggle = false, _shouldMove = false;
 
     private void Awake()
     {
+        _collider = GetComponent<Collider>();
         _originalPos = transform.position;
         _originalRot = transform.rotation;
         _tag = gameObject.tag;
@@ -22,7 +23,7 @@ public class MoveObject : MonoBehaviour
 
     void Start()
     {
-        NodeEffectController.Instance.OnMoveWorld += SetTarget;
+        NodeEffectController.Instance.OnToggleObjects += SetTarget;
     }
 
     void Update()
@@ -60,6 +61,7 @@ public class MoveObject : MonoBehaviour
     private IEnumerator MoveToTarget()
     {
         _isMoving = true;
+        _collider.enabled = false;
         gameObject.tag = "Untagged";
 
         while (_isMoving)
@@ -87,6 +89,7 @@ public class MoveObject : MonoBehaviour
 
                 _isMoving = false;
                 _shouldMove = false;
+                _collider.enabled = true;
                 gameObject.tag = _tag;
                 
                 yield break;

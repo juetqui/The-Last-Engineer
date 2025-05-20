@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class SelectionCameraMAnager : MonoBehaviour
+public class SelectionCameraManager : MonoBehaviour
 {
     private CinemachineFreeLook _camera;
 
