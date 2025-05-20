@@ -8,11 +8,13 @@ public class RangeWorldPowers : MonoBehaviour
 {
     public static RangeWorldPowers Instance;
     
-    [SerializeField] private float _teleportSphereRange;
+    [SerializeField] private float _detectionRange;
 
-    PlayerTDController _player = null;
-    public List<Materializer> _materializables = new List<Materializer>();
-    private int _selectedItem = default;
+    private PlayerTDController _player = null;
+    private List<Materializer> _materializables = default;
+    private Materializer _materializable = default;
+    
+    private int _selectedItem = 0;
     private bool _isActivated = false;
     
     public event Action MaterializeReset;
@@ -20,10 +22,10 @@ public class RangeWorldPowers : MonoBehaviour
     
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
+        if (Instance != null) Destroy(gameObject);
+        
+        Instance = this;
+        _materializables = new List<Materializer>();
     }
 
     private void Start()
@@ -41,19 +43,19 @@ public class RangeWorldPowers : MonoBehaviour
     }
     public void OnEnableInputs()
     {
-        //InputManager.Instance.dashInput.performed += Select;
         InputManager.Instance.shieldInput.performed += OnModoDetective;
-        InputManager.Instance.shieldInput.canceled += OffModoDetective;
-        InputManager.Instance.modoIzq.performed += ModoDetectiveIzq;
-        InputManager.Instance.modoDer.performed += ModoDetectiveDer;
+        //InputManager.Instance.shieldInput.canceled += OffModoDetective;
+        //InputManager.Instance.modoIzq.performed += context => ChangeSelection(-1);
+        //InputManager.Instance.modoDer.performed += context => ChangeSelection(1);
+        InputManager.Instance.modoDer.performed += ChangeMaterial;
     }
     public void OnDisableInputs()
     {
-        //InputManager.Instance.dashInput.performed -= Select;
         InputManager.Instance.shieldInput.performed -= OnModoDetective;
-        InputManager.Instance.shieldInput.canceled -= OffModoDetective;
-        InputManager.Instance.modoIzq.performed -= ModoDetectiveIzq;
-        InputManager.Instance.modoDer.performed -= ModoDetectiveDer;
+        //InputManager.Instance.shieldInput.canceled -= OffModoDetective;
+        //InputManager.Instance.modoIzq.performed -= context => ChangeSelection(-1);
+        //InputManager.Instance.modoDer.performed -= context => ChangeSelection(1);
+        InputManager.Instance.modoDer.performed -= ChangeMaterial;
     }
     private void OnDestroy()
     {
@@ -61,130 +63,113 @@ public class RangeWorldPowers : MonoBehaviour
         InputManager.Instance.onInputsDisabled -= OnDisableInputs;
     }
 
-    private void Select(InputAction.CallbackContext context)
+    private void Update()
     {
-        MaterializeReset?.Invoke();
-
-        foreach (var item in _materializables)
+        if (_isActivated)
         {
-            if (item.IsSelected)
-            {
-                item.ArtificialMaterialize();
-            }
-
-            item.IsSelected = false;
-            item.IsAble = false;
+            _materializable = GetNearestMaterializable();
+            _materializable.IsSelected = true;
         }
-
-        _materializables.Clear();
-        _isActivated = false;
     }
+
+    public void ChangeMaterial(InputAction.CallbackContext context)
+    {
+        if (_materializable == null) return;
+
+        _materializable.ArtificialMaterialize();
+        _materializable.IsSelected = false;
+        _materializable = null;
+        _isActivated = false;
+        MaterializeReset?.Invoke();
+    }
+
     public void OffModoDetective(InputAction.CallbackContext context)
     {
+        //MaterializeReset?.Invoke();
 
-        MaterializeReset?.Invoke();
+        //foreach (var item in _materializables)
+        //{
+        //    if (item.IsSelected)
+        //    {
+        //        item.ArtificialMaterialize();
+        //    }
 
-        foreach (var item in _materializables)
-        {
-            if (item.IsSelected)
-            {
-                item.ArtificialMaterialize();
-            }
+        //    item.IsSelected = false;
+        //    item.IsAble = false;
+        //}
 
-            item.IsSelected = false;
-            item.IsAble = false;
-        }
+        //_isActivated = false;
+        //_materializables.Clear();
+        //_selectedItem = 0;
 
-        _materializables.Clear();
-        _isActivated = false;
-
-        MaterializeSelection?.Invoke(PlayerTDController.Instance.transform);
+        //MaterializeSelection?.Invoke(_player.transform);
     }
+
     public void OnModoDetective(InputAction.CallbackContext context)
     {
-        _materializables.Clear();
+        if (_player._currentNodeType != NodeType.Blue) return;
+
+        _isActivated = true;
+        //_selectedItem = 0;
+        //_materializables.Clear();
         MaterializeReset?.Invoke();
 
-        if (PlayerTDController.Instance._currentNodeType == NodeType.Blue)
-        {
-            print(PlayerTDController.Instance._currentNodeType.ToString());
+        //_materializables = GetMaterializablesInRange();
 
-            _isActivated = true;
+        //foreach (var materializer in _materializables)
+        //{
+        //    materializer.IsAble = true;
+        //}
 
-            List<Materializer> DetectionHits = new List<Materializer>();
-            Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _teleportSphereRange);
+        //if (_materializables.Count > 0)
+        //{
+        //    _materializables[0].IsSelected = true;
+        //    MaterializeSelection?.Invoke(_materializables[0].transform);
+        //}
+    }
 
-            foreach (Collider hit in hitColliders)
-            {
-                if (hit.TryGetComponent(out Materializer materializer))
-                {
-                    DetectionHits.Add(materializer);
-                }
-            }
+    private List<Materializer> GetMaterializablesInRange()
+    {
+        var materializers = new List<Materializer>();
 
-            if (_materializables.Count != 0)
-            {
-                foreach (var item in _materializables)
-                {
-                    if (!DetectionHits.Contains(item))
-                    {
-                        item.IsAble = false;
-                        _materializables.Remove(item);
-
-                        if (_materializables.Count - 1 <= 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-
-            foreach (var item in DetectionHits)
-            {
-                if (_materializables.Count == 0)
-                {
-                    _materializables.Add(item);
-                    item.IsAble = true;
-                }
-                else if (!_materializables.Contains(item))
-                {
-                    _materializables.Add(item);
-                    item.IsAble = true;
-                }
-            }
-            
-            _materializables.OrderBy(m => Vector3.Distance(transform.position, m.transform.position));
-        }
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
         
-    }
-
-    public void ModoDetectiveIzq(InputAction.CallbackContext context)
-    {
-        if (_materializables.Count <= 0 || !_isActivated) return;
-        _materializables[_selectedItem].IsSelected = false;
-        _selectedItem++;
-
-        if (_selectedItem >= _materializables.Count)
+        foreach (var hit in hitColliders)
         {
-            _selectedItem = 0;
+            if (hit.TryGetComponent(out Materializer materializer))
+            {
+                materializers.Add(materializer);
+            }
         }
 
-        _materializables[_selectedItem].IsSelected = true;
-        MaterializeSelection?.Invoke(_materializables[_selectedItem].transform);
+        return materializers.OrderBy(m => Vector3.Distance(_player.transform.position, m.transform.position))
+                           .ToList();
     }
-    
-    public void ModoDetectiveDer(InputAction.CallbackContext context)
+
+    private Materializer GetNearestMaterializable()
     {
-        if (_materializables.Count <= 0 || !_isActivated) return;
+        var materializers = new List<Materializer>();
 
-        _materializables[_selectedItem].IsSelected = false;
-        _selectedItem--;
-
-        if (_selectedItem < 0)
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
+        
+        foreach (var hit in hitColliders)
         {
-            _selectedItem = _materializables.Count - 1;
+            if (hit.TryGetComponent(out Materializer materializer))
+            {
+                materializers.Add(materializer);
+            }
         }
 
+        return materializers.OrderBy(m => Vector3.Distance(_player.transform.position, m.transform.position))
+                           .FirstOrDefault();
+    }
+
+    private void ChangeSelection(int direction)
+    {
+        if (_materializables.Count == 0 || !_isActivated) return;
+
+        _materializables[_selectedItem].IsSelected = false;
+        _selectedItem = (_selectedItem + direction + _materializables.Count) % _materializables.Count;
         _materializables[_selectedItem].IsSelected = true;
         MaterializeSelection?.Invoke(_materializables[_selectedItem].transform);
     }

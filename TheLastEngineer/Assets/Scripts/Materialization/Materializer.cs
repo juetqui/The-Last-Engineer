@@ -80,6 +80,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     
     public void ArtificialMaterialize()
     {
+        Debug.Log("ArtificialMaterialize");
         IsMaterializeChanged = true;
         ChangeMaterialize(!isMaterialized);
 
@@ -93,6 +94,7 @@ public class Materializer : MonoBehaviour, IMaterializable
         RangeWorldPowers.Instance.MaterializeReset -= DesActivate;
 
     }
+
     public void ChangeMaterialize(bool SetMaterialized)
     {
         _collider.isTrigger = !SetMaterialized;
@@ -139,43 +141,6 @@ public class Materializer : MonoBehaviour, IMaterializable
         }
         
         ChangeMaterialize(materialize);
-    }
-    
-    public void Materialize2(bool materialize)
-    {
-
-        if (!_startsEnabled)
-        {
-            materialize = !materialize;
-        }
-
-        print(materialize);
-        _collider.isTrigger = !materialize;
-        if (materialize)
-
-        {
-            _renderer.shadowCastingMode = ShadowCastingMode.On;
-            _currentMat = _enabledMat;
-            if (_myrb)
-            {
-                _myrb.useGravity = true;
-
-            }
-            SetOutline(true);
-        }
-        else
-        {
-            _renderer.shadowCastingMode = ShadowCastingMode.Off;
-            _currentMat = _disabledMat;
-            if (_myrb)
-            {
-                _myrb.useGravity = false;
-            }
-            SetOutline(false);
-        }
-        
-
-        _renderer.material = _currentMat;
     }
 
     private void SetOutline(bool activate)
