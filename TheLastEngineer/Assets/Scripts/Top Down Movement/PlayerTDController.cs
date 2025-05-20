@@ -286,6 +286,10 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
+    public void LaserCollition()
+    {
+        _playerView.LaserCollition();
+    }
 
     #region -----TRIGGERS MANAGEMENT-----
     private void OnTriggerEnter(Collider coll)

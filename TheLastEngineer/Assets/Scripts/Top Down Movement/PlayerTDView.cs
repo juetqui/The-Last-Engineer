@@ -37,6 +37,10 @@ public class PlayerTDView
     {
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
+    public void LaserCollition()
+    {
+        PlayAudioWithRandomPitch(_fxSource, _dashClip);
+    }
     public void DashChargedSound()
     {
         PlayAudioWithRandomPitch(_fxSource, _chargedDashClip, 3f);
