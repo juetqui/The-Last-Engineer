@@ -4,14 +4,14 @@ public class PlayerTDView
 {
     private Outline _outline = default;
     private ParticleSystem[] _ps = default;
-
+    private SolvingController _solvingController;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData)
+    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController)
     {
         _outline = outline;
         _ps = ps;
@@ -23,6 +23,7 @@ public class PlayerTDView
         _chargedDashClip = playerData.chargedDashClip;
         _liftClip = playerData.liftClip;
         _putDownClip = playerData.putDownClip;
+        _solvingController = solvingController;
     }
 
     public void Walk(Vector3 moveVector)
@@ -39,7 +40,10 @@ public class PlayerTDView
     }
     public void LaserCollition()
     {
-        PlayAudioWithRandomPitch(_fxSource, _dashClip);
+        _animator.speed=0;
+        _solvingController.BurnShader();
+
+
     }
     public void DashChargedSound()
     {

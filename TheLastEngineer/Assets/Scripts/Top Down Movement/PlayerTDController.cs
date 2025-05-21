@@ -5,6 +5,7 @@ using MaskTransitions;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using DG.Tweening;
 
 public class PlayerTDController : MonoBehaviour, IMovablePassenger
 {
@@ -18,6 +19,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     [SerializeField] private AudioSource _fxSource;
 
     public static PlayerTDController Instance = null;
+    [SerializeField] private SolvingController _solvingController;
 
     private CharacterController _cc = default;
     private PlayerTDModel _playerModel = default;
@@ -78,7 +80,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _currentSpeed = _playerData.moveSpeed;
 
         _playerModel = new PlayerTDModel(_cc, transform, _playerData);
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData);
+        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData, _solvingController);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         
@@ -174,6 +176,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (_cc.isGrounded && !_playerModel.IsDashing)
         {
             var interactableTarget = GetClosestInteractable();
+            if (interactableTarget!=null)
+            {
+                transform.LookAt(new Vector3(interactableTarget.Transform.position.x, transform.position.y, interactableTarget.Transform.position.z));
+
+            }
             _currentState?.HandleInteraction(interactableTarget);
         }
     }
@@ -187,7 +194,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private IInteractable GetClosestInteractable()
     {
         return _interactables
-            .Where(i => i.CanInteract(this) && IsInFOV(i.Transform))
+            .Where(i => i.CanInteract(this)) //&& IsInFOV(i.Transform))
             .OrderByDescending(i => i.Priority)
             .ThenBy(i => Vector3.Distance(transform.position, i.Transform.position))
             .FirstOrDefault();
@@ -289,6 +296,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     public void LaserCollition()
     {
         _playerView.LaserCollition();
+        //if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
+
     }
 
     #region -----TRIGGERS MANAGEMENT-----

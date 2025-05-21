@@ -25,8 +25,8 @@ public class Laser : MonoBehaviour
 
         if (!_playerDetected)
             CastLaser(_startPoint.position, _startPoint.forward);
-        else
-            ResetLevel();
+        //else
+        //    ResetLevel();
     }
 
     private void CastLaser(Vector3 position, Vector3 direction)
@@ -52,6 +52,7 @@ public class Laser : MonoBehaviour
                 if (hit.transform.GetComponent<PlayerTDController>() != null)
                 {
                     _playerDetected = true;
+                    hit.transform.GetComponent<PlayerTDController>().LaserCollition();
                     return;
                 }
 
@@ -75,7 +76,7 @@ public class Laser : MonoBehaviour
 
     public void ResetLevel()
     {
-        _isResetting = true;
-        TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
+        //_isResetting = true;
+        //TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
 }

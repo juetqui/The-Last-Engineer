@@ -1,5 +1,7 @@
+using MaskTransitions;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.VFX;
 
 public class SolvingController : MonoBehaviour
@@ -7,8 +9,10 @@ public class SolvingController : MonoBehaviour
     public SkinnedMeshRenderer MySkinnedMeshRenderer;
     public float MaxBound;
     public float MinBound;
+    public float secondToDissolve;
 
     public VisualEffect VFXGraph;
+    public float ResetTimer;
     // en el tutorial los materiales estaban privados pero si no no funciona 
     public Material[] skinnedMaterials;
     [SerializeField] Transform startKillerTransform, endKillerTransform;
@@ -22,7 +26,7 @@ public class SolvingController : MonoBehaviour
     public int particleInintialRate = 20;
     float _totalDissolve;
     float _killerDistance;
-    // Start is called before the first frame update
+    
     void Start()
     {
         skinnedMaterials = MySkinnedMeshRenderer.materials;
@@ -46,13 +50,9 @@ public class SolvingController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public void BurnShader()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
             StartCoroutine(DissolveCo());
-        }
-
     }
     
     IEnumerator DissolveCo()
@@ -82,15 +82,18 @@ public class SolvingController : MonoBehaviour
             VFXGraph.SetVector3("StartKillerSize", new Vector3(killerSize.x, 1 / _rateQty, killerSize.z));
             VFXGraph.SetVector3("ParticlesSpeed", particleSpeed);
             VFXGraph.SetInt("initialParticleRate", particleInintialRate);
-
+            VFXGraph.Play();
+            VFXGraph.SetFloat("Duration", duration+ secondToDissolve);
 
         }
+        yield return new WaitForSeconds(secondToDissolve);
+
         if (skinnedMaterials.Length > 0)
         {
             Vector3 vector3 = Vector3.zero;
 
             float counter = 0;
-            VFXGraph.Play();
+            //VFXGraph.Play();
             VFXGraph.SetFloat("Duration", duration);
             int particlesCount = VFXGraph.GetInt("initialParticleRate");
             while (skinnedMaterials[0].GetFloat("_DisolveProgress") > 0)
@@ -113,7 +116,10 @@ public class SolvingController : MonoBehaviour
         {
             VFXGraph.Stop();
         }
+        yield return new WaitForSeconds(ResetTimer);
+        TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
+
     }
-   
+
 
 }
