@@ -8,7 +8,7 @@ public class RangeWorldPowers : MonoBehaviour
 {
     public static RangeWorldPowers Instance;
     
-    [SerializeField] private float _detectionRange;
+    [SerializeField] private float _detectionRange = 15f;
 
     private PlayerTDController _player = null;
     private List<Materializer> _materializables = default;
@@ -77,6 +77,7 @@ public class RangeWorldPowers : MonoBehaviour
         if (_materializable == null) return;
 
         _materializable.ArtificialMaterialize();
+        _materializable.IsAble = false;
         _materializable.IsSelected = false;
         _materializable = null;
         _isActivated = false;
@@ -128,26 +129,15 @@ public class RangeWorldPowers : MonoBehaviour
         //}
     }
 
-    private List<Materializer> GetMaterializablesInRange()
-    {
-        var materializers = new List<Materializer>();
-
-        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
-        
-        foreach (var hit in hitColliders)
-        {
-            if (hit.TryGetComponent(out Materializer materializer))
-            {
-                materializers.Add(materializer);
-            }
-        }
-
-        return materializers.OrderBy(m => Vector3.Distance(_player.transform.position, m.transform.position))
-                           .ToList();
-    }
-
     private Materializer GetNearestMaterializable()
     {
+        if (_materializable != null)
+        {
+            _materializable.IsAble = false;
+            _materializable.IsSelected = false;
+            _materializable = null;
+        }
+
         var materializers = new List<Materializer>();
 
         Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
@@ -162,6 +152,24 @@ public class RangeWorldPowers : MonoBehaviour
 
         return materializers.OrderBy(m => Vector3.Distance(_player.transform.position, m.transform.position))
                            .FirstOrDefault();
+    }
+
+    private List<Materializer> GetMaterializablesInRange()
+    {
+        var materializers = new List<Materializer>();
+
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
+
+        foreach (var hit in hitColliders)
+        {
+            if (hit.TryGetComponent(out Materializer materializer))
+            {
+                materializers.Add(materializer);
+            }
+        }
+
+        return materializers.OrderBy(m => Vector3.Distance(_player.transform.position, m.transform.position))
+                           .ToList();
     }
 
     private void ChangeSelection(int direction)

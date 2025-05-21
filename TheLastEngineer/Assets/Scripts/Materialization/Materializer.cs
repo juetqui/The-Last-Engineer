@@ -6,6 +6,7 @@ public class Materializer : MonoBehaviour, IMaterializable
 {
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
+    [SerializeField] private bool _debug = false;
     [SerializeField] private Color _outlineColor;
     [SerializeField] private Color _outlineActiveColor;
     
@@ -29,24 +30,16 @@ public class Materializer : MonoBehaviour, IMaterializable
     private void Update()
     {
         if (IsSelected)
-        {
-            GetComponent<Renderer>().material = mySelectedMaterial;
-
-        }
+            _renderer.material = mySelectedMaterial;
         else if (IsAble)
-        {
-            GetComponent<Renderer>().material = myAbleMaterial;
-        }
+            _renderer.material = myAbleMaterial;
         else
-        {
-            GetComponent<Renderer>().material = _currentMat;
-
-        }
+            _renderer.material = _currentMat;
     }
     
     public void ResetSelection()
     {
-        GetComponent<Renderer>().material = _enabledMat;
+        _renderer.material = _enabledMat;
     }
 
     private void Start()
@@ -82,7 +75,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         Debug.Log("ArtificialMaterialize");
         IsMaterializeChanged = true;
-        ChangeMaterialize(!isMaterialized);
+        ChangeMaterialize(false);
 
         RangeWorldPowers.Instance.MaterializeReset += DesActivate;
     }
@@ -90,13 +83,15 @@ public class Materializer : MonoBehaviour, IMaterializable
     public void DesActivate()
     {
         IsMaterializeChanged = false;
-        ChangeMaterialize(!isMaterialized);
+        ChangeMaterialize(true);
         RangeWorldPowers.Instance.MaterializeReset -= DesActivate;
 
     }
 
     public void ChangeMaterialize(bool SetMaterialized)
     {
+        if (_debug) Debug.Log(SetMaterialized);
+
         _collider.isTrigger = !SetMaterialized;
         
         if (SetMaterialized)
