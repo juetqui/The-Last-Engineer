@@ -65,6 +65,7 @@ public class SolvingController : MonoBehaviour
             foreach (var item in skinnedMaterials)
             {
                 item.shader = MyShader;
+
                 //item.SetFloat("MaxBounds", MaxBound);
                 //item.SetFloat("MinBounds", MinBound);
             }

@@ -15,7 +15,6 @@ public class NodeModel
         _maxY = maxY;
         _moveSpeed = moveSpeed;
         _rotSpeed = rotSpeed;
-        
         _initialGlobalPosition = transform.position;
     }
 
@@ -25,9 +24,10 @@ public class NodeModel
         float newGlobalY = _initialGlobalPosition.y + offset;
 
         _initialY += _rotSpeed * Time.deltaTime;
-        _transform.rotation = Quaternion.Euler(0, _initialY, 0);
+        // _transform.rotation = Quaternion.Euler(0, _initialY, 0);
         _transform.position = new Vector3(_initialGlobalPosition.x, newGlobalY, _initialGlobalPosition.z);
     }
+    
 
     public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
     {

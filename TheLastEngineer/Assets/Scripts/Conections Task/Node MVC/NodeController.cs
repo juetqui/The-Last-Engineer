@@ -6,7 +6,8 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     [SerializeField] private Renderer _renderer;
     [SerializeField] private Material _material;
     [SerializeField] private Collider _collider;
-    
+    [SerializeField] protected Animator _myAnimator;
+
     [Header("For Player's Dash hability only<br>(if this script is <color=#14a3c7>MaterializerNode</color> set value greater than 0)")]
     [SerializeField] protected float _emissionIntensity = 4f;
 
@@ -39,17 +40,22 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     protected void OnAwake()
     {
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
-        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _emissionIntensity);
+        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _emissionIntensity, _myAnimator);
     }
 
     protected void OnStart()
     {
         _nodeView.OnStart();
+        //_nodeView.SetIdleAnim();
     }
 
     protected void OnUpdate()
     {
         if (!_isChildren) MoveObject();
+        else
+        {
+            _nodeView.SetCollectedAnim();
+        }
     }
 
     public bool CanInteract(PlayerTDController player)
@@ -120,7 +126,22 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     {
         StartCoroutine(_nodeView.ResetHability(dashDuration, dashCD));
     }
+    
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.GetComponent<PlayerTDController>())
+        {
+            _nodeView.SetIdleAnim();
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.GetComponent<PlayerTDController>())
+        {
+            _nodeView.SetRangeAnim();
 
+        }
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

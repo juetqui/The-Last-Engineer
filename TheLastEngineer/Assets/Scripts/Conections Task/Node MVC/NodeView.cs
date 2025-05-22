@@ -13,10 +13,11 @@ public class NodeView
     private Color _baseColor = Color.white;
     private float _time = 0, _currentIntensity = 0f;
     private bool _isReseting = false;
+    Animator _myAnimator;
 
     public bool IsReseting { get { return _isReseting; } }
 
-    public NodeView(Renderer renderer, Material material, Collider collider, Outline outline, Color outlineColor, float emissionIntensity)
+    public NodeView(Renderer renderer, Material material, Collider collider, Outline outline, Color outlineColor, float emissionIntensity,Animator animator)
     {
         _renderer = renderer;
         _material = material;
@@ -24,6 +25,7 @@ public class NodeView
         _outline = outline;
         _outlineColor = outlineColor;
         _emissionIntensity = emissionIntensity;
+        _myAnimator = animator;
     }
 
     public void OnStart()
@@ -36,7 +38,21 @@ public class NodeView
     {
         _collider.enabled = onOff;
     }
-
+    public void SetIdleAnim()
+    {
+        _myAnimator.SetBool("IsOnRange", false);
+        _myAnimator.SetBool("IsCollected", false);
+    }
+    public void SetCollectedAnim()
+    {
+        _myAnimator.SetBool("IsOnRange", false);
+        _myAnimator.SetBool("IsCollected", true);
+    }
+    public void SetRangeAnim()
+    {
+        _myAnimator.SetBool("IsOnRange", true);
+        _myAnimator.SetBool("IsCollected", false);
+    }
     public IEnumerator ResetHability(float dashDuration, float dashCD)
     {
         _isReseting = true;
