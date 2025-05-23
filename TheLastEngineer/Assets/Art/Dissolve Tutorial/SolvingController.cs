@@ -10,7 +10,7 @@ public class SolvingController : MonoBehaviour
     public float MaxBound;
     public float MinBound;
     public float secondToDissolve;
-
+    [SerializeField] GameObject otherParticles;
     public VisualEffect VFXGraph;
     public float ResetTimer;
     // en el tutorial los materiales estaban privados pero si no no funciona 
@@ -52,13 +52,14 @@ public class SolvingController : MonoBehaviour
     // Update is called once per frame
     public void BurnShader()
     {
-            StartCoroutine(DissolveCo());
+        StartCoroutine(DissolveCo());
     }
     
     IEnumerator DissolveCo()
     {
-        skinnedMaterials = MySkinnedMeshRenderer.materials;
+        otherParticles.SetActive(false);
 
+        skinnedMaterials = MySkinnedMeshRenderer.materials;
         if (skinnedMaterials != null)
         {
 
