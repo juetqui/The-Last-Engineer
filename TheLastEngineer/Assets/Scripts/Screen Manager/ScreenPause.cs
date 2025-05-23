@@ -21,7 +21,7 @@ public class ScreenPause : MonoBehaviour, IScreen
 
     public void Start()
     {
-        Cursor.visible = true;
+        Cursor.visible = false;
     }
 
     public void BTN_Back()

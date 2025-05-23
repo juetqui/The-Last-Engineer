@@ -4,6 +4,6 @@ public class freeCursor : MonoBehaviour
 {
     void Start()
     {
-        Cursor.visible = true;
+        Cursor.visible = false;
     }
 }
