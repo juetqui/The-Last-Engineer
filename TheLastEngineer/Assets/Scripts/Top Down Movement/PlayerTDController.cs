@@ -30,7 +30,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     
     private float _currentSpeed = default;
     private Vector3 _movement = default;
-    public NodeType _currentNodeType = NodeType.None;
+    private NodeType _currentNodeType = NodeType.None;
     private bool _dropAvailable = true;
 
     public bool DropAvailable { get => _dropAvailable; }
@@ -176,11 +176,14 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (_cc.isGrounded && !_playerModel.IsDashing)
         {
             var interactableTarget = GetClosestInteractable();
-            if (interactableTarget!=null)
+            
+            if (interactableTarget != null)
             {
-                transform.LookAt(new Vector3(interactableTarget.Transform.position.x, transform.position.y, interactableTarget.Transform.position.z));
+                Vector3 targetRot = new Vector3(interactableTarget.Transform.position.x, transform.position.y, interactableTarget.Transform.position.z);
 
+                transform.LookAt(targetRot);
             }
+
             _currentState?.HandleInteraction(interactableTarget);
         }
     }
@@ -268,22 +271,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         return false;
     }
 
-    public bool IsInFOV(Transform interactable)
-    {
-        Vector3 playerPos = new Vector3(transform.position.x - 1f, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f);
-        Vector3 grabPos = new Vector3(transform.forward.x, transform.forward.y, transform.forward.z - 0.25f);
-
-        if (Vector3.Distance(playerPos, interactable.position) > 6f)
-        {
-            return false;
-        }
-
-        Vector3 dir = (interactable.position - playerPos).normalized;
-        float angle = Vector3.Angle(grabPos, dir);
-
-        return angle <= _playerData.fovAngle * 0.5f;
-    }
-
     public void CheckDropAvailable(bool available)
     {
         _dropAvailable = !available;
@@ -293,11 +280,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
+    
     public void LaserCollition()
     {
-        _playerView.LaserCollition();
-        //if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
-
+        //_playerView.LaserCollition();
+        if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
 
     #region -----TRIGGERS MANAGEMENT-----
@@ -322,13 +309,5 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
         Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f);
         Gizmos.DrawRay(rayPos, transform.forward * 3f);
-
-        // Dibujar el cono de FOV
-        Gizmos.color = Color.yellow;
-        float halfFOV = _playerData.fovAngle * 0.5f;
-        Vector3 leftBoundary = Quaternion.Euler(0, -halfFOV, 0) * transform.forward * 5f;
-        Vector3 rightBoundary = Quaternion.Euler(0, halfFOV, 0) * transform.forward * 5f;
-        Gizmos.DrawRay(rayPos, leftBoundary);
-        Gizmos.DrawRay(rayPos, rightBoundary);
     }
 }

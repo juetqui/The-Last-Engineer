@@ -16,8 +16,6 @@ public class MaterializeController : MonoBehaviour
         {
             Instance = this;
         }
-
-        OnMaterialize?.Invoke(false);
     }
 
     private void Start()
@@ -29,6 +27,6 @@ public class MaterializeController : MonoBehaviour
     private void Materialize(bool materialize, NodeType nodeType)
     {
         if (nodeType != _requiredType) return;
-        OnMaterialize?.Invoke(!materialize);
+        OnMaterialize?.Invoke(materialize);
     }
 }

@@ -9,133 +9,116 @@ public class Materializer : MonoBehaviour, IMaterializable
     [SerializeField] private bool _debug = false;
     [SerializeField] private Color _outlineColor;
     [SerializeField] private Color _outlineActiveColor;
-    
-    private Rigidbody _myrb = default;
+    [SerializeField] private Material _selectedMat;
+    [SerializeField] private Material _selectionMat;
+
     private Collider _collider = default;
-    private bool _isTrigger = default;
     private MeshRenderer _renderer = default;
     private Material _enabledMat = default, _disabledMat = default, _currentMat = default;
     private Outline _outline = default;
+    private bool _isTrigger = default, _hasChangedState = false, _currentState = false;
+    private int _toggleCount = 0;
 
-    [SerializeField] private bool _currentEnabled = true;
-    public bool IsAble;//Gabi
-    public bool IsSelected; //Gabi
-    public bool IsMaterializeChanged;
-    public bool isMaterialized;
-    public Material mySelectedMaterial; // El objeto al que le queremos cambiar el color
-    public Material myAbleMaterial; // El objeto al que le queremos cambiar el color
-
-    public static event Action<bool> OnPlayerInsideTrigger;
- 
-    private void Update()
-    {
-        if (IsSelected)
-            _renderer.material = mySelectedMaterial;
-        else if (IsAble)
-            _renderer.material = myAbleMaterial;
-        else
-            _renderer.material = _currentMat;
-    }
-    
-    public void ResetSelection()
-    {
-        _renderer.material = _enabledMat;
-    }
+    public static event Action<bool> OnPlayerInsideTrigger = delegate { };
 
     private void Start()
     {
         _collider = GetComponent<Collider>();
         _renderer = GetComponent<MeshRenderer>();
         _isTrigger = _collider.isTrigger;
+
         _enabledMat = _renderer.material;
         _disabledMat = Resources.Load<Material>("Materials/M_Shield");
-        _currentEnabled = _startsEnabled;
+        
         _outline = gameObject.AddComponent<Outline>();
         _outline.OutlineColor = _outlineColor;
         _outline.OutlineWidth = 3;
-        
-        if(TryGetComponent(out Rigidbody rigidbody))
-        {
-            _myrb = rigidbody;
-        }
 
-        if (!_startsEnabled)
+        _currentState = _startsEnabled;
+
+        ChangeMaterialize(_startsEnabled);
+
+        MaterializeController.Instance.OnMaterialize += Materialize;
+        RangeWorldPowers.Instance.OnSelectionActivated += ActivateSelection;
+        RangeWorldPowers.Instance.OnObjectSelected += CheckSelected;
+    }
+
+    private void ActivateSelection(bool isActive)
+    {
+        if (isActive)
         {
-            Materialize(!_startsEnabled);
+            _renderer.material = _selectionMat;
         }
         else
         {
-            Materialize(_startsEnabled);
+            _renderer.material = _currentMat;
+        }
+    }
+
+    private void CheckSelected(Materializer selected)
+    {
+        if (selected == this)
+        {
+            _renderer.material = _selectedMat;
+        }
+        else
+        {
+            _renderer.material = _currentMat;
+        }
+    }
+
+    public void ToggleMaterialization()
+    {
+        _hasChangedState = true;
+        _toggleCount++;
+
+        if (_toggleCount % 2 == 0)
+        {
+            _toggleCount = 0;
         }
 
-        MaterializeController.Instance.OnMaterialize += Materialize;
+        bool targetState = !_currentState;
+        ChangeMaterialize(targetState);
     }
-    
-    public void ArtificialMaterialize()
-    {
-        Debug.Log("ArtificialMaterialize");
-        IsMaterializeChanged = true;
-        ChangeMaterialize(false);
 
-        RangeWorldPowers.Instance.MaterializeReset += DesActivate;
-    }
-    
-    public void DesActivate()
+    public void Materialize(bool materialize)
     {
-        IsMaterializeChanged = false;
-        ChangeMaterialize(true);
-        RangeWorldPowers.Instance.MaterializeReset -= DesActivate;
+        bool targetState;
 
+        if (materialize)
+        {
+            targetState = !_currentState;
+        }
+        else
+        {
+            targetState = _hasChangedState && (_toggleCount % 2 != 0) ? !_startsEnabled : _startsEnabled;
+            _currentState = targetState;
+            _hasChangedState = false;
+        }
+
+        ChangeMaterialize(targetState);
     }
 
     public void ChangeMaterialize(bool SetMaterialized)
     {
-        if (_debug) Debug.Log(SetMaterialized);
-
         _collider.isTrigger = !SetMaterialized;
-        
+        _isTrigger = _collider.isTrigger;
+        _currentState = SetMaterialized;
+
         if (SetMaterialized)
         {
             _renderer.shadowCastingMode = ShadowCastingMode.On;
             _currentMat = _enabledMat;
-            isMaterialized = true;
-            
-            if (_myrb)
-            {
-                _myrb.useGravity = true;
-            }
-            
             SetOutline(true);
         }
         else
         {
             _renderer.shadowCastingMode = ShadowCastingMode.Off;
             _currentMat = _disabledMat;
-            isMaterialized = false;
-
-            if (_myrb)
-            {
-                _myrb.useGravity = false;
-            }
-            
             SetOutline(false);
         }
-        _renderer.material = _currentMat;
-    }
-    
-    public void Materialize(bool materialize)
-    {
 
-        if (!_startsEnabled)
-        {
-            materialize = !materialize;
-        }
-        if (IsMaterializeChanged)
-        {
-            materialize = !materialize;
-        }
-        
-        ChangeMaterialize(materialize);
+        _renderer.material = _currentMat;
     }
 
     private void SetOutline(bool activate)
@@ -150,6 +133,7 @@ public class Materializer : MonoBehaviour, IMaterializable
         }
     }
 
+    #region COLLISION CHECKS
     public bool IsTrigger()
     {
         return _collider.isTrigger;
@@ -170,4 +154,5 @@ public class Materializer : MonoBehaviour, IMaterializable
             OnPlayerInsideTrigger?.Invoke(_isTrigger);
         }
     }
+    #endregion
 }

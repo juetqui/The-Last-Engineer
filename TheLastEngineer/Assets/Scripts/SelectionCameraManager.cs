@@ -12,7 +12,7 @@ public class SelectionCameraManager : MonoBehaviour
 
     void Start()
     {
-        RangeWorldPowers.Instance.MaterializeSelection += SetTarget;
+        //RangeWorldPowers.Instance.MaterializeSelection += SetTarget;
     }
 
     private void SetTarget(Transform target)

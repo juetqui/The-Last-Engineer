@@ -61,7 +61,7 @@ public class PlayerTDModel
         _platformDisplacement = displacement;
     }
 
-    private void RotatePlayer(Vector3 rotDir)
+    public void RotatePlayer(Vector3 rotDir)
     {
         Quaternion toRotation = Quaternion.LookRotation(rotDir.normalized, Vector3.up);
         _transform.rotation = Quaternion.Lerp(_transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
