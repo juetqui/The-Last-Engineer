@@ -283,7 +283,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     
     public void LaserCollition()
     {
-        //_playerView.LaserCollition();
+        _playerView.LaserCollition();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
 
