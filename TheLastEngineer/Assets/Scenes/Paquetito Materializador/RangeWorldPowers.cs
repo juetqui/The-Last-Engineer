@@ -11,8 +11,8 @@ public class RangeWorldPowers : MonoBehaviour
     [SerializeField] private float _detectionRange = 15f;
 
     private PlayerTDController _player = null;
-    private Materializer _materializable = null;
-    private bool _isActivated = false, _canUseAbility = false;
+    private Materializer _materializable = null, _lastToggled = null;
+    private bool _isSelecting = false, _canUseAbility = false;
 
     public event Action<bool> OnSelectionActivated = delegate { };
     public event Action<Materializer> OnObjectSelected = delegate { };
@@ -33,14 +33,10 @@ public class RangeWorldPowers : MonoBehaviour
 
     private void Update()
     {
-        if (_isActivated)
+        if (_isSelecting)
         {
             _materializable = GetNearestMaterializable();
-
-            if (_materializable != null)
-            {
-                OnObjectSelected?.Invoke(_materializable);
-            }
+            OnObjectSelected?.Invoke(_materializable);
         }
     }
 
@@ -77,64 +73,57 @@ public class RangeWorldPowers : MonoBehaviour
         if (hasNode && node == NodeType.Blue)
         {
             _canUseAbility = true;
+            _isSelecting = false;
+            OnSelectionActivated?.Invoke(false);
         }
         else
         {
             _canUseAbility = false;
-            _isActivated = false;
-            
-            if (_materializable != null)
-            {
-                _materializable = null;
-                OnSelectionActivated?.Invoke(false);
-            }
+            _isSelecting = false;
+            _materializable = null;
+            OnSelectionActivated?.Invoke(false);
         }
     }
 
-    public void TurnOnSelection(InputAction.CallbackContext context)
+    private void TurnOnSelection(InputAction.CallbackContext context)
     {
         if (!_canUseAbility) return;
 
-        _isActivated = !_isActivated;
-
-        if (!_isActivated)
-        {
-            OnSelectionActivated?.Invoke(false);
-            _materializable = null;
-            return;
-        }
-
-        OnSelectionActivated?.Invoke(true);
+        _isSelecting = !_isSelecting;
+        OnSelectionActivated?.Invoke(_isSelecting);
+        if (!_isSelecting) _materializable = null;
     }
 
-    public void ChangeMaterializationState(InputAction.CallbackContext context)
+    private void ChangeMaterializationState(InputAction.CallbackContext context)
     {
-        if (_materializable == null) return;
+        if (!_isSelecting || _materializable == null) return;
 
         _materializable.ToggleMaterialization();
+        _isSelecting = false;
         _materializable = null;
-        _isActivated = false;
-
         OnSelectionActivated?.Invoke(false);
     }
 
     private Materializer GetNearestMaterializable()
     {
-        _materializable = null;
-
-        var materializers = new List<Materializer>();
         Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
+        Materializer closest = null;
+        float minDistance = float.MaxValue;
 
         foreach (var hit in hitColliders)
         {
             if (hit.TryGetComponent(out Materializer materializer))
             {
-                materializers.Add(materializer);
+                float distance = Vector3.Distance(_player.transform.position, materializer.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closest = materializer;
+                }
             }
         }
 
-        return materializers.OrderBy(m => Vector3.Distance(_player.transform.position, m.transform.position))
-                           .FirstOrDefault();
+        return closest;
     }
 }
 

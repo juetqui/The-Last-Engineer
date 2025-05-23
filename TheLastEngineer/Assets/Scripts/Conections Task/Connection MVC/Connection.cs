@@ -39,4 +39,12 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
             succededInteraction = false;
         }
     }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out PlayerTDController player))
+        {
+            player.RemoveFromInteractables(this);
+        }
+    }
 }

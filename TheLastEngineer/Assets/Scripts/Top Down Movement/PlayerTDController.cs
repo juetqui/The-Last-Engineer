@@ -176,7 +176,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (_cc.isGrounded && !_playerModel.IsDashing)
         {
             var interactableTarget = GetClosestInteractable();
-            
+
             if (interactableTarget != null)
             {
                 Vector3 targetRot = new Vector3(interactableTarget.Transform.position.x, transform.position.y, interactableTarget.Transform.position.z);
@@ -285,6 +285,14 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         _playerView.LaserCollition();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
+    }
+
+    public void RemoveFromInteractables(IInteractable interactable)
+    {
+        if (_interactables.Contains(interactable))
+        {
+            _interactables.Remove(interactable);
+        }
     }
 
     #region -----TRIGGERS MANAGEMENT-----

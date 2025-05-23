@@ -16,8 +16,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     private MeshRenderer _renderer = default;
     private Material _enabledMat = default, _disabledMat = default, _currentMat = default;
     private Outline _outline = default;
-    private bool _isTrigger = default, _hasChangedState = false, _currentState = false;
-    private int _toggleCount = 0;
+    private bool _currentState = false, _finalState = false;
 
     public static event Action<bool> OnPlayerInsideTrigger = delegate { };
 
@@ -25,7 +24,6 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         _collider = GetComponent<Collider>();
         _renderer = GetComponent<MeshRenderer>();
-        _isTrigger = _collider.isTrigger;
 
         _enabledMat = _renderer.material;
         _disabledMat = Resources.Load<Material>("Materials/M_Shield");
@@ -34,106 +32,58 @@ public class Materializer : MonoBehaviour, IMaterializable
         _outline.OutlineColor = _outlineColor;
         _outline.OutlineWidth = 3;
 
-        _currentState = _startsEnabled;
+        _finalState = _currentState = _startsEnabled;
 
-        ChangeMaterialize(_startsEnabled);
+        UpdateAppearance(_currentState, SelectionType.Canceled);
 
         MaterializeController.Instance.OnMaterialize += Materialize;
         RangeWorldPowers.Instance.OnSelectionActivated += ActivateSelection;
         RangeWorldPowers.Instance.OnObjectSelected += CheckSelected;
     }
 
-    private void ActivateSelection(bool isActive)
+    private void OnDestroy()
     {
-        if (isActive)
-        {
-            _renderer.material = _selectionMat;
-        }
-        else
-        {
-            _renderer.material = _currentMat;
-        }
-    }
-
-    private void CheckSelected(Materializer selected)
-    {
-        if (selected == this)
-        {
-            _renderer.material = _selectedMat;
-        }
-        else
-        {
-            _renderer.material = _currentMat;
-        }
+        MaterializeController.Instance.OnMaterialize -= Materialize;
+        RangeWorldPowers.Instance.OnSelectionActivated -= ActivateSelection;
+        RangeWorldPowers.Instance.OnObjectSelected -= CheckSelected;
     }
 
     public void ToggleMaterialization()
     {
-        _hasChangedState = true;
-        _toggleCount++;
-
-        if (_toggleCount % 2 == 0)
-        {
-            _toggleCount = 0;
-        }
-
-        bool targetState = !_currentState;
-        ChangeMaterialize(targetState);
+        _currentState = !_currentState;
+        UpdateAppearance(_currentState, SelectionType.Canceled);
     }
 
     public void Materialize(bool materialize)
     {
-        bool targetState;
-
-        if (materialize)
-        {
-            targetState = !_currentState;
-        }
-        else
-        {
-            targetState = _hasChangedState && (_toggleCount % 2 != 0) ? !_startsEnabled : _startsEnabled;
-            _currentState = targetState;
-            _hasChangedState = false;
-        }
-
-        ChangeMaterialize(targetState);
+        _currentState = !_currentState;
+        UpdateAppearance(_currentState, SelectionType.Canceled);
     }
 
-    public void ChangeMaterialize(bool SetMaterialized)
+    private void ActivateSelection(bool isActive)
     {
-        _collider.isTrigger = !SetMaterialized;
-        _isTrigger = _collider.isTrigger;
-        _currentState = SetMaterialized;
-
-        if (SetMaterialized)
-        {
-            _renderer.shadowCastingMode = ShadowCastingMode.On;
-            _currentMat = _enabledMat;
-            SetOutline(true);
-        }
-        else
-        {
-            _renderer.shadowCastingMode = ShadowCastingMode.Off;
-            _currentMat = _disabledMat;
-            SetOutline(false);
-        }
-
-        _renderer.material = _currentMat;
+        UpdateAppearance(_currentState, isActive ? SelectionType.Selecting : SelectionType.Canceled);
     }
 
-    private void SetOutline(bool activate)
+    private void CheckSelected(Materializer selected)
     {
-        if (activate)
-        {
-            _outline.enabled = true;
-        }
-        else
-        {
-            _outline.enabled = false;
-        }
+        UpdateAppearance(_currentState, selected == this ? SelectionType.Selected : SelectionType.Selecting);
     }
 
-    #region COLLISION CHECKS
+    private void UpdateAppearance(bool isMaterialized, SelectionType selectionState)
+    {
+        _collider.isTrigger = !isMaterialized;
+        _renderer.shadowCastingMode = isMaterialized ? ShadowCastingMode.On : ShadowCastingMode.Off;
+        _outline.enabled = isMaterialized;
+
+        if (selectionState == SelectionType.Selecting)
+            _renderer.material = _selectionMat;
+        else if (selectionState == SelectionType.Selected)
+            _renderer.material = _selectedMat;
+        else
+            _renderer.material = isMaterialized ? _enabledMat : _disabledMat;
+    }
+
     public bool IsTrigger()
     {
         return _collider.isTrigger;
@@ -141,18 +91,17 @@ public class Materializer : MonoBehaviour, IMaterializable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out PlayerTDController player))
+        if (_collider.isTrigger && other.TryGetComponent(out PlayerTDController player))
         {
-            OnPlayerInsideTrigger?.Invoke(_isTrigger);
+            OnPlayerInsideTrigger?.Invoke(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.TryGetComponent(out PlayerTDController player))
+        if (_collider.isTrigger && other.TryGetComponent(out PlayerTDController player))
         {
-            OnPlayerInsideTrigger?.Invoke(_isTrigger);
+            OnPlayerInsideTrigger?.Invoke(false);
         }
     }
-    #endregion
 }
