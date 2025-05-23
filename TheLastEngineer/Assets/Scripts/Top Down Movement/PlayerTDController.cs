@@ -6,17 +6,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using DG.Tweening;
+using System.Collections;
 
 public class PlayerTDController : MonoBehaviour, IMovablePassenger
 {
     [SerializeField] private PlayerData _playerData;
-
     [Header("MVC Player View")]
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem[] _ps;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _walkSource;
     [SerializeField] private AudioSource _fxSource;
+    [SerializeField] private float _deadTimer;
 
     public static PlayerTDController Instance = null;
     [SerializeField] private SolvingController _solvingController;
@@ -27,7 +28,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private NodeController _node = default;
 
     private List<IInteractable> _interactables = default;
-    
+    public bool IsDead;
     private float _currentSpeed = default;
     private Vector3 _movement = default;
     private NodeType _currentNodeType = NodeType.None;
@@ -90,8 +91,16 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void Update()
     {
-        _playerModel.OnUpdate(GetMovement(), _currentSpeed);
-        _playerView.Walk(GetMovement());
+        if(IsDead==false)
+        {
+            _playerModel.OnUpdate(GetMovement(), _currentSpeed);
+            _playerView.Walk(GetMovement());
+
+
+        }
+
+
+
     }
 
     private Vector3 GetMovement()
@@ -159,7 +168,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (_playerModel.CanDash && GetMovement() != Vector3.zero)
+        if (_playerModel.CanDash && GetMovement() != Vector3.zero&& !IsDead)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
@@ -283,6 +292,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     
     public void LaserCollition()
     {
+        IsDead = true;
         _playerView.LaserCollition();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
@@ -301,9 +311,19 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (coll.TryGetComponent(out IInteractable interactable))
             _interactables.Add(interactable);
 
-        else if (coll.CompareTag("Void")) ResetLevel();
-    }
+        else if (coll.CompareTag("Void")) 
+        {
 
+            IsDead = true;
+            StartCoroutine(KillPlayer(_deadTimer));
+        }     }
+    IEnumerator KillPlayer(float deadTimer)
+    {
+        yield return new WaitForSeconds(deadTimer);
+
+        ResetLevel();
+
+    }
     private void OnTriggerExit(Collider coll)
     {
         if (coll.TryGetComponent(out IInteractable interactable))
