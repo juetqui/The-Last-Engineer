@@ -11,7 +11,7 @@ public class RangeWorldPowers : MonoBehaviour
     [SerializeField] private float _detectionRange = 15f;
 
     private PlayerTDController _player = null;
-    private Materializer _materializable = null, _lastToggled = null;
+    private Materializer _materializable = null;
     private bool _isSelecting = false, _canUseAbility = false;
 
     public event Action<bool> OnSelectionActivated = delegate { };

@@ -6,7 +6,6 @@ public class Materializer : MonoBehaviour, IMaterializable
 {
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
-    [SerializeField] private bool _debug = false;
     [SerializeField] private Color _outlineColor;
     [SerializeField] private Color _outlineActiveColor;
     [SerializeField] private Material _selectedMat;
@@ -14,9 +13,9 @@ public class Materializer : MonoBehaviour, IMaterializable
 
     private Collider _collider = default;
     private MeshRenderer _renderer = default;
-    private Material _enabledMat = default, _disabledMat = default, _currentMat = default;
+    private Material _enabledMat = default, _disabledMat = default;
     private Outline _outline = default;
-    private bool _currentState = false, _finalState = false;
+    private bool _currentState = false;
 
     public static event Action<bool> OnPlayerInsideTrigger = delegate { };
 
@@ -32,20 +31,28 @@ public class Materializer : MonoBehaviour, IMaterializable
         _outline.OutlineColor = _outlineColor;
         _outline.OutlineWidth = 3;
 
-        _finalState = _currentState = _startsEnabled;
+        _currentState = _startsEnabled;
 
         UpdateAppearance(_currentState, SelectionType.Canceled);
 
         MaterializeController.Instance.OnMaterialize += Materialize;
-        RangeWorldPowers.Instance.OnSelectionActivated += ActivateSelection;
-        RangeWorldPowers.Instance.OnObjectSelected += CheckSelected;
+
+        if (RangeWorldPowers.Instance != null)
+        {
+            RangeWorldPowers.Instance.OnSelectionActivated += ActivateSelection;
+            RangeWorldPowers.Instance.OnObjectSelected += CheckSelected;
+        }
     }
 
     private void OnDestroy()
     {
         MaterializeController.Instance.OnMaterialize -= Materialize;
-        RangeWorldPowers.Instance.OnSelectionActivated -= ActivateSelection;
-        RangeWorldPowers.Instance.OnObjectSelected -= CheckSelected;
+
+        if (RangeWorldPowers.Instance != null)
+        {
+            RangeWorldPowers.Instance.OnSelectionActivated -= ActivateSelection;
+            RangeWorldPowers.Instance.OnObjectSelected -= CheckSelected;
+        }
     }
 
     public void ToggleMaterialization()
