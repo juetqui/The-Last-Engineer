@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: ebc673f141fcf0f4fa60a4759d5b85a6, type: 2}
+  m_LightingDataAsset: {fileID: 0}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 22c38cbdae78f8842ac254a5f3a57cda, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -407,15 +407,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startsEnabled: 0
+  _debug: 0
   _outlineColor: {r: 0, g: 1, b: 0, a: 1}
   _outlineActiveColor: {r: 0, g: 0, b: 0, a: 0}
-  _currentEnabled: 1
-  IsAble: 0
-  IsSelected: 0
-  IsMaterializeChanged: 0
-  isMaterialized: 0
-  mySelectedMaterial: {fileID: 0}
-  myAbleMaterial: {fileID: 0}
+  _selectedMat: {fileID: 0}
+  _selectionMat: {fileID: 0}
 --- !u!114 &11739382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,15 +566,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startsEnabled: 0
+  _debug: 0
   _outlineColor: {r: 0, g: 1, b: 0, a: 1}
   _outlineActiveColor: {r: 0, g: 0, b: 0, a: 0}
-  _currentEnabled: 1
-  IsAble: 0
-  IsSelected: 0
-  IsMaterializeChanged: 0
-  isMaterialized: 0
-  mySelectedMaterial: {fileID: 0}
-  myAbleMaterial: {fileID: 0}
+  _selectedMat: {fileID: 0}
+  _selectionMat: {fileID: 0}
 --- !u!65 &59218605
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2501,15 +2493,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startsEnabled: 1
+  _debug: 0
   _outlineColor: {r: 0, g: 1, b: 0, a: 1}
   _outlineActiveColor: {r: 0, g: 0, b: 0, a: 0}
-  _currentEnabled: 1
-  IsAble: 0
-  IsSelected: 0
-  IsMaterializeChanged: 0
-  isMaterialized: 0
-  mySelectedMaterial: {fileID: 0}
-  myAbleMaterial: {fileID: 0}
+  _selectedMat: {fileID: 0}
+  _selectionMat: {fileID: 0}
 --- !u!114 &632113019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3891,15 +3879,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startsEnabled: 0
+  _debug: 0
   _outlineColor: {r: 0, g: 1, b: 0, a: 1}
   _outlineActiveColor: {r: 0, g: 0, b: 0, a: 0}
-  _currentEnabled: 1
-  IsAble: 0
-  IsSelected: 0
-  IsMaterializeChanged: 0
-  isMaterialized: 0
-  mySelectedMaterial: {fileID: 0}
-  myAbleMaterial: {fileID: 0}
+  _selectedMat: {fileID: 0}
+  _selectionMat: {fileID: 0}
 --- !u!114 &994425263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5230,15 +5214,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startsEnabled: 1
+  _debug: 0
   _outlineColor: {r: 0, g: 1, b: 0, a: 1}
   _outlineActiveColor: {r: 0, g: 0, b: 0, a: 0}
-  _currentEnabled: 1
-  IsAble: 0
-  IsSelected: 0
-  IsMaterializeChanged: 0
-  isMaterialized: 0
-  mySelectedMaterial: {fileID: 0}
-  myAbleMaterial: {fileID: 0}
+  _selectedMat: {fileID: 0}
+  _selectionMat: {fileID: 0}
 --- !u!114 &1519947419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13324,7 +13304,7 @@ Transform:
   m_GameObject: {fileID: 2574450827101085268}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 30, z: 8}
+  m_LocalPosition: {x: 4.84, y: 30, z: -6.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
