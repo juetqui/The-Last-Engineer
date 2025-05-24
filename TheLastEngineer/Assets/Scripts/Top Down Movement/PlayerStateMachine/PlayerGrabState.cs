@@ -23,7 +23,7 @@ public class PlayerGrabState : IPlayerState
             {
                 _playerController.DropOrGrabNode(false);
                 _playerController.ReleaseNode();
-                _playerController.RemoveFromInteractables(interactable);
+                _playerController.RemoveInteractable(interactable);
                 _playerController.SetState(_playerController.EmptyState);
                 InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
             }

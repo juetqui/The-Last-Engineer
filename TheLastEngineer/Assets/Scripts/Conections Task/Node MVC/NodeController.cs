@@ -103,6 +103,11 @@ public abstract class NodeController : MonoBehaviour, IInteractable
         if (!parentIsPlayer && newParent != null)
         {
             _connectable = newParent.GetComponent<IConnectable>();
+
+            //if (_connectable != null)
+            //{
+            //    PlayerTDController.Instance.RemoveFromInteractables(this);
+            //}
         }
 
         if (newParent != null) _isChildren = true;
