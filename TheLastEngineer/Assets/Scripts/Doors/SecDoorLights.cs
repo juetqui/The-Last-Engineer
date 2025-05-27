@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class SecDoorLights : MonoBehaviour
@@ -11,7 +12,6 @@ public class SecDoorLights : MonoBehaviour
     
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _openedColor;
-
 
     private MeshRenderer _renderer;
     private Color _currentColor = default, _startColor = default, _targetColor = default;
@@ -27,11 +27,6 @@ public class SecDoorLights : MonoBehaviour
         _secTM.onRunning += StartLerp;
     }
 
-    void Update()
-    {
-        if (_isLerping) LerpColors();
-    }
-
     private void StartLerp(bool isRunning)
     {
         if (_index == 0)
@@ -42,20 +37,25 @@ public class SecDoorLights : MonoBehaviour
 
         _startColor = isRunning ? _closedColor : _openedColor;
         _targetColor = isRunning ? _openedColor : _closedColor;
-        _time = 0;
-        _isLerping = true;
+
+        StartCoroutine(LerpColors());
     }
 
-    private void LerpColors()
+    private IEnumerator LerpColors()
     {
-        _time += Time.deltaTime / _lerpTime;
-        _time = Mathf.Clamp01(_time);
-        _currentColor = Color.Lerp(_startColor, _targetColor, _time);
-        _renderer.material.SetColor("_EmissionColor", _currentColor);
+        _time = 0f;
 
-        if (_light != null)
-            _light.color = _currentColor;
+        while (_time < _lerpTime)
+        {
+            _time += Time.deltaTime / _lerpTime;
+            _time = Mathf.Clamp01(_time);
+            _currentColor = Color.Lerp(_startColor, _targetColor, _time);
+            _renderer.material.SetColor("_EmissionColor", _currentColor);
 
-        if (_time >= 1.0f) _isLerping = false;
+            if (_light != null)
+                _light.color = _currentColor;
+
+            yield return null;
+        }
     }
 }
