@@ -91,15 +91,18 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void Update()
     {
-        if(!_isDead)
-        {
-            _playerModel.OnUpdate(GetMovement(), _currentSpeed);
+        
+        _playerModel.OnUpdate(GetMovement(), _currentSpeed);
             _playerView.Walk(GetMovement());
-        }
+        
     }
 
     private Vector3 GetMovement()
     {
+        if (_isDead)
+        {
+            return Vector3.zero;
+        }
         _movement = InputManager.Instance.moveInput.ReadValue<Vector2>();
 
         return new Vector3(_movement.x, 0, _movement.y);
