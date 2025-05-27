@@ -28,7 +28,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private NodeController _node = default;
 
     private List<IInteractable> _interactables = default;
-    public bool IsDead;
+    private bool _isDead = false;
     private float _currentSpeed = default;
     private Vector3 _movement = default;
     private NodeType _currentNodeType = NodeType.None;
@@ -91,20 +91,18 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void Update()
     {
-        if(IsDead==false)
-        {
-            _playerModel.OnUpdate(GetMovement(), _currentSpeed);
+        
+        _playerModel.OnUpdate(GetMovement(), _currentSpeed);
             _playerView.Walk(GetMovement());
-
-
-        }
-
-
-
+        
     }
 
     private Vector3 GetMovement()
     {
+        if (_isDead)
+        {
+            return Vector3.zero;
+        }
         _movement = InputManager.Instance.moveInput.ReadValue<Vector2>();
 
         return new Vector3(_movement.x, 0, _movement.y);
@@ -168,7 +166,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (_playerModel.CanDash && GetMovement() != Vector3.zero&& !IsDead)
+        if (_playerModel.CanDash && GetMovement() != Vector3.zero&& !_isDead)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
@@ -205,6 +203,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private IInteractable GetClosestInteractable()
     {
+        foreach (var item in _interactables)
+        {
+            Debug.Log(_interactables.Count());
+        }
+
         return _interactables
             .Where(i => i.CanInteract(this)) //&& IsInFOV(i.Transform))
             .OrderByDescending(i => i.Priority)
@@ -251,6 +254,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (_node == null) return;
 
         _node.Attach(_node.transform.position);
+        RemoveInteractable(_node);
         ResetNode();
     }
 
@@ -292,7 +296,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     
     public void LaserCollition()
     {
-        IsDead = true;
+        _isDead = true;
         _playerView.LaserCollition();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
@@ -313,10 +317,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
         else if (coll.CompareTag("Void")) 
         {
-
-            IsDead = true;
+            _isDead = true;
             StartCoroutine(KillPlayer(_deadTimer));
-        }     }
+        }     
+    }
+
     IEnumerator KillPlayer(float deadTimer)
     {
         yield return new WaitForSeconds(deadTimer);

@@ -61,7 +61,7 @@ public class MoveObject : MonoBehaviour
     private IEnumerator MoveToTarget()
     {
         _isMoving = true;
-        _collider.enabled = false;
+        //_collider.enabled = false;
         gameObject.tag = "Untagged";
 
         while (_isMoving)
@@ -89,7 +89,7 @@ public class MoveObject : MonoBehaviour
 
                 _isMoving = false;
                 _shouldMove = false;
-                _collider.enabled = true;
+                //_collider.enabled = true;
                 gameObject.tag = _tag;
                 
                 yield break;

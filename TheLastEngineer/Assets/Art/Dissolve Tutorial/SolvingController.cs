@@ -67,8 +67,8 @@ public class SolvingController : MonoBehaviour
             {
                 item.shader = MyShader;
 
-                //item.SetFloat("MaxBounds", MaxBound);
-                //item.SetFloat("MinBounds", MinBound);
+                item.SetFloat("_MaxHeight", MaxBound);
+                item.SetFloat("_MinHeight", MinBound);
             }
             _rateQty = duration/refreshRate;
             _totalDissolve = skinnedMaterials[0].GetFloat("_DisolveProgress");
@@ -103,7 +103,7 @@ public class SolvingController : MonoBehaviour
                 vector3 += Vector3.up * (_killerDistance / _rateQty);
                 VFXGraph.SetInt("initialParticleRate", particlesCount += particleIncreaseRate);
                 VFXGraph.SetVector3("StartKillerSize", (killerSize + vector3 * 1.5f));
-                print(vector3);
+                print(VFXGraph.GetVector3("StartKillerSize"));
                 print(killerSize + vector3);
                 counter += _totalDissolve / _rateQty;
                 for (int i = 0; i < skinnedMaterials.Length; i++)
