@@ -7,8 +7,6 @@ public class Materializer : MonoBehaviour, IMaterializable
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
     [SerializeField] private Color _outlineColor;
-    [SerializeField] private Material _selectedMat;
-    [SerializeField] private Material _selectionMat;
 
     private Collider _collider = default;
     private MeshRenderer _renderer = default;
@@ -36,10 +34,10 @@ public class Materializer : MonoBehaviour, IMaterializable
 
         MaterializeController.Instance.OnMaterialize += Materialize;
 
-        if (RangeWorldPowers.Instance != null)
+        if (ActiveMaterialization.Instance != null)
         {
-            RangeWorldPowers.Instance.OnSelectionActivated += ActivateSelection;
-            RangeWorldPowers.Instance.OnObjectSelected += CheckSelected;
+            ActiveMaterialization.Instance.OnSelectionActivated += ActivateSelection;
+            ActiveMaterialization.Instance.OnObjectSelected += CheckSelected;
         }
     }
 
@@ -47,10 +45,10 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         MaterializeController.Instance.OnMaterialize -= Materialize;
 
-        if (RangeWorldPowers.Instance != null)
+        if (ActiveMaterialization.Instance != null)
         {
-            RangeWorldPowers.Instance.OnSelectionActivated -= ActivateSelection;
-            RangeWorldPowers.Instance.OnObjectSelected -= CheckSelected;
+            ActiveMaterialization.Instance.OnSelectionActivated -= ActivateSelection;
+            ActiveMaterialization.Instance.OnObjectSelected -= CheckSelected;
         }
     }
 
@@ -80,18 +78,11 @@ public class Materializer : MonoBehaviour, IMaterializable
     {
         _collider.isTrigger = !isMaterialized;
         _renderer.shadowCastingMode = isMaterialized ? ShadowCastingMode.On : ShadowCastingMode.Off;
-        //_outline.enabled = isMaterialized;
 
         if (selectionState == SelectionType.On)
-        {
-            //_renderer.material = _selectionMat;
             _outline.OutlineColor = Color.yellow;
-        }
         else if (selectionState == SelectionType.Selected)
-        {
-            //_renderer.material = _selectedMat;
             _outline.OutlineColor = Color.green;
-        }
         else
         {
             _outline.OutlineColor = _outlineColor;

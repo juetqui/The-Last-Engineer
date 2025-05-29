@@ -2,9 +2,9 @@ using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
 
-public class RangeWorldPowers : MonoBehaviour
+public class ActiveMaterialization : MonoBehaviour
 {
-    public static RangeWorldPowers Instance;
+    public static ActiveMaterialization Instance;
 
     [SerializeField] private float _detectionRange = 6;
 
