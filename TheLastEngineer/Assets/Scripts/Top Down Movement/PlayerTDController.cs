@@ -203,11 +203,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private IInteractable GetClosestInteractable()
     {
-        foreach (var item in _interactables)
-        {
-            Debug.Log(_interactables.Count());
-        }
-
         return _interactables
             .Where(i => i.CanInteract(this)) //&& IsInFOV(i.Transform))
             .OrderByDescending(i => i.Priority)

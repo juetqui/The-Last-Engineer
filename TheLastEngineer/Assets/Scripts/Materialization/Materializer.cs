@@ -7,7 +7,6 @@ public class Materializer : MonoBehaviour, IMaterializable
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
     [SerializeField] private Color _outlineColor;
-    [SerializeField] private Color _outlineActiveColor;
     [SerializeField] private Material _selectedMat;
     [SerializeField] private Material _selectionMat;
 
@@ -33,7 +32,7 @@ public class Materializer : MonoBehaviour, IMaterializable
 
         _currentState = _startsEnabled;
 
-        UpdateAppearance(_currentState, SelectionType.Canceled);
+        UpdateAppearance(_currentState, SelectionType.Off);
 
         MaterializeController.Instance.OnMaterialize += Materialize;
 
@@ -58,37 +57,46 @@ public class Materializer : MonoBehaviour, IMaterializable
     public void ToggleMaterialization()
     {
         _currentState = !_currentState;
-        UpdateAppearance(_currentState, SelectionType.Canceled);
+        UpdateAppearance(_currentState, SelectionType.Off);
     }
 
     public void Materialize(bool materialize)
     {
         _currentState = !_currentState;
-        UpdateAppearance(_currentState, SelectionType.Canceled);
+        UpdateAppearance(_currentState, SelectionType.Off);
     }
 
     private void ActivateSelection(bool isActive)
     {
-        UpdateAppearance(_currentState, isActive ? SelectionType.Selecting : SelectionType.Canceled);
+        UpdateAppearance(_currentState, isActive ? SelectionType.On : SelectionType.Off);
     }
 
     private void CheckSelected(Materializer selected)
     {
-        UpdateAppearance(_currentState, selected == this ? SelectionType.Selected : SelectionType.Selecting);
+        UpdateAppearance(_currentState, selected == this ? SelectionType.Selected : SelectionType.On);
     }
 
     private void UpdateAppearance(bool isMaterialized, SelectionType selectionState)
     {
         _collider.isTrigger = !isMaterialized;
         _renderer.shadowCastingMode = isMaterialized ? ShadowCastingMode.On : ShadowCastingMode.Off;
-        _outline.enabled = isMaterialized;
+        //_outline.enabled = isMaterialized;
 
-        if (selectionState == SelectionType.Selecting)
-            _renderer.material = _selectionMat;
+        if (selectionState == SelectionType.On)
+        {
+            //_renderer.material = _selectionMat;
+            _outline.OutlineColor = Color.yellow;
+        }
         else if (selectionState == SelectionType.Selected)
-            _renderer.material = _selectedMat;
+        {
+            //_renderer.material = _selectedMat;
+            _outline.OutlineColor = Color.green;
+        }
         else
+        {
+            _outline.OutlineColor = _outlineColor;
             _renderer.material = isMaterialized ? _enabledMat : _disabledMat;
+        }
     }
 
     public bool IsTrigger()

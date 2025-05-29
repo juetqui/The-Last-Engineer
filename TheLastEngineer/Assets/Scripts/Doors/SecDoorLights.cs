@@ -17,7 +17,6 @@ public class SecDoorLights : MonoBehaviour
     private Color _currentColor = default, _startColor = default, _targetColor = default;
     private int _index = 0;
     private float _time = 0;
-    private bool _isLerping = false;
 
     void Start()
     {
