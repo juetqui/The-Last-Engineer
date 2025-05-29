@@ -10,8 +10,7 @@ public enum NodeType
     None,
     Purple,
     Green,
-    Blue,
-    Dash
+    Blue
 }
 
 public enum InteractablePriority

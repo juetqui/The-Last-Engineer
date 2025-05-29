@@ -7,7 +7,7 @@ public class NodeEffectController : MonoBehaviour
 {
     public static NodeEffectController Instance = null;
 
-    [SerializeField] private NodeType _requiredType;
+    [SerializeField] private NodeType _requiredType = NodeType.Purple;
 
     public Action<bool> OnToggleObjects = delegate { };
 

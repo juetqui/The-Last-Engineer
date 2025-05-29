@@ -1,17 +1,15 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
-using System.Linq;
 
-public class RangeWorldPowers : MonoBehaviour
+public class ActiveMaterialization : MonoBehaviour
 {
-    public static RangeWorldPowers Instance;
+    public static ActiveMaterialization Instance;
 
-    [SerializeField] private float _detectionRange = 15f;
+    [SerializeField] private float _detectionRange = 6;
 
     private PlayerTDController _player = null;
-    private Materializer _materializable = null;
+    private Materializer _materializable = null, _lastChanged = null;
     private bool _isSelecting = false, _canUseAbility = false;
 
     public event Action<bool> OnSelectionActivated = delegate { };
@@ -51,13 +49,13 @@ public class RangeWorldPowers : MonoBehaviour
 
     public void OnEnableInputs()
     {
-        InputManager.Instance.shieldInput.performed += TurnOnSelection;
+        //InputManager.Instance.shieldInput.performed += TurnOnSelection;
         InputManager.Instance.modoDer.performed += ChangeMaterializationState;
     }
 
     public void OnDisableInputs()
     {
-        InputManager.Instance.shieldInput.performed -= TurnOnSelection;
+        //InputManager.Instance.shieldInput.performed -= TurnOnSelection;
         InputManager.Instance.modoDer.performed -= ChangeMaterializationState;
     }
 
@@ -73,14 +71,15 @@ public class RangeWorldPowers : MonoBehaviour
         if (hasNode && node == NodeType.Blue)
         {
             _canUseAbility = true;
-            _isSelecting = false;
-            OnSelectionActivated?.Invoke(false);
+            _isSelecting = true;
+            OnSelectionActivated?.Invoke(true);
         }
         else
         {
             _canUseAbility = false;
             _isSelecting = false;
             _materializable = null;
+            _lastChanged = null;
             OnSelectionActivated?.Invoke(false);
         }
     }
@@ -91,17 +90,28 @@ public class RangeWorldPowers : MonoBehaviour
 
         _isSelecting = !_isSelecting;
         OnSelectionActivated?.Invoke(_isSelecting);
-        if (!_isSelecting) _materializable = null;
+
+        if (!_isSelecting)
+        {
+            _materializable = null;
+            _lastChanged = null;
+        }
     }
 
     private void ChangeMaterializationState(InputAction.CallbackContext context)
     {
         if (!_isSelecting || _materializable == null) return;
 
+        if (_lastChanged != null && _lastChanged != _materializable)
+        {
+            _lastChanged.ToggleMaterialization();
+        }
+
         _materializable.ToggleMaterialization();
-        _isSelecting = false;
+        //_isSelecting = false;
+        _lastChanged = _materializable;
         _materializable = null;
-        OnSelectionActivated?.Invoke(false);
+        //OnSelectionActivated?.Invoke(false);
     }
 
     private Materializer GetNearestMaterializable()
@@ -129,7 +139,7 @@ public class RangeWorldPowers : MonoBehaviour
 
 public enum SelectionType
 {
-    Selecting,
-    Selected,
-    Canceled
+    On,
+    Off,
+    Selected
 }
