@@ -8,7 +8,7 @@ public class RangeWorldPowers : MonoBehaviour
 {
     public static RangeWorldPowers Instance;
 
-    [SerializeField] private float _detectionRange = 15f;
+    [SerializeField] private float _detectionRange = 6;
 
     private PlayerTDController _player = null;
     private Materializer _materializable = null;
