@@ -8,7 +8,7 @@ public class NodeEffectController : MonoBehaviour
     public static NodeEffectController Instance = null;
 
     [SerializeField] private NodeType _requiredType = NodeType.Purple;
-    [SerializeField] private float _defaultCD = 1f, _nodeCD = 2.5f;
+    [SerializeField] private float _defaultCD = 0.5f, _nodeCD = 2.5f;
 
     private float _currentCD = default;
     private bool _toggle = false;
