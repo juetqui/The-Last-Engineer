@@ -7,6 +7,7 @@ public class Materializer : MonoBehaviour, IMaterializable
     [Header("<color=#FF00FF>TOGGLE TO START OBJECT (UN)-MATERIALIZED</color>")]
     [SerializeField] private bool _startsEnabled = true;
     [SerializeField] private Color _outlineColor;
+    [SerializeField] private int _activeOutlineWidth = 7;
 
     private Collider _collider = default;
     private MeshRenderer _renderer = default;
@@ -80,9 +81,15 @@ public class Materializer : MonoBehaviour, IMaterializable
         _renderer.shadowCastingMode = isMaterialized ? ShadowCastingMode.On : ShadowCastingMode.Off;
 
         if (selectionState == SelectionType.On)
+        {
+            _outline.OutlineWidth = 3;
             _outline.OutlineColor = Color.yellow;
+        }
         else if (selectionState == SelectionType.Selected)
+        {
+            _outline.OutlineWidth = _activeOutlineWidth;
             _outline.OutlineColor = Color.green;
+        }
         else
         {
             _outline.OutlineColor = _outlineColor;

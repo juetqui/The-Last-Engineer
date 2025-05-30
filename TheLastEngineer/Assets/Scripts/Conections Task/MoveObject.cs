@@ -1,17 +1,20 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MoveObject : MonoBehaviour
 {
-    [SerializeField] Transform _targetTransform;
-    [SerializeField] float _moveSpeed = 20f;
+    [SerializeField] private Transform _targetTransform;
+    [SerializeField] private float _moveSpeed = 20f;
+    [SerializeField] private Color _outlineColor;
 
     private Vector3 _originalPos = default, _currentPos = default, _targetPos = default;
     private Quaternion _originalRot = default, _currentRot = default, _targetRot = default;
 
+    private Outline _outline = default;
     private Collider _collider = default;
     private string _tag = "";
-    private bool _isMoving = false, _toggle = false, _shouldMove = false;
+    private bool _isMoving = false, _toggle = false;
 
     private void Awake()
     {
@@ -23,21 +26,47 @@ public class MoveObject : MonoBehaviour
 
     void Start()
     {
+        _outline = gameObject.AddComponent<Outline>();
+        _outline.OutlineColor = _outlineColor;
+        _outline.OutlineWidth = 3;
+
         NodeEffectController.Instance.OnToggleObjects += SetTarget;
+        ActiveObjectMove.Instance.OnSelectionActivated += ActivateSelection;
+        ActiveObjectMove.Instance.OnObjectSelected += CheckSelected;
     }
 
-    void Update()
+    private void ActivateSelection(bool isSelecting)
     {
-        if (!_isMoving && _shouldMove)
+        _outline.OutlineWidth = 3;
+
+        if (isSelecting)
+            _outline.OutlineColor = Color.yellow;
+        else
+            _outline.OutlineColor = _outlineColor;
+    }
+
+    private void CheckSelected(MoveObject targetObject)
+    {
+        if (targetObject != this)
         {
-            StartCoroutine(MoveToTarget());
+            _outline.OutlineWidth = 3;
+            _outline.OutlineColor = Color.yellow;
+            return;
         }
+
+        _outline.OutlineColor = Color.green;
+        _outline.OutlineWidth = 7;
+    }
+
+    public void TogglePos()
+    {
+        _toggle = !_toggle;
+        SetTarget(_toggle);
     }
 
     private void SetTarget(bool toggle)
     {
         _toggle = toggle;
-        _shouldMove = true;
         _isMoving = false;
 
         if (toggle)
@@ -56,12 +85,13 @@ public class MoveObject : MonoBehaviour
             _targetPos = _originalPos;
             _targetRot = _originalRot;
         }
+
+        StartCoroutine(MoveToTarget());
     }
 
     private IEnumerator MoveToTarget()
     {
         _isMoving = true;
-        //_collider.enabled = false;
         gameObject.tag = "Untagged";
 
         while (_isMoving)
@@ -88,7 +118,6 @@ public class MoveObject : MonoBehaviour
                 transform.rotation = _targetRot;
 
                 _isMoving = false;
-                _shouldMove = false;
                 //_collider.enabled = true;
                 gameObject.tag = _tag;
                 
