@@ -31,8 +31,12 @@ public class MoveObject : MonoBehaviour
         _outline.OutlineWidth = 3;
 
         NodeEffectController.Instance.OnToggleObjects += SetTarget;
-        ActiveObjectMove.Instance.OnSelectionActivated += ActivateSelection;
-        ActiveObjectMove.Instance.OnObjectSelected += CheckSelected;
+
+        if (ActiveObjectMove.Instance != null)
+        {
+            ActiveObjectMove.Instance.OnSelectionActivated += ActivateSelection;
+            ActiveObjectMove.Instance.OnObjectSelected += CheckSelected;
+        }
     }
 
     private void ActivateSelection(bool isSelecting)
