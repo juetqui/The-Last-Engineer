@@ -11,7 +11,7 @@ public class LevelSelector : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SceneManager.LoadScene("Lvl Inicial 1");
+            SceneManager.LoadScene("Lvl Inicial");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
