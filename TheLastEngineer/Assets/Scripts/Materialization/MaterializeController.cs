@@ -29,19 +29,19 @@ public class MaterializeController : MonoBehaviour
         _player = PlayerTDController.Instance;
         _player.OnNodeGrabed += Materialize;
 
-        StartCoroutine(ToggleMaterialization());
+        //StartCoroutine(ToggleMaterialization());
     }
 
     private void Materialize(bool hasNode, NodeType nodeType)
     {
         if (nodeType != _requiredType) return;
 
-        if (hasNode)
-            _currentCD = _nodeCD;
-        else
-            _currentCD = _defaultCD;
+        //if (hasNode)
+        //    _currentCD = _nodeCD;
+        //else
+        //    _currentCD = _defaultCD;
 
-        //OnMaterialize?.Invoke(materialize);
+        OnMaterialize?.Invoke(hasNode);
     }
 
     private IEnumerator ToggleMaterialization()

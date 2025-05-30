@@ -95,6 +95,11 @@ public class Materializer : MonoBehaviour, IMaterializable
             _outline.OutlineColor = _outlineColor;
             _renderer.material = isMaterialized ? _enabledMat : _disabledMat;
         }
+
+        if (TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = isMaterialized;
+        }
     }
 
     public bool IsTrigger()
