@@ -15,7 +15,9 @@ public class SpecificConnectionController : Connection<SecondaryTM>
     [SerializeField] private AudioClip _errorClip;
     [SerializeField] private Color _color;
     [SerializeField] private Color _secColor;
-
+    [SerializeField] ParticleSystem idlePSystem;
+    [SerializeField] ParticleSystem correctPSystem;
+    [SerializeField] GameObject correcNodeIndicator;
     [ColorUsage(true, true)]
     [SerializeField] private Color _fresnelColor;
 
@@ -45,6 +47,12 @@ public class SpecificConnectionController : Connection<SecondaryTM>
 
     public override bool CanInteract(PlayerTDController player)
     {
+        if (correctPSystem != null)
+            correctPSystem.Stop();
+        if (correcNodeIndicator != null)
+            correcNodeIndicator.SetActive(false);
+        if (idlePSystem != null)
+            idlePSystem.Stop();
         return player.HasNode() && !_isDisabled;
     }
 
@@ -66,7 +74,35 @@ public class SpecificConnectionController : Connection<SecondaryTM>
         _connectionView.Enable(true);
         _connectionView.EnableTrigger(true);
     }
-
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent(out PlayerTDController playerTDController))
+        {
+          
+            if (idlePSystem != null && playerTDController.HasNode() && playerTDController.GetCurrentNode().NodeType == _requiredType)
+            {
+                idlePSystem.Stop();
+                idlePSystem.Clear();
+            }
+                
+            if (correctPSystem != null && playerTDController.HasNode() && playerTDController.GetCurrentNode().NodeType == _requiredType)
+                correctPSystem.Play();
+            if (correcNodeIndicator != null && playerTDController.HasNode() && playerTDController.GetCurrentNode().NodeType == _requiredType)
+                correcNodeIndicator.SetActive(true);
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out PlayerTDController playerTDController))
+        {
+            if (correctPSystem != null)
+            correctPSystem.Stop();
+            if (correcNodeIndicator != null)
+                correcNodeIndicator.SetActive(false);
+            if (idlePSystem != null)
+            idlePSystem.Play();
+        }
+    }
     private void CheckReceivedNode()
     {
         _connectionView.EnableTrigger(false);
