@@ -9,7 +9,7 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private float _waitCD;
     [SerializeField] private LayerMask _floorMask;
 
-    private NodeType _requiredNode = NodeType.Blue;
+    private NodeType _requiredNode = NodeType.Green;
     private IMovablePassenger _passenger = default;
     private Vector3 _targetPos = default;
     private int _index = 0;
@@ -29,13 +29,13 @@ public class PlatformController : MonoBehaviour
 
     private void MovePlatform()
     {
-        if (!_canMove)
-        {
-            _targetPos = _positions[0].position;
+        if (!_canMove) return;
+        //{
+        //    _targetPos = _positions[0].position;
 
-            if (Vector3.Distance(transform.position, _targetPos) > 0.1f)
-                MoveToTarget();
-        }
+        //    if (Vector3.Distance(transform.position, _targetPos) > 0.1f)
+        //        MoveToTarget();
+        //}
 
         if (_canMove && !_arrived && _waitingToMove == null)
         {

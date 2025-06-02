@@ -7,6 +7,7 @@ public class MoveControl : MonoBehaviour
 {
     public static MoveControl Instance = null;
 
+    [SerializeField] private NodeType _requiredType = NodeType.Green;
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
 
@@ -41,7 +42,7 @@ public class MoveControl : MonoBehaviour
 
     private void CheckNode(bool hasNode, NodeType nodeType)
     {
-        _currentDuration = (!hasNode || nodeType != NodeType.Green) ? _defaultDuration : _nodeDuration;
+        _currentDuration = (!hasNode || nodeType != _requiredType) ? _defaultDuration : _nodeDuration;
     }
 
     private IEnumerator StartTimer()
