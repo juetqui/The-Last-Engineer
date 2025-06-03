@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
 
 public class PressuredDoor : MonoBehaviour
 {
@@ -10,7 +9,8 @@ public class PressuredDoor : MonoBehaviour
     [SerializeField] private PressurePlate[] _plates;
     [SerializeField] private float _restartCD;
 
-    private MeshRenderer _renderer;
+    private Animator _animator = default;
+    //private MeshRenderer _renderer = default;
     private int _pressedPlates = 0;
     private bool _taskFinished = false;
 
@@ -18,8 +18,9 @@ public class PressuredDoor : MonoBehaviour
 
     void Start()
     {
-        _renderer = GetComponent<MeshRenderer>();
-        _renderer.material = _commonMat;
+        _animator = GetComponent<Animator>();
+        //_renderer = GetComponent<MeshRenderer>();
+        //_renderer.material = _commonMat;
 
         foreach (var plate in _plates)
         {
@@ -29,15 +30,14 @@ public class PressuredDoor : MonoBehaviour
 
     void Update()
     {
-        if (_pressedPlates == _plates.Length && !_taskFinished)
-        {
-            OnTaskFinished?.Invoke(true);
-            StartCoroutine(RestartTask());
-        }
-        else if(_renderer.material != _commonMat && !_taskFinished)
-        {
-            _renderer.material = _commonMat;
-        }
+        //if (_pressedPlates == _plates.Length && !_taskFinished)
+        //{
+            //StartCoroutine(RestartTask());
+        //}
+        //else if(_renderer.material != _commonMat && !_taskFinished)
+        //{
+        //    _renderer.material = _commonMat;
+        //}
     }
 
     private void CheckPlates(bool pressed)
@@ -45,6 +45,14 @@ public class PressuredDoor : MonoBehaviour
         if (pressed)
         {
             _pressedPlates++;
+
+            if (_pressedPlates == _plates.Length && !_taskFinished)
+            {
+                _taskFinished = true;
+                _animator.SetBool("Open", true);
+                OnTaskFinished?.Invoke(true);
+                //StartCoroutine(RestartTask());
+            }
         }
         else
         {
@@ -57,12 +65,15 @@ public class PressuredDoor : MonoBehaviour
     private IEnumerator RestartTask()
     {
         _taskFinished = true;
-        _renderer.material = _successMat;
-        
+        _animator.SetBool("Open", true);
+        OnTaskFinished?.Invoke(true);
+        //_renderer.material = _successMat;
+
         yield return new WaitForSeconds(_restartCD);
         
         _taskFinished = false;
-        _renderer.material = _commonMat;
+        _animator.SetBool("Open", false);
         OnTaskFinished?.Invoke(false);
+        //_renderer.material = _commonMat;
     }
 }
