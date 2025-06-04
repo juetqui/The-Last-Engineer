@@ -1,10 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Glitcheable : MonoBehaviour
 {
-    [SerializeField] private Transform _newPos;
+    [SerializeField] private List<Transform> _newPosList;
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
 
@@ -12,12 +13,14 @@ public class Glitcheable : MonoBehaviour
     private Image _timer = default;
     private bool _disposed = false, _canMove = true, _isStopped = false;
     private float _currentDuration = default;
+    private int _index = 0;
 
     private void Awake()
     {
         _timer = GetComponentInChildren<Image>();
 
-        _targetPos = _newPos.position;
+        _targetPos = _newPosList[_index].position;
+        _index++;
         _originalPos = transform.position;
         _currentDuration = _defaultDuration;
     }
@@ -54,10 +57,16 @@ public class Glitcheable : MonoBehaviour
 
     private void UpdateTarget()
     {
+        if (_index == _newPosList.Count - 1)
+            _index = 0;
+        else
+            _index++;
+
         transform.position = _targetPos;
 
-        _disposed = !_disposed;
-        _targetPos = _disposed ? _originalPos : _newPos.position;
+        //_disposed = !_disposed;
+        //_targetPos = _disposed ? _originalPos : _newPosList[_index].position;
+        _targetPos = _newPosList[_index].position;
     }
 
     private IEnumerator StartTimer()

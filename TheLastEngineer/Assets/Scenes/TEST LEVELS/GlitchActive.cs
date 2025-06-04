@@ -40,8 +40,11 @@ public class GlitchActive : MonoBehaviour
 
             OnStopableSelected?.Invoke(glitcheable);
 
-            if (Input.GetKeyDown(KeyCode.V))
+            if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
+            {
                 OnStopObject?.Invoke(glitcheable);
+                Debug.Log("HOLA");
+            }
         }
     }
 
