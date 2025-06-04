@@ -25,6 +25,7 @@ public class Glitcheable : MonoBehaviour
     void Start()
     {
         PlayerTDController.Instance.OnNodeGrabed += CheckNode;
+        GlitchActive.Instance.OnStopObject += StopObject;
     }
 
     void Update()
@@ -33,6 +34,17 @@ public class Glitcheable : MonoBehaviour
         {
             StartCoroutine(StartTimer());
         }
+    }
+
+    private void StopObject(Glitcheable glitcheable)
+    {
+        if (glitcheable != this)
+        {
+            _isStopped = false;
+            return;
+        }
+
+        _isStopped = !_isStopped;
     }
 
     private void CheckNode(bool hasNode, NodeType nodeType)
@@ -54,7 +66,11 @@ public class Glitcheable : MonoBehaviour
 
         while (_timer.fillAmount > 0f)
         {
-            _timer.fillAmount -= _currentDuration * Time.deltaTime;
+            if (!_isStopped)
+                _timer.fillAmount -= _currentDuration * Time.deltaTime;
+            else
+                _timer.fillAmount -= 0f;
+
             yield return null;
         }
 
