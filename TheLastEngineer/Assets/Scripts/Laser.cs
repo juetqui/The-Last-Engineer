@@ -1,4 +1,6 @@
 using MaskTransitions;
+using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,6 +11,7 @@ public class Laser : MonoBehaviour
     [SerializeField] private int _maxBounces;
     [SerializeField] private float _maxDist;
     [SerializeField] private bool _onlyReflectables;
+   public GameObject objectsHits;
 
     private LineRenderer _lineRenderer = default;
     private bool _playerDetected = false, _isResetting = false;
@@ -55,8 +58,42 @@ public class Laser : MonoBehaviour
                     hit.transform.GetComponent<PlayerTDController>().LaserCollition();
                     return;
                 }
+                if (hit.transform.GetComponent<ILaserReceptor>() != null)
+                {
+                    if (objectsHits != null)
+                    {
+                        if (objectsHits != hit.transform.gameObject)
+                        {
+                            print("cambio");
+                            objectsHits.GetComponent<ILaserReceptor>().LaserNotRecived();
+                            hit.transform.GetComponent<ILaserReceptor>().LaserRecived();
+                            objectsHits = hit.transform.gameObject;
+                        }
+                       
 
-                position = hit.point;
+                    }
+                    else
+                    {
+                        print(objectsHits==null);
+                        objectsHits = hit.transform.gameObject;
+                        hit.transform.GetComponent<ILaserReceptor>().LaserRecived();
+
+
+                    }
+
+                }
+                else if(!hit.transform.gameObject.CompareTag(_reflectableTag))
+                {
+                    if (objectsHits != null)
+                    {
+                        objectsHits.GetComponent<ILaserReceptor>().LaserNotRecived();
+                        objectsHits = default;
+
+
+                    }
+                }
+
+                    position = hit.point;
                 direction = Vector3.Reflect(direction, hit.normal);
 
                 _lineRenderer.SetPosition(i + 1, position);
@@ -71,7 +108,9 @@ public class Laser : MonoBehaviour
                     break;
                 }
             }
+
         }
+        
     }
 
     public void ResetLevel()

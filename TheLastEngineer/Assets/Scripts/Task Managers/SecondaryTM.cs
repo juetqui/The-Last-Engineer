@@ -32,4 +32,12 @@ public class SecondaryTM : TaskManager
     {
         _animator.SetBool("Open", isRunning);
     }
+    public void OpenDoor()
+    {
+        _animator.SetBool("Open", true);
+    }
+    public void CloseDoor()
+    {
+        _animator.SetBool("Open", false);
+    }
 }
