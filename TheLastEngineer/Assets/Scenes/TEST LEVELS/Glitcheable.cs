@@ -8,8 +8,8 @@ public class Glitcheable : MonoBehaviour
     [SerializeField] private List<Transform> _newPosList;
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
-
     private Vector3 _originalPos = default, _targetPos = default;
+    private Quaternion _targetRot = default;
     private Image _timer = default;
     private bool _disposed = false, _canMove = true, _isStopped = false;
     private float _currentDuration = default;
@@ -20,6 +20,7 @@ public class Glitcheable : MonoBehaviour
         _timer = GetComponentInChildren<Image>();
 
         _targetPos = _newPosList[_index].position;
+        _targetRot = _newPosList[_index].rotation;
         _index++;
         _originalPos = transform.position;
         _currentDuration = _defaultDuration;
@@ -63,10 +64,14 @@ public class Glitcheable : MonoBehaviour
             _index++;
 
         transform.position = _targetPos;
+        transform.rotation = _newPosList[_index].rotation;
+
 
         //_disposed = !_disposed;
         //_targetPos = _disposed ? _originalPos : _newPosList[_index].position;
         _targetPos = _newPosList[_index].position;
+        _targetRot = _newPosList[_index].rotation;
+
     }
 
     private IEnumerator StartTimer()

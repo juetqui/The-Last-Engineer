@@ -88,7 +88,7 @@ public class GlitchActive : MonoBehaviour
     }
     private Glitcheable GetNearestStopable()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange*40);
         Glitcheable closest = null;
         float minDistance = float.MaxValue;
 
@@ -96,12 +96,17 @@ public class GlitchActive : MonoBehaviour
         {
             if (hit.TryGetComponent(out Glitcheable glitcheable))
             {
-                float distance = Vector3.Distance(_player.transform.position, glitcheable.transform.position);
-                if (distance < minDistance)
+                if (Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.ClosestPoint(_player.transform.position).x, hit.ClosestPoint(_player.transform.position).z)) <= _detectionRange)
                 {
-                    minDistance = distance;
-                    closest = glitcheable;
+                    float distance = Vector3.Distance(_player.transform.position, glitcheable.transform.position);
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        closest = glitcheable;
+                    }
+
                 }
+
             }
         }
 
@@ -112,13 +117,21 @@ public class GlitchActive : MonoBehaviour
     {
         glitcheables.Clear();
         
-        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange*40);
 
         foreach (var hit in hitColliders)
         {
-            if (hit.TryGetComponent(out Glitcheable glitcheable))
+            
+                if (hit.TryGetComponent(out Glitcheable glitcheable))
             {
-                glitcheables.Add(glitcheable);
+                if (Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.ClosestPoint(_player.transform.position).x, hit.ClosestPoint(_player.transform.position).z)) <= _detectionRange)
+                {
+                    print(Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.transform.position.x, hit.transform.position.z)));
+                    print(_detectionRange);
+
+                    glitcheables.Add(glitcheable);
+
+                }
             }
         }
 
