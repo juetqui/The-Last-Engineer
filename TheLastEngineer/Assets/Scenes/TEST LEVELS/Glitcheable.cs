@@ -3,44 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Glitcheable : MonoBehaviour
+public abstract class Glitcheable : MonoBehaviour
 {
-    [SerializeField] private List<Transform> _newPosList;
+    [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
+
+    protected List<Transform> _currentList = default;
+    protected Image _timer = default;
+    protected bool _canMove = true, _isStopped = false;
+    protected int _index = 0;
+    
     private Vector3 _originalPos = default, _targetPos = default;
     private Quaternion _targetRot = default;
-    private Image _timer = default;
-    private bool _disposed = false, _canMove = true, _isStopped = false;
     private float _currentDuration = default;
-    private int _index = 0;
 
-    private void Awake()
+    public bool IsStopped { get { return _isStopped; } }
+
+    protected void OnAwake()
     {
         _timer = GetComponentInChildren<Image>();
 
-        _targetPos = _newPosList[_index].position;
-        _targetRot = _newPosList[_index].rotation;
-        _index++;
+        _currentList = _newPosList;
+        _targetPos = _currentList[_index].position;
+        _targetRot = _currentList[_index].rotation;
+
         _originalPos = transform.position;
         _currentDuration = _defaultDuration;
     }
 
-    void Start()
-    {
-        PlayerTDController.Instance.OnNodeGrabed += CheckNode;
-        GlitchActive.Instance.OnStopObject += StopObject;
-    }
-
-    void Update()
-    {
-        if (_canMove && !_isStopped)
-        {
-            StartCoroutine(StartTimer());
-        }
-    }
-
-    private void StopObject(Glitcheable glitcheable)
+    protected void StopObject(Glitcheable glitcheable)
     {
         if (glitcheable != this)
         {
@@ -51,30 +43,26 @@ public class Glitcheable : MonoBehaviour
         _isStopped = !_isStopped;
     }
 
-    private void CheckNode(bool hasNode, NodeType nodeType)
+    protected void CheckNode(bool hasNode, NodeType nodeType)
     {
         _currentDuration = (!hasNode || nodeType != NodeType.Green) ? _defaultDuration : _nodeDuration;
     }
 
-    private void UpdateTarget()
+    protected void UpdateTarget()
     {
-        if (_index == _newPosList.Count - 1)
+        if (_index == _currentList.Count - 1)
             _index = 0;
         else
             _index++;
 
         transform.position = _targetPos;
-        transform.rotation = _newPosList[_index].rotation;
+        transform.rotation = _currentList[_index].rotation;
 
-
-        //_disposed = !_disposed;
-        //_targetPos = _disposed ? _originalPos : _newPosList[_index].position;
-        _targetPos = _newPosList[_index].position;
-        _targetRot = _newPosList[_index].rotation;
-
+        _targetPos = _currentList[_index].position;
+        _targetRot = _currentList[_index].rotation;
     }
 
-    private IEnumerator StartTimer()
+    protected IEnumerator StartTimer()
     {
         _canMove = false;
 

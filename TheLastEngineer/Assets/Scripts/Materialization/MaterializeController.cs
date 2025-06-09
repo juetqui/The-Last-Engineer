@@ -5,7 +5,8 @@ using UnityEngine;
 public class MaterializeController : MonoBehaviour
 {
     [SerializeField] private NodeType _requiredType;
-    [SerializeField] private float _defaultCD = 0.5f, _nodeCD = 2.5f;
+    [SerializeField] private float _defaultCD = 0.5f;
+    //[SerializeField] private float _nodeCD = 2.5f;
 
     public static MaterializeController Instance = null;
     private PlayerTDController _player = null;
