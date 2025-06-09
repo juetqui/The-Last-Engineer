@@ -64,7 +64,7 @@ public class Laser : MonoBehaviour
                     {
                         if (objectsHits != hit.transform.gameObject)
                         {
-                            print("cambio");
+                            //print("cambio");
                             objectsHits.GetComponent<ILaserReceptor>().LaserNotRecived();
                             hit.transform.GetComponent<ILaserReceptor>().LaserRecived();
                             objectsHits = hit.transform.gameObject;
@@ -74,7 +74,7 @@ public class Laser : MonoBehaviour
                     }
                     else
                     {
-                        print(objectsHits==null);
+                        //print(objectsHits==null);
                         objectsHits = hit.transform.gameObject;
                         hit.transform.GetComponent<ILaserReceptor>().LaserRecived();
 

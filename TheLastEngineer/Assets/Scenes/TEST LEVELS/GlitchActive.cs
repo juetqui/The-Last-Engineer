@@ -126,8 +126,8 @@ public class GlitchActive : MonoBehaviour
             {
                 if (Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.ClosestPoint(_player.transform.position).x, hit.ClosestPoint(_player.transform.position).z)) <= _detectionRange)
                 {
-                    print(Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.transform.position.x, hit.transform.position.z)));
-                    print(_detectionRange);
+                    //print(Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.transform.position.x, hit.transform.position.z)));
+                    //print(_detectionRange);
 
                     glitcheables.Add(glitcheable);
 

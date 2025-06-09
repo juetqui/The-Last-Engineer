@@ -9,17 +9,33 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
 {
     [SerializeField] UnityEvent OnEndHit;
     [SerializeField] UnityEvent OnHit;
+    [SerializeField] UnityEvent OnFill;
+    [SerializeField] UnityEvent OnDepleated;
+    bool _isCompleted;
     public void LaserNotRecived()
     {
-        OnEndHit.Invoke();
+        if (!_isCompleted)
+        {
+            OnEndHit?.Invoke();
+            _isCompleted = true;
+            print(_isCompleted);
+        }
     }
 
     public void LaserRecived()
     {
-        OnHit.Invoke();
+        OnHit?.Invoke();
+    }
+    public void ChargeCompleted()
+    {
+        OnFill?.Invoke();
+    }
+    public void ChargeDepleted()
+    {
+        OnDepleated?.Invoke();
     }
 
-  
+
 
     // Update is called once per frame
 }
