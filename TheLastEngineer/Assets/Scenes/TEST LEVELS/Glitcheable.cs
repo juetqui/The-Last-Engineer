@@ -37,10 +37,10 @@ public abstract class Glitcheable : MonoBehaviour
         if (glitcheable != this)
         {
             _isStopped = false;
+
             return;
         }
-
-        _isStopped = !_isStopped;
+        _isStopped = true;
     }
 
     protected void CheckNode(bool hasNode, NodeType nodeType)
@@ -84,5 +84,9 @@ public abstract class Glitcheable : MonoBehaviour
 
         _timer.fillAmount = 1f;
         _canMove = true;
+    }
+    public void CorruptionCancel()
+    {
+        StopObject(this);
     }
 }
