@@ -1,4 +1,5 @@
 using MaskTransitions;
+using System;
 using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class Laser : MonoBehaviour
     [SerializeField] private int _maxBounces;
     [SerializeField] private float _maxDist;
     [SerializeField] private bool _onlyReflectables;
+    public Action _onCollition;
+
    public GameObject objectsHits;
 
     private LineRenderer _lineRenderer = default;
@@ -107,12 +110,20 @@ public class Laser : MonoBehaviour
                     
                     break;
                 }
+                if (CollitionCheck(hit))
+                {
+                    _onCollition();
+                }
+
             }
 
         }
         
     }
-
+    protected virtual bool CollitionCheck(RaycastHit hit)
+    {
+        return default;
+    }
     public void ResetLevel()
     {
         //_isResetting = true;

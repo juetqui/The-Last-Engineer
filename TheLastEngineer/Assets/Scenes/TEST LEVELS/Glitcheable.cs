@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Glitcheable : MonoBehaviour
+public class Glitcheable : MonoBehaviour, ICorruptionCanceler
 {
     [SerializeField] private List<Transform> _newPosList;
     [SerializeField] private float _defaultDuration = 1f;
@@ -11,7 +11,8 @@ public class Glitcheable : MonoBehaviour
     private Vector3 _originalPos = default, _targetPos = default;
     private Quaternion _targetRot = default;
     private Image _timer = default;
-    private bool _disposed = false, _canMove = true, _isStopped = false;
+    private bool _disposed = false, _canMove = true;
+        public bool _isStopped = false;
     private float _currentDuration = default;
     private int _index = 0;
 
@@ -45,10 +46,10 @@ public class Glitcheable : MonoBehaviour
         if (glitcheable != this)
         {
             _isStopped = false;
+
             return;
         }
-
-        _isStopped = !_isStopped;
+        _isStopped = true;
     }
 
     private void CheckNode(bool hasNode, NodeType nodeType)
@@ -96,5 +97,9 @@ public class Glitcheable : MonoBehaviour
 
         _timer.fillAmount = 1f;
         _canMove = true;
+    }
+    public void CorruptionCancel()
+    {
+        StopObject(this);
     }
 }
