@@ -112,4 +112,10 @@ public class EnergyLoad : MonoBehaviour
         _currentLoad = 0;
         OnUnloaded?.Invoke();
     }
+    public void TotalUnload()
+    {
+        _currentLoad = 0;
+        _isCurrentlyUnloading = false;
+        _isCurrentlyLoading = false;
+    }
 }

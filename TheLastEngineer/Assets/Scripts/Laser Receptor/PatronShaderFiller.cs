@@ -32,8 +32,17 @@ public class PatronShaderFiller : MonoBehaviour
     }
     public void SetFull()
     {
-        _myMaterial.SetFloat("_Step", 1);
+        _currentLoad = 1;
+        _myMaterial.SetFloat("_Step", _currentLoad);
         _completed = true;
+        print(_currentLoad);
+
+    }
+    public void SetDepleated()
+    {
+        _currentLoad = 0;
+        _myMaterial.SetFloat("_Step", _currentLoad);
+        _completed = false;
         print(_currentLoad);
 
     }
