@@ -7,20 +7,25 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 
     void Start()
     {
-        PlayerTDController.Instance.OnNodeGrabed += CheckNode;
         GlitchActive.Instance.OnStopObject += StopObject;
+        TimerController.Instance.OnTimerCycleStart += OnCycleStart;
+        TimerController.Instance.OnTimerCycleComplete += UpdateTarget;
     }
 
     void Update()
     {
-        if (_canMove && !_isStopped)
-        {
-            StartCoroutine(StartTimer());
-        }
+        UpdateTimer();
+    }
+
+    private void OnCycleStart()
+    {
+        if (_isStopped) return;
+
+        _timer.fillAmount = 1f;
     }
 
     public void CorruptionCancel()
     {
-        StopObject(this);
+        _isStopped = true;
     }
 }
