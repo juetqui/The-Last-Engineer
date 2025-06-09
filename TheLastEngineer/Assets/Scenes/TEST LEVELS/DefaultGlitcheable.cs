@@ -1,4 +1,4 @@
-public class DefaultGlitcheable : Glitcheable
+public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 {
     private void Awake()
     {
@@ -17,5 +17,10 @@ public class DefaultGlitcheable : Glitcheable
         {
             StartCoroutine(StartTimer());
         }
+    }
+
+    public void CorruptionCancel()
+    {
+        StopObject(this);
     }
 }
