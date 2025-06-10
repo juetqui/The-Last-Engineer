@@ -292,11 +292,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     public IEnumerator RespawnPlayer()
     {
-        _cc.enabled = false;
         TransitionManager.Instance.PlayTransition(3f);
         
         yield return new WaitForSeconds(1f);
 
+        _cc.enabled = false;
         transform.position = _checkPointPos;
         _cc.enabled = true;
         _isDead = false;
