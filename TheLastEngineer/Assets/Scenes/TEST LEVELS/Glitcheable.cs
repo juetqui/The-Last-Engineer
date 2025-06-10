@@ -4,36 +4,46 @@ using UnityEngine.UI;
 
 public abstract class Glitcheable : MonoBehaviour
 {
+    [SerializeField] private Transform _feedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
-    [SerializeField] private float _defaultDuration = 1f;
-    [SerializeField] private float _nodeDuration = 2f;
 
     protected List<Transform> _currentList = default;
     protected Image _timer = default;
     protected bool _canMove = true, _isStopped = false;
     protected int _index = 0;
 
-    private Vector3 _targetPos = default;
+    private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
     private Color _originalColor = default;
+    private Coroutine _moveTrail = null;
 
     public bool IsStopped { get { return _isStopped; } }
-
     protected void OnAwake()
     {
         _timer = GetComponentInChildren<Image>();
-
         _currentList = _newPosList;
         _targetPos = _currentList[_index].position;
         _originalColor = _timer.color;
+
+        if (_feedbackPos != null)
+            _feedBackCurrentPos = _feedBackStartPos = _feedbackPos.position;
     }
 
     protected void UpdateTimer()
     {
         _timer.fillAmount = _timerController.CurrentFillAmount;
-        
+
         if (_isStopped) _timer.color = Color.magenta;
-        else _timer.color = _originalColor;
+        else
+        {
+            _timer.color = _originalColor;
+            
+            if (_feedbackPos != null)
+            {
+                float t = 1f - _timerController.CurrentFillAmount;
+                _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
+            }
+        }
     }
 
     protected void StopObject(Glitcheable glitcheable)
@@ -47,6 +57,7 @@ public abstract class Glitcheable : MonoBehaviour
         _isStopped = !_isStopped;
     }
 
+
     protected void UpdateTarget()
     {
         if (_isStopped) return;
@@ -58,8 +69,11 @@ public abstract class Glitcheable : MonoBehaviour
 
         transform.position = _targetPos;
         transform.rotation = _currentList[_index].rotation;
-        
+
         _targetPos = _currentList[_index].position;
+
+        if (_feedbackPos != null)
+            _feedBackCurrentPos = _feedbackPos.position;
     }
 
     public void PositionReset()
@@ -70,5 +84,7 @@ public abstract class Glitcheable : MonoBehaviour
         _timer.fillAmount = 1;
         _index = 0;
 
+        if (_feedbackPos != null)
+            _feedBackCurrentPos = _feedBackStartPos;
     }
 }

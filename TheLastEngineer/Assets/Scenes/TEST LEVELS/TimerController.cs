@@ -15,6 +15,7 @@ public class TimerController : MonoBehaviour
     public event Action OnTimerCycleComplete;
 
     public float CurrentFillAmount => _currentFillAmount;
+    public float CurrentDuration => _currentDuration;
 
     private void Awake()
     {
