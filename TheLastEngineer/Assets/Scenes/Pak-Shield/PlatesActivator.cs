@@ -16,7 +16,6 @@ public class PlatesActivator : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            Debug.Log("Entro");
             OnActivatePlates?.Invoke(true);
         }
     }
@@ -25,7 +24,6 @@ public class PlatesActivator : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            Debug.Log("Salgo");
             OnActivatePlates?.Invoke(false);
         }
     }

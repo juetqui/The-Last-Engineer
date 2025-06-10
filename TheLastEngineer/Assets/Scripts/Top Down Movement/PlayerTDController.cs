@@ -5,7 +5,6 @@ using MaskTransitions;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using DG.Tweening;
 using System.Collections;
 
 public class PlayerTDController : MonoBehaviour, IMovablePassenger
@@ -30,7 +29,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private List<IInteractable> _interactables = default;
     private bool _isDead = false;
     private float _currentSpeed = default;
-    private Vector3 _movement = default;
+    private Vector3 _movement = default, _checkPointPos = default;
     private NodeType _currentNodeType = NodeType.None;
     private bool _dropAvailable = true;
 
@@ -70,6 +69,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();
+
+        _checkPointPos = transform.position;
 
         Materializer.OnPlayerInsideTrigger += CheckDropAvailable;
     }
@@ -284,9 +285,21 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _dropAvailable = !available;
     }
 
-    public void ResetLevel()
+    public void SetCheckPointPos(Vector3 newPos)
     {
-        TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
+        _checkPointPos = newPos;
+    }
+
+    public IEnumerator RespawnPlayer()
+    {
+        _cc.enabled = false;
+        TransitionManager.Instance.PlayTransition(3f);
+        
+        yield return new WaitForSeconds(1f);
+
+        transform.position = _checkPointPos;
+        _cc.enabled = true;
+        _isDead = false;
     }
     
     public void LaserCollition()
@@ -313,16 +326,16 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         else if (coll.CompareTag("Void")) 
         {
             _isDead = true;
-            StartCoroutine(KillPlayer(_deadTimer));
-        }     
+            StartCoroutine(RespawnPlayer());
+            //StartCoroutine(KillPlayer(_deadTimer));
+        }
     }
 
     IEnumerator KillPlayer(float deadTimer)
     {
         yield return new WaitForSeconds(deadTimer);
 
-        ResetLevel();
-
+        RespawnPlayer();
     }
     private void OnTriggerExit(Collider coll)
     {
