@@ -8,6 +8,8 @@ namespace MaskTransitions
     {
         private Material cachedMaterial;
 
+        public CompareFunction stencilComparison = CompareFunction.NotEqual;
+
         public override Material materialForRendering
         {
             get
@@ -15,8 +17,8 @@ namespace MaskTransitions
                 if (cachedMaterial == null)
                 {
                     cachedMaterial = new Material(base.materialForRendering);
-                    cachedMaterial.SetInt("_StencilComp", (int)CompareFunction.NotEqual);
                 }
+                cachedMaterial.SetInt("_StencilComp", (int)stencilComparison);
                 return cachedMaterial;
             }
         }
@@ -37,6 +39,12 @@ namespace MaskTransitions
             base.OnDestroy();
         }
 
+        public void SetStencilComparison(CompareFunction comparison)
+        {
+            stencilComparison = comparison;
+            SetMaterialDirty(); // Forzar a que el material se actualice
+        }
     }
+
 }
 

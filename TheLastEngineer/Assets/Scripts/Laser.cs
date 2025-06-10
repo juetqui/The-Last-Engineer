@@ -30,7 +30,13 @@ public class Laser : MonoBehaviour
         if (_isResetting) return;
 
         if (!_playerDetected)
+        {
             CastLaser(_startPoint.position, _startPoint.forward);
+
+            CorruptionCheck();
+
+        }
+
         //else
         //    ResetLevel();
     }
@@ -118,7 +124,11 @@ public class Laser : MonoBehaviour
             }
 
         }
-        
+
+    }
+    protected virtual void CorruptionCheck()
+    {
+
     }
     protected virtual bool CollitionCheck(RaycastHit hit)
     {

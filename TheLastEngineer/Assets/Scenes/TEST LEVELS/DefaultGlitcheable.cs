@@ -25,9 +25,16 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 
         _timer.fillAmount = 1f;
     }
+    public void CorruptionCheck() { }
 
+    public void CorruptionRestore()
+    {
+        _isStopped = false;
+        print("hola");
+    }
     public void CorruptionCancel()
     {
+        print("cancelado");
         _isStopped = true;
         //TimerController.Instance.OnTimerCycleStart -= OnCycleStart;
         //TimerController.Instance.OnTimerCycleComplete -= UpdateTarget;

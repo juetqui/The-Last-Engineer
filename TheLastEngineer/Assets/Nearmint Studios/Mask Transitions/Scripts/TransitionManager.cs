@@ -65,10 +65,12 @@ namespace MaskTransitions
         {
             float animationTime = totalTime ?? individualTransitionTime;
 
-            maskRect.sizeDelta = Vector2.zero;
-            parentMaskRect.sizeDelta = Vector2.zero;
+            cutoutMask.SetStencilComparison(UnityEngine.Rendering.CompareFunction.Equal);
 
-            maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            maskRect.sizeDelta = new Vector2(maxSize, maxSize);
+            parentMaskRect.sizeDelta = new Vector2(maxSize, maxSize);
+
+            maskRect.DOSizeDelta(Vector2.zero, animationTime).SetEase(Ease.InOutQuad);
             if (rotation)
                 maskRect.DORotate(new Vector3(0, 0, 180), animationTime, RotateMode.FastBeyond360).SetEase(Ease.InOutQuad);
         }
@@ -77,11 +79,11 @@ namespace MaskTransitions
         {
             float animationTime = totalTime ?? individualTransitionTime;
 
-            maskRect.sizeDelta = Vector2.zero;
-            parentMaskRect.sizeDelta = Vector2.zero;
+            maskRect.sizeDelta = new Vector2(maxSize, maxSize);
+            parentMaskRect.sizeDelta = new Vector2(maxSize, maxSize);
             maskRect.rotation = Quaternion.identity;
 
-            Tween blueTweenSize = maskRect.DOSizeDelta(new Vector2(maxSize, maxSize), animationTime).SetEase(Ease.InOutQuad);
+            Tween blueTweenSize = maskRect.DOSizeDelta(Vector2.zero, animationTime).SetEase(Ease.InOutQuad);
 
             Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize);
 
@@ -98,6 +100,8 @@ namespace MaskTransitions
         void EndAnimation(float? totalTime = null)
         {
             float animationTime = totalTime ?? individualTransitionTime;
+
+            cutoutMask.SetStencilComparison(UnityEngine.Rendering.CompareFunction.NotEqual);
 
             maskRect.sizeDelta = new Vector2(maxSize, maxSize);
             parentMaskRect.sizeDelta = Vector2.zero;
@@ -138,6 +142,7 @@ namespace MaskTransitions
         {
             yield return new WaitForSeconds(delay);
 
+            cutoutMask.SetStencilComparison(UnityEngine.Rendering.CompareFunction.Always);
             Tween animationTween = StartAnimationForLoad();
 
             // Wait for the animation to complete
@@ -150,6 +155,7 @@ namespace MaskTransitions
                 yield return null;
             }
 
+            cutoutMask.SetStencilComparison(UnityEngine.Rendering.CompareFunction.NotEqual);
             EndAnimation();
         }
         #endregion
