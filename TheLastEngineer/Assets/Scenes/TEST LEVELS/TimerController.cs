@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TimerController : MonoBehaviour
 {
+    [SerializeField] private NodeType _requiredNode = NodeType.Purple;
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
 
@@ -28,7 +29,7 @@ public class TimerController : MonoBehaviour
 
     public void SetDuration(bool hasNode, NodeType nodeType)
     {
-        _currentDuration = (!hasNode || nodeType != NodeType.Green) ? _defaultDuration : _nodeDuration;
+        _currentDuration = (!hasNode || nodeType != _requiredNode) ? _defaultDuration : _nodeDuration;
     }
 
     private IEnumerator TimerRoutine()

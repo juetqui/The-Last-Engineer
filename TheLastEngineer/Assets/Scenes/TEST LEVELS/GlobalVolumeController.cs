@@ -5,6 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 public class GlobalVolumeController : MonoBehaviour
 {
+    [SerializeField] private NodeType _requiredNode = NodeType.Purple;
     [SerializeField] private float _maxIntensity = 0.15f;
     private Volume _volume = null;
 
@@ -20,7 +21,7 @@ public class GlobalVolumeController : MonoBehaviour
 
     private void AddCA(bool hasNode, NodeType nodeType)
     {
-        if (!hasNode || nodeType != NodeType.Green)
+        if (!hasNode || nodeType != _requiredNode)
         {
             StartCoroutine(RemoveEffect());
             return;

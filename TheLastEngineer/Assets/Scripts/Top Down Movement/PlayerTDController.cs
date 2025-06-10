@@ -54,7 +54,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     #region -----CHECKERS FOR PLAYER ACTIONS-----
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public bool HasNode() => _node != null;
-    private bool CheckShieldAvialable() => _currentNodeType == NodeType.Green;
+    private bool CheckShieldAvialable() => _currentNodeType == NodeType.Purple;
     private bool CheckDashAvialable() => _playerModel.CanDash;
     public NodeController GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
