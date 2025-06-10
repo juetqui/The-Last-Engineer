@@ -77,15 +77,10 @@ namespace MaskTransitions
         {
             float animationTime = totalTime ?? individualTransitionTime;
 
-            // Cambiar comparador para mostrar solo dentro del círculo
-            cutoutMask.SetStencilComparison(UnityEngine.Rendering.CompareFunction.Equal);
-
-            // Comenzar desde tamaño grande
             maskRect.sizeDelta = new Vector2(maxSize, maxSize);
             parentMaskRect.sizeDelta = new Vector2(maxSize, maxSize);
             maskRect.rotation = Quaternion.identity;
 
-            // Animar hacia tamaño cero (cerrar)
             Tween blueTweenSize = maskRect.DOSizeDelta(Vector2.zero, animationTime).SetEase(Ease.InOutQuad);
 
             Sequence animationSequence = DOTween.Sequence().Join(blueTweenSize);
