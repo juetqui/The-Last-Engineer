@@ -14,7 +14,7 @@ public class PatronShaderFiller : MonoBehaviour
     bool _completed;
     [SerializeField] float unfillTime;
     [SerializeField] float fillTime;
-    public float _currentLoad;
+    public float _currentLoad=0;
     private void Start()
     {
         _myMeshRenderer = GetComponent<MeshRenderer>();
@@ -25,7 +25,7 @@ public class PatronShaderFiller : MonoBehaviour
     }
     public void Fill()
     {
-        _currentLoad = Mathf.Clamp(_currentLoad + Time.deltaTime / unfillTime, 0, 1);
+        _currentLoad = Mathf.Clamp(_currentLoad + Time.deltaTime / fillTime, 0, 1);
         _myMaterial.SetFloat("_Step", _currentLoad);
         print(_currentLoad);
 
@@ -43,7 +43,7 @@ public class PatronShaderFiller : MonoBehaviour
         _currentLoad = 0;
         _myMaterial.SetFloat("_Step", _currentLoad);
         _completed = false;
-        print(_currentLoad);
+        print("medescargo");
 
     }
     public void UnFill()

@@ -13,7 +13,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected Image _timer = default;
     protected bool _canMove = true, _isStopped = false;
     protected int _index = 0;
-    
+   // protected Vector3 _currentDuration;
     private Vector3 _targetPos = default;
     //private Vector3 _originalPos = default;
     //private Quaternion _targetRot = default;
@@ -29,7 +29,6 @@ public abstract class Glitcheable : MonoBehaviour
         _targetPos = _currentList[_index].position;
         //_targetRot = _currentList[_index].rotation;
 
-        //_originalPos = transform.position;
         //_currentDuration = _defaultDuration;
     }
 
@@ -91,4 +90,13 @@ public abstract class Glitcheable : MonoBehaviour
     //    _timer.fillAmount = 1f;
     //    _canMove = true;
     //}
+    public void PositionReset()
+    {
+        transform.position = _currentList[_currentList.Count - 1].position;
+        transform.rotation = _currentList[_currentList.Count-1].rotation;
+        _isStopped = false;
+        _timer.fillAmount = 1;
+        _index = 0;
+
+    }
 }
