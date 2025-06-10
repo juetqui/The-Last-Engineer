@@ -103,8 +103,8 @@ public class SolvingController : MonoBehaviour
                 vector3 += Vector3.up * (_killerDistance / _rateQty);
                 VFXGraph.SetInt("initialParticleRate", particlesCount += particleIncreaseRate);
                 VFXGraph.SetVector3("StartKillerSize", (killerSize + vector3 * 1.5f));
-                print(VFXGraph.GetVector3("StartKillerSize"));
-                print(killerSize + vector3);
+                //print(VFXGraph.GetVector3("StartKillerSize"));
+                //print(killerSize + vector3);
                 counter += _totalDissolve / _rateQty;
                 for (int i = 0; i < skinnedMaterials.Length; i++)
                 {

@@ -309,6 +309,13 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
 
+    public void CorruptionCollided()
+    {
+        if (_currentNodeType == NodeType.Purple) return;
+
+        LaserCollition();
+    }
+
     public void RemoveFromInteractables(IInteractable interactable)
     {
         if (_interactables.Contains(interactable))

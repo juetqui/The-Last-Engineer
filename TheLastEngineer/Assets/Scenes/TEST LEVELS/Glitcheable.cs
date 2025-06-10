@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,6 +6,7 @@ using UnityEngine.UI;
 public abstract class Glitcheable : MonoBehaviour
 {
     [SerializeField] private Transform _feedbackPos;
+    [SerializeField] private Transform _secFeedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
 
@@ -15,6 +17,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected int _index = 0;
 
     private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
+    private Vector3 _secFeedBackStartPos = default, _secFeedBackCurrentPos = default;
     private Color _originalColor = default;
     private Coroutine _moveTrail = null;
 
@@ -28,6 +31,9 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedBackStartPos = _feedbackPos.position;
+        
+        if (_secFeedbackPos != null)
+            _secFeedBackCurrentPos = _secFeedBackStartPos = _secFeedbackPos.position;
     }
 
     protected void UpdateTimer()
@@ -38,12 +44,8 @@ public abstract class Glitcheable : MonoBehaviour
         else
         {
             _timer.color = _originalColor;
-            
-            if (_feedbackPos != null)
-            {
-                float t = 1f - _timerController.CurrentFillAmount;
-                _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
-            }
+
+            StartCoroutine(MoveTrail());
         }
     }
 
@@ -75,6 +77,9 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedbackPos.position;
+        
+        if (_secFeedbackPos != null)
+            _secFeedBackCurrentPos = _secFeedbackPos.position;
     }
 
     public void PositionReset()
@@ -87,5 +92,33 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedBackStartPos;
+        
+        if (_secFeedbackPos != null)
+            _secFeedBackCurrentPos = _secFeedBackStartPos;
+    }
+
+    private IEnumerator MoveTrail()
+    {
+        if (_feedbackPos != null)
+        {
+            float t = 1f - _timerController.CurrentFillAmount;
+            _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
+        }
+
+        yield return new WaitForSeconds(0.25f);
+
+        if (_secFeedbackPos != null)
+        {
+            float t = 1f - _timerController.CurrentFillAmount;
+            _secFeedbackPos.position = Vector3.Lerp(_secFeedBackCurrentPos, _targetPos, t);
+        }
+    }
+
+    private void OnTriggerEnter(Collider coll)
+    {
+        if (coll.gameObject.TryGetComponent(out PlayerTDController player))
+        {
+            player.CorruptionCollided();
+        }
     }
 }
