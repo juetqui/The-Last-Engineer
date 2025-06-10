@@ -37,6 +37,8 @@ public class BigPressurePlate : MonoBehaviour
             newColor = Color.green;
         else if (color == PlateType.Blue)
             newColor = Color.blue;
+        else if(color == PlateType.Purple)
+            newColor = Color.magenta;
 
         _renderer.material.color = pressed ? newColor : Color.yellow;
 

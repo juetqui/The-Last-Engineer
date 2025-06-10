@@ -31,5 +31,6 @@ public enum PlateType
 {
     None,
     Green,
-    Blue
+    Blue,
+    Purple
 }
