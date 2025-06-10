@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class TimerController : MonoBehaviour
 {
-    public static TimerController Instance { get; private set; }
-
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
 
@@ -19,16 +17,6 @@ public class TimerController : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         _currentDuration = _defaultDuration;
     }
 

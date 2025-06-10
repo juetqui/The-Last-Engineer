@@ -10,8 +10,8 @@ public class PlatesGlitcheable : Glitcheable
     void Start()
     {
         GlitchActive.Instance.OnStopObject += StopObject;
-        TimerController.Instance.OnTimerCycleStart += OnCycleStart;
-        TimerController.Instance.OnTimerCycleComplete += UpdateTarget;
+        _timerController.OnTimerCycleStart += OnCycleStart;
+        _timerController.OnTimerCycleComplete += UpdateTarget;
     }
 
     void Update()

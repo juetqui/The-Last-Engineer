@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 {
     private void Awake()
@@ -8,8 +10,8 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
     void Start()
     {
         GlitchActive.Instance.OnStopObject += StopObject;
-        TimerController.Instance.OnTimerCycleStart += OnCycleStart;
-        TimerController.Instance.OnTimerCycleComplete += UpdateTarget;
+        _timerController.OnTimerCycleStart += OnCycleStart;
+        _timerController.OnTimerCycleComplete += UpdateTarget;
     }
 
     void Update()
