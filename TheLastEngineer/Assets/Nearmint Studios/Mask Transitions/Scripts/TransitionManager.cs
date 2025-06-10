@@ -65,6 +65,8 @@ namespace MaskTransitions
         {
             float animationTime = totalTime ?? individualTransitionTime;
 
+            cutoutMask.SetStencilComparison(UnityEngine.Rendering.CompareFunction.Equal);
+
             maskRect.sizeDelta = new Vector2(maxSize, maxSize);
             parentMaskRect.sizeDelta = new Vector2(maxSize, maxSize);
 
