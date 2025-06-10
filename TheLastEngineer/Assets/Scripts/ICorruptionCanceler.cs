@@ -5,4 +5,6 @@ using UnityEngine;
 public interface ICorruptionCanceler
 {
     public void CorruptionCancel();
+    public void CorruptionRestore();
+    public void CorruptionCheck();
 }

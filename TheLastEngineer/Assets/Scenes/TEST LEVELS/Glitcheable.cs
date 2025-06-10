@@ -11,7 +11,8 @@ public abstract class Glitcheable : MonoBehaviour
 
     protected List<Transform> _currentList = default;
     protected Image _timer = default;
-    protected bool _canMove = true, _isStopped = false;
+    protected bool _canMove = true;
+    public bool _isStopped = false;
     protected int _index = 0;
 
     private Vector3 _targetPos = default;
