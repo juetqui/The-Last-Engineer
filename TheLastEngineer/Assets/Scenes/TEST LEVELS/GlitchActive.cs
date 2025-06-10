@@ -72,6 +72,13 @@ public class GlitchActive : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
                 OnStopObject?.Invoke(glitcheable);
         }
+
+        UpdateAreaPos();
+    }
+
+    private void UpdateAreaPos()
+    {
+        _interactionArea.transform.position = transform.position;
     }
 
     private void CheckNode(bool hasNode, NodeType nodeType)
