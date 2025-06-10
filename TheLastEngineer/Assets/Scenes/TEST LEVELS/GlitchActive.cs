@@ -8,8 +8,8 @@ public class GlitchActive : MonoBehaviour
 {
     public static GlitchActive Instance = null;
 
-    [SerializeField] private NodeType _requiredNode = NodeType.Purple;
-    [SerializeField] private float _detectionRange = 6f;
+    [SerializeField] private NodeType _requiredNode = NodeType.Green;
+    [SerializeField] private float _detectionRange = 10f;
     [SerializeField] private float _scaleSpeed = 10f;
     [SerializeField] private GameObject _interactionArea;
 
