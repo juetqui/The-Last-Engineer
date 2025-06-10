@@ -29,5 +29,7 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
     public void CorruptionCancel()
     {
         _isStopped = true;
+        //TimerController.Instance.OnTimerCycleStart -= OnCycleStart;
+        //TimerController.Instance.OnTimerCycleComplete -= UpdateTarget;
     }
 }

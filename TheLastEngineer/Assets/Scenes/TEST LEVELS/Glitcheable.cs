@@ -13,7 +13,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected Image _timer = default;
     protected bool _canMove = true, _isStopped = false;
     protected int _index = 0;
-    
+
     private Vector3 _targetPos = default;
     private Color _originalColor = default;
 
@@ -57,6 +57,18 @@ public abstract class Glitcheable : MonoBehaviour
             _index++;
 
         transform.position = _targetPos;
+        transform.rotation = _currentList[_index].rotation;
+        
         _targetPos = _currentList[_index].position;
+    }
+
+    public void PositionReset()
+    {
+        transform.position = _currentList[_currentList.Count - 1].position;
+        transform.rotation = _currentList[_currentList.Count-1].rotation;
+        _isStopped = false;
+        _timer.fillAmount = 1;
+        _index = 0;
+
     }
 }

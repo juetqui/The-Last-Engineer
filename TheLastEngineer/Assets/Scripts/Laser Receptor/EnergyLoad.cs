@@ -117,5 +117,7 @@ public class EnergyLoad : MonoBehaviour
         _currentLoad = 0;
         _isCurrentlyUnloading = false;
         _isCurrentlyLoading = false;
+        OnUnloaded?.Invoke();
+
     }
 }
