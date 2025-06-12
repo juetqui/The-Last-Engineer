@@ -32,6 +32,7 @@ public class Laser : MonoBehaviour
         if (!_playerDetected)
         {
             CastLaser(_startPoint.position, _startPoint.forward);
+            //CastLaser(_startPoint.position, _startPoint.rotation.eulerAngles);
 
             CorruptionCheck();
 
@@ -47,7 +48,7 @@ public class Laser : MonoBehaviour
 
         for (int i = 0; i < _maxBounces; i++)
         {
-            direction = new Vector3(direction.x, 0, direction.z);
+            direction = new Vector3(direction.x, /*direction.y*/0, direction.z);
 
             Ray ray = new Ray(position, direction);
             RaycastHit hit;
@@ -64,7 +65,8 @@ public class Laser : MonoBehaviour
                 if (hit.transform.GetComponent<PlayerTDController>() != null)
                 {
                     _playerDetected = true;
-                    hit.transform.GetComponent<PlayerTDController>().LaserCollition();
+                    //hit.transform.GetComponent<PlayerTDController>().LaserCollition();
+                    print("Player Hiited");
                     return;
                 }
                 if (hit.transform.GetComponent<ILaserReceptor>() != null)
@@ -112,8 +114,9 @@ public class Laser : MonoBehaviour
                     for (int j = (i + 1); j <= _maxBounces; j++)
                     {
                         _lineRenderer.SetPosition(j, position);
+                        _lineRenderer.SetPosition(j, position);
                     }
-                    
+
                     break;
                 }
                 if (CollitionCheck(hit))
