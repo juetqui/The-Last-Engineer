@@ -27,15 +27,13 @@ public class PatronShaderFiller : MonoBehaviour
     {
         _currentLoad = Mathf.Clamp(_currentLoad + Time.deltaTime / fillTime, 0, 1);
         _myMaterial.SetFloat("_Step", _currentLoad);
-        print(_currentLoad);
 
     }
     public void SetFull()
     {
         _currentLoad = 1;
         _myMaterial.SetFloat("_Step", _currentLoad);
-        //_completed = true;
-        print(_currentLoad);
+        _completed = true;
 
     }
     public void SetDepleated()
@@ -52,7 +50,7 @@ public class PatronShaderFiller : MonoBehaviour
         {
             _currentLoad = Mathf.Clamp(_currentLoad - Time.deltaTime / unfillTime, 0, 1);
             _myMaterial.SetFloat("_Step", _currentLoad);
-            print(_currentLoad);
+            //print(_currentLoad);
         }
         
 

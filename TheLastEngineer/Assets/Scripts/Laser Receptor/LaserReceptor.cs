@@ -18,7 +18,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         {
             OnEndHit?.Invoke();
             //_isCompleted = true;
-            print(_isCompleted);
+            //print(_isCompleted);
         }
     }
 
@@ -29,6 +29,10 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public void ChargeCompleted()
     {
         OnFill?.Invoke();
+    }
+    public void ChargeFilled()
+    {
+        _isCompleted = true;
     }
     public void ChargeDepleted()
     {
