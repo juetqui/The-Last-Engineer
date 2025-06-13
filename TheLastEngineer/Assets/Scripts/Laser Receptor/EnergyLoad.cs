@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 public class EnergyLoad : MonoBehaviour
 {
     public UnityEvent OnLoaded;
+    public UnityEvent OnBrotherCompleted;
     public UnityEvent OnUnloaded;
     public UnityEvent OnLoading;
     public UnityEvent OnUnloading;
@@ -19,14 +20,29 @@ public class EnergyLoad : MonoBehaviour
     public bool _isCurrentlyLoading = false;
     private Coroutine _loadCoroutine;
     public bool _isCurrentlyUnloading;
+    [SerializeField] EnergyLoad brotherReceptor;
+    public bool isFull;
     private void Update()
     {
-        
+        if (brotherReceptor != null&& isFull)
+        {
+            new WaitForSeconds(0.1f);
+            if (!brotherReceptor.isFull)
+            {
+                isFull = false;
+                StartUnloading();
+            }
+            else
+            {
+                OnBrotherCompleted?.Invoke();
+
+            }
+        }
     }
     public void StartLoading()
     {
         print("loading");
-        if (_isCurrentlyLoading)
+        if (_isCurrentlyLoading||isFull)
         {
             return;
         }
@@ -90,6 +106,7 @@ public class EnergyLoad : MonoBehaviour
         }
         _currentLoad = 1;
         print("lodeado");
+        isFull = true;
         OnLoaded?.Invoke();
 
     }
@@ -121,5 +138,12 @@ public class EnergyLoad : MonoBehaviour
         _isCurrentlyLoading = false;
         OnUnloaded?.Invoke();
 
+    }
+    public void BrotherCheck()
+    {
+        if (isFull && brotherReceptor.isFull)
+        {
+            OnBrotherCompleted?.Invoke();
+        }
     }
 }

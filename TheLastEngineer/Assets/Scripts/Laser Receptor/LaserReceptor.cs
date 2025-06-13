@@ -14,6 +14,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     MeshRenderer meshRenderer;
     Collider collider;
     public bool _isCompleted;
+    public bool _isFull;
     public void LaserNotRecived()
     {
         if (!_isCompleted)
@@ -30,6 +31,11 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
 
     }
     public void TurnOffObject()
+    {
+        meshRenderer.enabled = false;
+        collider.enabled = false;
+    }
+    public void BrotherCompletationChecker()
     {
         meshRenderer.enabled = false;
         collider.enabled = false;
