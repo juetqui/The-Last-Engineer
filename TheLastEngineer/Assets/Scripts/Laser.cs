@@ -72,7 +72,7 @@ public class Laser : MonoBehaviour
                 if (hit.transform.TryGetComponent(out PlayerTDController player))
                 {
                     _playerDetected = true;
-                    player.CorruptionCollided();
+                    player.LaserCollition();
                     position = hit.point;
                     _lineRenderer.SetPosition(i + 1, position);
 

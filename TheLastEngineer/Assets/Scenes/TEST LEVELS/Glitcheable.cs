@@ -71,9 +71,9 @@ public abstract class Glitcheable : MonoBehaviour
         transform.position = _targetPos;
         transform.rotation = _currentList[_index].rotation;
 
-        _targetPos = _currentList[_index].position;
-
         if (_isPlatform) OnPosChanged?.Invoke(_targetPos);
+
+        _targetPos = _currentList[_index].position;
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedbackPos.position;
