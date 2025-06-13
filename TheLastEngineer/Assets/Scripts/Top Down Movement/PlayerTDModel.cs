@@ -61,6 +61,11 @@ public class PlayerTDModel
         _platformDisplacement = displacement;
     }
 
+    public void SetPos(Vector3 newPos)
+    {
+        _cc.Move(newPos);
+    }
+
     public void RotatePlayer(Vector3 rotDir)
     {
         Quaternion toRotation = Quaternion.LookRotation(rotDir.normalized, Vector3.up);

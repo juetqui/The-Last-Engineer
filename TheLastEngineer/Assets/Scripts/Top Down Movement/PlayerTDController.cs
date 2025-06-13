@@ -316,6 +316,18 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         LaserCollition();
     }
 
+    public void SetPlatform(Glitcheable platform)
+    {
+        transform.SetParent(platform.transform);
+        platform.OnPosChanged += _playerModel.SetPos;
+    }
+
+    public void UnSetPlatform(Glitcheable platform)
+    {
+        transform.SetParent(null);
+        platform.OnPosChanged -= _playerModel.SetPos;
+    }
+
     public void RemoveFromInteractables(IInteractable interactable)
     {
         if (_interactables.Contains(interactable))

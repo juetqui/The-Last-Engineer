@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,17 +10,19 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] private Transform _secFeedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
+    [SerializeField] protected bool _isPlatform = false;
 
     protected List<Transform> _currentList = default;
     protected Image _timer = default;
     protected bool _canMove = true;
-    public bool _isStopped = false;
+    protected bool _isStopped = false;
     protected int _index = 0;
 
     private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
     private Vector3 _secFeedBackStartPos = default, _secFeedBackCurrentPos = default;
     private Color _originalColor = default;
-    private Coroutine _moveTrail = null;
+    
+    public Action<Vector3> OnPosChanged = delegate { };
 
     public bool IsStopped { get { return _isStopped; } }
     protected void OnAwake()
@@ -65,6 +68,8 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (_isStopped) return;
 
+        Vector3 oldPos = transform.position;
+
         if (_index == _currentList.Count - 1)
             _index = 0;
         else
@@ -72,6 +77,11 @@ public abstract class Glitcheable : MonoBehaviour
 
         transform.position = _targetPos;
         transform.rotation = _currentList[_index].rotation;
+
+        Vector3 displacement = _targetPos - oldPos;
+        
+        if (_isPlatform)
+            OnPosChanged?.Invoke(displacement);
 
         _targetPos = _currentList[_index].position;
 
@@ -116,9 +126,21 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.gameObject.TryGetComponent(out PlayerTDController player))
+        if (coll.TryGetComponent(out PlayerTDController player))
         {
-            player.CorruptionCollided();
+            if (_isPlatform && player.GetCurrentNode() != null && player.GetCurrentNode().NodeType == NodeType.Purple)
+                player.SetPlatform(this);
+            else
+                player.CorruptionCollided();
+        }
+    }
+
+    private void OnTriggerExit(Collider coll)
+    {
+        if (coll.TryGetComponent(out PlayerTDController player))
+        {
+            if (_isPlatform && player.GetCurrentNode() != null && player.GetCurrentNode().NodeType == NodeType.Purple)
+                player.UnSetPlatform(this);
         }
     }
 }
