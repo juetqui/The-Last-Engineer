@@ -39,7 +39,6 @@ public class SolvingController : MonoBehaviour
     {
         skinnedMaterials = MySkinnedMeshRenderer.materials;
         _originalShaders = new List<Shader>();
-        _totalDissolve = skinnedMaterials[0].GetFloat("_DisolveProgress");
 
         // Guardar valores iniciales del VFX
         _initialStartKillerSize = new Vector3(killerSize.x, 1 / (duration / refreshRate), killerSize.z);

@@ -12,12 +12,14 @@ public class LevelChanger : MonoBehaviour
     private void Start()
     {
         _collider = GetComponent<BoxCollider>();
-        MainTM.Instance.onRunning += EnableCollider;
-        
+
+        if (MainTM.Instance != null)
+            MainTM.Instance.onRunning += EnableCollider;
+
         EnableCollider(false);
     }
 
-    private void EnableCollider(bool isRunning)
+    public void EnableCollider(bool isRunning)
     {
         _collider.enabled = isRunning;
     }
