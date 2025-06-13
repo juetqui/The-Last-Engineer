@@ -13,6 +13,7 @@ public class Laser : MonoBehaviour
     [SerializeField] private float _maxDist;
     [SerializeField] private bool _onlyReflectables;
     public Action _onCollition;
+    PlayerTDController _playerTDController;
 
    public GameObject objectsHits;
 
@@ -21,10 +22,16 @@ public class Laser : MonoBehaviour
 
     private void Start()
     {
+        _playerTDController = FindObjectOfType<PlayerTDController>();
+        //_playerTDController.OnRespawn += LaserReset;
         _lineRenderer = GetComponent<LineRenderer>();
         _lineRenderer.SetPosition(0, _startPoint.position);
-    }
 
+    }
+    public void LaserReset()
+    {
+        _playerDetected = false;
+    }
     private void Update()
     {
         if (_isResetting) return;
@@ -66,8 +73,13 @@ public class Laser : MonoBehaviour
                 {
                     _playerDetected = true;
                     hit.transform.GetComponent<PlayerTDController>().LaserCollition();
+                    position = hit.point;
+                    _lineRenderer.SetPosition(i + 1, position);
+
                     print("Player Hiited");
-                    return;
+                    continue;
+                    //break;
+                    //sreturn;
                 }
                 if (hit.transform.GetComponent<ILaserReceptor>() != null)
                 {
@@ -113,7 +125,6 @@ public class Laser : MonoBehaviour
                 {
                     for (int j = (i + 1); j <= _maxBounces; j++)
                     {
-                        _lineRenderer.SetPosition(j, position);
                         _lineRenderer.SetPosition(j, position);
                     }
 

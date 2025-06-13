@@ -73,11 +73,9 @@ public class EnergyLoad : MonoBehaviour
     }
     private IEnumerator LoadRoutine(float loadTime)
     {
-        print("aaaa");
 
         while (_currentLoad <= 1f)
         {
-            print("bbb");
 
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
