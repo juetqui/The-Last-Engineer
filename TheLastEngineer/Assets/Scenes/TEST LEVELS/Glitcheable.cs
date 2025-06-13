@@ -44,7 +44,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         _timer.fillAmount = _timerController.CurrentFillAmount;
 
-        if (_isStopped) _timer.color = Color.magenta;
+        if (_isStopped) _timer.color = Color.yellow;
         else _timer.color = _originalColor;
 
         StartCoroutine(MoveTrail());
@@ -68,10 +68,10 @@ public abstract class Glitcheable : MonoBehaviour
         if (_index == _currentList.Count - 1) _index = 0;
         else _index++;
 
-        _targetPos = _currentList[_index].position;
-
         transform.position = _targetPos;
         transform.rotation = _currentList[_index].rotation;
+
+        _targetPos = _currentList[_index].position;
 
         if (_isPlatform) OnPosChanged?.Invoke(_targetPos);
 

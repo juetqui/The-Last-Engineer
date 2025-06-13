@@ -296,7 +296,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         _isDead = true;
         _solvingController.BurnShader();
-        //_playerView.LaserCollition();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
         StartCoroutine(KillPlayer(_deadTimer));
     }
@@ -311,12 +310,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     public void SetPlatform(Glitcheable platform)
     {
         if (_currentPlatform != null && _currentPlatform != platform)
-        {
-            Debug.Log($"Unsubscribing from previous platform: {_currentPlatform.name}, Handlers before: {_currentPlatform.OnPosChanged?.GetInvocationList().Length ?? 0}");
             _currentPlatform.OnPosChanged -= _playerModel.SetPos;
-        }
 
-        Debug.Log($"Subscribing to platform: {platform.name}, Handlers before: {platform.OnPosChanged?.GetInvocationList().Length ?? 0}, Handlers after: {(platform.OnPosChanged?.GetInvocationList().Length ?? 0) + 1}");
         transform.SetParent(platform.transform);
         _currentPlatform = platform;
         _currentPlatform.OnPosChanged += _playerModel.SetPos;
@@ -326,9 +321,10 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         if (_currentPlatform == platform)
         {
-            Debug.Log($"Unsubscribing from platform: {platform.name}, Handlers before: {platform.OnPosChanged?.GetInvocationList().Length ?? 0}, Handlers after: {(platform.OnPosChanged?.GetInvocationList().Length ?? 0) - 1}");
             transform.SetParent(null);
+            
             Delegate[] handlers = platform.OnPosChanged?.GetInvocationList();
+            
             if (handlers != null)
             {
                 foreach (Delegate handler in handlers)
@@ -336,10 +332,10 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
                     if (handler.Method.Name == nameof(_playerModel.SetPos))
                     {
                         platform.OnPosChanged -= (Action<Vector3>)handler;
-                        Debug.Log($"Removed specific SetPos handler from {platform.name}");
                     }
                 }
             }
+            
             _currentPlatform = null;
         }
     }
