@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public abstract class Glitcheable : MonoBehaviour
 {
     [SerializeField] private Transform _feedbackPos;
-    [SerializeField] private Transform _secFeedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
@@ -34,9 +33,6 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedBackStartPos = _feedbackPos.position;
-        
-        if (_secFeedbackPos != null)
-            _secFeedBackCurrentPos = _secFeedBackStartPos = _secFeedbackPos.position;
     }
 
     protected void UpdateTimer()
@@ -84,9 +80,6 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedbackPos.position;
-        
-        if (_secFeedbackPos != null)
-            _secFeedBackCurrentPos = _secFeedbackPos.position;
     }
 
     public void PositionReset()
@@ -99,9 +92,6 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedBackStartPos;
-        
-        if (_secFeedbackPos != null)
-            _secFeedBackCurrentPos = _secFeedBackStartPos;
     }
 
     private IEnumerator MoveTrail()
@@ -119,13 +109,8 @@ public abstract class Glitcheable : MonoBehaviour
                 _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
             }
         }
-
-        yield return new WaitForSeconds(0.25f);
-
-        if (_secFeedbackPos != null)
-        {
-            _secFeedbackPos.position = Vector3.Lerp(_secFeedBackCurrentPos, _targetPos, t);
-        }
+        
+        yield return null;
     }
 
     private void OnTriggerEnter(Collider coll)
