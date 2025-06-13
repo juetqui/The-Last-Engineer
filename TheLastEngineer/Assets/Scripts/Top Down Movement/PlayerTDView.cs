@@ -38,11 +38,10 @@ public class PlayerTDView
     {
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
-
-    public void LaserCollition()
+    
+    public void SetAnimatorSpeed(float speed)
     {
-        _animator.speed = 0;
-        _solvingController.BurnShader();
+        _animator.speed = speed;
     }
 
     public void RespawnPlayer()

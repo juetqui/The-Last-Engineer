@@ -18,7 +18,7 @@ public class Laser : MonoBehaviour
    public GameObject objectsHits;
 
     private LineRenderer _lineRenderer = default;
-    private bool _playerDetected = false, _isResetting = false;
+    private bool _isResetting = false;
 
     private void Start()
     {
@@ -28,25 +28,13 @@ public class Laser : MonoBehaviour
         _lineRenderer.SetPosition(0, _startPoint.position);
 
     }
-    public void LaserReset()
-    {
-        _playerDetected = false;
-    }
+
     private void Update()
     {
         if (_isResetting) return;
 
-        if (!_playerDetected)
-        {
-            CastLaser(_startPoint.position, _startPoint.forward);
-            //CastLaser(_startPoint.position, _startPoint.rotation.eulerAngles);
-
-            CorruptionCheck();
-
-        }
-
-        //else
-        //    ResetLevel();
+        CastLaser(_startPoint.position, _startPoint.forward);
+        CorruptionCheck();
     }
 
     private void CastLaser(Vector3 position, Vector3 direction)
@@ -71,14 +59,11 @@ public class Laser : MonoBehaviour
 
                 if (hit.transform.TryGetComponent(out PlayerTDController player))
                 {
-                    _playerDetected = true;
                     player.LaserCollition();
                     position = hit.point;
                     _lineRenderer.SetPosition(i + 1, position);
 
                     continue;
-                    //break;
-                    //sreturn;
                 }
                 if (hit.transform.GetComponent<ILaserReceptor>() != null)
                 {
@@ -146,10 +131,5 @@ public class Laser : MonoBehaviour
     protected virtual bool CollitionCheck(RaycastHit hit)
     {
         return default;
-    }
-    public void ResetLevel()
-    {
-        //_isResetting = true;
-        //TransitionManager.Instance.LoadLevel(SceneManager.GetActiveScene().name);
     }
 }

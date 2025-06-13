@@ -87,7 +87,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData, _solvingController);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
-        
+        _solvingController.OnDissolveCompleted += OnDissolveCompleted;
+
         SetState(_playerEmptyState);
         StartInputs();
     }
@@ -291,20 +292,42 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         _checkPointPos = newPos;
     }
-    
+
     public void LaserCollition()
     {
+        if (_isDead) return;
         _isDead = true;
-        _solvingController.BurnShader();
+        _playerView.SetAnimatorSpeed(0f);
+        _solvingController?.BurnShader();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
-        StartCoroutine(KillPlayer(_deadTimer));
     }
 
     public void CorruptionCollided()
     {
         if (_currentNodeType == NodeType.Purple) return;
-
         LaserCollition();
+    }
+
+    private void OnDissolveCompleted()
+    {
+        StartCoroutine(RespawnPlayer());
+    }
+
+    public IEnumerator RespawnPlayer()
+    {
+        TransitionManager.Instance.PlayTransition(3f);
+        yield return new WaitForSeconds(1f);
+
+        _cc.enabled = false;
+        transform.position = _checkPointPos;
+        _cc.enabled = true;
+
+        yield return new WaitForSeconds(0.5f);
+
+        _isDead = false;
+        _playerView.SetAnimatorSpeed(1f);
+        _solvingController?.RespawnPlayer();
+        OnEnableInputs();
     }
 
     public void SetPlatform(Glitcheable platform)
@@ -359,27 +382,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             _isDead = true;
             StartCoroutine(RespawnPlayer());
         }
-    }
-
-    IEnumerator KillPlayer(float deadTimer)
-    {
-        yield return new WaitForSeconds(deadTimer);
-
-        StartCoroutine(RespawnPlayer());
-    }
-
-    public IEnumerator RespawnPlayer()
-    {
-        TransitionManager.Instance.PlayTransition(3f);
-
-        yield return new WaitForSeconds(1f);
-
-        _cc.enabled = false;
-        transform.position = _checkPointPos;
-        _cc.enabled = true;
-        _isDead = false;
-        _playerView.RespawnPlayer();
-        OnEnableInputs();
     }
 
     private void OnTriggerExit(Collider coll)
