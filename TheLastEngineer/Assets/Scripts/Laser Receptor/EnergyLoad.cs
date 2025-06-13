@@ -16,9 +16,9 @@ public class EnergyLoad : MonoBehaviour
     [SerializeField] private float _maxLoad = 0f;
     [SerializeField] private float _timeToLoad = 0f;
     [SerializeField] private float _timeToUnload = 0f;
-    private bool _isCurrentlyLoading = false;
+    public bool _isCurrentlyLoading = false;
     private Coroutine _loadCoroutine;
-    bool _isCurrentlyUnloading;
+    public bool _isCurrentlyUnloading;
     private void Update()
     {
         
@@ -73,8 +73,12 @@ public class EnergyLoad : MonoBehaviour
     }
     private IEnumerator LoadRoutine(float loadTime)
     {
+        print("aaaa");
+
         while (_currentLoad <= 1f)
         {
+            print("bbb");
+
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
                 _currentLoad = _currentLoad + Time.deltaTime/loadTime;

@@ -64,7 +64,7 @@ public class Laser : MonoBehaviour
 
                 if (hit.transform.GetComponent<PlayerTDController>() != null)
                 {
-                    _playerDetected = true;
+                    //_playerDetected = true;
                     //hit.transform.GetComponent<PlayerTDController>().LaserCollition();
                     print("Player Hiited");
                     return;

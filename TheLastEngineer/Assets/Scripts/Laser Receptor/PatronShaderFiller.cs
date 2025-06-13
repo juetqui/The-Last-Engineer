@@ -11,7 +11,7 @@ public class PatronShaderFiller : MonoBehaviour
     Material _myMaterial;
     [SerializeField] float minBound;
     [SerializeField] float maxBound;
-    bool _completed;
+    public bool _completed;
     [SerializeField] float unfillTime;
     [SerializeField] float fillTime;
     public float _currentLoad=0;
@@ -34,7 +34,7 @@ public class PatronShaderFiller : MonoBehaviour
     {
         _currentLoad = 1;
         _myMaterial.SetFloat("_Step", _currentLoad);
-        _completed = true;
+        //_completed = true;
         print(_currentLoad);
 
     }
@@ -42,7 +42,7 @@ public class PatronShaderFiller : MonoBehaviour
     {
         _currentLoad = 0;
         _myMaterial.SetFloat("_Step", _currentLoad);
-        _completed = false;
+        //_completed = false;
         print("medescargo");
 
     }

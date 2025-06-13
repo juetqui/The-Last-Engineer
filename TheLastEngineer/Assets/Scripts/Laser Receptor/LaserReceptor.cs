@@ -11,13 +11,13 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     [SerializeField] UnityEvent OnHit;
     [SerializeField] UnityEvent OnFill;
     [SerializeField] UnityEvent OnDepleated;
-    bool _isCompleted;
+    public bool _isCompleted;
     public void LaserNotRecived()
     {
         if (!_isCompleted)
         {
             OnEndHit?.Invoke();
-            _isCompleted = true;
+            //_isCompleted = true;
             print(_isCompleted);
         }
     }
