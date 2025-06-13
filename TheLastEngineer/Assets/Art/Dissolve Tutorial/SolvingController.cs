@@ -1,5 +1,6 @@
 using MaskTransitions;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.VFX;
@@ -26,10 +27,13 @@ public class SolvingController : MonoBehaviour
     public int particleInintialRate = 20;
     float _totalDissolve;
     float _killerDistance;
+
+    private List<Shader> _originalShaders = default;
     
     void Start()
     {
         skinnedMaterials = MySkinnedMeshRenderer.materials;
+        _originalShaders = new List<Shader>();
         //_totalDissolve = skinnedMaterials[0].GetFloat("_DisolveProgress");
 
 
@@ -49,6 +53,19 @@ public class SolvingController : MonoBehaviour
 
     }
 
+    public void RespawnPlayer()
+    {
+        skinnedMaterials = MySkinnedMeshRenderer.materials;
+
+        foreach (var currentShader in skinnedMaterials)
+        {
+            foreach (var originalShader in _originalShaders)
+            {
+                currentShader.shader = originalShader;
+            }
+        }
+    }
+
     // Update is called once per frame
     public void BurnShader()
     {
@@ -65,6 +82,8 @@ public class SolvingController : MonoBehaviour
 
             foreach (var item in skinnedMaterials)
             {
+                _originalShaders.Add(item.shader);
+
                 item.shader = MyShader;
 
                 item.SetFloat("_MaxHeight", MaxBound);

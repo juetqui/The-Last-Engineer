@@ -18,12 +18,17 @@ public abstract class Glitcheable : MonoBehaviour
     protected int _index = 0;
 
     private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
-    private Vector3 _secFeedBackStartPos = default, _secFeedBackCurrentPos = default;
     private Color _originalColor = default;
-    
+
     public Action<Vector3> OnPosChanged = delegate { };
 
     public bool IsStopped { get { return _isStopped; } }
+
+    public int GetOnPosChangedHandlerCount()
+    {
+        return OnPosChanged?.GetInvocationList().Length ?? 0;
+    }
+
     protected void OnAwake()
     {
         _timer = GetComponentInChildren<Image>();
@@ -52,31 +57,23 @@ public abstract class Glitcheable : MonoBehaviour
             _isStopped = false;
             return;
         }
-        
+
         _isStopped = !_isStopped;
     }
-
 
     protected void UpdateTarget()
     {
         if (_isStopped) return;
 
-        Vector3 oldPos = transform.position;
+        if (_index == _currentList.Count - 1) _index = 0;
+        else _index++;
 
-        if (_index == _currentList.Count - 1)
-            _index = 0;
-        else
-            _index++;
+        _targetPos = _currentList[_index].position;
 
         transform.position = _targetPos;
         transform.rotation = _currentList[_index].rotation;
 
-        Vector3 displacement = _targetPos - oldPos;
-        
-        if (_isPlatform)
-            OnPosChanged?.Invoke(displacement);
-
-        _targetPos = _currentList[_index].position;
+        if (_isPlatform) OnPosChanged?.Invoke(_targetPos);
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedbackPos.position;
@@ -85,7 +82,7 @@ public abstract class Glitcheable : MonoBehaviour
     public void PositionReset()
     {
         transform.position = _currentList[_currentList.Count - 1].position;
-        transform.rotation = _currentList[_currentList.Count-1].rotation;
+        transform.rotation = _currentList[_currentList.Count - 1].rotation;
         _isStopped = false;
         _timer.fillAmount = 1;
         _index = 0;
@@ -101,15 +98,11 @@ public abstract class Glitcheable : MonoBehaviour
         if (_feedbackPos != null)
         {
             if (_isStopped)
-            {
                 _feedbackPos.position = Vector3.Lerp(_feedbackPos.position, _feedBackCurrentPos, t);
-            }
             else
-            {
                 _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
-            }
         }
-        
+
         yield return null;
     }
 
@@ -117,7 +110,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            if (_isPlatform && player.GetCurrentNode() != null && player.GetCurrentNode().NodeType == NodeType.Purple)
+            if (_isPlatform && (player.GetCurrentNode() == null || player.GetCurrentNode().NodeType == NodeType.Purple))
                 player.SetPlatform(this);
             else
                 player.CorruptionCollided();
@@ -128,8 +121,13 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            if (_isPlatform && player.GetCurrentNode() != null && player.GetCurrentNode().NodeType == NodeType.Purple)
+            if (_isPlatform && (player.GetCurrentNode() == null || player.GetCurrentNode().NodeType == NodeType.Purple))
                 player.UnSetPlatform(this);
         }
+    }
+
+    private void OnDestroy()
+    {
+        OnPosChanged = null;
     }
 }

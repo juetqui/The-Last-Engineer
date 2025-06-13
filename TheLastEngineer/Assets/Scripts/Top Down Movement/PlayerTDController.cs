@@ -33,6 +33,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     private NodeType _currentNodeType = NodeType.None;
     private bool _dropAvailable = true;
 
+    private Glitcheable _currentPlatform = null;
+
     public bool DropAvailable { get => _dropAvailable; }
 
     #region -----STATES VARIABLES-----
@@ -81,7 +83,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         
         _currentSpeed = _playerData.moveSpeed;
 
-        _playerModel = new PlayerTDModel(_cc, transform, _playerData);
+        _playerModel = new PlayerTDModel(_cc, transform, _playerData, GetComponent<Collider>());
         _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData, _solvingController);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
@@ -289,24 +291,14 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         _checkPointPos = newPos;
     }
-
-    public IEnumerator RespawnPlayer()
-    {
-        TransitionManager.Instance.PlayTransition(3f);
-        
-        yield return new WaitForSeconds(1f);
-
-        _cc.enabled = false;
-        transform.position = _checkPointPos;
-        _cc.enabled = true;
-        _isDead = false;
-    }
     
     public void LaserCollition()
     {
         _isDead = true;
-        _playerView.LaserCollition();
+        _solvingController.BurnShader();
+        //_playerView.LaserCollition();
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
+        StartCoroutine(KillPlayer(_deadTimer));
     }
 
     public void CorruptionCollided()
@@ -318,14 +310,38 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     public void SetPlatform(Glitcheable platform)
     {
+        if (_currentPlatform != null && _currentPlatform != platform)
+        {
+            Debug.Log($"Unsubscribing from previous platform: {_currentPlatform.name}, Handlers before: {_currentPlatform.OnPosChanged?.GetInvocationList().Length ?? 0}");
+            _currentPlatform.OnPosChanged -= _playerModel.SetPos;
+        }
+
+        Debug.Log($"Subscribing to platform: {platform.name}, Handlers before: {platform.OnPosChanged?.GetInvocationList().Length ?? 0}, Handlers after: {(platform.OnPosChanged?.GetInvocationList().Length ?? 0) + 1}");
         transform.SetParent(platform.transform);
-        platform.OnPosChanged += _playerModel.SetPos;
+        _currentPlatform = platform;
+        _currentPlatform.OnPosChanged += _playerModel.SetPos;
     }
 
     public void UnSetPlatform(Glitcheable platform)
     {
-        transform.SetParent(null);
-        platform.OnPosChanged -= _playerModel.SetPos;
+        if (_currentPlatform == platform)
+        {
+            Debug.Log($"Unsubscribing from platform: {platform.name}, Handlers before: {platform.OnPosChanged?.GetInvocationList().Length ?? 0}, Handlers after: {(platform.OnPosChanged?.GetInvocationList().Length ?? 0) - 1}");
+            transform.SetParent(null);
+            Delegate[] handlers = platform.OnPosChanged?.GetInvocationList();
+            if (handlers != null)
+            {
+                foreach (Delegate handler in handlers)
+                {
+                    if (handler.Method.Name == nameof(_playerModel.SetPos))
+                    {
+                        platform.OnPosChanged -= (Action<Vector3>)handler;
+                        Debug.Log($"Removed specific SetPos handler from {platform.name}");
+                    }
+                }
+            }
+            _currentPlatform = null;
+        }
     }
 
     public void RemoveFromInteractables(IInteractable interactable)
@@ -346,7 +362,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         {
             _isDead = true;
             StartCoroutine(RespawnPlayer());
-            //StartCoroutine(KillPlayer(_deadTimer));
         }
     }
 
@@ -354,8 +369,23 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
     {
         yield return new WaitForSeconds(deadTimer);
 
-        RespawnPlayer();
+        StartCoroutine(RespawnPlayer());
     }
+
+    public IEnumerator RespawnPlayer()
+    {
+        TransitionManager.Instance.PlayTransition(3f);
+
+        yield return new WaitForSeconds(1f);
+
+        _cc.enabled = false;
+        transform.position = _checkPointPos;
+        _cc.enabled = true;
+        _isDead = false;
+        _playerView.RespawnPlayer();
+        OnEnableInputs();
+    }
+
     private void OnTriggerExit(Collider coll)
     {
         if (coll.TryGetComponent(out IInteractable interactable))

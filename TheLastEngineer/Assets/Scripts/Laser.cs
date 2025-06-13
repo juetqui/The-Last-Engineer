@@ -69,14 +69,13 @@ public class Laser : MonoBehaviour
                     continue;
                 }
 
-                if (hit.transform.GetComponent<PlayerTDController>() != null)
+                if (hit.transform.TryGetComponent(out PlayerTDController player))
                 {
                     _playerDetected = true;
-                    hit.transform.GetComponent<PlayerTDController>().LaserCollition();
+                    player.CorruptionCollided();
                     position = hit.point;
                     _lineRenderer.SetPosition(i + 1, position);
 
-                    print("Player Hiited");
                     continue;
                     //break;
                     //sreturn;

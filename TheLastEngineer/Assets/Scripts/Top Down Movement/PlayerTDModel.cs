@@ -5,6 +5,7 @@ public class PlayerTDModel
 {
     private CharacterController _cc = default;
     private Transform _transform = default;
+    private Collider _collider = default;
 
     private float _moveSpeed = default, _rotSpeed = default;
     private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
@@ -20,10 +21,11 @@ public class PlayerTDModel
     public delegate void OnDashCDFinished();
     public OnDashCDFinished onDashCDFinished = default;
 
-    public PlayerTDModel(CharacterController cc, Transform transform, PlayerData playerData)
+    public PlayerTDModel(CharacterController cc, Transform transform, PlayerData playerData, Collider colider)
     {
         _cc = cc;
         _transform = transform;
+        _collider = colider;
         _moveSpeed = playerData.moveSpeed;
         _rotSpeed = playerData.rotSpeed;
         _dashSpeed = playerData.dashSpeed;
@@ -63,7 +65,10 @@ public class PlayerTDModel
 
     public void SetPos(Vector3 newPos)
     {
-        _cc.Move(newPos);
+        bool wasEnabled = _cc.enabled;
+        _cc.enabled = false;
+        _transform.position = new Vector3(newPos.x, _transform.position.y, newPos.z);
+        _cc.enabled = wasEnabled;
     }
 
     public void RotatePlayer(Vector3 rotDir)
