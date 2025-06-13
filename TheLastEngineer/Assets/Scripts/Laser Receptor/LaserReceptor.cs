@@ -11,6 +11,8 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     [SerializeField] UnityEvent OnHit;
     [SerializeField] UnityEvent OnFill;
     [SerializeField] UnityEvent OnDepleated;
+    MeshRenderer meshRenderer;
+    Collider collider;
     public bool _isCompleted;
     public void LaserNotRecived()
     {
@@ -21,7 +23,17 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             //print(_isCompleted);
         }
     }
+    private void Start()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+        collider = GetComponent<Collider>();
 
+    }
+    public void TurnOffObject()
+    {
+        meshRenderer.enabled = false;
+        collider.enabled = false;
+    }
     public void LaserRecived()
     {
         OnHit?.Invoke();
