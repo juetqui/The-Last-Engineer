@@ -3,51 +3,31 @@ using UnityEngine.SceneManagement;
 
 public class LevelSelector : MonoBehaviour
 {
+    private string[] sceneNames;
+
+    private void Start()
+    {
+        int sceneCount = SceneManager.sceneCountInBuildSettings;
+        sceneNames = new string[sceneCount];
+
+        // Llenar el array con los nombres de las escenas
+        for (int i = 0; i < sceneCount; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            sceneNames[i] = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            Debug.Log($"Escena {i}: {sceneNames[i]}");
+        }
+    }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SceneManager.LoadScene("TESTING");
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SceneManager.LoadScene("Lvl Inicial");
+            SceneManager.LoadScene(sceneNames[0]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            SceneManager.LoadScene("Lvl 9");
+            SceneManager.LoadScene(sceneNames[1]);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SceneManager.LoadScene("Lvl 10 B");
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            SceneManager.LoadScene("Lvl 11");
-        }
-        //else if (Input.GetKeyDown(KeyCode.Alpha4))
-        //{
-        //    SceneManager.LoadScene("Lvl 12");
-        //}
-        //else if (Input.GetKeyDown(KeyCode.Alpha5))
-        //{
-        //    SceneManager.LoadScene("Lvl 5");
-        //}
-        //else if (Input.GetKeyDown(KeyCode.Alpha6))
-        //{
-        //    SceneManager.LoadScene("Lvl 6");
-        //}
-        //else if (Input.GetKeyDown(KeyCode.Alpha7))
-        //{
-        //    SceneManager.LoadScene("Lvl 7");
-        //}
-        //else if (Input.GetKeyDown(KeyCode.Alpha8))
-        //{
-        //    SceneManager.LoadScene("Lvl 8");
-        //}
-        //else if (Input.GetKeyDown(KeyCode.Alpha9))
-        //{
-        //    SceneManager.LoadScene("NEW Camera Testing");
-        //}
     }
 }

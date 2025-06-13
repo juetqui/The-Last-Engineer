@@ -44,7 +44,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         _timer.fillAmount = _timerController.CurrentFillAmount;
 
-        if (_isStopped) _timer.color = Color.yellow;
+        if (_isStopped) _timer.color = Color.magenta;
         else _timer.color = _originalColor;
 
         StartCoroutine(MoveTrail());
