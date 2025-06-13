@@ -315,6 +315,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     public IEnumerator RespawnPlayer()
     {
+        if (_currentPlatform != null) UnSetPlatform(_currentPlatform);
+
         TransitionManager.Instance.PlayTransition(3f);
         yield return new WaitForSeconds(1f);
 
