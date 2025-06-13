@@ -44,12 +44,9 @@ public abstract class Glitcheable : MonoBehaviour
         _timer.fillAmount = _timerController.CurrentFillAmount;
 
         if (_isStopped) _timer.color = Color.magenta;
-        else
-        {
-            _timer.color = _originalColor;
+        else _timer.color = _originalColor;
 
-            StartCoroutine(MoveTrail());
-        }
+        StartCoroutine(MoveTrail());
     }
 
     protected void StopObject(Glitcheable glitcheable)
@@ -109,17 +106,24 @@ public abstract class Glitcheable : MonoBehaviour
 
     private IEnumerator MoveTrail()
     {
+        float t = 1f - _timerController.CurrentFillAmount;
+
         if (_feedbackPos != null)
         {
-            float t = 1f - _timerController.CurrentFillAmount;
-            _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
+            if (_isStopped)
+            {
+                _feedbackPos.position = Vector3.Lerp(_feedbackPos.position, _feedBackCurrentPos, t);
+            }
+            else
+            {
+                _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
+            }
         }
 
         yield return new WaitForSeconds(0.25f);
 
         if (_secFeedbackPos != null)
         {
-            float t = 1f - _timerController.CurrentFillAmount;
             _secFeedbackPos.position = Vector3.Lerp(_secFeedBackCurrentPos, _targetPos, t);
         }
     }
