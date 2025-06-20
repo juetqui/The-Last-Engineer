@@ -10,12 +10,10 @@ public class LevelSelector : MonoBehaviour
         int sceneCount = SceneManager.sceneCountInBuildSettings;
         sceneNames = new string[sceneCount];
 
-        // Llenar el array con los nombres de las escenas
         for (int i = 0; i < sceneCount; i++)
         {
             string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
             sceneNames[i] = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-            Debug.Log($"Escena {i}: {sceneNames[i]}");
         }
     }
 

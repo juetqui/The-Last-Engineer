@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using MaskTransitions;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,8 +72,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _interactables = new List<IInteractable>();
 
         _checkPointPos = transform.position;
-
-        Materializer.OnPlayerInsideTrigger += CheckDropAvailable;
     }
 
     private void Start()
@@ -281,11 +278,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
             return true;
         
         return false;
-    }
-
-    public void CheckDropAvailable(bool available)
-    {
-        _dropAvailable = !available;
     }
 
     public void SetCheckPointPos(Vector3 newPos)
