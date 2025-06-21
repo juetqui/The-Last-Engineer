@@ -23,10 +23,12 @@ public class GlobalVolumeController : MonoBehaviour
     {
         if (!hasNode || nodeType != _requiredNode)
         {
+            Debug.Log("Remove");
             StartCoroutine(RemoveEffect());
             return;
         }
 
+        Debug.Log("Add");
         StartCoroutine(AddEffect());
     }
 

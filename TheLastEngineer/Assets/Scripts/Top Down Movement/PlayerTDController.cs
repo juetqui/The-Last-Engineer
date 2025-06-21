@@ -11,7 +11,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private PlayerData _playerData;
     [Header("MVC Player View")]
     [SerializeField] private Outline _outline;
-    [SerializeField] private ParticleSystem[] _ps;
+    [SerializeField] private ParticleSystem _walkPS;
+    [SerializeField] private ParticleSystem _orbitPS;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _walkSource;
     [SerializeField] private AudioSource _fxSource;
@@ -81,7 +82,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _currentSpeed = _playerData.moveSpeed;
 
         _playerModel = new PlayerTDModel(_cc, transform, _playerData, GetComponent<Collider>());
-        _playerView = new PlayerTDView(_outline, _ps, _animator, _walkSource, _fxSource, _playerData, _solvingController);
+        _playerView = new PlayerTDView(_outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController);
 
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         _solvingController.OnDissolveCompleted += OnDissolveCompleted;
@@ -254,7 +255,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     {
         _node = null;
         _currentNodeType = NodeType.None;
-        _playerView.GrabNode();
+        _playerView.GrabNode(false, Color.black);
     }
     #endregion
 
@@ -268,14 +269,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         return false;
     }
 
-    public bool CheckForWalls(NodeController node)
-    {
-        if (Physics.Raycast(transform.position, node.transform.position, 7f, _playerData.wallMask))
-            return true;
-        
-        return false;
-    }
-
     public void SetCheckPointPos(Vector3 newPos)
     {
         _checkPointPos = newPos;
@@ -284,9 +277,11 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public void LaserRecived()
     {
         if (_isDead) return;
+        
         _isDead = true;
         _playerView.SetAnimatorSpeed(0f);
         _solvingController?.BurnShader();
+        
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
 

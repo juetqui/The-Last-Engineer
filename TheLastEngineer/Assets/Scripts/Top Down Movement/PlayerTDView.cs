@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerTDView
 {
     private Outline _outline = default;
-    private ParticleSystem[] _ps = default;
+    private ParticleSystem _walkPS = default, _orbitPS = default;
     private SolvingController _solvingController;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
@@ -11,10 +11,11 @@ public class PlayerTDView
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem[] ps, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController)
+    public PlayerTDView(Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController)
     {
         _outline = outline;
-        _ps = ps;
+        _walkPS = walkPS;
+        _orbitPS = orbitPS;
         _animator = animator;
         _walkSource = walkSource;
         _fxSource = fxSource;
@@ -62,21 +63,18 @@ public class PlayerTDView
 
     public void PlayPS(Color color)
     {
-        foreach (var ps in _ps)
-        {
-            ParticleSystem.MainModule psMain = ps.main;
-
-            psMain.startColor = color;
-            ps.Play();
-        }
+        _walkPS.startColor = color;
+        _orbitPS.startColor = color;
+        _orbitPS.Play();
     }
 
     public void StopPS()
     {
-        foreach (var ps in _ps) ps.Stop();
+        _walkPS.startColor = Color.white;
+        _orbitPS.Stop();
     }
 
-    public void GrabNode(bool grab = false, Color outlineColor = default)
+    public void GrabNode(bool grab, Color outlineColor)
     {
         _fxSource.volume = 1f;
 
