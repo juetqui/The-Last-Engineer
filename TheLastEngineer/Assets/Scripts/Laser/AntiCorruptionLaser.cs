@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ public class AntiCorruptionLser : Laser
     public List<ICorruptionCanceler> _stoppedObjects = new List<ICorruptionCanceler>();
     public List<ICorruptionCanceler> _hittedObjects = new List<ICorruptionCanceler>();
 
+    public Action OnCollition = delegate { };
+
     protected override bool CollitionCheck(RaycastHit hit)
     {
         if (hit.transform.TryGetComponent(out ICorruptionCanceler corruptionCanceler))
@@ -13,7 +16,7 @@ public class AntiCorruptionLser : Laser
             if (!_hittedObjects.Contains(corruptionCanceler))
             {
                 _hittedObjects.Add(corruptionCanceler);
-                _onCollition += corruptionCanceler.CorruptionCancel;
+                OnCollition += corruptionCanceler.CorruptionCancel;
             }
             
             return true;

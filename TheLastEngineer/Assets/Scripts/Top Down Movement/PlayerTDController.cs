@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 using System.Collections;
 
-public class PlayerTDController : MonoBehaviour, IMovablePassenger
+public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
     [SerializeField] private PlayerData _playerData;
     [Header("MVC Player View")]
@@ -92,18 +92,14 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
 
     private void Update()
     {
-        
         _playerModel.OnUpdate(GetMovement(), _currentSpeed);
-            _playerView.Walk(GetMovement());
-        
+        _playerView.Walk(GetMovement());
     }
 
     private Vector3 GetMovement()
     {
-        if (_isDead)
-        {
-            return Vector3.zero;
-        }
+        if (_isDead) return Vector3.zero;
+        
         _movement = InputManager.Instance.moveInput.ReadValue<Vector2>();
 
         return new Vector3(_movement.x, 0, _movement.y);
@@ -285,7 +281,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         _checkPointPos = newPos;
     }
 
-    public void LaserCollition()
+    public void LaserRecived()
     {
         if (_isDead) return;
         _isDead = true;
@@ -294,10 +290,12 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
 
+    public void LaserNotRecived() { return; }
+
     public void CorruptionCollided()
     {
         if (_currentNodeType == NodeType.Purple) return;
-        LaserCollition();
+        LaserRecived();
     }
 
     private void OnDissolveCompleted()

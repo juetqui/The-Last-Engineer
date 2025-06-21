@@ -18,6 +18,7 @@ public class GlitchActive : MonoBehaviour
     private float _detectionOffset = 5f, _offsetRange = 0f;
     private int _index = 0;
     private bool _enabled = false;
+    private Coroutine _currentCoroutine = null;
 
     public Action<Glitcheable> OnStopObject = delegate { };
     public Action<Glitcheable> OnStopableSelected = delegate { };
@@ -86,43 +87,19 @@ public class GlitchActive : MonoBehaviour
 
     private void CheckNode(bool hasNode, NodeType nodeType)
     {
+        if (_currentCoroutine != null)
+            StopCoroutine(_currentCoroutine);
+
         if (!hasNode || nodeType != _requiredNode)
         {
             OnStopableSelected(null);
             _index = 0;
-            StartCoroutine(DeactivateArea());
+            _currentCoroutine = StartCoroutine(DeactivateArea());
             return;
         }
 
-        StartCoroutine(ActivateArea());
+        _currentCoroutine = StartCoroutine(ActivateArea());
     }
-
-    //private Glitcheable GetNearestStopable()
-    //{
-    //    Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange*40);
-    //    Glitcheable closest = null;
-    //    float minDistance = float.MaxValue;
-
-    //    foreach (var hit in hitColliders)
-    //    {
-    //        if (hit.TryGetComponent(out Glitcheable glitcheable))
-    //        {
-    //            if (Vector2.Distance(new Vector2(_player.transform.position.x, _player.transform.position.z), new Vector2(hit.ClosestPoint(_player.transform.position).x, hit.ClosestPoint(_player.transform.position).z)) <= _detectionRange)
-    //            {
-    //                float distance = Vector3.Distance(_player.transform.position, glitcheable.transform.position);
-    //                if (distance < minDistance)
-    //                {
-    //                    minDistance = distance;
-    //                    closest = glitcheable;
-    //                }
-
-    //            }
-
-    //        }
-    //    }
-
-    //    return closest;
-    //}
 
     private List<Glitcheable> GetStopablesInArea(ref List<Glitcheable> glitcheables)
     {

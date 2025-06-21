@@ -1,99 +1,115 @@
-using System;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
-    [SerializeField] private Transform _startPoint;
-    [SerializeField] private string _reflectableTag;
-    [SerializeField] private int _maxBounces;
-    [SerializeField] private float _maxDist;
-    [SerializeField] private bool _onlyReflectables;
-    public Action _onCollition;
-    PlayerTDController _playerTDController;
+    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private float _maxDist = 20f;
+    [SerializeField] private bool _startsInitialized = false;
+    [SerializeField] private LayerMask _laserLayer;
 
-   public GameObject objectsHits;
+    private ILaserReceptor _lastHit = null;
+    private RaycastHit _rayHit;
+    private Ray _ray;
 
-    private LineRenderer _lineRenderer = default;
-    private bool _isResetting = false;
+    private void Awake()
+    {
+        _lineRenderer.positionCount = 2;
+
+        Vector3 laserPos = GetFixedLaserPos();
+
+        _lineRenderer.SetPosition(0, laserPos);
+        _lineRenderer.SetPosition(1, laserPos);
+    }
 
     private void Start()
     {
-        _playerTDController = FindObjectOfType<PlayerTDController>();
-        _lineRenderer = GetComponent<LineRenderer>();
-        _lineRenderer.SetPosition(0, _startPoint.position);
-
+        if (_startsInitialized) CastLaser();
     }
 
     private void Update()
     {
-        if (_isResetting) return;
+        if (!_startsInitialized) return;
 
-        CastLaser(_startPoint.position, _startPoint.forward);
+        CastLaser();
         CorruptionCheck();
     }
 
-    private void CastLaser(Vector3 position, Vector3 direction)
+    private void CastLaser()
     {
-        _lineRenderer.SetPosition(0, _startPoint.position);
+        Vector3 laserPos = GetFixedLaserPos();
 
-        for (int i = 0; i < _maxBounces; i++)
+        _ray = new Ray(laserPos, transform.forward);
+
+        if (Physics.Raycast(_ray, out _rayHit, _maxDist, _laserLayer))
         {
-            direction = new Vector3(direction.x, /*direction.y*/0, direction.z);
-
-            Ray ray = new Ray(position, direction);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, _maxDist))
+            if (_rayHit.collider.TryGetComponent(out PlayerTDController player))
             {
-                if (hit.transform.TryGetComponent(out PlayerTDController player))
+                if (_lastHit != null && player != _lastHit)
                 {
-                    player.LaserCollition();
-                    position = hit.point;
-                    _lineRenderer.SetPosition(i + 1, position);
-
-                    continue;
-                }
-                
-                if (hit.transform.TryGetComponent(out ILaserReceptor laserReceptor))
-                {
-                    if (objectsHits != null && objectsHits != hit.transform.gameObject)
-                    {
-                        objectsHits.GetComponent<ILaserReceptor>().LaserNotRecived();
-                        laserReceptor.LaserRecived();
-                        objectsHits = hit.transform.gameObject;
-                    }
-                    else
-                    {
-                        objectsHits = hit.transform.gameObject;
-                        laserReceptor.LaserRecived();
-                    }
-                }
-                else if(!hit.transform.gameObject.CompareTag(_reflectableTag) && objectsHits != null)
-                {
-                    objectsHits.GetComponent<ILaserReceptor>().LaserNotRecived();
-                    objectsHits = default;
+                    _lastHit.LaserNotRecived();
                 }
 
-                position = hit.point;
-                direction = Vector3.Reflect(direction, hit.normal);
+                _lineRenderer.SetPosition(0, laserPos);
+                _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
+                player.LaserRecived();
+                _lastHit = null;
+            }
+            else if (_rayHit.collider.TryGetComponent(out ILaserReceptor receptor))
+            {
+                if (_lastHit != null && _lastHit != receptor)
+                    _lastHit.LaserNotRecived();
 
-                _lineRenderer.SetPosition(i + 1, position);
-
-                if (hit.transform.tag != _reflectableTag && _onlyReflectables)
+                _lineRenderer.SetPosition(0, laserPos);
+                _lineRenderer.SetPosition(1, _rayHit.point);
+                receptor.LaserRecived();
+                _lastHit = receptor;
+            }
+            else
+            {
+                if (_lastHit != null)
                 {
-                    for (int j = (i + 1); j <= _maxBounces; j++)
-                    {
-                        _lineRenderer.SetPosition(j, position);
-                    }
-
-                    break;
+                    _lastHit.LaserNotRecived();
+                    _lastHit = null;
                 }
-                
-                if (CollitionCheck(hit)) _onCollition();
+
+                _lineRenderer.SetPosition(0, laserPos);
+                _lineRenderer.SetPosition(1, _rayHit.point);
             }
         }
+        else
+        {
+            if (_lastHit != null)
+            {
+                _lastHit.LaserNotRecived();
+                _lastHit = null;
+            }
+
+            _lineRenderer.SetPosition(0, laserPos);
+            _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
+        }
     }
-    
+
+    private Vector3 GetFixedLaserPos()
+    {
+        return new Vector3(transform.position.x, transform.position.y, transform.position.z) + transform.forward * 2;
+    }
+
+    public void LaserRecived()
+    {
+        _startsInitialized = true;
+        CastLaser();
+    }
+
+    public void LaserNotRecived()
+    {
+        Vector3 laserPos = GetFixedLaserPos();
+
+        _startsInitialized = false;
+
+        _lineRenderer.SetPosition(0, laserPos);
+        _lineRenderer.SetPosition(1, laserPos);
+    }
+
     protected virtual void CorruptionCheck()
     {
 
@@ -101,6 +117,6 @@ public class Laser : MonoBehaviour
 
     protected virtual bool CollitionCheck(RaycastHit hit)
     {
-        return default;
+        return false;
     }
 }
