@@ -18,6 +18,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected int _index = 0;
 
     private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
+    private Quaternion _targetRot = default;
     private Color _originalColor = default;
 
     public Action<Vector3> OnPosChanged = delegate { };
@@ -34,6 +35,7 @@ public abstract class Glitcheable : MonoBehaviour
         _timer = GetComponentInChildren<Image>();
         _currentList = _newPosList;
         _targetPos = _currentList[_index].position;
+        _targetRot = _currentList[_index].rotation;
         _originalColor = _timer.color;
 
         if (_feedbackPos != null)
@@ -69,12 +71,12 @@ public abstract class Glitcheable : MonoBehaviour
         else _index++;
 
         transform.position = _targetPos;
-        transform.rotation = _currentList[_index].rotation;
+        transform.rotation = _targetRot;
 
         if (_isPlatform) OnPosChanged?.Invoke(_targetPos);
 
         _targetPos = _currentList[_index].position;
-
+        _targetRot = _currentList[_index].rotation;
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedbackPos.position;
     }
