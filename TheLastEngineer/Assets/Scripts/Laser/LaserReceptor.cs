@@ -23,7 +23,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     bool _isCurrentlyLoading;
     bool _isCurrentlyUnloading;
     public float _timeToUnfill = 0;
-    private void Start()
+    private void Awake()
     {
         _myMeshRenderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<Collider>();
