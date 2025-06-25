@@ -127,7 +127,6 @@ public class Laser : MonoBehaviour
     public void LaserRecived()
     {
         _startsInitialized = true;
-        CastLaser();
     }
 
     public void LaserNotRecived()
