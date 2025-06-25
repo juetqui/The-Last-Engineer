@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimerController : MonoBehaviour
 {
-    [SerializeField] private NodeType _requiredNode = NodeType.Purple;
+    [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private float _defaultDuration = 1f;
     [SerializeField] private float _nodeDuration = 2f;
 

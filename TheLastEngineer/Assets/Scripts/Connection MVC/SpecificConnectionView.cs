@@ -63,8 +63,7 @@ public class SpecificConnectionView
 
     private void SetTexture()
     {
-        if (_type == NodeType.Purple) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_PurpleNode"));
-        else if (_type == NodeType.Green) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_GreenNode"));
-        else if (_type == NodeType.Blue) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_BlueNode"));
+        if (_type == NodeType.Corrupted) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_PurpleNode"));
+        else if (_type == NodeType.Default) _renderer.material.SetTexture("_Texture2D", Resources.Load<Texture2D>("Textures/T_YellowNode"));
     }
 }

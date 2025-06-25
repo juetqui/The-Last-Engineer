@@ -30,9 +30,9 @@ public class MultipleListsGlitcheable : Glitcheable
 
     private void OnCycleStart()
     {
-        if (_isStopped) return;
+        if (_isStopped || !_isCorrupted) return;
 
-        _timer.fillAmount = 1f;
+        //_timer.fillAmount = 1f;
     }
 
     private void ChangePosList(bool changed)

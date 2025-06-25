@@ -8,9 +8,8 @@ public enum PlayerState
 public enum NodeType
 {
     None,
-    Purple,
-    Green,
-    Blue
+    Default,
+    Corrupted
 }
 
 public enum InteractablePriority

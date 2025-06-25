@@ -8,7 +8,7 @@ public class GlitchActive : MonoBehaviour
 {
     public static GlitchActive Instance = null;
 
-    [SerializeField] private NodeType _requiredNode = NodeType.Green;
+    [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private float _detectionRange = 10f;
     [SerializeField] private float _scaleSpeed = 10f;
     [SerializeField] private GameObject _interactionArea;
@@ -22,6 +22,7 @@ public class GlitchActive : MonoBehaviour
 
     public Action<Glitcheable> OnStopObject = delegate { };
     public Action<Glitcheable> OnStopableSelected = delegate { };
+    public Action<Glitcheable> OnChangeObjectState = delegate { };
 
     private void Awake()
     {
@@ -64,17 +65,16 @@ public class GlitchActive : MonoBehaviour
             OnStopableSelected?.Invoke(glitcheable);
 
             if (Input.GetKeyDown(KeyCode.I) && _glitcheables.Count > 0)
-            {
                 _index = (_index >= _glitcheables.Count - 1) ? 0 : _index + 1;
-            }
 
             if (Input.GetKeyDown(KeyCode.U) && _glitcheables.Count > 0)
-            {
                 _index = (_index <= 0) ? _glitcheables.Count - 1 : _index - 1;
-            }
 
             if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
                 OnStopObject?.Invoke(glitcheable);
+
+            if (Input.GetKeyDown(KeyCode.C) && glitcheable != null)
+                OnChangeObjectState?.Invoke(glitcheable);
         }
 
         UpdateAreaPos();
@@ -90,7 +90,7 @@ public class GlitchActive : MonoBehaviour
         if (_currentCoroutine != null)
             StopCoroutine(_currentCoroutine);
 
-        if (!hasNode || nodeType != _requiredNode)
+        if (!hasNode || nodeType == NodeType.None)
         {
             OnStopableSelected(null);
             _index = 0;

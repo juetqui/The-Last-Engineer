@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 {
     private void Awake()
@@ -21,22 +19,20 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 
     private void OnCycleStart()
     {
-        if (_isStopped) return;
+        if (_isStopped || !_isCorrupted) return;
 
-        _timer.fillAmount = 1f;
+        //_timer.fillAmount = 1f;
     }
+    
     public void CorruptionCheck() { }
 
     public void CorruptionRestore()
     {
         _isStopped = false;
-        print("hola");
     }
+
     public void CorruptionCancel()
     {
-        print("cancelado");
         _isStopped = true;
-        //TimerController.Instance.OnTimerCycleStart -= OnCycleStart;
-        //TimerController.Instance.OnTimerCycleComplete -= UpdateTarget;
     }
 }

@@ -10,9 +10,11 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
+    [SerializeField] protected bool _isCorrupted = true;
 
+    private NodeType _requiredNode = NodeType.Corrupted;
     protected List<Transform> _currentList = default;
-    protected Image _timer = default;
+    //protected Image _timer = default;
     protected bool _canMove = true;
     protected bool _isStopped = false;
     protected int _index = 0;
@@ -32,11 +34,11 @@ public abstract class Glitcheable : MonoBehaviour
 
     protected void OnAwake()
     {
-        _timer = GetComponentInChildren<Image>();
+        //_timer = GetComponentInChildren<Image>();
         _currentList = _newPosList;
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
-        _originalColor = _timer.color;
+        //_originalColor = _timer.color;
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedBackStartPos = _feedbackPos.position;
@@ -44,10 +46,10 @@ public abstract class Glitcheable : MonoBehaviour
 
     protected void UpdateTimer()
     {
-        _timer.fillAmount = _timerController.CurrentFillAmount;
+        //_timer.fillAmount = _timerController.CurrentFillAmount;
 
-        if (_isStopped) _timer.color = Color.magenta;
-        else _timer.color = _originalColor;
+        //if (_isStopped) _timer.color = Color.magenta;
+        //else _timer.color = _originalColor;
 
         StartCoroutine(MoveTrail());
     }
@@ -63,9 +65,29 @@ public abstract class Glitcheable : MonoBehaviour
         _isStopped = !_isStopped;
     }
 
+    public void ChangeCorruptionState(NodeType nodeType)
+    {
+        Debug.Log("Before: " + _isCorrupted);
+
+        if (nodeType == NodeType.Default)
+            _isCorrupted = false;
+        else if (nodeType == NodeType.Corrupted)
+            _isCorrupted = true;
+        else return;
+
+        Debug.Log("After: " + _isCorrupted);
+
+        //UpdateCorruptionState();
+    }
+
+    private void UpdateCorruptionState()
+    {
+        //Cambiar vista del objeto según corresponda
+    }
+
     protected void UpdateTarget()
     {
-        if (_isStopped) return;
+        if (_isStopped || !_isCorrupted) return;
 
         if (_index == _currentList.Count - 1) _index = 0;
         else _index++;
@@ -86,7 +108,7 @@ public abstract class Glitcheable : MonoBehaviour
         transform.position = _currentList[_currentList.Count - 1].position;
         transform.rotation = _currentList[_currentList.Count - 1].rotation;
         _isStopped = false;
-        _timer.fillAmount = 1;
+        //_timer.fillAmount = 1;
         _index = 0;
 
         if (_feedbackPos != null)
@@ -99,7 +121,7 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
         {
-            if (_isStopped)
+            if (_isStopped || !_isCorrupted)
                 _feedbackPos.position = Vector3.Lerp(_feedbackPos.position, _feedBackCurrentPos, t);
             else
                 _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
@@ -112,7 +134,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            if (_isPlatform && (player.GetCurrentNode() == null || player.GetCurrentNode().NodeType == NodeType.Purple))
+            if (_isPlatform && player.GetCurrentNode().NodeType == _requiredNode)
                 player.SetPlatform(this);
             else
                 player.CorruptionCollided();
@@ -123,7 +145,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            if (_isPlatform && (player.GetCurrentNode() == null || player.GetCurrentNode().NodeType == NodeType.Purple))
+            if (_isPlatform)
                 player.UnSetPlatform(this);
         }
     }

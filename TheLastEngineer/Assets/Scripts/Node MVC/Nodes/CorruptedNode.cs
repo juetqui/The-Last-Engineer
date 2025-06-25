@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using static TreeEditor.TreeEditorHelper;
 
-public class TransporterNode : NodeController
+public class CorruptedNode : NodeController
 {
     private void Awake()
     {
@@ -12,7 +11,6 @@ public class TransporterNode : NodeController
     void Start()
     {
         OnStart();
-
     }
 
     void Update()

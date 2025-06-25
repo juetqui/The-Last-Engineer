@@ -8,7 +8,7 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _waitCD;
     [SerializeField] private LayerMask _floorMask;
-    [SerializeField] private NodeType _requiredNode = NodeType.Purple;
+    [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
 
     private IMovablePassenger _passenger = default;
     private Vector3 _targetPos = default;

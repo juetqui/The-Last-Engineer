@@ -13,7 +13,7 @@ public class ShieldController : MonoBehaviour
 
     private bool _isActive = false, _canUse = true;
 
-    private TransporterNode _transporterNode = null;
+    private CorruptedNode _transporterNode = null;
     //private ShieldModel _shieldModel = default;
     private ShieldView _shieldView = default;
 
@@ -22,7 +22,7 @@ public class ShieldController : MonoBehaviour
         _renderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<SphereCollider>();
         _audioSource = GetComponent<AudioSource>();
-        _transporterNode = GetComponentInParent<TransporterNode>();
+        _transporterNode = GetComponentInParent<CorruptedNode>();
         
         //_shieldModel = new ShieldModel();
         _shieldView = new ShieldView(_renderer, _collider, _audioSource, _chargedFX);

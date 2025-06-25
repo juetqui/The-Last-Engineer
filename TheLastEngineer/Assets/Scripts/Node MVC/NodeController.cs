@@ -3,14 +3,9 @@ using UnityEngine;
 public abstract class NodeController : MonoBehaviour, IInteractable
 {
     [Header("View")]
-    [SerializeField] private Material _material;
-    [SerializeField] private Renderer _renderer = default;
+    private Renderer _renderer = default;
     private Collider _collider = default;
     protected Animator _animator = default;
-
-    [Header("For Player's Dash hability only<br>(if this script is <color=#14a3c7>MaterializerNode</color> set value greater than 0)")]
-    [SerializeField] protected float _emissionIntensity = 4f;
-
 
     [Header("Outline")]
     [SerializeField] private Color _outlineColor;
@@ -40,11 +35,12 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     protected void OnAwake()
     {
         _collider = GetComponent<Collider>();
+        _renderer = GetComponent<Renderer>();
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
 
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
-        _nodeView = new NodeView(_renderer, _material, _collider, _outline, _outlineColor, _emissionIntensity, _animator);
+        _nodeView = new NodeView(_renderer, _collider, _outline, _outlineColor, _animator);
     }
 
     protected void OnStart()
@@ -61,6 +57,11 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     public bool CanInteract(PlayerTDController player)
     {
         return !player.HasNode();
+    }
+
+    private void InteractWithGlitcheable(Glitcheable glitcheable)
+    {
+        glitcheable.ChangeCorruptionState(_nodeType);
     }
 
     public virtual void Interact(PlayerTDController player, out bool succededInteraction)
@@ -97,39 +98,29 @@ public abstract class NodeController : MonoBehaviour, IInteractable
 
     public virtual void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
     {
-        if (parentIsPlayer) _nodeView.EnableColl(false);
-        else _nodeView.EnableColl(true);
+        if (parentIsPlayer)
+        {
+            GlitchActive.Instance.OnChangeObjectState += InteractWithGlitcheable;
+            _nodeView.EnableColl(false);
+        }
+        else
+        {
+            GlitchActive.Instance.OnChangeObjectState -= InteractWithGlitcheable;
+            _nodeView.EnableColl(true);
+        }
 
         if (!parentIsPlayer && newParent != null)
-        {
             _connectable = newParent.GetComponent<IConnectable>();
-
-            //if (_connectable != null)
-            //{
-            //    PlayerTDController.Instance.RemoveFromInteractables(this);
-            //}
-        }
 
         if (newParent != null) _isChildren = true;
         else _isChildren = false;
 
         if (newParent != null && newScale != default)
-        {
             _nodeModel.SetPos(newPos, NodeType, newParent, newScale);
-        }
         else if (newParent != null && newScale == default)
-        {
             _nodeModel.SetPos(newPos, NodeType, newParent);
-        }
         else if (newParent == null && newScale == default)
-        {
             _nodeModel.SetPos(newPos, NodeType);
-        }
-    }
-
-    public void UseHability(float dashDuration, float dashCD)
-    {
-        StartCoroutine(_nodeView.ResetHability(dashDuration, dashCD));
     }
 
     private void OnTriggerEnter(Collider other)

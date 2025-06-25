@@ -5,7 +5,7 @@ using UnityEngine.Rendering.Universal;
 
 public class GlobalVolumeController : MonoBehaviour
 {
-    [SerializeField] private NodeType _requiredNode = NodeType.Purple;
+    [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private float _maxIntensity = 0.15f;
     private Volume _volume = null;
 
@@ -23,12 +23,10 @@ public class GlobalVolumeController : MonoBehaviour
     {
         if (!hasNode || nodeType != _requiredNode)
         {
-            Debug.Log("Remove");
             StartCoroutine(RemoveEffect());
             return;
         }
 
-        Debug.Log("Add");
         StartCoroutine(AddEffect());
     }
 
