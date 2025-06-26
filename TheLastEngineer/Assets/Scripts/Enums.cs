@@ -1,8 +1,7 @@
 public enum PlayerState
 {
-    Empty,
-    Grab,
-    Place
+    Default,
+    Corrupted
 }
 
 public enum NodeType
