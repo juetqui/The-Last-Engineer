@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GenericConnectionController : Connection<GenericTM>
 {
@@ -28,5 +29,10 @@ public class GenericConnectionController : Connection<GenericTM>
     {
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _recievedNode = null;
+    }
+    public void EjectNode(Vector3 position = default)
+    {
+        _recievedNode.gameObject.transform.position = position;
+
     }
 }
