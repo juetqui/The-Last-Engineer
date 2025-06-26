@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using System;
 
 public class AntiCorruptionMachine : MonoBehaviour
 {
@@ -69,27 +70,41 @@ public class AntiCorruptionMachine : MonoBehaviour
 
                 if (hitCollider.gameObject.GetComponent<AntiCorruptionTest>())
                 {
-                    objectsInside.Add(hitCollider);
-                    if (!previousObjectsInside.Contains(hitCollider))
-                    {
-                        hitCollider.gameObject.GetComponent<AntiCorruptionTest>().onRange();
-                        // Llama al método del script del objeto que entró
+                    Vector2 vector = new Vector2(hitCollider.ClosestPoint(originTransform.position).x, hitCollider.ClosestPoint(originTransform.position).z);
 
+                    if (Vector2.Distance(vector, origin2Dvector) <= currentRadius)
+                    {
+                        objectsInside.Add(hitCollider);
+                        if (!previousObjectsInside.Contains(hitCollider))
+                        {
+                            hitCollider.gameObject.GetComponent<AntiCorruptionTest>().onRange();
+                            print("agrego");
+
+                            // Llama al método del script del objeto que en
+                        }
                     }
                 }
 
                 // Si el objeto no estaba en la lista anterior, acaba de entrar
 
             }
-            foreach (Collider prevCollider in previousObjectsInside)
+            List<Collider> coll = new List<Collider>();
+            int acum = 0;
+            for (int i=0; i<previousObjectsInside.Count; i++)
             {
-                Vector2 vector = new Vector2(prevCollider.ClosestPoint(originTransform.position).x, prevCollider.ClosestPoint(originTransform.position).z);
+                Vector2 vector = new Vector2(previousObjectsInside[acum].ClosestPoint(originTransform.position).x, previousObjectsInside[acum].ClosestPoint(originTransform.position).z);
                 if (Vector2.Distance(vector, origin2Dvector) >currentRadius)
                 {
-                    prevCollider.gameObject.GetComponent<AntiCorruptionTest>().OutofRange();
-                    print(prevCollider.gameObject.transform.position.ToString() + " " + Vector2.Distance(vector, origin2Dvector).ToString() + currentRadius.ToString());
+                    previousObjectsInside[acum].gameObject.GetComponent<AntiCorruptionTest>().OutofRange();
+                    objectsInside.Remove(previousObjectsInside[acum]);
+                    acum--;
+                   // objectsInside.Add(prevCollider);
                 }
+               
+                acum++;
             }
+            
+
             if (!_isActive)
             {
                 foreach (Collider prevCollider in previousObjectsInside)
@@ -109,7 +124,10 @@ public class AntiCorruptionMachine : MonoBehaviour
 
                 break;
             }
-            currentRadius-=reductionByFrame;
+            currentRadius -= reductionByFrame;
+            
+            
+
             yield return null;
 
         }
@@ -119,6 +137,7 @@ public class AntiCorruptionMachine : MonoBehaviour
         }
 
     }
+   
     public void RemoveNodeFromMachine()
     {
         _connection.EjectNode(playerPosition);
