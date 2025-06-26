@@ -14,6 +14,9 @@ public abstract class Glitcheable : MonoBehaviour
 
     private NodeType _requiredNode = NodeType.Corrupted;
     protected List<Transform> _currentList = default;
+    private Renderer _renderer = default;
+    private Material _objectMat;
+    private Material _corruptionMat;
     //protected Image _timer = default;
     protected bool _canMove = true;
     protected bool _isStopped = false;
@@ -35,6 +38,11 @@ public abstract class Glitcheable : MonoBehaviour
     protected void OnAwake()
     {
         //_timer = GetComponentInChildren<Image>();
+        _renderer = GetComponent<Renderer>();
+
+        _objectMat = Resources.Load<Material>("Materials/M_Objects");
+        _corruptionMat = Resources.Load<Material>("Materials/M_Corruption");
+
         _currentList = _newPosList;
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
@@ -42,6 +50,8 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedBackStartPos = _feedbackPos.position;
+
+        UpdateCorruptionState();
     }
 
     protected void UpdateTimer()
@@ -65,24 +75,28 @@ public abstract class Glitcheable : MonoBehaviour
         _isStopped = !_isStopped;
     }
 
-    public void ChangeCorruptionState(NodeType nodeType)
+    public bool ChangeCorruptionState(NodeType nodeType, bool newState)
     {
-        Debug.Log("Before: " + _isCorrupted);
+        if (newState == _isCorrupted) return false;
 
-        if (nodeType == NodeType.Default)
-            _isCorrupted = false;
-        else if (nodeType == NodeType.Corrupted)
-            _isCorrupted = true;
-        else return;
+        _isCorrupted = newState;
+        UpdateCorruptionState();
 
-        Debug.Log("After: " + _isCorrupted);
-
-        //UpdateCorruptionState();
+        return true;
     }
 
     private void UpdateCorruptionState()
     {
-        //Cambiar vista del objeto según corresponda
+        if (_isCorrupted)
+        {
+            _renderer.material = _corruptionMat;
+            _feedbackPos.gameObject.SetActive(true);
+        }
+        else
+        {
+            _renderer.material = _objectMat;
+            _feedbackPos.gameObject.SetActive(false);
+        }
     }
 
     protected void UpdateTarget()

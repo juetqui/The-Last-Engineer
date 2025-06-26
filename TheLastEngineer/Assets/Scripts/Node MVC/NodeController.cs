@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public abstract class NodeController : MonoBehaviour, IInteractable
+public class NodeController : MonoBehaviour, IInteractable
 {
     [Header("View")]
     private Renderer _renderer = default;
@@ -8,7 +9,9 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     protected Animator _animator = default;
 
     [Header("Outline")]
-    [SerializeField] private Color _outlineColor;
+    [SerializeField] private Color _corruptionOutline;
+    [SerializeField] private Color _defaultOutline;
+    private Color _currentOutline = default;
     private Outline _outline = default;
 
     [Header("Model")]
@@ -27,28 +30,32 @@ public abstract class NodeController : MonoBehaviour, IInteractable
     
     private bool _isConnected = false;
 
+    public Action<NodeType> OnUpdatedNodeType = delegate { };
+
     public NodeType NodeType { get { return _nodeType; } }
-    public Color OutlineColor { get { return _outlineColor; } }
+    public Color OutlineColor { get { return _currentOutline; } }
     public bool IsChildren { get { return _isChildren; } }
     public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } }
 
-    protected void OnAwake()
+    protected void Awake()
     {
         _collider = GetComponent<Collider>();
-        _renderer = GetComponent<Renderer>();
+        _renderer = GetComponentInChildren<Renderer>();
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
+        
+        _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
 
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
-        _nodeView = new NodeView(_renderer, _collider, _outline, _outlineColor, _animator);
+        _nodeView = new NodeView(_renderer, _collider, _outline, _currentOutline, _animator);
     }
 
-    protected void OnStart()
+    protected void Start()
     {
         _nodeView.OnStart();
     }
 
-    protected void OnUpdate()
+    protected void Update()
     {
         if (!_isChildren) MoveObject();
         else _nodeView.SetCollectedAnim();
@@ -61,10 +68,22 @@ public abstract class NodeController : MonoBehaviour, IInteractable
 
     private void InteractWithGlitcheable(Glitcheable glitcheable)
     {
-        glitcheable.ChangeCorruptionState(_nodeType);
+        bool newObjectState = _nodeType == NodeType.Default ? false : true;
+
+        if (glitcheable.ChangeCorruptionState(_nodeType, newObjectState))
+            UpdateNodeType();
     }
 
-    public virtual void Interact(PlayerTDController player, out bool succededInteraction)
+    private void UpdateNodeType()
+    {
+        _nodeType = _nodeType == NodeType.Default ? NodeType.Corrupted : NodeType.Default;
+        _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
+
+        _nodeView.UpdateNodeType(_nodeType, _currentOutline);
+        OnUpdatedNodeType?.Invoke(_nodeType);
+    }
+
+    public  void Interact(PlayerTDController player, out bool succededInteraction)
     {
         if (CanInteract(player))
         {
@@ -83,7 +102,7 @@ public abstract class NodeController : MonoBehaviour, IInteractable
         _nodeModel.MoveObject();
     }
 
-    protected virtual void Attach(PlayerTDController player, Vector3 newPos)
+    protected void Attach(PlayerTDController player, Vector3 newPos)
     {
         Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
         
@@ -96,7 +115,7 @@ public abstract class NodeController : MonoBehaviour, IInteractable
         }
     }
 
-    public virtual void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
+    public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
     {
         if (parentIsPlayer)
         {

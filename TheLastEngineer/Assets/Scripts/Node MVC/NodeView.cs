@@ -47,4 +47,14 @@ public class NodeView
         _myAnimator.SetBool("IsOnRange", true);
         _myAnimator.SetBool("IsCollected", false);
     }
+
+    public void UpdateNodeType(NodeType nodeType, Color currentOutline)
+    {
+        if (nodeType == NodeType.Default)
+            _renderer.material = Resources.Load<Material>("Materials/M_DefaultNode");
+        else
+            _renderer.material = Resources.Load<Material>("Materials/M_CorruptedNode");
+
+        _outline.OutlineColor = currentOutline;
+    }
 }

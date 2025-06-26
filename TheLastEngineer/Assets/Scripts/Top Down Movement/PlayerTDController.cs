@@ -225,6 +225,13 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public void DropOrGrabNode(bool grabbed)
     {
         OnNodeGrabed?.Invoke(grabbed, _node.NodeType);
+        _node.OnUpdatedNodeType += UpdateOnNodeChange;
+    }
+
+    private void UpdateOnNodeChange(NodeType nodeType)
+    {
+        _currentNodeType = nodeType;
+        _playerView.GrabNode(true, _node.OutlineColor);
     }
 
     public void PickUpNode(NodeController node)
@@ -245,7 +252,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public void DropNode()
     {
         if (_node == null) return;
-
+        
+        _node.OnUpdatedNodeType -= UpdateOnNodeChange;
         _node.Attach(_node.transform.position);
         RemoveInteractable(_node);
         ResetNode();
