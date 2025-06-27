@@ -64,6 +64,7 @@ public class CorruptedCorridor : MonoBehaviour
         if(_isActive && acum < 0)
         {
             _isActive = false;
+            transportSphere.SetActive(false);
             PlayerTDController.Instance._cc.enabled = true;
             PlayerTDController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
 
