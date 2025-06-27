@@ -9,6 +9,7 @@ using System.Collections;
 public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
     [SerializeField] private PlayerData _playerData;
+    
     [Header("MVC Player View")]
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem _walkPS;
@@ -49,13 +50,14 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public Action<float, float> OnDash;
     public Action<NodeController> OnChangeActiveShield;
     public Action<bool, NodeType> OnNodeGrabed;
+    public Action<bool> OnAbsorbCorruption;
 
     [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
 
     #region -----CHECKERS FOR PLAYER ACTIONS-----
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public bool HasNode() => _node != null;
-    //private bool CheckShieldAvialable() => _currentNodeType == NodeType.Purple;
+    private bool CheckCorruptionAvailable() => _currentNodeType == NodeType.Corrupted;
     private bool CheckDashAvialable() => _playerModel.CanDash;
     public NodeController GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
@@ -156,10 +158,12 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     private void GetShieldKey(InputAction.CallbackContext context)
     {
-        //if (CheckShieldAvialable())
-        //    OnChangeActiveShield?.Invoke(_node);
-        //else
-        //    _playerView.PlayErrorSound(_playerData.emptyHand);
+        if (CheckCorruptionAvailable())
+        {
+            StartCoroutine(StartCorruption());
+        }
+        else
+            _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 
     private void GetDashKey(InputAction.CallbackContext context)
@@ -232,6 +236,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     {
         _currentNodeType = nodeType;
         _playerView.GrabNode(true, _node.OutlineColor);
+        OnNodeGrabed?.Invoke(true, _node.NodeType);
     }
 
     public void PickUpNode(NodeController node)
@@ -306,6 +311,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         StartCoroutine(RespawnPlayer());
     }
 
+    private IEnumerator StartCorruption()
+    {
+        OnAbsorbCorruption.Invoke(true);
+
+        yield return new WaitForSeconds(5f);
+
+        OnAbsorbCorruption.Invoke(false);
+    }
+
     public IEnumerator RespawnPlayer()
     {
         if (_currentPlatform != null) UnSetPlatform(_currentPlatform);
@@ -361,9 +375,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public void RemoveFromInteractables(IInteractable interactable)
     {
         if (_interactables.Contains(interactable))
-        {
             _interactables.Remove(interactable);
-        }
     }
 
     #region -----TRIGGERS MANAGEMENT-----
@@ -385,12 +397,4 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
             _interactables.Remove(interactable);
     }
     #endregion
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-
-        Vector3 rayPos = new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z) - (transform.forward / 0.8f);
-        Gizmos.DrawRay(rayPos, transform.forward * 3f);
-    }
 }

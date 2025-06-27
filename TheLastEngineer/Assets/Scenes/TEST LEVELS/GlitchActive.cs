@@ -77,24 +77,25 @@ public class GlitchActive : MonoBehaviour
                 OnChangeObjectState?.Invoke(glitcheable);
         }
 
-        UpdateAreaPos();
+        //UpdateAreaPos();
     }
 
-    private void UpdateAreaPos()
-    {
-        _interactionArea.transform.position = transform.position;
-    }
+    //private void UpdateAreaPos()
+    //{
+    //    _interactionArea.transform.position = transform.position;
+    //}
 
     private void CheckNode(bool hasNode, NodeType nodeType)
     {
-        if (_currentCoroutine != null)
-            StopCoroutine(_currentCoroutine);
+        //if (_currentCoroutine != null)
+        //    StopCoroutine(_currentCoroutine);
 
         if (!hasNode || nodeType == NodeType.None)
         {
             OnStopableSelected(null);
             _index = 0;
-            _currentCoroutine = StartCoroutine(DeactivateArea());
+            _enabled = false;
+            //_currentCoroutine = StartCoroutine(DeactivateArea());
             return;
         }
 
@@ -120,30 +121,32 @@ public class GlitchActive : MonoBehaviour
 
     private IEnumerator ActivateArea()
     {
-        while (_interactionArea.transform.localScale.x < _offsetRange)
-        {
-            Vector3 newScale = new Vector3(_scaleSpeed, 0f, _scaleSpeed);
+        //while (_interactionArea.transform.localScale.x < _offsetRange)
+        //{
+        //    Vector3 newScale = new Vector3(_scaleSpeed, 0f, _scaleSpeed);
 
-            _interactionArea.transform.localScale += newScale * Time.deltaTime;
-            yield return null;
-        }
+        //    _interactionArea.transform.localScale += newScale * Time.deltaTime;
+        //    yield return null;
+        //}
 
-        _interactionArea.transform.localScale = new Vector3(_offsetRange, 0.1f, _offsetRange);
+        //_interactionArea.transform.localScale = new Vector3(_offsetRange, 0.1f, _offsetRange);
+        
+        yield return new WaitForSeconds(0.5f);
         _enabled = true;
     }
 
-    private IEnumerator DeactivateArea()
-    {
-        _enabled = false;
+    //private IEnumerator DeactivateArea()
+    //{
+    //    _enabled = false;
 
-        while (_interactionArea.transform.localScale.x > 0.1f)
-        {
-            Vector3 newScale = new Vector3(_scaleSpeed, 0f, _scaleSpeed);
+    //    while (_interactionArea.transform.localScale.x > 0.1f)
+    //    {
+    //        Vector3 newScale = new Vector3(_scaleSpeed, 0f, _scaleSpeed);
 
-            _interactionArea.transform.localScale -= newScale * Time.deltaTime;
-            yield return null;
-        }
+    //        _interactionArea.transform.localScale -= newScale * Time.deltaTime;
+    //        yield return null;
+    //    }
 
-        _interactionArea.transform.localScale = Vector3.one * 0.1f;
-    }
+    //    _interactionArea.transform.localScale = Vector3.one * 0.1f;
+    //}
 }
