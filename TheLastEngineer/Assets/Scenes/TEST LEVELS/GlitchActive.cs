@@ -70,8 +70,8 @@ public class GlitchActive : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.U) && _glitcheables.Count > 0)
                 _index = (_index <= 0) ? _glitcheables.Count - 1 : _index - 1;
 
-            if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
-                OnStopObject?.Invoke(glitcheable);
+            //if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
+            //    OnStopObject?.Invoke(glitcheable);
 
             if (Input.GetKeyDown(KeyCode.C) && glitcheable != null)
                 OnChangeObjectState?.Invoke(glitcheable);

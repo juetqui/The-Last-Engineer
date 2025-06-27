@@ -11,6 +11,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private PlayerData _playerData;
     
     [Header("MVC Player View")]
+    [SerializeField] private Renderer _renderer = default;
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem _walkPS;
     [SerializeField] private ParticleSystem _orbitPS;
@@ -30,9 +31,10 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private List<IInteractable> _interactables = default;
     private bool _isDead = false;
     private float _currentSpeed = default;
-    private Vector3 _movement = default, _checkPointPos = default;
+    private Vector3 _movement = default, _checkPointPos = default, _absorvedCorruptionPos = default;
     private NodeType _currentNodeType = NodeType.None;
     private bool _dropAvailable = true;
+    private Coroutine _corruptionAbsorved = null;
 
     private Glitcheable _currentPlatform = null;
 
@@ -65,10 +67,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
+        if (Instance == null) Instance = this;
 
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
@@ -84,8 +83,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _currentSpeed = _playerData.moveSpeed;
 
         _playerModel = new PlayerTDModel(_cc, transform, _playerData, GetComponent<Collider>());
-        _playerView = new PlayerTDView(_outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController);
+        _playerView = new PlayerTDView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController);
 
+        _playerView.OnStart();
         _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         _solvingController.OnDissolveCompleted += OnDissolveCompleted;
 
@@ -158,17 +158,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     private void GetShieldKey(InputAction.CallbackContext context)
     {
-        if (CheckCorruptionAvailable())
-        {
-            StartCoroutine(StartCorruption());
-        }
+        if (CheckCorruptionAvailable() && _corruptionAbsorved == null)
+            _corruptionAbsorved = StartCoroutine(StartCorruption());
         else
             _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (_playerModel.CanDash && GetMovement() != Vector3.zero&& !_isDead)
+        if (_playerModel.CanDash && GetMovement() != Vector3.zero && !_isDead)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
@@ -176,8 +174,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
             OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
         }
-        //else
-        //    _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 
     private void GetInteractionKey(InputAction.CallbackContext context)
@@ -235,6 +231,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private void UpdateOnNodeChange(NodeType nodeType)
     {
         _currentNodeType = nodeType;
+
+        if (_corruptionAbsorved != null && _currentNodeType != NodeType.Corrupted)
+        {
+            StopCoroutine(_corruptionAbsorved);
+            _corruptionAbsorved = null;
+            OnAbsorbCorruption.Invoke(false);
+            _playerView.UpdatePlayerMaterials(false);
+        }
+
         _playerView.GrabNode(true, _node.OutlineColor);
         OnNodeGrabed?.Invoke(true, _node.NodeType);
     }
@@ -314,10 +319,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private IEnumerator StartCorruption()
     {
         OnAbsorbCorruption.Invoke(true);
+        _absorvedCorruptionPos = transform.position;
+        _playerView.UpdatePlayerMaterials(true);
 
         yield return new WaitForSeconds(5f);
 
         OnAbsorbCorruption.Invoke(false);
+        _playerView.UpdatePlayerMaterials(false);
+        _playerModel.SetPos(_absorvedCorruptionPos);
+        _corruptionAbsorved = null;
     }
 
     public IEnumerator RespawnPlayer()
