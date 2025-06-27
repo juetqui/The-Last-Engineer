@@ -10,6 +10,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public UnityEvent OnHit;
     public UnityEvent OnCompleated;
     public UnityEvent OnDepleated;
+    [SerializeField] TimerController TimerController;
     private MeshRenderer _myMeshRenderer = default;
     private Collider _collider = default;
     public bool _isCompleted = false;
@@ -23,6 +24,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     bool _isCurrentlyLoading;
     bool _isCurrentlyUnloading;
     public float _timeToUnfill = 0;
+    public float timeModifier;
     private void Awake()
     {
         _myMeshRenderer = GetComponent<MeshRenderer>();
@@ -79,8 +81,16 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
                 print("unfilleando");
+                if (TimerController != null)
+                {
+                    _currentLoad = _currentLoad + Time.deltaTime / loadTime/ TimerController.CurrentDuration;
 
-                _currentLoad = _currentLoad + Time.deltaTime / loadTime;
+                }
+                else
+                {
+                    _currentLoad = _currentLoad + Time.deltaTime / loadTime;
+
+                }
                 _myMaterial.SetFloat("_Step", _currentLoad);
 
                 yield return null;
@@ -93,14 +103,28 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         _currentLoad = 1;
         ChargeCompleted();
     }
+    float TimeModifierController()
+    {
+        return default;
+    }
     private IEnumerator UnLoadRoutine(float unloadTime)
     {
         while (_currentLoad >= 0f)
         {
             if (_isCurrentlyLoading == false && _isCurrentlyUnloading == true)
             {
+
                 print("filleando");
-                _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
+                if (TimerController != null)
+                {
+                    _currentLoad = _currentLoad - Time.deltaTime / unloadTime / TimerController.CurrentDuration;
+
+                }
+                else
+                {
+                    _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
+
+                }
                 _myMaterial.SetFloat("_Step", _currentLoad);
                 yield return null;
             }

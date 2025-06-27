@@ -9,7 +9,7 @@ using System.Collections;
 public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
     [SerializeField] private PlayerData _playerData;
-    
+    public bool IsCorrupted;
     [Header("MVC Player View")]
     [SerializeField] private Renderer _renderer = default;
     [SerializeField] private Outline _outline;
@@ -23,7 +23,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public static PlayerTDController Instance = null;
     [SerializeField] private SolvingController _solvingController;
 
-    private CharacterController _cc = default;
+    public CharacterController _cc = default;
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
     private NodeController _node = default;
