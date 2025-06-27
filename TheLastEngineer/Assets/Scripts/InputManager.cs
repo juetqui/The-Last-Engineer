@@ -8,7 +8,7 @@ public class InputManager : MonoBehaviour
     public static InputManager Instance = default;
     [HideInInspector] public PlayerInput playerInput = default;
     [HideInInspector] public PlayerInputs playerInputs = default;
-    [HideInInspector] public InputAction moveInput = default, interactInput = default, dashInput = default, shieldInput = default, modoIzq = default, modoDer = default;
+    [HideInInspector] public InputAction moveInput = default, interactInput = default, dashInput = default, shieldInput = default, corruptionChangeInput = default, modoIzq = default, modoDer = default;
 
     private Gamepad _gamepad = default;
 
@@ -34,6 +34,7 @@ public class InputManager : MonoBehaviour
         playerInputs.Player.Move.Enable();
         playerInputs.Player.Dash.Enable();
         playerInputs.Player.Shield.Enable();
+        playerInputs.Player.CorruptionChange.Enable();
         playerInputs.Player.Interact.Enable();
         playerInputs.Player.ModoDetectiveIzq.Enable();
         playerInputs.Player.ModoDetectiveDer.Enable();
@@ -41,6 +42,7 @@ public class InputManager : MonoBehaviour
         moveInput = playerInputs.Player.Move;
         dashInput = playerInputs.Player.Dash;
         shieldInput = playerInputs.Player.Shield;
+        corruptionChangeInput = playerInputs.Player.CorruptionChange;
         interactInput = playerInputs.Player.Interact;
         modoIzq= playerInputs.Player.ModoDetectiveIzq;
         modoDer = playerInputs.Player.ModoDetectiveDer;
@@ -55,6 +57,7 @@ public class InputManager : MonoBehaviour
         playerInputs.Player.Dash.Disable();
         playerInputs.Player.Interact.Disable();
         playerInputs.Player.Shield.Disable();
+        playerInputs.Player.CorruptionChange.Disable();
         playerInputs.Player.ModoDetectiveIzq.Disable();
         playerInputs.Player.ModoDetectiveDer.Disable();
 

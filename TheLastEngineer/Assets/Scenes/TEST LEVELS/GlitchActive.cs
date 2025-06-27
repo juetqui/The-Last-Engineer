@@ -14,6 +14,7 @@ public class GlitchActive : MonoBehaviour
     [SerializeField] private GameObject _interactionArea;
 
     private PlayerTDController _player = default;
+    private Glitcheable _selectedGlitcheable = null;
     private List<Glitcheable> _glitcheables = default;
     private float _detectionOffset = 5f, _offsetRange = 0f;
     private int _index = 0;
@@ -43,14 +44,12 @@ public class GlitchActive : MonoBehaviour
     {
         if (_enabled)
         {
-            Glitcheable glitcheable = null;
-
             _glitcheables = GetStopablesInArea(ref _glitcheables);
 
             if (_glitcheables.Count == 0)
             {
                 _index = 0;
-                OnStopableSelected?.Invoke(glitcheable);
+                OnStopableSelected?.Invoke(_selectedGlitcheable);
             }
             else if (_index >= _glitcheables.Count)
             {
@@ -59,10 +58,10 @@ public class GlitchActive : MonoBehaviour
 
             if (_glitcheables.Count > 0)
             {
-                glitcheable = _glitcheables[_index];
+                _selectedGlitcheable = _glitcheables[_index];
             }
 
-            OnStopableSelected?.Invoke(glitcheable);
+            OnStopableSelected?.Invoke(_selectedGlitcheable);
 
             if (Input.GetKeyDown(KeyCode.I) && _glitcheables.Count > 0)
                 _index = (_index >= _glitcheables.Count - 1) ? 0 : _index + 1;
@@ -73,11 +72,16 @@ public class GlitchActive : MonoBehaviour
             //if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
             //    OnStopObject?.Invoke(glitcheable);
 
-            if (Input.GetKeyDown(KeyCode.C) && glitcheable != null)
-                OnChangeObjectState?.Invoke(glitcheable);
+            //if (Input.GetKeyDown(KeyCode.C) && glitcheable != null)
+            //    OnChangeObjectState?.Invoke(glitcheable);
         }
 
         //UpdateAreaPos();
+    }
+
+    public void ChangeObjectState()
+    {
+        OnChangeObjectState?.Invoke(_selectedGlitcheable);
     }
 
     //private void UpdateAreaPos()

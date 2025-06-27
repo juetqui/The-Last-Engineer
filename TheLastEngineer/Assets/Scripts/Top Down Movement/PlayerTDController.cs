@@ -27,6 +27,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
     private NodeController _node = default;
+    private GlitchActive _glitchActive = default;
 
     private List<IInteractable> _interactables = default;
     private bool _isDead = false;
@@ -60,6 +61,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public bool HasNode() => _node != null;
     private bool CheckCorruptionAvailable() => _currentNodeType == NodeType.Corrupted;
+    private bool CheckCorruptionChangeAvailable() => _currentNodeType != NodeType.None;
     private bool CheckDashAvialable() => _playerModel.CanDash;
     public NodeController GetCurrentNode() => _node;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
@@ -72,6 +74,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
         _interactables = new List<IInteractable>();
+
+        _glitchActive = GetComponent<GlitchActive>();
 
         _checkPointPos = transform.position;
     }
@@ -146,6 +150,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         InputManager.Instance.interactInput.started += GetInteractionKey;
         InputManager.Instance.interactInput.canceled += CanceledHoldIInteraction;
         InputManager.Instance.shieldInput.performed += GetShieldKey;
+        InputManager.Instance.corruptionChangeInput.performed += GetCorruptionChangeKey;
     }
 
     public void OnDisableInputs()
@@ -154,8 +159,16 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         InputManager.Instance.interactInput.started -= GetInteractionKey;
         InputManager.Instance.interactInput.canceled -= CanceledHoldIInteraction;
         InputManager.Instance.shieldInput.performed -= GetShieldKey;
+        InputManager.Instance.corruptionChangeInput.performed -= GetCorruptionChangeKey;
     }
 
+    private void GetCorruptionChangeKey(InputAction.CallbackContext context)
+    {
+        if (CheckCorruptionChangeAvailable() && _glitchActive != null)
+            _glitchActive.ChangeObjectState();
+        else
+            _playerView.PlayErrorSound(_playerData.emptyHand);
+    }
     private void GetShieldKey(InputAction.CallbackContext context)
     {
         if (CheckCorruptionAvailable() && _corruptionAbsorved == null)
