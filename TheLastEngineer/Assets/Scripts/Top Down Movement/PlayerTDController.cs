@@ -251,6 +251,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
             _corruptionAbsorved = null;
             OnAbsorbCorruption.Invoke(false);
             _playerView.UpdatePlayerMaterials(false);
+            IsCorrupted = false;
         }
 
         _playerView.GrabNode(true, _node.OutlineColor);
@@ -332,6 +333,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private IEnumerator StartCorruption()
     {
         OnAbsorbCorruption.Invoke(true);
+        IsCorrupted = true;
         _absorvedCorruptionPos = transform.position;
         _playerView.UpdatePlayerMaterials(true);
 
@@ -340,6 +342,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         OnAbsorbCorruption.Invoke(false);
         _playerView.UpdatePlayerMaterials(false);
         _playerModel.SetPos(_absorvedCorruptionPos);
+        IsCorrupted = false;
         _corruptionAbsorved = null;
     }
 

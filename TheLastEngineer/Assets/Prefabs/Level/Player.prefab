@@ -10422,6 +10422,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8568432559036753050}
+    - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 912942544766933695}
     - targetCorrespondingSourceObject: {fileID: 100050, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3695308875843583011}
@@ -10526,6 +10529,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerData: {fileID: 11400000, guid: 034d45afae0886c4ea7b2880e04fc2a9, type: 2}
+  IsCorrupted: 0
+  _renderer: {fileID: 4107978417725018305}
   _outline: {fileID: 3695308875843583011}
   _walkPS: {fileID: 8607820957874910226}
   _orbitPS: {fileID: 3809637157225715178}
@@ -10534,6 +10539,7 @@ MonoBehaviour:
   _fxSource: {fileID: 1870816041742522971}
   _deadTimer: 1.5
   _solvingController: {fileID: 6115980601384117390}
+  _cc: {fileID: 0}
   attachPos: {x: 0, y: 1, z: 1.2}
 --- !u!82 &799766619159577487
 AudioSource:
@@ -10776,6 +10782,15 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
+  corruptionChangeInput:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
   modoIzq:
     m_Name: 
     m_Type: 0
@@ -10852,6 +10867,20 @@ MonoBehaviour:
   _detectionRange: 12
   _scaleSpeed: 10
   _interactionArea: {fileID: 0}
+--- !u!114 &912942544766933695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107978417728134607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180fbf6830b49044e9969c7e17308364, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _passiveMat: {fileID: 2100000, guid: 2a07f83828bd3534e965673ebd4e8c47, type: 2}
+  _corruptionMat: {fileID: 2100000, guid: c130ec2a1893ed14993e2feaf2968680, type: 2}
 --- !u!4 &4107978417728618991 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}

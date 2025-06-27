@@ -33,7 +33,7 @@ public class CorruptedCorridor : MonoBehaviour
     //}
     private void OnTriggerEnter(Collider other)
     {
-        print("dasdasd");
+        //print("dasdasd");
         if (other.gameObject.GetComponent<PlayerTDController>())
         {
             if (!PlayerTDController.Instance.IsCorrupted)
@@ -41,6 +41,7 @@ public class CorruptedCorridor : MonoBehaviour
                 transportSphere.SetActive(true);
                 transportSphere.transform.position = PlayerTDController.Instance.gameObject.transform.position + transportOffset;
                 PlayerTDController.Instance._cc.enabled = false;
+                PlayerTDController.Instance.GetComponent<Collider>().enabled = false;
                 PlayerTDController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
                 _isActive = true;
                 acum = GetCloserNode();
@@ -66,6 +67,7 @@ public class CorruptedCorridor : MonoBehaviour
             _isActive = false;
             transportSphere.SetActive(false);
             PlayerTDController.Instance._cc.enabled = true;
+            PlayerTDController.Instance.GetComponent<Collider>().enabled = true;
             PlayerTDController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
 
 
