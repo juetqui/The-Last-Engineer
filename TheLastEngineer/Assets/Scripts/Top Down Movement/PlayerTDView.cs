@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerTDView
 {
+    private Renderer _renderer = default;
+    private Material[] _originalMats = default, _corruptionMats = default;
     private Outline _outline = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
     private SolvingController _solvingController;
@@ -11,8 +13,9 @@ public class PlayerTDView
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController)
+    public PlayerTDView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController)
     {
+        _renderer = renderer;
         _outline = outline;
         _walkPS = walkPS;
         _orbitPS = orbitPS;
@@ -27,10 +30,19 @@ public class PlayerTDView
         _solvingController = solvingController;
     }
 
+    public void OnStart()
+    {
+        _originalMats = _renderer.materials;
+        _corruptionMats = new Material[_renderer.materials.Length];
+
+        for (int i = 0; i < _renderer.materials.Length; i++)
+        {
+            _corruptionMats[i] = Resources.Load<Material>("Materials/M_PlayerCorruption");
+        }
+    }
+
     public void Walk(Vector3 moveVector)
     {
-        //Debug.Log(moveVector.magnitude);
-
         if (moveVector.magnitude > 0f) _animator.SetBool("IsWalking", true);
         else _animator.SetBool("IsWalking", false);
     }
@@ -43,6 +55,12 @@ public class PlayerTDView
     public void SetAnimatorSpeed(float speed)
     {
         _animator.speed = speed;
+    }
+
+    public void UpdatePlayerMaterials(bool hasPowerUp)
+    {
+        if (hasPowerUp) _renderer.materials = _corruptionMats;
+        else _renderer.materials = _originalMats;
     }
 
     public void RespawnPlayer()

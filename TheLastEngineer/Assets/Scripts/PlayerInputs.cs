@@ -89,6 +89,15 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CorruptionChange"",
+                    ""type"": ""Button"",
+                    ""id"": ""e5ec5aa8-cb48-4b95-9311-a511aab45dd3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -282,7 +291,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""03645f0c-0004-4c54-8efb-584b24913b9c"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
@@ -331,6 +340,17 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""ModoDetectiveDer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a444f6f2-1182-4dd1-9327-02307a8b0fce"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CorruptionChange"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -925,6 +945,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         m_Player_Shield = m_Player.FindAction("Shield", throwIfNotFound: true);
         m_Player_ModoDetectiveIzq = m_Player.FindAction("ModoDetectiveIzq", throwIfNotFound: true);
         m_Player_ModoDetectiveDer = m_Player.FindAction("ModoDetectiveDer", throwIfNotFound: true);
+        m_Player_CorruptionChange = m_Player.FindAction("CorruptionChange", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1005,6 +1026,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Shield;
     private readonly InputAction m_Player_ModoDetectiveIzq;
     private readonly InputAction m_Player_ModoDetectiveDer;
+    private readonly InputAction m_Player_CorruptionChange;
     public struct PlayerActions
     {
         private @PlayerInputs m_Wrapper;
@@ -1016,6 +1038,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         public InputAction @Shield => m_Wrapper.m_Player_Shield;
         public InputAction @ModoDetectiveIzq => m_Wrapper.m_Player_ModoDetectiveIzq;
         public InputAction @ModoDetectiveDer => m_Wrapper.m_Player_ModoDetectiveDer;
+        public InputAction @CorruptionChange => m_Wrapper.m_Player_CorruptionChange;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1046,6 +1069,9 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @ModoDetectiveDer.started += instance.OnModoDetectiveDer;
             @ModoDetectiveDer.performed += instance.OnModoDetectiveDer;
             @ModoDetectiveDer.canceled += instance.OnModoDetectiveDer;
+            @CorruptionChange.started += instance.OnCorruptionChange;
+            @CorruptionChange.performed += instance.OnCorruptionChange;
+            @CorruptionChange.canceled += instance.OnCorruptionChange;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1071,6 +1097,9 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
             @ModoDetectiveDer.started -= instance.OnModoDetectiveDer;
             @ModoDetectiveDer.performed -= instance.OnModoDetectiveDer;
             @ModoDetectiveDer.canceled -= instance.OnModoDetectiveDer;
+            @CorruptionChange.started -= instance.OnCorruptionChange;
+            @CorruptionChange.performed -= instance.OnCorruptionChange;
+            @CorruptionChange.canceled -= instance.OnCorruptionChange;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1260,6 +1289,7 @@ public partial class @PlayerInputs: IInputActionCollection2, IDisposable
         void OnShield(InputAction.CallbackContext context);
         void OnModoDetectiveIzq(InputAction.CallbackContext context);
         void OnModoDetectiveDer(InputAction.CallbackContext context);
+        void OnCorruptionChange(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
