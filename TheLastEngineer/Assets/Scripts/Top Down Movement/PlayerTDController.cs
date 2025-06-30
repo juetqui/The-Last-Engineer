@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
@@ -18,6 +19,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _walkSource;
     [SerializeField] private AudioSource _fxSource;
+    [SerializeField] private Image _dashImage;
     [SerializeField] private float _deadTimer;
 
     public static PlayerTDController Instance = null;
@@ -64,6 +66,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private bool CheckCorruptionChangeAvailable() => _currentNodeType != NodeType.None;
     private bool CheckDashAvialable() => _playerModel.CanDash;
     public NodeController GetCurrentNode() => _node;
+    public NodeType GetCurrentNodeType() => _currentNodeType;
     public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
     #endregion
 
@@ -87,10 +90,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _currentSpeed = _playerData.moveSpeed;
 
         _playerModel = new PlayerTDModel(_cc, transform, _playerData, GetComponent<Collider>());
-        _playerView = new PlayerTDView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController);
+        _playerView = new PlayerTDView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController, _dashImage);
 
         _playerView.OnStart();
-        _playerModel.onDashCDFinished += _playerView.DashChargedSound;
         _solvingController.OnDissolveCompleted += OnDissolveCompleted;
 
         SetState(_playerEmptyState);
@@ -186,6 +188,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
             _playerView.DashSound();
             OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
+            StartCoroutine(_playerView.DashCD(_playerData.dashCD));
         }
     }
 

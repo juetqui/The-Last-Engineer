@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -18,8 +19,7 @@ public class PlayerTDModel
     public bool IsDashing { get { return _isDashing; } }
     public bool CanDash { get { return _canDash; } }
 
-    public delegate void OnDashCDFinished();
-    public OnDashCDFinished onDashCDFinished = default;
+    public Action<float> OnDashCDStarted = delegate { };
 
     public PlayerTDModel(CharacterController cc, Transform transform, PlayerData playerData, Collider colider)
     {
@@ -96,8 +96,8 @@ public class PlayerTDModel
 
     public IEnumerator DashCD()
     {
+        OnDashCDStarted?.Invoke(_dashCD);
         yield return new WaitForSeconds(_dashCD);
-        onDashCDFinished?.Invoke();
         _canDash = true;
     }
 }

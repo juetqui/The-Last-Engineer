@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerTDView
 {
@@ -10,10 +12,11 @@ public class PlayerTDView
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default;
+    private Image _dashImage = default;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController)
+    public PlayerTDView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController, Image dashImage)
     {
         _renderer = renderer;
         _outline = outline;
@@ -28,6 +31,7 @@ public class PlayerTDView
         _liftClip = playerData.liftClip;
         _putDownClip = playerData.putDownClip;
         _solvingController = solvingController;
+        _dashImage = dashImage;
     }
 
     public void OnStart()
@@ -49,6 +53,8 @@ public class PlayerTDView
 
     public void DashSound()
     {
+        _dashImage.fillAmount = 0f;
+        SetParticlesLT(0.7f, 1f);
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
     
@@ -92,6 +98,12 @@ public class PlayerTDView
         _orbitPS.Stop();
     }
 
+    private void SetParticlesLT(float minVal, float maxVal)
+    {
+        var main = _walkPS.main;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(minVal, maxVal);
+    }
+
     public void GrabNode(bool grab, Color outlineColor)
     {
         _fxSource.volume = 1f;
@@ -129,5 +141,21 @@ public class PlayerTDView
         source.clip = clip;
         source.pitch = pitch;
         source.Play();
+    }
+
+    public IEnumerator DashCD(float cd)
+    {
+        float timer = 0f;
+
+        while (timer < cd)
+        {
+            timer += Time.deltaTime;
+
+            _dashImage.fillAmount = timer / cd;
+            yield return null;
+        }
+
+        _dashImage.fillAmount = 1f;
+        SetParticlesLT(0.2f, 0.3f);
     }
 }

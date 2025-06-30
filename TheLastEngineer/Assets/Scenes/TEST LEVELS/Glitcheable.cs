@@ -22,6 +22,8 @@ public abstract class Glitcheable : MonoBehaviour
     protected bool _isStopped = false;
     protected int _index = 0;
 
+    private Coroutine _coroutine = null;
+
     private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
     private Quaternion _targetRot = default;
     private Color _originalColor = default;
@@ -113,6 +115,7 @@ public abstract class Glitcheable : MonoBehaviour
 
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
+
         if (_feedbackPos != null)
             _feedBackCurrentPos = _feedbackPos.position;
     }
@@ -133,6 +136,9 @@ public abstract class Glitcheable : MonoBehaviour
     {
         float t = 1f - _timerController.CurrentFillAmount;
 
+        //_renderer.material.SetFloat("_Alpha", _timerController.CurrentFillAmount);
+        //_feedbackPos.GetComponentInChildren<Renderer>().material.SetFloat("_Alpha", t);
+
         if (_feedbackPos != null)
         {
             if (_isStopped || !_isCorrupted)
@@ -148,7 +154,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            if (_isPlatform && player.GetCurrentNode().NodeType == _requiredNode)
+            if (_isPlatform && player.GetCurrentNodeType() == _requiredNode)
                 player.SetPlatform(this);
             else
                 player.CorruptionCollided();

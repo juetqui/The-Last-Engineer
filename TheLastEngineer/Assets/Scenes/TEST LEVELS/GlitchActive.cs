@@ -31,7 +31,6 @@ public class GlitchActive : MonoBehaviour
             Instance = this;
 
         _player = GetComponent<PlayerTDController>();
-        _offsetRange = _detectionRange + _detectionOffset;
         _glitcheables = new List<Glitcheable>();
     }
 
@@ -42,41 +41,36 @@ public class GlitchActive : MonoBehaviour
 
     void Update()
     {
-        if (_enabled)
+        if (!_enabled) return;
+
+        _glitcheables = GetStopablesInArea();
+
+        if (_selectedGlitcheable != null && !_glitcheables.Contains(_selectedGlitcheable))
         {
-            _glitcheables = GetStopablesInArea(ref _glitcheables);
-
-            if (_glitcheables.Count == 0)
-            {
-                _index = 0;
-                OnStopableSelected?.Invoke(_selectedGlitcheable);
-            }
-            else if (_index >= _glitcheables.Count)
-            {
-                _index = 0;
-            }
-
-            if (_glitcheables.Count > 0)
-            {
-                _selectedGlitcheable = _glitcheables[_index];
-            }
-
-            OnStopableSelected?.Invoke(_selectedGlitcheable);
-
-            if (Input.GetKeyDown(KeyCode.I) && _glitcheables.Count > 0)
-                _index = (_index >= _glitcheables.Count - 1) ? 0 : _index + 1;
-
-            if (Input.GetKeyDown(KeyCode.U) && _glitcheables.Count > 0)
-                _index = (_index <= 0) ? _glitcheables.Count - 1 : _index - 1;
-
-            //if (Input.GetKeyDown(KeyCode.V) && glitcheable != null)
-            //    OnStopObject?.Invoke(glitcheable);
-
-            //if (Input.GetKeyDown(KeyCode.C) && glitcheable != null)
-            //    OnChangeObjectState?.Invoke(glitcheable);
+            _selectedGlitcheable = null;
+            _index = 0;
         }
 
-        //UpdateAreaPos();
+        if (_glitcheables.Count > 0)
+        {
+            if (_index >= _glitcheables.Count)
+                _index = 0;
+
+            _selectedGlitcheable = _glitcheables[_index];
+        }
+        else
+        {
+            _selectedGlitcheable = null;
+            _index = 0;
+        }
+
+        OnStopableSelected?.Invoke(_selectedGlitcheable);
+
+        if (Input.GetKeyDown(KeyCode.I) && _glitcheables.Count > 0)
+            _index = (_index >= _glitcheables.Count - 1) ? 0 : _index + 1;
+
+        if (Input.GetKeyDown(KeyCode.U) && _glitcheables.Count > 0)
+            _index = (_index <= 0) ? _glitcheables.Count - 1 : _index - 1;
     }
 
     public void ChangeObjectState()
@@ -84,33 +78,24 @@ public class GlitchActive : MonoBehaviour
         OnChangeObjectState?.Invoke(_selectedGlitcheable);
     }
 
-    //private void UpdateAreaPos()
-    //{
-    //    _interactionArea.transform.position = transform.position;
-    //}
-
     private void CheckNode(bool hasNode, NodeType nodeType)
     {
-        //if (_currentCoroutine != null)
-        //    StopCoroutine(_currentCoroutine);
-
         if (!hasNode || nodeType == NodeType.None)
         {
             OnStopableSelected(null);
             _index = 0;
             _enabled = false;
-            //_currentCoroutine = StartCoroutine(DeactivateArea());
             return;
         }
 
         _currentCoroutine = StartCoroutine(ActivateArea());
     }
 
-    private List<Glitcheable> GetStopablesInArea(ref List<Glitcheable> glitcheables)
+    private List<Glitcheable> GetStopablesInArea()
     {
-        glitcheables.Clear();
+        List<Glitcheable> glitcheables = new List<Glitcheable>();
         
-        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange - _detectionOffset);
+        Collider[] hitColliders = Physics.OverlapSphere(_player.transform.position, _detectionRange);
 
         foreach (var hit in hitColliders)
         {
@@ -125,32 +110,7 @@ public class GlitchActive : MonoBehaviour
 
     private IEnumerator ActivateArea()
     {
-        //while (_interactionArea.transform.localScale.x < _offsetRange)
-        //{
-        //    Vector3 newScale = new Vector3(_scaleSpeed, 0f, _scaleSpeed);
-
-        //    _interactionArea.transform.localScale += newScale * Time.deltaTime;
-        //    yield return null;
-        //}
-
-        //_interactionArea.transform.localScale = new Vector3(_offsetRange, 0.1f, _offsetRange);
-        
         yield return new WaitForSeconds(0.5f);
         _enabled = true;
     }
-
-    //private IEnumerator DeactivateArea()
-    //{
-    //    _enabled = false;
-
-    //    while (_interactionArea.transform.localScale.x > 0.1f)
-    //    {
-    //        Vector3 newScale = new Vector3(_scaleSpeed, 0f, _scaleSpeed);
-
-    //        _interactionArea.transform.localScale -= newScale * Time.deltaTime;
-    //        yield return null;
-    //    }
-
-    //    _interactionArea.transform.localScale = Vector3.one * 0.1f;
-    //}
 }
