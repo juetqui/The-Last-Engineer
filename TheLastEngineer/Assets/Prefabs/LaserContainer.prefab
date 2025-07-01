@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5903100006420568134}
   - component: {fileID: 6954382144749611281}
   - component: {fileID: 6470738191142591021}
-  - component: {fileID: 2678463127931799470}
+  - component: {fileID: 1361569617971716932}
   m_Layer: 8
   m_Name: LaserContainer
   m_TagString: Untagged
@@ -107,7 +107,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2678463127931799470
+--- !u!114 &1361569617971716932
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -147,8 +147,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8668095767172102034}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0.5}
   m_LocalScale: {x: 0.25, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -239,6 +239,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lineRenderer: {fileID: 0}
   _maxDist: 100
+  _raycastOffsetX: 2
+  _raycastOffsetZ: 1
   _startsInitialized: 1
   _laserLayer:
     serializedVersion: 2
