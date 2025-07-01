@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
-using UnityEngine.UI;
 
 public abstract class Glitcheable : MonoBehaviour
 {
@@ -12,25 +12,21 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected bool _isCorrupted = true;
 
-    private NodeType _requiredNode = NodeType.Corrupted;
     protected List<Transform> _currentList = default;
-    private Renderer _renderer = default;
-    private Material _objectMat;
-    private Material _corruptionMat;
-    //protected Image _timer = default;
     protected bool _canMove = true;
     protected bool _isStopped = false;
     protected int _index = 0;
 
+    private Renderer _renderer = default, _feedbackRenderer = default;
     private Coroutine _coroutine = null;
-
+    private NodeType _requiredNode = NodeType.Corrupted;
     private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
     private Quaternion _targetRot = default;
     private Color _originalColor = default;
 
-    public Action<Vector3> OnPosChanged = delegate { };
-
     public bool IsStopped { get { return _isStopped; } }
+
+    public Action<Vector3> OnPosChanged = delegate { };
 
     public int GetOnPosChangedHandlerCount()
     {
@@ -39,31 +35,36 @@ public abstract class Glitcheable : MonoBehaviour
 
     protected void OnAwake()
     {
-        //_timer = GetComponentInChildren<Image>();
         _renderer = GetComponent<Renderer>();
-
-        _objectMat = Resources.Load<Material>("Materials/M_Objects");
-        _corruptionMat = Resources.Load<Material>("Materials/M_Corruption");
+        _feedbackRenderer = _feedbackPos.GetComponent<Renderer>();
 
         _currentList = _newPosList;
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
-        //_originalColor = _timer.color;
-
-        if (_feedbackPos != null)
-            _feedBackCurrentPos = _feedBackStartPos = _feedbackPos.position;
-
-        UpdateCorruptionState();
     }
 
-    protected void UpdateTimer()
+    public void CheckTimerPhase(Phase currentPhase)
     {
-        //_timer.fillAmount = _timerController.CurrentFillAmount;
+        if (_isStopped || !_isCorrupted) return;
 
-        //if (_isStopped) _timer.color = Color.magenta;
-        //else _timer.color = _originalColor;
+        if (_coroutine != null)
+        {
+            StopCoroutine(_coroutine);
+            _coroutine = null;
+        }
 
-        StartCoroutine(MoveTrail());
+        if (currentPhase == Phase.Transparency)
+        {
+            _coroutine = StartCoroutine(SetTransparency());
+        }
+        else if (currentPhase == Phase.Movement)
+        {
+            _coroutine = StartCoroutine(MoveTrail());
+        }
+        else if (currentPhase == Phase.ReverseTransparency)
+        {
+            _coroutine = StartCoroutine(ResetTransparency());
+        }
     }
 
     protected void StopObject(Glitcheable glitcheable)
@@ -82,23 +83,8 @@ public abstract class Glitcheable : MonoBehaviour
         if (newState == _isCorrupted) return false;
 
         _isCorrupted = newState;
-        UpdateCorruptionState();
 
         return true;
-    }
-
-    private void UpdateCorruptionState()
-    {
-        if (_isCorrupted)
-        {
-            _renderer.material = _corruptionMat;
-            _feedbackPos.gameObject.SetActive(true);
-        }
-        else
-        {
-            _renderer.material = _objectMat;
-            _feedbackPos.gameObject.SetActive(false);
-        }
     }
 
     protected void UpdateTarget()
@@ -115,9 +101,6 @@ public abstract class Glitcheable : MonoBehaviour
 
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
-
-        if (_feedbackPos != null)
-            _feedBackCurrentPos = _feedbackPos.position;
     }
 
     public void PositionReset()
@@ -125,29 +108,52 @@ public abstract class Glitcheable : MonoBehaviour
         transform.position = _currentList[_currentList.Count - 1].position;
         transform.rotation = _currentList[_currentList.Count - 1].rotation;
         _isStopped = false;
-        //_timer.fillAmount = 1;
         _index = 0;
+    }
 
-        if (_feedbackPos != null)
-            _feedBackCurrentPos = _feedBackStartPos;
+    private IEnumerator SetTransparency()
+    {
+        while (_timerController.CurrentPhase == Phase.Transparency && _timerController.CurrentFillAmount > 0f)
+        {
+            float alpha = _timerController.CurrentFillAmount;
+
+            _renderer.material.SetFloat("_Alpha", alpha);
+            _feedbackRenderer.material.SetFloat("_Alpha", 1f - alpha);
+
+            yield return null;
+        }
+    }
+
+    private IEnumerator ResetTransparency()
+    {
+        while (_timerController.CurrentPhase == Phase.ReverseTransparency && _timerController.CurrentFillAmount > 0f)
+        {
+            float alpha = _timerController.CurrentFillAmount;
+            
+            _renderer.material.SetFloat("_Alpha", 1f - alpha);
+            _feedbackRenderer.material.SetFloat("_Alpha", alpha);
+
+            yield return null;
+        }
     }
 
     private IEnumerator MoveTrail()
     {
-        float t = 1f - _timerController.CurrentFillAmount;
+        Vector3 startPos = transform.position;
+        Quaternion startRot = transform.rotation;
 
-        //_renderer.material.SetFloat("_Alpha", _timerController.CurrentFillAmount);
-        //_feedbackPos.GetComponentInChildren<Renderer>().material.SetFloat("_Alpha", t);
-
-        if (_feedbackPos != null)
+        while (_timerController.CurrentPhase == Phase.Movement && _timerController.CurrentFillAmount < 1f)
         {
-            if (_isStopped || !_isCorrupted)
-                _feedbackPos.position = Vector3.Lerp(_feedbackPos.position, _feedBackCurrentPos, t);
-            else
-                _feedbackPos.position = Vector3.Lerp(_feedBackCurrentPos, _targetPos, t);
+            float t = _timerController.CurrentFillAmount;
+            
+            transform.position = Vector3.Lerp(startPos, _targetPos, t);
+            transform.rotation = Quaternion.Lerp(startRot, _targetRot, t);
+
+            yield return null;
         }
 
-        yield return null;
+        transform.position = _targetPos;
+        transform.rotation = _targetRot;
     }
 
     private void OnTriggerEnter(Collider coll)

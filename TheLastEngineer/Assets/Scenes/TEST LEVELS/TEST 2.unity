@@ -7271,7 +7271,7 @@ GameObject:
   - component: {fileID: 257075458}
   - component: {fileID: 257075457}
   m_Layer: 0
-  m_Name: Glitchable Object (1)
+  m_Name: Glitchable Feedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7285,12 +7285,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 257075455}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000015454333, y: -0.000000015454287, z: -0.70710576, w: 0.70710784}
+  m_LocalRotation: {x: -0, y: -0, z: 2.3883568e-16, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 2.5, z: 0.5}
+  m_LocalScale: {x: 0.4166667, y: 0.4166667, z: 0.4166667}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 1407041113}
+  m_Father: {fileID: 1239714707}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &257075457
 MeshRenderer:
@@ -40915,6 +40915,7 @@ Transform:
   - {fileID: 1503077069}
   - {fileID: 1180697100}
   - {fileID: 1989090641}
+  - {fileID: 257075456}
   m_Father: {fileID: 1417801327}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1239714708
@@ -40929,7 +40930,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f7581a4192be8b478afdebf6f79bac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _feedbackPos: {fileID: 1407041113}
+  _feedbackPos: {fileID: 257075456}
   _newPosList:
   - {fileID: 1529708117}
   - {fileID: 1261078620}
@@ -42536,11 +42537,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 901376907}
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!4 &1407041113 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5051337298502035228, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
-  m_PrefabInstance: {fileID: 1540863909}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1410998801
 GameObject:
   m_ObjectHideFlags: 0
@@ -48847,7 +48843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2091862483365962779, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3252852230083504365, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_PropertySheet.m_Float.m_Array.Array.size
@@ -48903,11 +48899,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3533811305851334934, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3607404066135205123, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3833455645134292970, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4838523282971639356, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_LocalPosition.x
@@ -48993,6 +48993,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 6395518654419909460, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6593840589626421189, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_Name
       value: Glitcheable Platform Container (1)
@@ -49067,6 +49071,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7358151686422459962, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7441274662064871783, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7614535063491349066, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
@@ -49145,9 +49153,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4838523282971639356, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
       insertIndex: 2
       addedObject: {fileID: 1239714707}
-    - targetCorrespondingSourceObject: {fileID: 5051337298502035228, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 257075456}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3d513b5c7f5e1db4cbcef3012dd9c466, type: 3}
 --- !u!4 &1544171004 stripped
@@ -49500,7 +49505,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requiredNode: 2
-  _defaultDuration: 0.5
+  _transparencyDuration: 1
+  _moveDuration: 1
   _nodeDuration: 3
 --- !u!4 &1589886139
 Transform:

@@ -2,55 +2,83 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+public enum Phase { Transparency, Movement, ReverseTransparency }
+
 public class TimerController : MonoBehaviour
 {
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
-    [SerializeField] private float _defaultDuration = 1f;
+    [SerializeField] private float _transparencyDuration = 1f;
+    [SerializeField] private float _moveDuration = 0.5f;
     [SerializeField] private float _nodeDuration = 2f;
 
-    private float _currentDuration;
+    private float _currentTransparencyDuration, _currentMoveDuration;
     private float _currentFillAmount = 1f;
+    private Phase _currentPhase = Phase.Transparency;
 
-    public event Action OnTimerCycleStart;
     public event Action OnTimerCycleComplete;
 
     public float CurrentFillAmount => _currentFillAmount;
-    public float CurrentDuration => _currentDuration;
+    public float CurrentDuration => _currentMoveDuration;
+    public Phase CurrentPhase => _currentPhase;
+
+    public Action<Phase> OnPhaseChanged = delegate { };
 
     private void Awake()
     {
-        _currentDuration = _defaultDuration;
+        _currentTransparencyDuration = _transparencyDuration;
+        _currentMoveDuration = _moveDuration;
     }
 
     private void Start()
     {
         PlayerTDController.Instance.OnNodeGrabed += SetDuration;
-        StartCoroutine(TimerRoutine());
+        StartCoroutine(DissolveTimer());
     }
 
     public void SetDuration(bool hasNode, NodeType nodeType)
     {
-        _currentDuration = (!hasNode || nodeType != _requiredNode) ? _defaultDuration : _nodeDuration;
+        _currentTransparencyDuration = (!hasNode || nodeType != _requiredNode) ? _transparencyDuration : _transparencyDuration * 2f;
+        _currentMoveDuration = (!hasNode || nodeType != _requiredNode) ? _moveDuration : _moveDuration * 2f;
     }
 
-    private IEnumerator TimerRoutine()
+    private IEnumerator DissolveTimer()
     {
-        while (true)
+        _currentFillAmount = 1f;
+        _currentPhase = Phase.Transparency;
+        OnPhaseChanged?.Invoke(_currentPhase);
+
+        while (_currentFillAmount > 0f)
         {
-            OnTimerCycleStart?.Invoke();
-            _currentFillAmount = 1f;
-
-            while (_currentFillAmount > 0f)
-            {
-                _currentFillAmount -= Time.deltaTime / _currentDuration;
-                yield return null;
-            }
-
-            _currentFillAmount = 0f;
-
-            yield return new WaitForSeconds(0.25f);
-
-            OnTimerCycleComplete?.Invoke();
+            _currentFillAmount -= Time.deltaTime / _currentTransparencyDuration;
+            yield return null;
         }
+
+        _currentFillAmount = 0f;
+        _currentPhase = Phase.Movement;
+        OnPhaseChanged?.Invoke(_currentPhase);
+
+        while (_currentFillAmount < 1f)
+        {
+            _currentFillAmount += Time.deltaTime / _currentMoveDuration;
+            yield return null;
+        }
+        
+        _currentFillAmount = 1f;
+        _currentPhase = Phase.ReverseTransparency;
+        OnPhaseChanged?.Invoke(_currentPhase);
+
+        while (_currentFillAmount > 0f)
+        {
+            _currentFillAmount -= Time.deltaTime / _currentTransparencyDuration;
+            yield return null;
+        }
+        
+        _currentFillAmount = 0f;
+
+        OnTimerCycleComplete?.Invoke();
+
+        yield return new WaitForSeconds(3f);
+
+        StartCoroutine(DissolveTimer());
     }
 }

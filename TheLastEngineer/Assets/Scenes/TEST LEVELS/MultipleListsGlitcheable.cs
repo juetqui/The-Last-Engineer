@@ -19,20 +19,13 @@ public class MultipleListsGlitcheable : Glitcheable
     void Start()
     {
         GlitchActive.Instance.OnStopObject += StopObject;
-        _timerController.OnTimerCycleStart += OnCycleStart;
         _timerController.OnTimerCycleComplete += UpdateTarget;
-    }
-
-    void Update()
-    {
-        UpdateTimer();
+        _timerController.OnPhaseChanged += CheckTimerPhase;
     }
 
     private void OnCycleStart()
     {
         if (_isStopped || !_isCorrupted) return;
-
-        //_timer.fillAmount = 1f;
     }
 
     private void ChangePosList(bool changed)
