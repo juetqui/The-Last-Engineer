@@ -5603,6 +5603,7 @@ MonoBehaviour:
   - {fileID: 848607474}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &150941349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12205,6 +12206,7 @@ MonoBehaviour:
   OnDepleated:
     m_PersistentCalls:
       m_Calls: []
+  TimerController: {fileID: 0}
   _isCompleted: 0
   minBound: -0.6
   maxBound: 0.51
@@ -12213,6 +12215,7 @@ MonoBehaviour:
   fillTime: 1.5
   _currentLoad: 0
   _timeToUnfill: 0
+  timeModifier: 0
 --- !u!1001 &342640844
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13221,6 +13224,7 @@ MonoBehaviour:
   - {fileID: 8467959568237360097}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &384331592
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16058,6 +16062,7 @@ MonoBehaviour:
   - {fileID: 355366397}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &468251992
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18226,6 +18231,7 @@ MonoBehaviour:
   - {fileID: 502038442}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &512976006
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29943,6 +29949,7 @@ MonoBehaviour:
   OnDepleated:
     m_PersistentCalls:
       m_Calls: []
+  TimerController: {fileID: 0}
   _isCompleted: 0
   minBound: -0.6
   maxBound: 0.51
@@ -29951,6 +29958,7 @@ MonoBehaviour:
   fillTime: 1.5
   _currentLoad: 0
   _timeToUnfill: 0
+  timeModifier: 0
 --- !u!1001 &780311985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53120,6 +53128,7 @@ MonoBehaviour:
   OnDepleated:
     m_PersistentCalls:
       m_Calls: []
+  TimerController: {fileID: 0}
   _isCompleted: 0
   minBound: -0.6
   maxBound: 0.51
@@ -53128,6 +53137,7 @@ MonoBehaviour:
   fillTime: 1.5
   _currentLoad: 0
   _timeToUnfill: 0
+  timeModifier: 0
 --- !u!1001 &1359070188
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -59940,6 +59950,7 @@ MonoBehaviour:
   - {fileID: 48163829}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &1554103418
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61452,6 +61463,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1329815347180713955, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329815347180713955, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329815347180713955, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329815347180713955, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872515821849895473, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872515821849895473, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872515821849895473, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1872515821849895473, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2252802972214967370, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -61532,14 +61575,78 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2730555793973954334, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2730555793973954334, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2730555793973954334, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2730555793973954334, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2899684674042458250, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
       propertyPath: m_Name
       value: Crosshair Selection UI (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622435419545900164, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622435419545900164, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622435419545900164, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3622435419545900164, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5048869189187760866, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
       propertyPath: _camera
       value: 
       objectReference: {fileID: 553308951}
+    - target: {fileID: 5933316234835513302, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933316234835513302, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933316234835513302, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5933316234835513302, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875037942367170784, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875037942367170784, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875037942367170784, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875037942367170784, guid: c78cc33cff2567744a375a7829748a6d, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -63683,6 +63790,7 @@ MonoBehaviour:
   OnDepleated:
     m_PersistentCalls:
       m_Calls: []
+  TimerController: {fileID: 0}
   _isCompleted: 0
   minBound: -0.6
   maxBound: 0.51
@@ -63691,6 +63799,7 @@ MonoBehaviour:
   fillTime: 1.5
   _currentLoad: 0
   _timeToUnfill: 0
+  timeModifier: 0
 --- !u!1001 &1622419066
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -64559,6 +64668,7 @@ MonoBehaviour:
   - {fileID: 1265413714}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &1639335044
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67081,6 +67191,7 @@ MonoBehaviour:
   - {fileID: 815316330}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &1688521015
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -80711,6 +80822,7 @@ MonoBehaviour:
   - {fileID: 357362438}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!1001 &2010373816
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -90705,6 +90817,7 @@ MonoBehaviour:
   - {fileID: 46315316}
   _timerController: {fileID: 898610245}
   _isPlatform: 0
+  _isCorrupted: 1
 --- !u!114 &2882425473510392738
 MonoBehaviour:
   m_ObjectHideFlags: 0
