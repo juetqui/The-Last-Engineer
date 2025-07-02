@@ -53,6 +53,7 @@ public class PlayerTDView
 
     public void DashSound()
     {
+        if(_dashImage!=null)
         _dashImage.fillAmount = 0f;
         SetParticlesLT(0.7f, 1f);
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
@@ -150,12 +151,14 @@ public class PlayerTDView
         while (timer < cd)
         {
             timer += Time.deltaTime;
+            if (_dashImage != null)
 
-            _dashImage.fillAmount = timer / cd;
+                _dashImage.fillAmount = timer / cd;
             yield return null;
         }
+        if (_dashImage != null)
 
-        _dashImage.fillAmount = 1f;
+            _dashImage.fillAmount = 1f;
         SetParticlesLT(0.2f, 0.3f);
     }
 }
