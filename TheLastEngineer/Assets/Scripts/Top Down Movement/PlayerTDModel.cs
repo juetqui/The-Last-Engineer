@@ -12,7 +12,7 @@ public class PlayerTDModel
     private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
 
     private float _gravity = -9.81f;
-    private bool _isDashing = false, _canDash = true;
+    private bool _isDashing = false, _canDash = true, _useGravity = true;
 
     private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
 
@@ -44,14 +44,17 @@ public class PlayerTDModel
         if (moveDir.magnitude > 0f)
             RotatePlayer(moveDir);
 
-        if (!_isDashing)
+        if (!_isDashing && _useGravity)
         {
             if (_cc.isGrounded)
                 _velocity.y = -1f;
             else
                 _velocity.y -= _gravity * -5f * Time.deltaTime;
         }
-        else return;
+        else
+        {
+            _velocity.y = 0f;
+        }
 
         Vector3 totalMovement = (moveDir.normalized * _moveSpeed * Time.deltaTime) + _platformDisplacement;
         _cc.Move(totalMovement);
@@ -69,6 +72,11 @@ public class PlayerTDModel
         _cc.enabled = false;
         _transform.position = new Vector3(newPos.x, _transform.position.y, newPos.z);
         _cc.enabled = wasEnabled;
+    }
+
+    public void SetGravity(bool useGravity)
+    {
+        _useGravity = useGravity;
     }
 
     public void RotatePlayer(Vector3 rotDir)

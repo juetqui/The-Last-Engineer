@@ -26,6 +26,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private SolvingController _solvingController;
 
     public CharacterController _cc = default;
+
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
     private NodeController _node = default;
@@ -36,7 +37,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private float _currentSpeed = default;
     private Vector3 _movement = default, _checkPointPos = default, _absorvedCorruptionPos = default;
     private NodeType _currentNodeType = NodeType.None;
-    private bool _dropAvailable = true;
+    private bool _dropAvailable = true, _canMove = true;
     private Coroutine _corruptionAbsorved = null;
 
     private Glitcheable _currentPlatform = null;
@@ -107,7 +108,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     private Vector3 GetMovement()
     {
-        if (_isDead) return Vector3.zero;
+        if (_isDead || !_canMove) return Vector3.zero;
         
         _movement = InputManager.Instance.moveInput.ReadValue<Vector2>();
 
@@ -351,7 +352,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     public IEnumerator RespawnPlayer()
     {
-        if (_currentPlatform != null) UnSetPlatform(_currentPlatform);
+        if (_currentPlatform != null) UnsetPlatform(_currentPlatform);
 
         TransitionManager.Instance.PlayTransition(3f);
         yield return new WaitForSeconds(1f);
@@ -372,13 +373,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     {
         if (_currentPlatform != null && _currentPlatform != platform)
             _currentPlatform.OnPosChanged -= _playerModel.SetPos;
-
+        
+        _playerModel.SetGravity(false);
         transform.SetParent(platform.transform);
         _currentPlatform = platform;
         _currentPlatform.OnPosChanged += _playerModel.SetPos;
+        _currentPlatform.OnPosChanged += CheckPlatformMovement;
     }
 
-    public void UnSetPlatform(Glitcheable platform)
+    public void UnsetPlatform(Glitcheable platform)
     {
         if (_currentPlatform == platform)
         {
@@ -397,7 +400,22 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
                 }
             }
             
+            _playerModel.SetGravity(true);
+            _canMove = true;
             _currentPlatform = null;
+        }
+    }
+
+    public void SetCanMove(bool canMove)
+    {
+        _canMove = canMove;
+    }
+
+    private void CheckPlatformMovement(Vector3 movement)
+    {
+        if (_currentPlatform != null)
+        {
+            _canMove = !(_currentPlatform.IsStopped == false);
         }
     }
 

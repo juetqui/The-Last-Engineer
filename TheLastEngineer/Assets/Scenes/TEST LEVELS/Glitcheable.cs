@@ -6,6 +6,9 @@ using UnityEngine;
 
 public abstract class Glitcheable : MonoBehaviour
 {
+    [SerializeField] private Collider _coll;
+    [SerializeField] private Collider _triggerColl;
+    [SerializeField] private ParticleSystem _ps;
     [SerializeField] private Transform _feedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
@@ -17,6 +20,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected bool _isStopped = false;
     protected int _index = 0;
 
+    private PlayerTDController _player = null;
     private Renderer _renderer = default, _feedbackRenderer = default;
     private Coroutine _coroutine = null;
     private NodeType _requiredNode = NodeType.Corrupted;
@@ -41,6 +45,8 @@ public abstract class Glitcheable : MonoBehaviour
         _currentList = _newPosList;
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
+
+        _ps.Stop();
     }
 
     public void CheckTimerPhase(Phase currentPhase)
@@ -97,8 +103,6 @@ public abstract class Glitcheable : MonoBehaviour
         transform.position = _targetPos;
         transform.rotation = _targetRot;
 
-        if (_isPlatform) OnPosChanged?.Invoke(_targetPos);
-
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
     }
@@ -113,6 +117,19 @@ public abstract class Glitcheable : MonoBehaviour
 
     private IEnumerator SetTransparency()
     {
+        if (_player != null)
+        {
+            _player.SetCanMove(false);
+            OnPosChanged?.Invoke(transform.position);
+        }
+
+        _coll.enabled = false;
+        _triggerColl.enabled = false;
+
+        var ps = _ps.velocityOverLifetime;
+        ps.radial = -4.91f;
+        _ps.Play();
+
         while (_timerController.CurrentPhase == Phase.Transparency && _timerController.CurrentFillAmount > 0f)
         {
             float alpha = _timerController.CurrentFillAmount;
@@ -122,10 +139,17 @@ public abstract class Glitcheable : MonoBehaviour
 
             yield return null;
         }
+
+        _ps.Stop();
     }
 
     private IEnumerator ResetTransparency()
     {
+        var ps = _ps.velocityOverLifetime;
+        ps.radial = 1f;
+
+        _ps.Play();
+
         while (_timerController.CurrentPhase == Phase.ReverseTransparency && _timerController.CurrentFillAmount > 0f)
         {
             float alpha = _timerController.CurrentFillAmount;
@@ -135,10 +159,23 @@ public abstract class Glitcheable : MonoBehaviour
 
             yield return null;
         }
+
+        _coll.enabled = true;
+        _triggerColl.enabled = true;
+        _ps.Stop();
+
+        if (_player != null)
+        {
+            _player.SetCanMove(true);
+            _player.UnsetPlatform(this);
+            _player = null;
+        }
     }
 
     private IEnumerator MoveTrail()
     {
+        _ps.Stop();
+
         Vector3 startPos = transform.position;
         Quaternion startRot = transform.rotation;
 
@@ -149,11 +186,15 @@ public abstract class Glitcheable : MonoBehaviour
             transform.position = Vector3.Lerp(startPos, _targetPos, t);
             transform.rotation = Quaternion.Lerp(startRot, _targetRot, t);
 
+            if (_isPlatform)
+                OnPosChanged?.Invoke(transform.position);
+
             yield return null;
         }
 
         transform.position = _targetPos;
         transform.rotation = _targetRot;
+        OnPosChanged?.Invoke(transform.position);
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -161,7 +202,11 @@ public abstract class Glitcheable : MonoBehaviour
         if (coll.TryGetComponent(out PlayerTDController player))
         {
             if (_isPlatform && player.GetCurrentNodeType() == _requiredNode)
-                player.SetPlatform(this);
+            {
+                _player = player;
+                _player.SetPlatform(this);
+                _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
+            }
             else
                 player.CorruptionCollided();
         }
@@ -171,8 +216,11 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
-            if (_isPlatform)
-                player.UnSetPlatform(this);
+            if (_isPlatform && _player != null && player == _player)
+            {
+                _player.UnsetPlatform(this);
+                _player = null;
+            }
         }
     }
 
