@@ -62,7 +62,6 @@ public class TimerController : MonoBehaviour
             _currentFillAmount += Time.deltaTime / _currentMoveDuration;
             yield return null;
         }
-        
         _currentFillAmount = 1f;
         _currentPhase = Phase.ReverseTransparency;
         OnPhaseChanged?.Invoke(_currentPhase);
@@ -77,7 +76,7 @@ public class TimerController : MonoBehaviour
 
         OnTimerCycleComplete?.Invoke();
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(0.5f);
 
         StartCoroutine(DissolveTimer());
     }

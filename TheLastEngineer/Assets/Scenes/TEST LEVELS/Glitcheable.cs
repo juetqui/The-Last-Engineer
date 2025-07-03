@@ -13,6 +13,7 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
+    [SerializeField] protected float _radialDonutPS = 4.91f;
     [SerializeField] protected bool _isCorrupted = true;
 
     protected List<Transform> _currentList = default;
@@ -127,7 +128,7 @@ public abstract class Glitcheable : MonoBehaviour
         _triggerColl.enabled = false;
 
         var ps = _ps.velocityOverLifetime;
-        ps.radial = -4.91f;
+        ps.radial = _radialDonutPS;
         _ps.Play();
 
         while (_timerController.CurrentPhase == Phase.Transparency && _timerController.CurrentFillAmount > 0f)
