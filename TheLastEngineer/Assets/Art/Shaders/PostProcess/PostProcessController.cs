@@ -6,6 +6,7 @@ public class PostProcessController : MonoBehaviour
     [SerializeField] private Material _passiveMat;
     [SerializeField] private Material _corruptionMat;
 
+    private Coroutine _currentEffect = null;
     private float _vignetteAmount = 9f;
     private float _speed = 60f;
 
@@ -32,13 +33,16 @@ public class PostProcessController : MonoBehaviour
 
     private void ActivateCorruption(bool hasEffect)
     {
+        if (_currentEffect != null)
+            StopCoroutine(_currentEffect);
+
         if (!hasEffect)
         {
-            StartCoroutine(DeactivatePP(_corruptionMat));
+            _currentEffect = StartCoroutine(DeactivatePP(_corruptionMat));
             return;
         }
 
-        StartCoroutine(ActivatePP(_corruptionMat));
+        _currentEffect = StartCoroutine(ActivatePP(_corruptionMat));
     }
 
     private IEnumerator ActivatePP(Material material)

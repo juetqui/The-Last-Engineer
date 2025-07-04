@@ -9,13 +9,13 @@ public class TimerController : MonoBehaviour
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private float _transparencyDuration = 1f;
     [SerializeField] private float _moveDuration = 0.5f;
-    [SerializeField] private float _nodeDuration = 2f;
 
     private float _currentTransparencyDuration, _currentMoveDuration;
     private float _currentFillAmount = 1f;
     private Phase _currentPhase = Phase.Transparency;
 
-    public event Action OnTimerCycleComplete;
+    public event Action OnTimerCycleStarted = delegate { };
+    public event Action OnTimerCycleComplete = delegate { };
 
     public float CurrentFillAmount => _currentFillAmount;
     public float CurrentDuration => _currentMoveDuration;
@@ -43,6 +43,9 @@ public class TimerController : MonoBehaviour
 
     private IEnumerator DissolveTimer()
     {
+        OnTimerCycleStarted?.Invoke();
+        yield return new WaitForSeconds(1.5f);
+
         _currentFillAmount = 1f;
         _currentPhase = Phase.Transparency;
         OnPhaseChanged?.Invoke(_currentPhase);
@@ -73,11 +76,7 @@ public class TimerController : MonoBehaviour
         }
         
         _currentFillAmount = 0f;
-
         OnTimerCycleComplete?.Invoke();
-
-        yield return new WaitForSeconds(0.5f);
-
         StartCoroutine(DissolveTimer());
     }
 }

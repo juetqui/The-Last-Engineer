@@ -68,6 +68,8 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void InteractWithGlitcheable(Glitcheable glitcheable)
     {
+        if (glitcheable == null) return;
+
         bool newObjectState = _nodeType == NodeType.Default ? false : true;
 
         if (glitcheable.ChangeCorruptionState(_nodeType, newObjectState))

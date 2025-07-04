@@ -2,9 +2,9 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class TextGlitcher : MonoBehaviour
+public class UITextGlitcher : MonoBehaviour
 {
-    public TextMeshPro textMesh;
+    public TextMeshProUGUI textMesh;
     [Tooltip("Time to display original text before glitching (seconds)")]
     public float originalTextDuration = 2f;
     [Tooltip("Total duration of the glitch effect (seconds)")]
@@ -20,7 +20,7 @@ public class TextGlitcher : MonoBehaviour
     {
         if (textMesh == null)
         {
-            textMesh = GetComponent<TextMeshPro>();
+            textMesh = GetComponent<TextMeshProUGUI>();
         }
         originalText = textMesh.text;
         StartCoroutine(GlitchCycle());

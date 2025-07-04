@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public abstract class Glitcheable : MonoBehaviour
@@ -15,6 +14,7 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = 4.91f;
     [SerializeField] protected bool _isCorrupted = true;
+    [SerializeField] private bool _debug = false;
 
     protected List<Transform> _currentList = default;
     protected bool _canMove = true;
@@ -25,9 +25,8 @@ public abstract class Glitcheable : MonoBehaviour
     private Renderer _renderer = default, _feedbackRenderer = default;
     private Coroutine _coroutine = null;
     private NodeType _requiredNode = NodeType.Corrupted;
-    private Vector3 _targetPos = default, _feedBackStartPos = default, _feedBackCurrentPos = default;
+    protected Vector3 _targetPos = default;
     private Quaternion _targetRot = default;
-    private Color _originalColor = default;
 
     public bool IsStopped { get { return _isStopped; } }
 
@@ -91,11 +90,30 @@ public abstract class Glitcheable : MonoBehaviour
 
         _isCorrupted = newState;
 
+        if (_isCorrupted)
+        {
+            _timerController.OnTimerCycleComplete += StartMovingAfterCycle;
+        }
+        else
+        {
+            _timerController.OnPhaseChanged -= CheckTimerPhase;
+            _timerController.OnTimerCycleComplete -= UpdateTarget;
+        }
+
         return true;
+    }
+
+    private void StartMovingAfterCycle()
+    {
+        _timerController.OnTimerCycleComplete -= StartMovingAfterCycle;
+        _timerController.OnPhaseChanged += CheckTimerPhase;
+        _timerController.OnTimerCycleComplete += UpdateTarget;
     }
 
     protected void UpdateTarget()
     {
+        if (_debug) Debug.Log("UPDATE TARGET");
+
         if (_isStopped || !_isCorrupted) return;
 
         if (_index == _currentList.Count - 1) _index = 0;
@@ -141,6 +159,9 @@ public abstract class Glitcheable : MonoBehaviour
             yield return null;
         }
 
+        _renderer.material.SetFloat("_Alpha", 0f);
+        _feedbackRenderer.material.SetFloat("_Alpha", 1f);
+
         _ps.Stop();
     }
 
@@ -160,6 +181,9 @@ public abstract class Glitcheable : MonoBehaviour
 
             yield return null;
         }
+
+        _renderer.material.SetFloat("_Alpha", 1f);
+        _feedbackRenderer.material.SetFloat("_Alpha", 0f);
 
         _coll.enabled = true;
         _triggerColl.enabled = true;
@@ -200,7 +224,7 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player))
+        if (coll.TryGetComponent(out PlayerTDController player) && _isCorrupted && !_isStopped)
         {
             if (_isPlatform && player.GetCurrentNodeType() == _requiredNode)
             {
@@ -215,7 +239,7 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player))
+        if (coll.TryGetComponent(out PlayerTDController player) && _isCorrupted)
         {
             if (_isPlatform && _player != null && player == _player)
             {

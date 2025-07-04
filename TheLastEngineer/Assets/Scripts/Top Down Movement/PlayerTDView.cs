@@ -88,14 +88,18 @@ public class PlayerTDView
 
     public void PlayPS(Color color)
     {
-        _walkPS.startColor = color;
-        _orbitPS.startColor = color;
+        var walkPS = _walkPS.main;
+        var orbitPS = _orbitPS.main;
+
+        walkPS.startColor = color;
+        orbitPS.startColor = color;
         _orbitPS.Play();
     }
 
     public void StopPS()
     {
-        _walkPS.startColor = Color.white;
+        var walkPS = _walkPS.main;
+        walkPS.startColor = Color.white;
         _orbitPS.Stop();
     }
 

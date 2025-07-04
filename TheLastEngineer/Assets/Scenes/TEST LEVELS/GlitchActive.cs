@@ -8,15 +8,12 @@ public class GlitchActive : MonoBehaviour
 {
     public static GlitchActive Instance = null;
 
-    [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private float _detectionRange = 10f;
-    [SerializeField] private float _scaleSpeed = 10f;
     [SerializeField] private GameObject _interactionArea;
 
     private PlayerTDController _player = default;
     private Glitcheable _selectedGlitcheable = null;
     private List<Glitcheable> _glitcheables = default;
-    private float _detectionOffset = 5f, _offsetRange = 0f;
     private int _index = 0;
     private bool _enabled = false;
     private Coroutine _currentCoroutine = null;
