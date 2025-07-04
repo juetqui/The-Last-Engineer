@@ -9,7 +9,8 @@ public class GenericTM : MonoBehaviour
     [SerializeField] private List<NodeType> _requiredTypes;
 
     [Header("MVC View")]
-    [SerializeField] protected AudioSource _source;
+    private Animator _animator;
+    private AudioSource _source;
 
     private int _workingNodes = default, _totalToFinish = default;
     private bool _running = false;
@@ -24,6 +25,9 @@ public class GenericTM : MonoBehaviour
 
     private void Awake()
     {
+        _animator = GetComponent<Animator>();
+        _source = GetComponent<AudioSource>();
+
         SetUp();
     }
     private void OnDestroy()
@@ -49,9 +53,18 @@ public class GenericTM : MonoBehaviour
     private void ValidateAllConnections()
     {
         _running = CheckRequirements();
-        
-        if (_running && !_source.isPlaying) _source.Play();
-        else _source.Stop();
+
+        if (_running && !_source.isPlaying)
+        {
+            Debug.Log(_animator);
+            _animator.SetBool("DoorActivated", true);
+            _source.Play();
+        }
+        else
+        {
+            _animator.SetBool("DoorActivated", false);
+            _source.Stop();
+        }
 
         onRunning?.Invoke(_running);
     }
