@@ -8,8 +8,14 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
     public bool RequiresHoldInteraction => false;
     #endregion
 
+    [SerializeField] protected NodeController _recievedNode = null;
+    
     protected MainTM _mainTM = default;
-    protected NodeController _recievedNode = null;
+
+    private void Start()
+    {
+        if (_recievedNode != null) SetNode(_recievedNode);
+    }
 
     public abstract void SetSecTM(T secTM);
     protected abstract void SetNode(NodeController node);

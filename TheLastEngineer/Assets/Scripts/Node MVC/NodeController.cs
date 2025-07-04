@@ -17,7 +17,9 @@ public class NodeController : MonoBehaviour, IInteractable
     [Header("Model")]
     [SerializeField] protected NodeType _nodeType;
     [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
-    [SerializeField] private bool _isChildren = false;
+    [SerializeField] private bool _isChildren;
+
+    [SerializeField] private bool _debug = false; 
 
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Transform Transform => transform;
