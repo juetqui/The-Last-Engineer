@@ -13,8 +13,11 @@ public class GlitchAbsorption : MonoBehaviour
 
     private void SetCorruptedState(bool setCorruption)
     {
-        _vfx.SetActive(setCorruption);
-        _playerGhost.SetActive(setCorruption);
+        if (_vfx != null)
+            _vfx.SetActive(setCorruption);
+
+        if (_playerGhost != null)
+            _playerGhost.SetActive(setCorruption);
 
         _playerGhost.transform.position = PlayerTDController.Instance.transform.position;
         _playerGhost.transform.rotation = PlayerTDController.Instance.transform.rotation;

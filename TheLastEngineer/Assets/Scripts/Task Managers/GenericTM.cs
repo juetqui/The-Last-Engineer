@@ -56,7 +56,6 @@ public class GenericTM : MonoBehaviour
 
         if (_running && !_source.isPlaying)
         {
-            Debug.Log(_animator);
             _animator.SetBool("DoorActivated", true);
             _source.Play();
         }
