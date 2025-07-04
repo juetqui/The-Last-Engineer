@@ -13,8 +13,11 @@ public class Laser : MonoBehaviour
     private RaycastHit _rayHit;
     private Ray _ray, _leftRay, _rightRay;
 
+    private AudioSource _audioSource = default;
+
     private void Awake()
     {
+        _audioSource = GetComponent<AudioSource>();
         _lineRenderer.positionCount = 2;
 
         Vector3 laserPos = GetFixedLaserPos();
@@ -25,12 +28,23 @@ public class Laser : MonoBehaviour
 
     private void Start()
     {
-        if (_startsInitialized) CastLaser();
+        if (_startsInitialized)
+        {
+            CastLaser();
+            _audioSource.Play();
+        }
     }
 
     private void Update()
     {
-        if (!_startsInitialized) return;
+        if (!_startsInitialized)
+        {
+            _audioSource.Stop();
+            return;
+        }
+
+        if (!_audioSource.isPlaying)
+            _audioSource.Play();
 
         CastLaser();
         CorruptionCheck();

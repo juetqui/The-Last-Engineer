@@ -5,16 +5,16 @@ using UnityEngine;
 
 public abstract class Glitcheable : MonoBehaviour
 {
+    [SerializeField] private GlitchSounds _sounds;
     [SerializeField] private Collider _coll;
     [SerializeField] private Collider _triggerColl;
-    [SerializeField] private ParticleSystem _ps;
+    [SerializeField] protected ParticleSystem _ps;
     [SerializeField] private Transform _feedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = 4.91f;
     [SerializeField] protected bool _isCorrupted = true;
-    [SerializeField] private bool _debug = false;
 
     protected List<Transform> _currentList = default;
     protected bool _canMove = true;
@@ -24,6 +24,7 @@ public abstract class Glitcheable : MonoBehaviour
     private PlayerTDController _player = null;
     private Renderer _renderer = default, _feedbackRenderer = default;
     private Coroutine _coroutine = null;
+    private AudioSource _audioSource = default;
     private NodeType _requiredNode = NodeType.Corrupted;
     protected Vector3 _targetPos = default;
     private Quaternion _targetRot = default;
@@ -39,6 +40,7 @@ public abstract class Glitcheable : MonoBehaviour
 
     protected void OnAwake()
     {
+        _audioSource = GetComponent<AudioSource>();
         _renderer = GetComponent<Renderer>();
         _feedbackRenderer = _feedbackPos.GetComponent<Renderer>();
 
@@ -92,12 +94,21 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_isCorrupted)
         {
-            _timerController.OnTimerCycleComplete += StartMovingAfterCycle;
+            _timerController.OnTimerCycleStarted += StartMovingAfterCycle;
         }
         else
         {
             _timerController.OnPhaseChanged -= CheckTimerPhase;
             _timerController.OnTimerCycleComplete -= UpdateTarget;
+
+            _renderer.material.SetFloat("_Alpha", 1f);
+            _feedbackRenderer.material.SetFloat("_Alpha", 0f);
+
+            var ps = _ps.main;
+            var psVel = _ps.velocityOverLifetime;
+            psVel.radial = 1f;
+            ps.loop = true;
+            _ps.Play();
         }
 
         return true;
@@ -105,15 +116,14 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void StartMovingAfterCycle()
     {
-        _timerController.OnTimerCycleComplete -= StartMovingAfterCycle;
+        _timerController.OnTimerCycleStarted -= StartMovingAfterCycle;
         _timerController.OnPhaseChanged += CheckTimerPhase;
         _timerController.OnTimerCycleComplete += UpdateTarget;
+        _ps.Stop();
     }
 
     protected void UpdateTarget()
     {
-        if (_debug) Debug.Log("UPDATE TARGET");
-
         if (_isStopped || !_isCorrupted) return;
 
         if (_index == _currentList.Count - 1) _index = 0;
@@ -144,6 +154,8 @@ public abstract class Glitcheable : MonoBehaviour
 
         _coll.enabled = false;
         _triggerColl.enabled = false;
+        _audioSource.clip = _sounds.startSFX;
+        _audioSource.Play();
 
         var ps = _ps.velocityOverLifetime;
         ps.radial = _radialDonutPS;
@@ -169,8 +181,10 @@ public abstract class Glitcheable : MonoBehaviour
     {
         var ps = _ps.velocityOverLifetime;
         ps.radial = 1f;
-
         _ps.Play();
+
+        _audioSource.clip = _sounds.endSFX;
+        _audioSource.Play();
 
         while (_timerController.CurrentPhase == Phase.ReverseTransparency && _timerController.CurrentFillAmount > 0f)
         {

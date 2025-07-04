@@ -10,8 +10,20 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
     void Start()
     {
         GlitchActive.Instance.OnStopObject += StopObject;
-        _timerController.OnTimerCycleComplete += UpdateTarget;
-        _timerController.OnPhaseChanged += CheckTimerPhase;
+
+        if (_isCorrupted)
+        {
+            _timerController.OnTimerCycleComplete += UpdateTarget;
+            _timerController.OnPhaseChanged += CheckTimerPhase;
+        }
+        else
+        {
+            var ps = _ps.main;
+            var psVel = _ps.velocityOverLifetime;
+            psVel.radial = 1f;
+            ps.loop = true;
+            _ps.Play();
+        }
     }
 
     private void OnCycleStart()
