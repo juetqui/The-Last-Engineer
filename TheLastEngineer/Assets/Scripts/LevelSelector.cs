@@ -6,11 +6,9 @@ public class LevelSelector : MonoBehaviour
 {
     [SerializeField] private List<Transform> _checkpoints = new List<Transform>();
     private string[] sceneNames;
-
     private void Start()
     {
         int sceneCount = SceneManager.sceneCountInBuildSettings;
-        
         sceneNames = new string[sceneCount];
 
         for (int i = 0; i < sceneCount; i++)
@@ -31,7 +29,7 @@ public class LevelSelector : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             PlayerTDController.Instance.SetCheckPointPos(_checkpoints[1].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            //StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[1]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -51,6 +49,30 @@ public class LevelSelector : MonoBehaviour
             PlayerTDController.Instance.SetCheckPointPos(_checkpoints[4].position);
             StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[4]);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[5].position);
+            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            //SceneManager.LoadScene(sceneNames[4]);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[6].position);
+            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            //SceneManager.LoadScene(sceneNames[4]);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[7].position);
+            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            //SceneManager.LoadScene(sceneNames[4]);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[1].position);
+            //StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            //SceneManager.LoadScene(sceneNames[1]);
         }
     }
 }
