@@ -182,7 +182,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     private void GetDashKey(InputAction.CallbackContext context)
     {
-        if (_playerModel.CanDash && GetMovement() != Vector3.zero && !_isDead)
+        if (_playerModel.CanDashWithCoyoteTime() && GetMovement() != Vector3.zero && !_isDead)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));

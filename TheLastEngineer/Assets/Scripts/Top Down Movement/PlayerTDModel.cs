@@ -10,9 +10,11 @@ public class PlayerTDModel
 
     private float _moveSpeed = default, _rotSpeed = default;
     private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
+    private float _coyoteTimeCounter = 0f, _coyoteTime = 0.3f;
 
     private float _gravity = -9.81f;
     private bool _isDashing = false, _canDash = true, _useGravity = true;
+
 
     private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
 
@@ -37,6 +39,16 @@ public class PlayerTDModel
     {
         _moveSpeed = moveSpeed;
         MovePlayer(moveDir);
+
+        if (_cc.isGrounded)
+            _coyoteTimeCounter = _coyoteTime;
+        else
+            _coyoteTimeCounter -= Time.deltaTime;
+    }
+
+    public bool CanDashWithCoyoteTime()
+    {
+        return (_canDash && (_cc.isGrounded || _coyoteTimeCounter > 0f));
     }
 
     private void MovePlayer(Vector3 moveDir)
@@ -91,7 +103,7 @@ public class PlayerTDModel
         _isDashing = true;
         _canDash = false;
 
-        float dashSpeed = _dashSpeed; // Ya no importa el tipo de Node
+        float dashSpeed = _dashSpeed;
 
         while (Time.time < dashTimer + _dashDuration)
         {
