@@ -5,22 +5,24 @@ using UnityEngine;
 using System;
 using UnityEngine.Events;
 
-public class PatronShaderFiller : MonoBehaviour
+public class LaserReceptorFill : MonoBehaviour
 {
     MeshRenderer _myMeshRenderer;
     Material _myMaterial;
-    [SerializeField] float minBound;
-    [SerializeField] float maxBound;
+    [SerializeField] float Ymin;
+    [SerializeField] float Ymax;
     public bool _completed;
+    public UnityEvent OnLoaded;
+    public UnityEvent OnUnloaded;
     [SerializeField] float unfillTime;
     [SerializeField] float fillTime;
-    public float _currentLoad=0;
+    float _currentLoad=0;
     private void Start()
     {
         _myMeshRenderer = GetComponent<MeshRenderer>();
         _myMaterial = _myMeshRenderer.material;
-        _myMaterial.SetFloat("_MinBound", minBound);
-        _myMaterial.SetFloat("_MaxBound", maxBound);
+        _myMaterial.SetFloat("_Ymin", Ymin);
+        _myMaterial.SetFloat("_Ymax", Ymax);
 
     }
     public void Fill()
