@@ -10,8 +10,7 @@ public class ShaderFiller : MonoBehaviour
 {
     MeshRenderer _myMeshRenderer;
     Material _myMaterial;
-    [SerializeField] float Ymin;
-    [SerializeField] float Ymax;
+    private float MinBoundShader = 1;
     public bool _completed;
     public bool _isLoading;
     public bool _isUnloading;
@@ -30,8 +29,7 @@ public class ShaderFiller : MonoBehaviour
         if (unfillTime == default) unfillTime = fillTime;
         _myMeshRenderer = GetComponent<MeshRenderer>();
         _myMaterial = _myMeshRenderer.material;
-        _myMaterial.SetFloat("_Ymin", Ymin);
-        _myMaterial.SetFloat("_Ymax", Ymax);
+        _myMaterial.SetFloat("_MinBound", MinBoundShader);
         if (startactive) StartFill();
     }
     public void StartFill()

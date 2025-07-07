@@ -23,6 +23,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Texture2DLightning:
+        m_Texture: {fileID: 2800000, guid: 6a582a9c2ea221b49895b428fcb4933b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -37,12 +41,26 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _MaxBound: 1.1
-    - _MinBound: -0.1
+    - _MaxBound: 1
+    - _MinBound: 1
+    - _NoiseAmount: 0.036
+    - _NoiseSaturation: 2.4
+    - _NoiseScale: 100
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Step: 0
-    m_Colors: []
+    - _SliderColor: 0
+    - _Step: 1
+    - _StepNoise: 0.649
+    m_Colors:
+    - _Color: {r: 0.122774966, g: 0.19180477, b: 0.8396226, a: 0}
+    - _ColorFill: {r: 0.1273585, g: 1, b: 0.17182441, a: 0}
+    - _ColorFill_1: {r: 0, g: 0.26460794, b: 0.6320754, a: 0}
+    - _ColorNoise: {r: 0.23553754, g: 0.45392042, b: 0.745283, a: 0}
+    - _NoiseSpeed: {r: 0.2, g: 0, b: 0, a: 0}
+    - _Speed1: {r: 0, g: 1, b: 0, a: 0}
+    - _Speed2: {r: 0, g: -0.5, b: 0, a: 0}
+    - _Vector2: {r: 6.02, g: 0, b: 0, a: 0}
+    - _Vector2_1: {r: 0.1, g: -0.1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &6104610097778192833
 MonoBehaviour:
