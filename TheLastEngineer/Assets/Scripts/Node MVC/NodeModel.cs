@@ -5,7 +5,7 @@ public class NodeModel
     private Transform _transform = default;
     private float _minY = default, _maxY = default, _moveSpeed = default, _rotSpeed = default, _initialY = default;
     private Vector3 _scaleVector = new Vector3(0.0125f, 0.0125f, 0.0125f);
-    private Vector3 _initialGlobalPosition;
+    private Vector3 _initialGlobalPosition = Vector3.zero;
 
     public NodeModel(Transform transform, float minY, float maxY, float moveSpeed, float rotSpeed)
     {
@@ -21,10 +21,10 @@ public class NodeModel
     public void MoveObject()
     {
         float offset = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
-        float newGlobalY = _initialGlobalPosition.y + offset;
+        float newGlobalY = _transform.position.y + offset;
 
         _initialY += _rotSpeed * Time.deltaTime;
-        _transform.position = new Vector3(_initialGlobalPosition.x, newGlobalY, _initialGlobalPosition.z);
+        _transform.position = new Vector3(_transform.position.x, newGlobalY, _transform.position.z);
     }
     
 

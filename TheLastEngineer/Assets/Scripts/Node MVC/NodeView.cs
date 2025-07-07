@@ -27,6 +27,8 @@ public class NodeView
 
     public void EnableColl(bool onOff)
     {
+        if (_collider.enabled == onOff) return;
+
         _collider.enabled = onOff;
     }
 

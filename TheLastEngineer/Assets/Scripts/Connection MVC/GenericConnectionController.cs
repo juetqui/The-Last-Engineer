@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class GenericConnectionController : Connection<GenericTM>
 {
+    [SerializeField] private Transform _nodePos;
     private List<GenericTM> _secTaskManagers = new List<GenericTM>();
     public Action<NodeType, bool> OnNodeConnected;
 
@@ -20,7 +20,7 @@ public class GenericConnectionController : Connection<GenericTM>
 
     protected override void SetNode(NodeController node)
     {
-        node.Attach(Vector3.zero, transform);
+        node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f);
         _recievedNode = node;
         OnNodeConnected?.Invoke(node.NodeType, true);
     }

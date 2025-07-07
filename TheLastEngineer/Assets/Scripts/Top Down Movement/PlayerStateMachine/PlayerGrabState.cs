@@ -23,7 +23,10 @@ public class PlayerGrabState : IPlayerState
             {
                 _playerController.DropOrGrabNode(false);
                 _playerController.ReleaseNode();
-                _playerController.RemoveInteractable(interactable);
+
+                if (!(interactable is GenericConnectionController) && !(interactable is SpecificConnectionController))
+                    _playerController.RemoveInteractable(interactable);
+
                 _playerController.SetState(_playerController.EmptyState);
                 InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
             }

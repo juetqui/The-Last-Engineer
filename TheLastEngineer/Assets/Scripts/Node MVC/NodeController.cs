@@ -1,11 +1,13 @@
 using System;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
+using UnityEngine.UIElements;
 
 public class NodeController : MonoBehaviour, IInteractable
 {
     [Header("View")]
+    private BoxCollider _collider = default;
     private Renderer _renderer = default;
-    private Collider _collider = default;
     protected Animator _animator = default;
 
     [Header("Outline")]
@@ -16,6 +18,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
     [Header("Model")]
     [SerializeField] protected NodeType _nodeType;
+    [SerializeField] protected LayerMask _floorLayer;
     [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
     [SerializeField] private bool _isChildren;
 
@@ -25,6 +28,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private NodeView _nodeView = default;
     private NodeModel _nodeModel = default;
+    private RaycastHit hit = default;
 
     private IConnectable _connectable = default;
     
@@ -39,7 +43,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
     protected void Awake()
     {
-        _collider = GetComponent<Collider>();
+        _collider = GetComponent<BoxCollider>();
         _renderer = GetComponentInChildren<Renderer>();
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
@@ -101,7 +105,10 @@ public class NodeController : MonoBehaviour, IInteractable
     private void MoveObject()
     {
         _nodeView.EnableColl(true);
-        _nodeModel.MoveObject();
+        //_nodeModel.MoveObject();
+        
+        if (!Physics.Raycast(transform.position, -transform.up, out hit, 3f, _floorLayer))
+            transform.position -= Vector3.up * Time.deltaTime * 15f;
     }
 
     protected void Attach(PlayerTDController player, Vector3 newPos)

@@ -219,7 +219,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private IInteractable GetClosestInteractable()
     {
         return _interactables
-            .Where(i => i.CanInteract(this)) //&& IsInFOV(i.Transform))
+            .Where(i => i.CanInteract(this))
             .OrderByDescending(i => i.Priority)
             .ThenBy(i => Vector3.Distance(transform.position, i.Transform.position))
             .FirstOrDefault();
