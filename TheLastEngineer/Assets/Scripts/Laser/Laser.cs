@@ -7,6 +7,7 @@ public class Laser : MonoBehaviour
     [SerializeField] private float _raycastOffsetX = 2f;
     [SerializeField] private float _raycastOffsetZ = 1f;
     [SerializeField] private bool _startsInitialized = false;
+    private bool _isInitialized;
     [SerializeField] private LayerMask _laserLayer;
 
     private ILaserReceptor _lastHit = null;
@@ -30,6 +31,7 @@ public class Laser : MonoBehaviour
     {
         if (_startsInitialized)
         {
+            _isInitialized = true;
             CastLaser();
             _audioSource.Play();
         }
@@ -37,7 +39,7 @@ public class Laser : MonoBehaviour
 
     private void Update()
     {
-        if (!_startsInitialized)
+        if (!_isInitialized)
         {
             _audioSource.Stop();
             return;
@@ -140,14 +142,14 @@ public class Laser : MonoBehaviour
 
     public void LaserRecived()
     {
-        _startsInitialized = true;
+        _isInitialized = true;
     }
 
     public void LaserNotRecived()
     {
         Vector3 laserPos = GetFixedLaserPos();
-
-        _startsInitialized = false;
+        if(!_startsInitialized)
+        _isInitialized = false;
 
         _lineRenderer.SetPosition(0, laserPos);
         _lineRenderer.SetPosition(1, laserPos);

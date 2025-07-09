@@ -22,8 +22,9 @@ public class ShaderFiller : MonoBehaviour
     [SerializeField] float unfillTime;
     private Coroutine _loadCoroutine;
     public bool startactive;
+    public float timeModifier=2;
 
-    float _currentLoad = 0;
+    public float _currentLoad = 0;
     private void Start()
     {
         if (unfillTime == default) unfillTime = fillTime;
@@ -34,10 +35,17 @@ public class ShaderFiller : MonoBehaviour
     }
     public void StartFill()
     {
-        _isUnloading = false;
-        _isLoading = true;
-       // OnLoading?.Invoke();
-        _loadCoroutine = StartCoroutine(LoadRoutine(fillTime));
+        if (!_completed)
+        {
+            _isUnloading = false;
+            // OnLoading?.Invoke();
+            if (_isLoading == false)
+            {
+                _isLoading = true;
+                _loadCoroutine = StartCoroutine(LoadRoutine(fillTime));
+            }
+        }
+        
     }
     private IEnumerator LoadRoutine(float loadTime)
     {
@@ -45,7 +53,15 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isLoading == true)
             {
-                _currentLoad = _currentLoad + Time.deltaTime / loadTime;
+                if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                {
+                    _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
+                }
+                else
+                {
+                    _currentLoad = _currentLoad + Time.deltaTime / loadTime;
+
+                }
                 _myMaterial.SetFloat("_Step", _currentLoad);
                 OnLoading?.Invoke();
                 yield return null;
@@ -60,11 +76,25 @@ public class ShaderFiller : MonoBehaviour
         _currentLoad = 1;
         FinishLoad?.Invoke();
     }
+    public void SetCompleated()
+    {
+        _completed = true;
+    }
+    public void SeyUnCompleated()
+    {
+        _completed =false;
+        print("dasdasd");
+    }
     public void StartUnFill()
     {
         _isLoading = false;
-        _isUnloading = true;
-        _loadCoroutine = StartCoroutine(UnLoadRoutine(unfillTime));
+        if (_isUnloading == false)
+        {
+            _isUnloading = true;
+            _loadCoroutine = StartCoroutine(UnLoadRoutine(unfillTime));
+
+        }
+
     }
     private IEnumerator UnLoadRoutine(float unloadTime)
     {
@@ -72,7 +102,14 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isUnloading == true)
             {
-                _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
+                if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                {
+                    _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
+                }
+                else
+                {
+                    _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
+                }
                 _myMaterial.SetFloat("_Step", _currentLoad);
                 OnUnLoading?.Invoke();
                 yield return null;
