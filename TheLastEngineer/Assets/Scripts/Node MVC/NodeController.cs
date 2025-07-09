@@ -33,6 +33,7 @@ public class NodeController : MonoBehaviour, IInteractable
     private IConnectable _connectable = default;
     
     private bool _isConnected = false;
+    private Vector3 _resetPos = Vector3.zero;
 
     public Action<NodeType> OnUpdatedNodeType = delegate { };
 
@@ -47,7 +48,9 @@ public class NodeController : MonoBehaviour, IInteractable
         _renderer = GetComponentInChildren<Renderer>();
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
-        
+
+        _resetPos = transform.position;
+
         _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
 
         _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
@@ -153,7 +156,12 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.GetComponent<PlayerTDController>())
+        if (other.CompareTag("Void"))
+        {
+            Debug.Log("RESET");
+            _nodeModel.ResetPos(_resetPos);
+        }
+        else if (other.gameObject.GetComponent<PlayerTDController>())
         {
             _nodeView.SetRangeAnim();
         }

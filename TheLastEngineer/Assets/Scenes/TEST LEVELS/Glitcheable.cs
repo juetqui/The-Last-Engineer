@@ -153,7 +153,9 @@ public abstract class Glitcheable : MonoBehaviour
         }
 
         _coll.enabled = false;
-        _triggerColl.enabled = false;
+        
+        if (_triggerColl != null) _triggerColl.enabled = false;
+        
         _audioSource.clip = _sounds.startSFX;
         _audioSource.Play();
 
@@ -200,7 +202,7 @@ public abstract class Glitcheable : MonoBehaviour
         _feedbackRenderer.material.SetFloat("_Alpha", 0f);
 
         _coll.enabled = true;
-        _triggerColl.enabled = true;
+        if (_triggerColl != null) _triggerColl.enabled = true;
         _ps.Stop();
 
         if (_player != null)

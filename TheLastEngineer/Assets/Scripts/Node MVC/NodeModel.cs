@@ -27,7 +27,6 @@ public class NodeModel
         _transform.position = new Vector3(_transform.position.x, newGlobalY, _transform.position.z);
     }
     
-
     public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
     {
         _initialGlobalPosition = newPos;
@@ -48,5 +47,10 @@ public class NodeModel
 
         if (newScale != default) _transform.localScale = newScale;
         else _transform.localScale = Vector3.one;
+    }
+
+    public void ResetPos(Vector3 resetPos)
+    {
+        _transform.position = resetPos;
     }
 }
