@@ -53,9 +53,17 @@ public class NodeView
     public void UpdateNodeType(NodeType nodeType, Color currentOutline)
     {
         if (nodeType == NodeType.Default)
-            _renderer.material = Resources.Load<Material>("Materials/M_DefaultNode");
+        {
+            Material[] mats = _renderer.sharedMaterials;
+            mats[2] = Resources.Load<Material>("Materials/M_DefaultNode");
+            _renderer.sharedMaterials = mats;
+        }
         else
-            _renderer.material = Resources.Load<Material>("Materials/M_CorruptedNode");
+        {
+            Material[] mats = _renderer.sharedMaterials;
+            mats[2] = Resources.Load<Material>("Materials/M_CorruptedNode");
+            _renderer.sharedMaterials = mats;
+        }
 
         _outline.OutlineColor = currentOutline;
     }

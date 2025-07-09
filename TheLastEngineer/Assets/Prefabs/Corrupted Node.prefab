@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 2434316678522252375}
   - component: {fileID: 757628171860963890}
   - component: {fileID: 658344199128781819}
-  m_Layer: 7
+  - component: {fileID: 7616689881915723270}
+  m_Layer: 0
   m_Name: Node Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,6 +105,29 @@ MonoBehaviour:
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!136 &7616689881915723270
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2114750531628164762}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.08240388
+  m_Height: 0.3066084
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2340664612458414312
 GameObject:
   m_ObjectHideFlags: 0
@@ -114,7 +138,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6449118246735697936}
   - component: {fileID: 3673626804776369701}
-  - component: {fileID: 6105368313492912333}
   - component: {fileID: 5780423248293176325}
   - component: {fileID: 1798685731758055123}
   m_Layer: 0
@@ -161,29 +184,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!136 &6105368313492912333
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2340664612458414312}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1
-  m_Height: 3
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &5780423248293176325
 BoxCollider:
   m_ObjectHideFlags: 0

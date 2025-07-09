@@ -156,15 +156,10 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Void"))
-        {
-            Debug.Log("RESET");
-            _nodeModel.ResetPos(_resetPos);
-        }
-        else if (other.gameObject.GetComponent<PlayerTDController>())
-        {
+        if (other.gameObject.GetComponent<PlayerTDController>())
             _nodeView.SetRangeAnim();
-        }
+        else if (other.CompareTag("Void"))
+            _nodeModel.ResetPos(_resetPos);
     }
 
     private void OnTriggerExit(Collider other)
