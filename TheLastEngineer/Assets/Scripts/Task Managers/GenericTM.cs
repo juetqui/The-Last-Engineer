@@ -129,4 +129,22 @@ public class GenericTM : MonoBehaviour
         _workingNodes--;
         ValidateAllConnections();
     }
+    public void OpenDoor()
+    {
+        if (!_source.isPlaying)
+        {
+            _animator.SetBool("DoorActivated", true);
+            _source.Play();
+        }
+    }
+    public void CloseDoor()
+    {
+        _animator.SetBool("DoorActivated", false);
+
+        if (_source.isPlaying)
+        {
+            _source.Stop();
+        }
+    }
+
 }

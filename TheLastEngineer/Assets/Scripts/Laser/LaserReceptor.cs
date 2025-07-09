@@ -10,7 +10,6 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public UnityEvent OnHit;
     public UnityEvent OnCompleated;
     public UnityEvent OnDepleated;
-    [SerializeField] TimerController TimerController;
     private MeshRenderer _myMeshRenderer = default;
     private Collider _collider = default;
     public bool _isCompleted = false;
@@ -25,18 +24,24 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     bool _isCurrentlyUnloading;
     public float _timeToUnfill = 0;
     public float timeModifier;
+    public bool _canBeUnfilled= false;
+
     private void Awake()
     {
-        _myMeshRenderer = GetComponent<MeshRenderer>();
+        //_myMeshRenderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<Collider>();
-        _myMaterial = _myMeshRenderer.material;
-        _myMaterial.SetFloat("_MinBound", minBound);
-        _myMaterial.SetFloat("_MaxBound", maxBound);
+        //_myMaterial = _myMeshRenderer.material;
+        //_myMaterial.SetFloat("_MinBound", minBound);
+        //_myMaterial.SetFloat("_MaxBound", maxBound);
     }
     public void ChargeCompleted()
     {
         OnCompleated?.Invoke();
         _isCompleted = true;
+    }
+    public void SetUnCompleted()
+    {
+        _isCompleted = false;
     }
     public void ChargeDepleted()
     {
@@ -54,15 +59,15 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     }
     public void TurnOffObject()
     {
-        _myMeshRenderer.enabled = false;
+        //_myMeshRenderer.enabled = false;
         _collider.enabled = false;
     }
     public void LaserNotRecived()
     {
-        if (!_isCompleted)
+        if (!_isCompleted||_canBeUnfilled)
         {
             OnEndHit?.Invoke();
-            if (!_isCompleted && !_isCurrentlyUnloading)
+            if ((!_isCompleted && !_isCurrentlyUnloading) )
             {
                 _isCurrentlyLoading = false;
                 _isCurrentlyUnloading = true;
@@ -80,18 +85,17 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         {
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
-                print("unfilleando");
-                if (TimerController != null)
+                print("filleando");
+                if (PlayerTDController.Instance.HasNode()&&PlayerTDController.Instance.GetCurrentNodeType()==NodeType.Corrupted)
                 {
-                    _currentLoad = _currentLoad + Time.deltaTime / loadTime/ TimerController.CurrentDuration;
-
+                    _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
                 }
                 else
                 {
                     _currentLoad = _currentLoad + Time.deltaTime / loadTime;
 
                 }
-                _myMaterial.SetFloat("_Step", _currentLoad);
+                //_myMaterial.SetFloat("_Step", _currentLoad);
 
                 yield return null;
             }
@@ -114,18 +118,20 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             if (_isCurrentlyLoading == false && _isCurrentlyUnloading == true)
             {
 
-                print("filleando");
-                if (TimerController != null)
-                {
-                    _currentLoad = _currentLoad - Time.deltaTime / unloadTime / TimerController.CurrentDuration;
+                print("unfilleando");
+                
+                    if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                    {
+                        _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
+                    }
+                    else
+                    {
+                        _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
+                    }
 
-                }
-                else
-                {
-                    _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
-
-                }
-                _myMaterial.SetFloat("_Step", _currentLoad);
+                
+     
+                //_myMaterial.SetFloat("_Step", _currentLoad);
                 yield return null;
             }
             else if (_isCurrentlyLoading == true || _isCurrentlyUnloading == false)
