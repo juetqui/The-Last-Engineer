@@ -1,7 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
-using UnityEngine.UIElements;
 
 public class NodeController : MonoBehaviour, IInteractable
 {
@@ -9,6 +7,8 @@ public class NodeController : MonoBehaviour, IInteractable
     private BoxCollider _collider = default;
     private Renderer _renderer = default;
     protected Animator _animator = default;
+    [SerializeField] private Transform _feedbackPos;
+    private Transform _target = default;
 
     [Header("Outline")]
     [SerializeField] private Color _corruptionOutline;
@@ -53,7 +53,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
         _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
 
-        _nodeModel = new NodeModel(transform, _minY, _maxY, _moveSpeed, _rotSpeed);
+        _nodeModel = new NodeModel(transform, _feedbackPos, _minY, _maxY, _moveSpeed, _rotSpeed);
         _nodeView = new NodeView(_renderer, _collider, _outline, _currentOutline, _animator);
     }
 
@@ -64,6 +64,8 @@ public class NodeController : MonoBehaviour, IInteractable
 
     protected void Update()
     {
+        _nodeModel.RotateToTarget(_target);
+
         if (!_isChildren) MoveObject();
         else _nodeView.SetCollectedAnim();
     }
@@ -109,7 +111,7 @@ public class NodeController : MonoBehaviour, IInteractable
     {
         _nodeView.EnableColl(true);
         //_nodeModel.MoveObject();
-        
+
         if (!Physics.Raycast(transform.position, -transform.up, out hit, 3f, _floorLayer))
             transform.position -= Vector3.up * Time.deltaTime * 15f;
     }
@@ -156,16 +158,30 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.GetComponent<PlayerTDController>())
+        if (other.gameObject.TryGetComponent(out PlayerTDController player))
+        {
+            if (_target == null)
+            {
+                _feedbackPos.GetComponent<ParticleSystem>().Play();
+                _target = player.transform;
+            }
+            
             _nodeView.SetRangeAnim();
+        }
         else if (other.CompareTag("Void"))
             _nodeModel.ResetPos(_resetPos);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.GetComponent<PlayerTDController>())
+        if (other.gameObject.TryGetComponent(out PlayerTDController player))
         {
+            if (_target != null)
+            {
+                _feedbackPos.GetComponent<ParticleSystem>().Stop();
+                _target = null;
+            }
+
             _nodeView.SetIdleAnim();
         }
     }

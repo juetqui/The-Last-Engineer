@@ -151,10 +151,6 @@ public abstract class Glitcheable : MonoBehaviour
             _player.SetCanMove(false);
             OnPosChanged?.Invoke(transform.position);
         }
-
-        _coll.enabled = false;
-        
-        if (_triggerColl != null) _triggerColl.enabled = false;
         
         _audioSource.clip = _sounds.startSFX;
         _audioSource.Play();
@@ -173,6 +169,9 @@ public abstract class Glitcheable : MonoBehaviour
             yield return null;
         }
 
+        _coll.enabled = false;
+        if (_triggerColl != null) _triggerColl.enabled = false;
+
         _renderer.material.SetFloat("_Alpha", 0f);
         _feedbackRenderer.material.SetFloat("_Alpha", 1f);
 
@@ -185,13 +184,16 @@ public abstract class Glitcheable : MonoBehaviour
         ps.radial = 1f;
         _ps.Play();
 
+        _coll.enabled = true;
+        if (_triggerColl != null) _triggerColl.enabled = true;
+
         _audioSource.clip = _sounds.endSFX;
         _audioSource.Play();
 
         while (_timerController.CurrentPhase == Phase.ReverseTransparency && _timerController.CurrentFillAmount > 0f)
         {
             float alpha = _timerController.CurrentFillAmount;
-            
+
             _renderer.material.SetFloat("_Alpha", 1f - alpha);
             _feedbackRenderer.material.SetFloat("_Alpha", alpha);
 
@@ -200,9 +202,6 @@ public abstract class Glitcheable : MonoBehaviour
 
         _renderer.material.SetFloat("_Alpha", 1f);
         _feedbackRenderer.material.SetFloat("_Alpha", 0f);
-
-        _coll.enabled = true;
-        if (_triggerColl != null) _triggerColl.enabled = true;
         _ps.Stop();
 
         if (_player != null)
@@ -238,30 +237,32 @@ public abstract class Glitcheable : MonoBehaviour
         OnPosChanged?.Invoke(transform.position);
     }
 
+    private bool CanSetPlayerPlatform(PlayerTDController player)
+    {
+        return _isCorrupted && !_isStopped && _isPlatform && player.GetCurrentNodeType() == _requiredNode;
+    }
+
+    private bool CanUnsetPlayerPlatform(PlayerTDController player)
+    {
+        return _isCorrupted && _isPlatform && _player != null && player == _player;
+    }
+
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && _isCorrupted && !_isStopped)
+        if (coll.TryGetComponent(out PlayerTDController player) && CanSetPlayerPlatform(player))
         {
-            if (_isPlatform && player.GetCurrentNodeType() == _requiredNode)
-            {
-                _player = player;
-                _player.SetPlatform(this);
-                _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
-            }
-            else
-                player.CorruptionCollided();
+            _player = player;
+            _player.SetPlatform(this);
+            _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
         }
     }
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && _isCorrupted)
+        if (coll.TryGetComponent(out PlayerTDController player) && CanUnsetPlayerPlatform(player))
         {
-            if (_isPlatform && _player != null && player == _player)
-            {
-                _player.UnsetPlatform(this);
-                _player = null;
-            }
+            _player.UnsetPlatform(this);
+            _player = null;
         }
     }
 

@@ -323,12 +323,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     public void LaserNotRecived() { return; }
 
-    public void CorruptionCollided()
-    {
-        if (_currentNodeType == NodeType.Corrupted) return;
-        LaserRecived();
-    }
-
     private void OnDissolveCompleted()
     {
         StartCoroutine(RespawnPlayer());
