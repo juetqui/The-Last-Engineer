@@ -15,6 +15,7 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = 4.91f;
     [SerializeField] protected bool _isCorrupted = true;
+    public bool _isIntargeteable = false;
 
     protected List<Transform> _currentList = default;
     protected bool _canMove = true;

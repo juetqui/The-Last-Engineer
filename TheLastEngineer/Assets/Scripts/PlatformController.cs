@@ -6,10 +6,12 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private GenericConnectionController _connection;
     [SerializeField] private Transform[] _positions;
     [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _corrputedMoveSpeed=0;
     [SerializeField] private float _waitCD;
+    [SerializeField] private float _corruptedWaitCD=0;
+    private float _currentWaitCD;
     [SerializeField] private LayerMask _floorMask;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
-
     private IMovablePassenger _passenger = default;
     private Vector3 _targetPos = default;
     private int _index = 0;
@@ -20,11 +22,28 @@ public class PlatformController : MonoBehaviour
     {
         _targetPos = _positions[0].position;
         _connection.OnNodeConnected += AvailableToMove;
+        if (_corrputedMoveSpeed<=0)
+        {
+            _corrputedMoveSpeed = _moveSpeed;
+
+        }
+        if (_corruptedWaitCD<=0)
+        {
+            _corruptedWaitCD = _waitCD;
+        }
     }
 
     void Update()
     {
         MovePlatform();
+        if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+        {
+            _currentWaitCD = _corruptedWaitCD;
+        }
+        else
+        {
+            _currentWaitCD = _waitCD;
+        }
     }
 
     private void MovePlatform()
@@ -60,7 +79,15 @@ public class PlatformController : MonoBehaviour
     private void MoveToTarget()
     {
         Vector3 dir = _targetPos - transform.position;
-        Vector3 displacement = dir.normalized * Time.deltaTime * _moveSpeed;
+        Vector3 displacement;
+        if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+        {
+            displacement = dir.normalized * Time.deltaTime * _corrputedMoveSpeed;
+        }
+        else
+        {
+            displacement = dir.normalized * Time.deltaTime * _moveSpeed;
+        }
         transform.position += displacement;
 
         if (_passenger != null)
@@ -84,7 +111,12 @@ public class PlatformController : MonoBehaviour
     private IEnumerator WaitToNextTarget()
     {
         _arrived = true;
-        yield return new WaitForSeconds(_waitCD);
+        float cDpassed = 1;
+        while (cDpassed > 0)
+        {
+            yield return new WaitForSeconds(_currentWaitCD*0.2f);
+            cDpassed = cDpassed - 0.2f;
+        }
         _arrived = false;
         _waitingToMove = null;
     }

@@ -98,6 +98,7 @@ public class GlitchActive : MonoBehaviour
         {
             if (hit.TryGetComponent(out Glitcheable glitcheable))
             {
+                if(!glitcheable._isIntargeteable)
                 glitcheables.Add(glitcheable);
             }
         }
