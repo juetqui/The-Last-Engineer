@@ -64,7 +64,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
     protected void Update()
     {
-        _nodeModel.RotateToTarget(_target);
+        //_nodeModel.RotateToTarget(_target);
 
         if (!_isChildren) MoveObject();
         else _nodeView.SetCollectedAnim();
@@ -162,7 +162,10 @@ public class NodeController : MonoBehaviour, IInteractable
         {
             if (_target == null)
             {
-                _feedbackPos.GetComponent<ParticleSystem>().Play();
+                ParticleSystem[] ps = GetComponentsInChildren<ParticleSystem>();
+
+                foreach (var item in ps) item.Play();
+
                 _target = player.transform;
             }
             
@@ -178,7 +181,10 @@ public class NodeController : MonoBehaviour, IInteractable
         {
             if (_target != null)
             {
-                _feedbackPos.GetComponent<ParticleSystem>().Stop();
+                ParticleSystem[] ps = GetComponentsInChildren<ParticleSystem>();
+
+                foreach (var item in ps) item.Stop();
+
                 _target = null;
             }
 
