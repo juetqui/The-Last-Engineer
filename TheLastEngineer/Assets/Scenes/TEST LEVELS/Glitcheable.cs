@@ -16,11 +16,11 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = -4.91f;
     [SerializeField] protected bool _isCorrupted = true;
-    public bool _isIntargeteable = false;
 
     protected List<Transform> _currentList = default;
     protected bool _canMove = true;
     protected bool _isStopped = false;
+    private bool _isIntargeteable = false;
     protected int _index = 0;
 
     private PlayerTDController _player = null;
@@ -31,6 +31,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected Vector3 _targetPos = default;
     private Quaternion _targetRot = default;
 
+    public bool IsIntargeteable { get { return _isIntargeteable; } }
     public bool IsCorrupted { get { return _isCorrupted; } }
     public bool IsStopped { get { return _isStopped; } }
 
@@ -102,6 +103,7 @@ public abstract class Glitcheable : MonoBehaviour
         }
         else
         {
+            StopAllCoroutines();
             _timerController.OnPhaseChanged -= CheckTimerPhase;
             _timerController.OnTimerCycleComplete -= UpdateTarget;
 
@@ -218,6 +220,7 @@ public abstract class Glitcheable : MonoBehaviour
 
     private IEnumerator MoveTrail()
     {
+        _isIntargeteable = true;
         _ps.Stop();
 
         Vector3 startPos = transform.position;
@@ -236,6 +239,8 @@ public abstract class Glitcheable : MonoBehaviour
             yield return null;
         }
 
+        _isIntargeteable = false;
+        
         transform.position = _targetPos;
         transform.rotation = _targetRot;
         OnPosChanged?.Invoke(transform.position);

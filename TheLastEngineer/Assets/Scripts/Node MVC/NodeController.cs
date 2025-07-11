@@ -1,14 +1,16 @@
 using System;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 public class NodeController : MonoBehaviour, IInteractable
 {
     [Header("View")]
+    [SerializeField] private Transform _feedbackPos;
     private BoxCollider _collider = default;
     private Renderer _renderer = default;
     protected Animator _animator = default;
-    [SerializeField] private Transform _feedbackPos;
     private Transform _target = default;
+    private ParticleSystem[] _particles = new ParticleSystem[2];
 
     [Header("Outline")]
     [SerializeField] private Color _corruptionOutline;
@@ -48,6 +50,7 @@ public class NodeController : MonoBehaviour, IInteractable
         _renderer = GetComponentInChildren<Renderer>();
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
+        _particles = GetComponentsInChildren<ParticleSystem>();
 
         _resetPos = transform.position;
 
@@ -68,6 +71,22 @@ public class NodeController : MonoBehaviour, IInteractable
 
         if (!_isChildren) MoveObject();
         else _nodeView.SetCollectedAnim();
+
+        if (_target != null && _nodeType == NodeType.Corrupted)
+        {
+            foreach (var ps in _particles)
+            {
+                if (!ps.isPlaying) ps.Play();
+            }
+        }
+        else
+        {
+            foreach (var ps in _particles)
+            {
+                if (ps.isPlaying) ps.Stop();
+            }
+        }
+
     }
 
     public bool CanInteract(PlayerTDController player)
@@ -162,10 +181,9 @@ public class NodeController : MonoBehaviour, IInteractable
         {
             if (_target == null)
             {
-                ParticleSystem[] ps = GetComponentsInChildren<ParticleSystem>();
-
-                foreach (var item in ps) item.Play();
-
+                //if (_nodeType == NodeType.Corrupted) foreach (var ps in _particles) ps.Play();
+                //else foreach (var ps in _particles) ps.Stop();
+                
                 _target = player.transform;
             }
             
@@ -175,16 +193,30 @@ public class NodeController : MonoBehaviour, IInteractable
             _nodeModel.ResetPos(_resetPos);
     }
 
+    //private void OnTriggerStay(Collider other)
+    //{
+    //    if (other.gameObject.TryGetComponent(out PlayerTDController player))
+    //    {
+    //        if (_target != null && _nodeType == NodeType.Corrupted)
+    //        {
+    //            foreach (var ps in _particles)
+    //            {
+    //                if (!ps.isPlaying) ps.Play();
+    //            }
+    //        }
+    //        else foreach (var ps in _particles) ps.Stop();
+    //    }
+    //}
+
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.TryGetComponent(out PlayerTDController player))
         {
             if (_target != null)
             {
-                ParticleSystem[] ps = GetComponentsInChildren<ParticleSystem>();
-
-                foreach (var item in ps) item.Stop();
-
+                //if (_nodeType == NodeType.Corrupted) foreach (var ps in _particles) ps.Play();
+                //else foreach (var ps in _particles) ps.Stop();
+                
                 _target = null;
             }
 
