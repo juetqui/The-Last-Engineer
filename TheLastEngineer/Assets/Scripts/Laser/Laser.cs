@@ -48,6 +48,11 @@ public class Laser : MonoBehaviour
     {
         if (!_isInitialized)
         {
+            if (_lastHit != null)
+            {
+                _lastHit.LaserNotRecived();
+                _lastHit = null;
+            }
             _audioSource.Stop();
             return;
         }

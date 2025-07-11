@@ -69,6 +69,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             OnEndHit?.Invoke();
             if ((!_isCompleted && !_isCurrentlyUnloading) )
             {
+                print("efesf");
                 _isCurrentlyLoading = false;
                 _isCurrentlyUnloading = true;
                 StartCoroutine(UnLoadRoutine(unfillTime));
