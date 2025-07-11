@@ -8,6 +8,7 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] private GlitchSounds _sounds;
     [SerializeField] private Collider _coll;
     [SerializeField] private Collider _triggerColl;
+    [SerializeField] private Renderer _renderer;
     [SerializeField] protected ParticleSystem _ps;
     [SerializeField] private Transform _feedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
@@ -23,7 +24,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected int _index = 0;
 
     private PlayerTDController _player = null;
-    private Renderer _renderer = default, _feedbackRenderer = default;
+    private Renderer _feedbackRenderer = default;
     private Coroutine _coroutine = null;
     private AudioSource _audioSource = default;
     private NodeType _requiredNode = NodeType.Corrupted;
@@ -42,8 +43,9 @@ public abstract class Glitcheable : MonoBehaviour
 
     protected void OnAwake()
     {
+        if (_renderer == null) _renderer = GetComponent<Renderer>();
+
         _audioSource = GetComponent<AudioSource>();
-        _renderer = GetComponent<Renderer>();
         _feedbackRenderer = _feedbackPos.GetComponent<Renderer>();
 
         _currentList = _newPosList;
