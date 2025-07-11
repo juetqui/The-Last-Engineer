@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MDist
-  m_Shader: {fileID: -6465566751694194690, guid: 7ecd532aa3936ad43bc04096ae4dde93, type: 3}
+  m_Name: M_Objects
+  m_Shader: {fileID: -6465566751694194690, guid: b1a07917fa6230b4584c04958b094cbc, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -23,6 +23,14 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _EmissiveTex:
+        m_Texture: {fileID: 2800000, guid: 91290a2280ef62b47ab3b6e98ac83ec5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 43b8b8cd0b6bb4747b1ccc3b7fd57437, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -37,12 +45,21 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DistIntensity: 3
-    - _DistSpeed: 0.1
-    - _DistSpeed2: 0.1
-    - _DistSpeed3: 0.42
-    - _VignetteAmount: 30
-    - _VignetteDistortion: 3
+    - _QueueControl: 0
+    - _QueueOffset: 0
     m_Colors:
-    - _Color: {r: 3.141361, g: 0.36183217, b: 2.2827222, a: 1}
+    - _EmissiveColor: {r: 0, g: 1.2089405, b: 4, a: 1}
   m_BuildTextureStacks: []
+--- !u!114 &8159883630086988011
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7

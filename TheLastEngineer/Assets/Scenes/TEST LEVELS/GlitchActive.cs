@@ -20,7 +20,7 @@ public class GlitchActive : MonoBehaviour
 
     public Action<Glitcheable> OnStopObject = delegate { };
     public Action<Glitcheable> OnStopableSelected = delegate { };
-    public Action<Glitcheable> OnChangeObjectState = delegate { };
+    public Action<Glitcheable, InteractionOutcome> OnChangeObjectState = delegate { };
 
     private void Awake()
     {
@@ -72,7 +72,22 @@ public class GlitchActive : MonoBehaviour
 
     public void ChangeObjectState()
     {
-        OnChangeObjectState?.Invoke(_selectedGlitcheable);
+        OnChangeObjectState?.Invoke(_selectedGlitcheable, CheckInteraction());
+    }
+
+    public InteractionOutcome CheckInteraction()
+    {
+        if (_selectedGlitcheable == null)
+            return new InteractionOutcome(InteractResult.Invalid);
+
+        bool incompatible =
+            (_player.GetCurrentNode().NodeType == NodeType.Corrupted && _selectedGlitcheable.IsCorrupted) ||
+            (_player.GetCurrentNode().NodeType == NodeType.Default   && !_selectedGlitcheable.IsCorrupted);
+
+        if (incompatible)
+            return new InteractionOutcome(InteractResult.Invalid);
+
+        return new InteractionOutcome(InteractResult.Valid);
     }
 
     private void CheckNode(bool hasNode, NodeType nodeType)
@@ -111,4 +126,12 @@ public class GlitchActive : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         _enabled = true;
     }
+}
+
+public enum InteractResult { Valid, Invalid }
+
+public readonly struct InteractionOutcome
+{
+    public readonly InteractResult Result;
+    public InteractionOutcome(InteractResult result) => Result = result;
 }

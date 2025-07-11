@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Filler
-  m_Shader: {fileID: -6465566751694194690, guid: 3a565a91ac37da24e8d5cc1a2a604356, type: 3}
+  m_Name: M_CheckpointEnabled
+  m_Shader: {fileID: -6465566751694194690, guid: 1845ccc4454062441bea163a8af35d12, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,8 +23,8 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _Texture2DLightning:
-        m_Texture: {fileID: 2800000, guid: 6a582a9c2ea221b49895b428fcb4933b, type: 3}
+    - _Texture2D:
+        m_Texture: {fileID: 2800000, guid: 3378f532704110a43a0ee394537fdf0c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -41,41 +41,19 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _MaxBound: 1
-    - _MinBound: 1
-    - _NoiseAmount: 0.036
-    - _NoiseSaturation: 2.4
-    - _NoiseScale: 100
-    - _NoiseXSpeed: 0.5
-    - _NoiseXSpeed_1: -0.5
-    - _NoiseXspeed: -0.5
-    - _NoiseXspeed_1: 0.5
-    - _NoiseYSpeed: 0.5
-    - _NoiseYSpeed_1: -0.5
-    - _NoiseYspeed: 0
+    - _Frequency: 5
+    - _FresnelStrength: 4
+    - _Opacity: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _SliderColor: 0
-    - _Step: 1
-    - _StepNoise: 0.649
-    - _noiseAmount: 50
+    - _TimeScale: -10
     m_Colors:
-    - _Color: {r: 0.122774966, g: 0.19180477, b: 0.8396226, a: 0}
-    - _ColorBack: {r: 0, g: 0.6869564, b: 1, a: 0.9529412}
-    - _ColorFill: {r: 0.1273585, g: 1, b: 0.17182441, a: 0}
-    - _ColorFill_1: {r: 0.1205176, g: 1.4230496, b: 4.6037736, a: 0}
-    - _ColorNoise: {r: 0.23553754, g: 0.45392042, b: 0.745283, a: 0}
-    - _NoiseSpeed: {r: 0.2, g: 0, b: 0, a: 0}
-    - _NoiseYspeed: {r: 0, g: 0.05, b: 0, a: 0}
-    - _NoiseYspeed_1: {r: 0, g: -0.1, b: 0, a: 0}
-    - _Speed1: {r: 0, g: 1, b: 0, a: 0}
-    - _Speed2: {r: 0, g: -0.5, b: 0, a: 0}
-    - _Vector2: {r: 6.02, g: 0, b: 0, a: 0}
-    - _Vector2_1: {r: 0.1, g: -0.1, b: 0, a: 0}
-    - _Yspeed: {r: 0, g: 0.05, b: 0, a: 0}
-    - _Yspeed_1: {r: 0, g: -0.1, b: 0, a: 0}
+    - _Color: {r: 0.4575472, g: 0.89615107, b: 1, a: 1}
+    - _Color2: {r: 0.8196079, g: 0.5505697, b: 0.26666656, a: 1}
+    - _FresnelColor: {r: 0.49411768, g: 0.9939526, b: 1.4980392, a: 1}
+    - _SecColor: {r: 0.11681202, g: 0.35581172, b: 0.7075472, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &6104610097778192833
+--- !u!114 &5142029529319379341
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

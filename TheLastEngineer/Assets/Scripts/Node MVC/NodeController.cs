@@ -75,7 +75,7 @@ public class NodeController : MonoBehaviour, IInteractable
         return !player.HasNode();
     }
 
-    private void InteractWithGlitcheable(Glitcheable glitcheable)
+    private void InteractWithGlitcheable(Glitcheable glitcheable, InteractionOutcome interactionResult)
     {
         if (glitcheable == null) return;
 

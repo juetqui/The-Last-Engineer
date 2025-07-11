@@ -1,113 +1,82 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 
 public class UpdateCrosshair : MonoBehaviour
 {
     [SerializeField] Camera _camera;
-    [SerializeField] List<Image> _imageList = new List<Image>();
-    [SerializeField] List<RectTransform> _imageRectTransformList = new List<RectTransform>();
-    private RectTransform _crosshair = default;
-    Animator _myAnim;
+    [SerializeField] Image _circleImage;
+    [SerializeField] Image _crossImage;
+    
+    private Animator _myAnim;
    
-    bool IsAppear;
     private void Awake()
     {
-        _crosshair = GetComponent<RectTransform>();
         _myAnim = GetComponent<Animator>();
-        
-        foreach (var item in _imageList)
-        {
-            _imageRectTransformList.Add(item.rectTransform);
-        }
-        
-        _myAnim.speed = 0;
-
+        _myAnim.speed = 1f;
         UpdatePos(null);
     }
 
     void Start()
     {
         GlitchActive.Instance.OnStopableSelected += UpdatePos;
-        GlitchActive.Instance.OnStopableSelected += TargetChange;
+        GlitchActive.Instance.OnChangeObjectState += TryPlayInvalidAnim;
     }
 
     private void UpdatePos(Glitcheable glitcheable)
     {
+        _myAnim.SetBool("IsActivated", false);
+        _myAnim.SetBool("HasTarget", glitcheable != null);
+
         if (glitcheable == null)
         {
-            foreach (var item in _imageList)
-            {
-                item.enabled = false;
-            }
-            
-            _crosshair.position = Vector3.zero;
+            ResetPos();
             return;
-        }
-        else
-        {
-            foreach (var item in _imageList)
-            {
-                item.enabled = true;
-            }
         }
 
         Vector3 targetPosition = glitcheable.transform.position;
         Vector3 screenPosition = _camera.WorldToScreenPoint(targetPosition);
 
-        if (screenPosition.z > 0)
-        {
-            foreach (var item in _imageList)
-            {
-                item.enabled = true;
-            }
-            
-            foreach (var item in _imageRectTransformList)
-            {
-                item.position = screenPosition;
-            }
-        }
-        else
-        {
-            foreach (var item in _imageList)
-            {
-                item.enabled = false;
-            }
-
-            _crosshair.position = Vector3.zero;
-        }
+        if (screenPosition.z > 0) CompareGlitchWithPlayerNode(glitcheable, screenPosition);
+        else ResetPos();
     }
-    public void TargetChange(Glitcheable glitcheable)
+    
+    private void ResetPos()
     {
-
-        if (glitcheable == null)
-        {
-            _myAnim.SetBool("HasAppeared", false);
-            _myAnim.SetBool("IsActivated", false);
-            IsAppear = false;
-            _myAnim.speed = 0;
-            return;
-        }
-        if (glitcheable.IsStopped)
-        {
-            _myAnim.speed = 1;
-            _myAnim.SetBool("HasAppeared", true);
-            _myAnim.SetBool("IsActivated", true);
-            IsAppear = true;
-        }
-        else if (IsAppear==false && !glitcheable.IsStopped)
-        {
-            _myAnim.speed = 1;
-        }
-        else
-        {
-            _myAnim.SetBool("HasAppeared", true);
-            _myAnim.SetBool("IsActivated", false);
-        }
+        _circleImage.enabled = false;
+        _circleImage.rectTransform.position = Vector3.zero;
+        
+        _crossImage.enabled = false;
+        _crossImage.rectTransform.position = Vector3.zero;
+        
+        _myAnim.SetBool("IsActivated", false);
+        _myAnim.SetBool("HasTarget", false);
     }
-    public void SetAppear()
+
+    private void CompareGlitchWithPlayerNode(Glitcheable glitcheable, Vector3 screenPosition)
     {
-        IsAppear = true;
+        bool compatible =
+            (PlayerTDController.Instance.GetCurrentNode().NodeType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
+            (PlayerTDController.Instance.GetCurrentNode().NodeType == NodeType.Default && !glitcheable.IsCorrupted);
+
+        _crossImage.enabled = compatible;
+        _circleImage.enabled = !compatible;
+
+        (_crossImage.enabled ? _crossImage : _circleImage).rectTransform.position = screenPosition;
+    }
+
+    private void TryPlayInvalidAnim(Glitcheable glitcheable, InteractionOutcome interactionResult)
+    {
+        Debug.Log(interactionResult.Result);
+
+        if (glitcheable == null) return;
+        
+        if (interactionResult.Result == InteractResult.Invalid)
+            _myAnim.SetTrigger("InvalidAction");
+    }
+
+    public void SetUpdateAnim()
+    {
+        _myAnim.SetBool("IsActivated", true);
     }
 }

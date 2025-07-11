@@ -13,7 +13,7 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
-    [SerializeField] protected float _radialDonutPS = 4.91f;
+    [SerializeField] protected float _radialDonutPS = -4.91f;
     [SerializeField] protected bool _isCorrupted = true;
     public bool _isIntargeteable = false;
 
@@ -30,6 +30,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected Vector3 _targetPos = default;
     private Quaternion _targetRot = default;
 
+    public bool IsCorrupted { get { return _isCorrupted; } }
     public bool IsStopped { get { return _isStopped; } }
 
     public Action<Vector3> OnPosChanged = delegate { };
