@@ -7,13 +7,13 @@ public class GenericTM : MonoBehaviour
     [Header("Lists")]
     [SerializeField] private List<GenericConnectionController> _connections;
     [SerializeField] private List<NodeType> _requiredTypes;
-
+    [SerializeField] private ParticleSystem _windParticle;
     [Header("MVC View")]
     private Animator _animator;
     private AudioSource _source;
 
     private int _workingNodes = default, _totalToFinish = default;
-    private bool _running = false;
+    protected bool _running = false;
 
     private Dictionary<NodeType, int> _totalRequired = new Dictionary<NodeType, int>();
     private Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
@@ -50,7 +50,7 @@ public class GenericTM : MonoBehaviour
             );
     }
 
-    private void ValidateAllConnections()
+    protected virtual void ValidateAllConnections()
     {
         _running = CheckRequirements();
 
@@ -58,17 +58,20 @@ public class GenericTM : MonoBehaviour
         {
             _animator.SetBool("DoorActivated", true);
             _source.Play();
+            _windParticle.Play();
         }
         else
         {
             _animator.SetBool("DoorActivated", false);
             _source.Stop();
+            _windParticle.Stop();
+
         }
 
         onRunning?.Invoke(_running);
     }
 
-    private bool CheckRequirements()
+    protected bool CheckRequirements()
     {
         bool hasAllConnections = _totalRequired.All(required =>
         {
