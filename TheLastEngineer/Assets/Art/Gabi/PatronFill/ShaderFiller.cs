@@ -83,7 +83,7 @@ public class ShaderFiller : MonoBehaviour
     public void SeyUnCompleated()
     {
         _completed =false;
-        print("dasdasd");
+        //print("dasdasd");
     }
     public void StartUnFill()
     {

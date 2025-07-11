@@ -67,8 +67,6 @@ public class UpdateCrosshair : MonoBehaviour
 
     private void TryPlayInvalidAnim(Glitcheable glitcheable, InteractionOutcome interactionResult)
     {
-        Debug.Log(interactionResult.Result);
-
         if (glitcheable == null) return;
         
         if (interactionResult.Result == InteractResult.Invalid)

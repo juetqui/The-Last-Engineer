@@ -258,7 +258,17 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && CanSetPlayerPlatform(player))
+        if (coll.TryGetComponent(out PlayerTDController player) && CanSetPlayerPlatform(player) && _player == null)
+        {
+            _player = player;
+            _player.SetPlatform(this);
+            _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
+        }
+    }
+
+    private void OnTriggerStay(Collider coll)
+    {
+        if (coll.TryGetComponent(out PlayerTDController player) && CanSetPlayerPlatform(player) && _player == null)
         {
             _player = player;
             _player.SetPlatform(this);
