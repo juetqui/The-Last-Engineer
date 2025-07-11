@@ -4,6 +4,8 @@ using UnityEngine;
 public class Laser : MonoBehaviour
 {
     [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private ParticleSystem _beamLaser;
+    [SerializeField] private ParticleSystem _hitLaser;
     [SerializeField] private float _maxDist = 20f;
     [SerializeField] private float _raycastOffsetX = 2f;
     [SerializeField] private float _raycastOffsetZ = 1f;
@@ -36,6 +38,7 @@ public class Laser : MonoBehaviour
         if (_startsInitialized)
         {
             _isInitialized = true;
+            _beamLaser.Play();
             CastLaser();
             _audioSource.Play();
         }
