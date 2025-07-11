@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
@@ -13,11 +14,14 @@ public class Laser : MonoBehaviour
     private ILaserReceptor _lastHit = null;
     private RaycastHit _rayHit;
     private Ray _ray, _leftRay, _rightRay;
+    private DefaultGlitcheable _glitcheable = null;
 
     private AudioSource _audioSource = default;
 
     private void Awake()
     {
+        _glitcheable = GetComponentInParent<DefaultGlitcheable>();
+        
         _audioSource = GetComponent<AudioSource>();
         _lineRenderer.positionCount = 2;
 
@@ -48,8 +52,18 @@ public class Laser : MonoBehaviour
         if (!_audioSource.isPlaying)
             _audioSource.Play();
 
-        CastLaser();
-        CorruptionCheck();
+        if (_glitcheable == null)
+        {
+            CastLaser();
+            CorruptionCheck();
+        }
+        else if (!_glitcheable.IsIntargeteable)
+        {
+            _lineRenderer.enabled = true;
+            CastLaser();
+            CorruptionCheck();
+        }
+        else _lineRenderer.enabled = false;
     }
 
     private void CastLaser()

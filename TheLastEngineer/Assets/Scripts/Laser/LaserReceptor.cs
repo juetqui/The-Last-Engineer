@@ -85,7 +85,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         {
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
-                print("filleando");
+                //print("filleando");
                 if (PlayerTDController.Instance.HasNode()&&PlayerTDController.Instance.GetCurrentNodeType()==NodeType.Corrupted)
                 {
                     _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
@@ -118,7 +118,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             if (_isCurrentlyLoading == false && _isCurrentlyUnloading == true)
             {
 
-                print("unfilleando");
+                //print("unfilleando");
                 
                     if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
                     {
