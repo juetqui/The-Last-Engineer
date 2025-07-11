@@ -95,9 +95,16 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
         _playerView.OnStart();
         _solvingController.OnDissolveCompleted += OnDissolveCompleted;
+        GlitchActive.Instance.OnChangeObjectState += CheckInteraction;
 
         SetState(_playerEmptyState);
         StartInputs();
+    }
+
+    private void CheckInteraction(Glitcheable glitcheable, InteractionOutcome outcome)
+    {
+        if (outcome.Result == InteractResult.Invalid)
+            _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 
     private void Update()
@@ -174,9 +181,9 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     }
     private void GetShieldKey(InputAction.CallbackContext context)
     {
-        if (CheckCorruptionAvailable() && _corruptionAbsorved == null)
-            _corruptionAbsorved = StartCoroutine(StartCorruption());
-        else
+        //if (CheckCorruptionAvailable() && _corruptionAbsorved == null)
+        //    _corruptionAbsorved = StartCoroutine(StartCorruption());
+        //else
             _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 

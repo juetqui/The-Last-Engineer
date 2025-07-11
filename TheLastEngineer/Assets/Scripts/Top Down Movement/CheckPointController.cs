@@ -66,6 +66,7 @@ public class CheckPointController : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerTDController player))
         {
+            GetComponentInChildren<ParticleSystem>().Play();
             //Vector3 checkPointPos = player.transform.position;
             player.SetCheckPointPos(_renderer.transform.position);
             StartCoroutine(SetMaterialsCoroutine());
