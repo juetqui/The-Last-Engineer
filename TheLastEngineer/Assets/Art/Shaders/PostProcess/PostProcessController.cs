@@ -28,7 +28,6 @@ public class PostProcessController : MonoBehaviour
         _corruptionMat.SetFloat("_VignetteAmount", 30f);
         PlayerTDController.Instance.OnNodeGrabed += ActivatePassive;
         PlayerTDController.Instance.OnAbsorbCorruption += ActivateCorruption;
-        GlitchActive.Instance.OnChangeObjectState += RefNegVignette;
     }
 
     private void ActivatePassive(bool hasNode, NodeType nodeType)
@@ -36,10 +35,12 @@ public class PostProcessController : MonoBehaviour
         if (!hasNode || nodeType != _requiredNode)
         {
             StartCoroutine(DeactivatePP(_passiveMat));
+            GlitchActive.Instance.OnChangeObjectState -= RefNegVignette;
             return;
         }
 
         StartCoroutine(ActivatePP(_passiveMat));
+        GlitchActive.Instance.OnChangeObjectState += RefNegVignette;
     }
 
     private void ActivateCorruption(bool hasEffect)
@@ -72,13 +73,8 @@ public class PostProcessController : MonoBehaviour
 
     private void RefNegVignette(Glitcheable gltich, InteractionOutcome interact)
     {
-        if(animated == false)
-        {
-            if (interact.Result == InteractResult.Invalid)
-            {
-                StartCoroutine(LerpColorRefNeg(_passiveMat));
-            }
-        }
+        if (!animated && interact.Result == InteractResult.Invalid)
+            StartCoroutine(LerpColorRefNeg(_passiveMat));
     }
 
     private IEnumerator LerpColorRefNeg(Material material)

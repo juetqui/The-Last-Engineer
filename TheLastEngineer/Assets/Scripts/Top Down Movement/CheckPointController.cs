@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class CheckPointController : MonoBehaviour
 {
+    [SerializeField] private Renderer _vfxRenderer;
     [SerializeField] private GenericTM _taskManager;
     [SerializeField] private float _transitionDuration = 0.5f;
     
@@ -12,15 +13,23 @@ public class CheckPointController : MonoBehaviour
     [SerializeField] private Color _enabledFresnelColor;
 
     private SkinnedMeshRenderer _renderer = default;
+    private AudioSource _source = default;
+    private bool _enabled = true;
 
     private void Awake()
     {
         _renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        _source = GetComponent<AudioSource>();
     }
 
     private IEnumerator SetMaterialsCoroutine()
     {
+        _enabled = false;
+        _source.Play();
+
         float elapsed = 0f;
+
+        Color vfxColor = _vfxRenderer.material.GetColor("_Color");
 
         Color[] startMain = new Color[_renderer.materials.Length];
         Color[] startSec = new Color[_renderer.materials.Length];
@@ -37,6 +46,10 @@ public class CheckPointController : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float t = elapsed / _transitionDuration;
+
+            Color vfxNewColor = Color.Lerp(vfxColor, _enabledFresnelColor, t);
+
+            _vfxRenderer.material.SetColor("_Color", vfxNewColor);
 
             foreach (var material in _renderer.materials)
             {
@@ -64,7 +77,7 @@ public class CheckPointController : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player))
+        if (coll.TryGetComponent(out PlayerTDController player) && _enabled)
         {
             GetComponentInChildren<ParticleSystem>().Play();
             //Vector3 checkPointPos = player.transform.position;
