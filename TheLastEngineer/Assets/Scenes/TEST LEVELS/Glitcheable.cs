@@ -11,7 +11,6 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] private Renderer _renderer;
     [SerializeField] protected ParticleSystem _ps;
     [SerializeField] private Transform _feedbackPos;
-    [SerializeField] private GameObject _ghostFeedback;
     [SerializeField] protected List<Transform> _newPosList;
     [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
@@ -101,7 +100,6 @@ public abstract class Glitcheable : MonoBehaviour
         if (_isCorrupted)
         {
             _timerController.OnTimerCycleStarted += StartMovingAfterCycle;
-            StartCoroutine(GhostFeedback());
         }
         else
         {
@@ -247,25 +245,6 @@ public abstract class Glitcheable : MonoBehaviour
         transform.position = _targetPos;
         transform.rotation = _targetRot;
         OnPosChanged?.Invoke(transform.position);
-    }
-
-    private IEnumerator GhostFeedback()
-    {
-        while (_ghostFeedback.transform.localScale.magnitude > 0.9f)
-        {
-            _ghostFeedback.transform.localScale -= Vector3.one * 0.5f * Time.deltaTime;
-            yield return null;
-        }
-
-        _ghostFeedback.transform.localScale = Vector3.one * 0.9f;
-
-        while (_ghostFeedback.transform.localScale.magnitude > 1.2f)
-        {
-            _ghostFeedback.transform.localScale -= Vector3.one * 0.5f * Time.deltaTime;
-            yield return null;
-        }
-
-        _ghostFeedback.transform.localScale = Vector3.one * 1.2f;
     }
 
     private bool CanSetPlayerPlatform(PlayerTDController player)
