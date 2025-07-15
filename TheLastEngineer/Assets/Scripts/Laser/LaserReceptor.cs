@@ -64,12 +64,12 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     }
     public void LaserNotRecived()
     {
+
         if (!_isCompleted||_canBeUnfilled)
         {
             OnEndHit?.Invoke();
             if ((!_isCompleted && !_isCurrentlyUnloading) )
             {
-                print("efesf");
                 _isCurrentlyLoading = false;
                 _isCurrentlyUnloading = true;
                 StartCoroutine(UnLoadRoutine(unfillTime));

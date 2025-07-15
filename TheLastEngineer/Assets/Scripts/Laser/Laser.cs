@@ -86,8 +86,8 @@ public class Laser : MonoBehaviour
         {
             if(_rayHit.collider.TryGetComponent(out PlayerTDController player))
             {
-                if (_lastHit != null)
-                    _lastHit.LaserNotRecived();
+                //if (_lastHit != null)
+                    //_lastHit.LaserNotRecived();
 
                 _lineRenderer.SetPosition(0, laserPos);
                 _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
