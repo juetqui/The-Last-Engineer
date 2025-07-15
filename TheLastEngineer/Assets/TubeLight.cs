@@ -30,9 +30,20 @@ public class TubeLight : MonoBehaviour
             StartCoroutine(TurnOff());
         }
     }
+    
+    public void ReceptorTurnOn()
+    {
+        StartCoroutine(TurnOn());
+    }
+
+    public void ReceptorTurnOff()
+    {
+        StartCoroutine(TurnOff());
+    }
 
     public IEnumerator TurnOn()
     {
+        _connected = true;
         float timer = 0;
 
         while (timer < 1f)
@@ -49,6 +60,7 @@ public class TubeLight : MonoBehaviour
     
     public IEnumerator TurnOff()
     {
+        _connected = false;
         float timer = 1f;
 
         while (timer > 0f)

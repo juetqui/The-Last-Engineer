@@ -63,6 +63,7 @@ public class NodeController : MonoBehaviour, IInteractable
     protected void Start()
     {
         _nodeView.OnStart();
+        _nodeView.UpdateNodeType(_nodeType, _currentOutline);
     }
 
     protected void Update()

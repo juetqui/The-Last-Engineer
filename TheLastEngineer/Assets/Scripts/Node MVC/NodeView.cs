@@ -52,19 +52,7 @@ public class NodeView
 
     public void UpdateNodeType(NodeType nodeType, Color currentOutline)
     {
-        if (nodeType == NodeType.Default)
-        {
-            Material[] mats = _renderer.sharedMaterials;
-            mats[2] = Resources.Load<Material>("Materials/M_DefaultNode");
-            _renderer.sharedMaterials = mats;
-        }
-        else
-        {
-            Material[] mats = _renderer.sharedMaterials;
-            mats[2] = Resources.Load<Material>("Materials/M_CorruptedNode");
-            _renderer.sharedMaterials = mats;
-        }
-
+        _renderer.material.SetColor("_EmissiveColor", currentOutline);
         _outline.OutlineColor = currentOutline;
     }
 }
