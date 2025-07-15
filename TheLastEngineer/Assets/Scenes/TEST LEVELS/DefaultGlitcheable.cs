@@ -24,14 +24,15 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
             ps.loop = true;
             _ps.Play();
         }
-        print(decalProjector.material);
         if (IsCorrupted)
         {
+            if(decalProjector!=null)
             decalProjector.material.SetFloat("_CorrruptedControl", 1f);
         }
         else
         {
-            decalProjector.material.SetFloat("_CorrruptedControl", 0f);
+            if (decalProjector != null)
+                decalProjector.material.SetFloat("_CorrruptedControl", 0f);
         }
     }
 
