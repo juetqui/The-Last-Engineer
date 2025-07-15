@@ -355,7 +355,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     {
         if (_currentPlatform != null) UnsetPlatform(_currentPlatform);
 
-        TransitionManager.Instance.PlayTransition(3f);
+        GlitchDeathController.Instance.TriggerGlitch();
         yield return new WaitForSeconds(1f);
 
         _cc.enabled = false;
