@@ -1,3 +1,5 @@
+using UnityEngine.Rendering.Universal;
+
 public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 {
     private void Awake()
@@ -21,6 +23,15 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
             psVel.radial = 1f;
             ps.loop = true;
             _ps.Play();
+        }
+        print(decalProjector.material);
+        if (IsCorrupted)
+        {
+            decalProjector.material.SetFloat("_CorrruptedControl", 1f);
+        }
+        else
+        {
+            decalProjector.material.SetFloat("_CorrruptedControl", 0f);
         }
     }
 

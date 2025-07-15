@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public abstract class Glitcheable : MonoBehaviour
 {
@@ -16,13 +17,12 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = -4.91f;
     [SerializeField] protected bool _isCorrupted = true;
-
+    public DecalProjector decalProjector;
     protected List<Transform> _currentList = default;
     protected bool _canMove = true;
     protected bool _isStopped = false;
     private bool _isIntargeteable = false;
     protected int _index = 0;
-
     private PlayerTDController _player = null;
     private Renderer _feedbackRenderer = default;
     private Coroutine _coroutine = null;
@@ -53,8 +53,13 @@ public abstract class Glitcheable : MonoBehaviour
         _targetPos = _currentList[_index].position;
         _targetRot = _currentList[_index].rotation;
 
+        decalProjector = GetComponentInChildren<DecalProjector>();
+
+        
+
         _ps.Stop();
     }
+   
 
     public void CheckTimerPhase(Phase currentPhase)
     {
@@ -93,9 +98,19 @@ public abstract class Glitcheable : MonoBehaviour
 
     public bool ChangeCorruptionState(NodeType nodeType, bool newState)
     {
-        if (newState == _isCorrupted) return false;
+        if (newState == _isCorrupted) 
+        {
+         return false;
+
+        }
+
 
         _isCorrupted = newState;
+
+        if (decalProjector != null && IsCorrupted)
+            decalProjector.material.SetFloat("_CorrruptedControl", 1f);
+        if (decalProjector != null && !IsCorrupted)
+            decalProjector.material.SetFloat("_CorrruptedControl", 0f);
 
         if (_isCorrupted)
         {
