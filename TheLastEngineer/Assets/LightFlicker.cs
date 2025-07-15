@@ -9,7 +9,6 @@ public class LightFlicker : MonoBehaviour
     [SerializeField] private float _maxSecTimer = 0.25f;
 
     private Light _light = default;
-    private bool _isFlicking = false;
 
     void Start()
     {

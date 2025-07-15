@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Purchasing;
 
 public class CheckPointController : MonoBehaviour
 {
@@ -13,12 +14,14 @@ public class CheckPointController : MonoBehaviour
     [SerializeField] private Color _enabledFresnelColor;
 
     private SkinnedMeshRenderer _renderer = default;
+    private Light _light = default;
     private AudioSource _source = default;
     private bool _enabled = true;
 
     private void Awake()
     {
         _renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        _light = GetComponentInChildren<Light>();
         _source = GetComponent<AudioSource>();
     }
 
@@ -48,8 +51,10 @@ public class CheckPointController : MonoBehaviour
             float t = elapsed / _transitionDuration;
 
             Color vfxNewColor = Color.Lerp(vfxColor, _enabledFresnelColor, t);
+            Color newLightColor = Color.Lerp(_light.color, _enabledMainColor, t);
 
             _vfxRenderer.material.SetColor("_Color", vfxNewColor);
+            _light.color = newLightColor;
 
             foreach (var material in _renderer.materials)
             {

@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
 
-public class tubitosluz : MonoBehaviour
+public class TubeLight : MonoBehaviour
 {
     [SerializeField] private GenericConnectionController _connection;
-    [SerializeField] private tubitosluz _nextConnection;
+    [SerializeField] private TubeLight _nextConnection;
 
     private Material _material;
     private NodeType _requiredNode = NodeType.Default;
