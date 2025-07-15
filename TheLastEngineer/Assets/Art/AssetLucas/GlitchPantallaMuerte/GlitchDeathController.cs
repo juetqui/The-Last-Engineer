@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class GlitchDeathController : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class GlitchDeathController : MonoBehaviour
 
     void Awake()
     {
+        glitchMaterial.SetFloat("_FullScreenColor", 0f);
+        glitchMaterial.SetFloat("_NoGlitchInScreen", 0f);
+
         if (Instance == null)
         {
             Instance = this;
@@ -32,23 +36,23 @@ public class GlitchDeathController : MonoBehaviour
         timer += Time.deltaTime;
         float t = timer / glitchDuration;
 
-        if (t <= 0.2f)
+        if (t <= 0.4f)
         {
             float localT = t / 0.2f;
-            glitchMaterial.SetFloat("_FullScreenColor", Mathf.Lerp(0f, 0.1f, localT));
+            glitchMaterial.SetFloat("_FullScreenColor", 0f);
             glitchMaterial.SetFloat("_NoGlitchInScreen", Mathf.Lerp(0f, 0.5f, localT));
         }
         else if (t <= 0.6f)
         {
             float localT = (t - 0.2f) / 0.4f;
             glitchMaterial.SetFloat("_FullScreenColor", Mathf.Lerp(0.1f, 1f, localT));
-            glitchMaterial.SetFloat("_NoGlitchInScreen", Mathf.Lerp(0.5f, 1f, localT));
+            glitchMaterial.SetFloat("_NoGlitchInScreen", 0.5f);
         }
         else if (t <= 0.8f)
         {
             float localT = (t - 0.6f) / 0.2f;
             glitchMaterial.SetFloat("_FullScreenColor", Mathf.Lerp(1f, 0.5f, localT));
-            glitchMaterial.SetFloat("_NoGlitchInScreen", Mathf.Lerp(1f, 0.5f, localT));
+            glitchMaterial.SetFloat("_NoGlitchInScreen", 1f);
         }
         else if (t <= 1f)
         {
