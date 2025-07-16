@@ -11,7 +11,7 @@ public class PlayerTDView
     private SolvingController _solvingController;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
-    private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default;
+    private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip;
     private Image _dashImage = default;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
@@ -30,6 +30,7 @@ public class PlayerTDView
         _chargedDashClip = playerData.chargedDashClip;
         _liftClip = playerData.liftClip;
         _putDownClip = playerData.putDownClip;
+        _deathClip = playerData.deathClip;
         _solvingController = solvingController;
         _dashImage = dashImage;
     }
@@ -79,6 +80,11 @@ public class PlayerTDView
     public void DashChargedSound()
     {
         PlayAudioWithRandomPitch(_fxSource, _chargedDashClip, 3f);
+    }
+
+    public void DeathSound()
+    {
+        PlayAudioWithRandomPitch(_fxSource, _deathClip, 1f);
     }
 
     public void WalkSound()

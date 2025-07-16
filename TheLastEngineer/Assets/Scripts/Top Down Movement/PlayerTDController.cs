@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.Collections;
 using UnityEngine.UI;
+using Cinemachine;
 
 public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
@@ -26,6 +27,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private SolvingController _solvingController;
 
     public CharacterController _cc = default;
+    private CinemachineImpulseSource _impulseSource = default;
 
     private PlayerTDModel _playerModel = default;
     private PlayerTDView _playerView = default;
@@ -74,6 +76,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private void Awake()
     {
         if (Instance == null) Instance = this;
+
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
 
         _playerEmptyState = new PlayerEmptyState();
         _playerGrabState = new PlayerGrabState();
@@ -193,6 +197,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
+            _impulseSource.GenerateImpulseWithForce(1f);
             _playerView.DashSound();
             OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
@@ -355,6 +360,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     {
         if (_currentPlatform != null) UnsetPlatform(_currentPlatform);
 
+        _playerView.DeathSound();
         GlitchDeathController.Instance.TriggerGlitch();
         yield return new WaitForSeconds(1f);
 
