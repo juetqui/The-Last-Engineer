@@ -17,6 +17,8 @@ public class EmissiveListener : MonoBehaviour
     {
         _renderer = GetComponent<Renderer>();
         _connection.OnNodeConnected += CheckConnectedNode;
+
+        CheckConnectedNode(_requiredNode, _connection.StartsConnected);
     }
 
     private void CheckConnectedNode(NodeType nodeType, bool connected)

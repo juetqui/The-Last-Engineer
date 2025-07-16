@@ -6,119 +6,106 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private GenericConnectionController _connection;
     [SerializeField] private Transform[] _positions;
     [SerializeField] private float _moveSpeed;
-    [SerializeField] private float _corrputedMoveSpeed=0;
+    [SerializeField] private float _corrputedMoveSpeed = 0;
     [SerializeField] private float _waitCD;
-    [SerializeField] private float _corruptedWaitCD=0;
-    private float _currentWaitCD;
     [SerializeField] private LayerMask _floorMask;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
+    
     private IMovablePassenger _passenger = default;
     private Vector3 _targetPos = default;
+    private float _currentSpeed = default;
     private int _index = 0;
-    private bool _canMove = false, _arrived = false;
+    private bool _canMove = false, _isMoving = false;
     private Coroutine _waitingToMove = null;
 
-    void Awake()
+    private void Start()
     {
         _targetPos = _positions[0].position;
+        _currentSpeed = _moveSpeed;
+        
         _connection.OnNodeConnected += AvailableToMove;
-        if (_corrputedMoveSpeed<=0)
-        {
-            _corrputedMoveSpeed = _moveSpeed;
+        PlayerTDController.Instance.OnNodeGrabed += CheckSpeed;
 
-        }
-        if (_corruptedWaitCD<=0)
+        if (_corrputedMoveSpeed <= 0f) _corrputedMoveSpeed = _moveSpeed / 2f;
+
+        _currentSpeed = _moveSpeed;
+        CheckSpeed(false, NodeType.None);
+
+        AvailableToMove(_requiredNode, _connection.StartsConnected);
+    }
+
+    private void AvailableToMove(NodeType node, bool isActive)
+    {
+        _canMove = (node == _requiredNode && isActive);
+
+        if (_canMove && _waitingToMove == null)
         {
-            _corruptedWaitCD = _waitCD;
+            _waitingToMove = StartCoroutine(WaitToNextTarget());
+        }
+        else if (!_canMove && _waitingToMove != null)
+        {
+            StopCoroutine(_waitingToMove);
+            _waitingToMove = null;
         }
     }
 
-    void Update()
+    private void CheckSpeed(bool hasNode, NodeType nodeType)
     {
-        MovePlatform();
-        if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+        if (!hasNode || nodeType != NodeType.Corrupted)
         {
-            _currentWaitCD = _corruptedWaitCD;
+            _currentSpeed = _moveSpeed;
+            return;
         }
-        else
-        {
-            _currentWaitCD = _waitCD;
-        }
+        
+        _currentSpeed = _corrputedMoveSpeed;
     }
 
     private void MovePlatform()
     {
-        if (!_canMove) return;
+        if (!_canMove || _isMoving) return;
         //{
         //    _targetPos = _positions[0].position;
-
-        //    if (Vector3.Distance(transform.position, _targetPos) > 0.1f)
-        //        MoveToTarget();
+        //    StartCoroutine(MoveToTarget());
         //}
 
-        if (_canMove && !_arrived && _waitingToMove == null)
-        {
-            if (Vector3.Distance(transform.position, _targetPos) > 0.1f)
-                MoveToTarget();
-            else
-            {
-                if (_passenger != null)
-                    _passenger.OnPlatformMoving(Vector3.zero);
-                
-                _index++;
-
-                if (_index == _positions.Length)
-                    _index = 0;
-
-                _waitingToMove = StartCoroutine(WaitToNextTarget());
-                _targetPos = _positions[_index].position;
-            }
-        }
+        StartCoroutine(MoveToTarget());
     }
 
-    private void MoveToTarget()
+    private void Move()
     {
         Vector3 dir = _targetPos - transform.position;
-        Vector3 displacement;
-        if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
-        {
-            displacement = dir.normalized * Time.deltaTime * _corrputedMoveSpeed;
-        }
-        else
-        {
-            displacement = dir.normalized * Time.deltaTime * _moveSpeed;
-        }
+
+        Vector3 displacement = dir.normalized * Time.deltaTime * _currentSpeed;
         transform.position += displacement;
 
-        if (_passenger != null)
-        {
-            _passenger.OnPlatformMoving(displacement);
-        }
+        if (_passenger != null) _passenger.OnPlatformMoving(displacement);
     }
 
-    public void AvailableToMove(NodeType node, bool isActive)
+    private IEnumerator MoveToTarget()
     {
-        if (node == _requiredNode && isActive)
+        const float threshold = 0.15f;
+        
+        while (Vector3.Distance(transform.position, _targetPos) > threshold)
         {
-            _canMove = true;
+            Move();
+            yield return null;
         }
-        else
-        {
-            _canMove = false;
-        }
+
+        if (_passenger != null)
+            _passenger.OnPlatformMoving(Vector3.zero);
+
+        _index = (_index + 1) % _positions.Length;
+        _waitingToMove = StartCoroutine(WaitToNextTarget());
     }
 
     private IEnumerator WaitToNextTarget()
     {
-        _arrived = true;
-        float cDpassed = 1;
-        while (cDpassed > 0)
-        {
-            yield return new WaitForSeconds(_currentWaitCD*0.2f);
-            cDpassed = cDpassed - 0.2f;
-        }
-        _arrived = false;
+        _targetPos = _positions[_index].position;
+
+        yield return new WaitForSeconds(_waitCD);
+
         _waitingToMove = null;
+        MovePlatform();
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -131,13 +118,10 @@ public class PlatformController : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out IMovablePassenger passenger) && _passenger == passenger)
+        if (coll.TryGetComponent(out IMovablePassenger passenger) && _passenger != null && _passenger == passenger)
         {
-            if (_passenger != null)
-            {
-                _passenger.OnPlatformMoving(Vector3.zero);
-                _passenger = null;
-            }
+            _passenger.OnPlatformMoving(Vector3.zero);
+            _passenger = null;
         }
     }
 }

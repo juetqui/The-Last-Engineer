@@ -10,7 +10,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public UnityEvent OnHit;
     public UnityEvent OnCompleated;
     public UnityEvent OnDepleated;
-    private MeshRenderer _myMeshRenderer = default;
+    //private MeshRenderer _myMeshRenderer = default;
     private Collider _collider = default;
     public bool _isCompleted = false;
     Material _myMaterial;

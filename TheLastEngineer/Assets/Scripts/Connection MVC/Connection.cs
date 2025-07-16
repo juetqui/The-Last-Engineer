@@ -11,10 +11,16 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
     [SerializeField] protected NodeController _recievedNode = null;
     
     protected MainTM _mainTM = default;
+    public bool StartsConnected { get; private set; }
 
     private void Start()
     {
-        if (_recievedNode != null) SetNode(_recievedNode);
+        if (_recievedNode != null)
+        {
+            SetNode(_recievedNode);
+            StartsConnected = true;
+        }
+        else StartsConnected = false;
     }
 
     public abstract void SetSecTM(T secTM);
