@@ -17,6 +17,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem _walkPS;
     [SerializeField] private ParticleSystem _orbitPS;
+    [SerializeField] private ParticleSystem _defaultPS;
+    [SerializeField] private ParticleSystem _corruptedPS;
     [SerializeField] private Animator _animator;
     [SerializeField] private AudioSource _walkSource;
     [SerializeField] private AudioSource _fxSource;
@@ -95,7 +97,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _currentSpeed = _playerData.moveSpeed;
 
         _playerModel = new PlayerTDModel(_cc, transform, _playerData, GetComponent<Collider>());
-        _playerView = new PlayerTDView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController, _dashImage);
+        _playerView = new PlayerTDView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController, _dashImage, _defaultPS, _corruptedPS);
 
         _playerView.OnStart();
         _solvingController.OnDissolveCompleted += OnDissolveCompleted;
@@ -271,6 +273,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         }
 
         _playerView.GrabNode(true, _node.OutlineColor);
+        _playerView.PlayNodePS(_node.NodeType);
         OnNodeGrabed?.Invoke(true, _node.NodeType);
     }
 
@@ -281,6 +284,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _node = node;
         _currentNodeType = _node.NodeType;
         _playerView.GrabNode(true, _node.OutlineColor);
+        _playerView.PlayNodePS(_node.NodeType);
         RemoveInteractable(node);
     }
 

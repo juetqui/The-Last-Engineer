@@ -8,6 +8,7 @@ public class PlayerTDView
     private Material[] _originalMats = default, _corruptionMats = default;
     private Outline _outline = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
+    private ParticleSystem _defaultPS = default, _corruptedPS = default;
     private SolvingController _solvingController;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
@@ -16,7 +17,7 @@ public class PlayerTDView
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController, Image dashImage)
+    public PlayerTDView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController, Image dashImage, ParticleSystem defaultPS, ParticleSystem corruptedPS)
     {
         _renderer = renderer;
         _outline = outline;
@@ -33,6 +34,8 @@ public class PlayerTDView
         _deathClip = playerData.deathClip;
         _solvingController = solvingController;
         _dashImage = dashImage;
+        _defaultPS = defaultPS;
+        _corruptedPS = corruptedPS;
     }
 
     public void OnStart()
@@ -100,6 +103,12 @@ public class PlayerTDView
         walkPS.startColor = color;
         orbitPS.startColor = color;
         _orbitPS.Play();
+    }
+
+    public void PlayNodePS(NodeType nodeType)
+    {
+        if (nodeType == NodeType.Corrupted) _corruptedPS.Play();
+        else _defaultPS.Play();
     }
 
     public void StopPS()
