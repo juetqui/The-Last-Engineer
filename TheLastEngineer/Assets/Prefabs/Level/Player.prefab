@@ -6452,6 +6452,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8589888789053636707}
+    - targetCorrespondingSourceObject: {fileID: 100014, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1123217752360243023}
     - targetCorrespondingSourceObject: {fileID: 100050, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3695308875843583011}
@@ -6922,8 +6925,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 180fbf6830b49044e9969c7e17308364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rendererData: {fileID: 11400000, guid: 6d0c13fe84a188d408ed52c2c768f2e3, type: 2}
   _passiveMat: {fileID: 2100000, guid: 2a07f83828bd3534e965673ebd4e8c47, type: 2}
   _corruptionMat: {fileID: 2100000, guid: c130ec2a1893ed14993e2feaf2968680, type: 2}
+  _shockWaveMat: {fileID: 2100000, guid: 294d9d745ac599242893c741f0b8d4b7, type: 2}
   _colorNeg: {r: 16.948381, g: 0.62114483, b: 0.62114483, a: 1}
   _colorOriginal: {r: 5.6784315, g: 0.8784314, b: 5.1137257, a: 1}
 --- !u!114 &8589888789053636707
@@ -6940,6 +6945,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   glitchMaterial: {fileID: 2100000, guid: f5960303e1cb61d4dba776e2cc5f7d0f, type: 2}
   glitchDuration: 2
+--- !u!114 &1123217752360243023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4107978417728134607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ImpulseDefinition:
+    m_ImpulseChannel: 1
+    m_ImpulseShape: 2
+    m_CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_ImpulseDuration: 0.2
+    m_ImpulseType: 2
+    m_DissipationRate: 0.25
+    m_RawSignal: {fileID: 0}
+    m_AmplitudeGain: 1
+    m_FrequencyGain: 1
+    m_RepeatMode: 0
+    m_Randomize: 1
+    m_TimeEnvelope:
+      m_AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      m_DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      m_AttackTime: 0
+      m_SustainTime: 0.2
+      m_DecayTime: 0.7
+      m_ScaleWithImpact: 1
+      m_HoldForever: 0
+    m_ImpactRadius: 100
+    m_DirectionMode: 0
+    m_DissipationMode: 2
+    m_DissipationDistance: 1000
+    m_PropagationSpeed: 2000
+  m_DefaultVelocity: {x: 0, y: 0, z: 5}
 --- !u!4 &4107978417728618963 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400050, guid: 02dd6406ed1ebc248b2fafd0485e0de9, type: 3}
