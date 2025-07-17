@@ -1,18 +1,21 @@
 using System.Collections;
-using Unity.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Splines.Interpolators;
+using UnityEngine.Rendering.Universal;
 
 public class PostProcessController : MonoBehaviour
 {
+    [SerializeField] private UniversalRendererData _rendererData;
     [SerializeField] private Material _passiveMat;
     [SerializeField] private Material _corruptionMat;
+    [SerializeField] private Material _shockWaveMat;
     [ColorUsage(true, true)]
     [SerializeField] private Color _colorNeg = new Color(191f, 7f, 7f);
     [ColorUsage(true, true)]
     [SerializeField] private Color _colorOriginal = new Color(191f, 28f, 164f);
-    
+
+    private ScriptableRendererFeature _shockWave = default;
     private float duracion = 1f;
     private Coroutine _currentEffect = null;
     private float _vignetteAmount = 9f;
@@ -26,8 +29,12 @@ public class PostProcessController : MonoBehaviour
     {
         _passiveMat.SetFloat("_VignetteAmount", 30f);
         _corruptionMat.SetFloat("_VignetteAmount", 30f);
+        
         PlayerTDController.Instance.OnNodeGrabed += ActivatePassive;
         PlayerTDController.Instance.OnAbsorbCorruption += ActivateCorruption;
+
+        _shockWave = _rendererData.rendererFeatures.Where(rf => rf is FullScreenPassRendererFeature).FirstOrDefault();
+        _shockWave.SetActive(false);
     }
 
     private void ActivatePassive(bool hasNode, NodeType nodeType)
@@ -40,6 +47,7 @@ public class PostProcessController : MonoBehaviour
         }
 
         StartCoroutine(ActivatePP(_passiveMat));
+        StartCoroutine(ActivateShockWave());
         GlitchActive.Instance.OnChangeObjectState += RefNegVignette;
     }
 
@@ -55,6 +63,42 @@ public class PostProcessController : MonoBehaviour
         }
 
         _currentEffect = StartCoroutine(ActivatePP(_corruptionMat));
+    }
+
+    private IEnumerator ActivateShockWave()
+    {
+        _shockWave.SetActive(true);
+        float effectAmount = -0.1f;
+        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
+
+        while (_shockWaveMat.GetFloat("_WaveDistanceFromCenter") < 1f)
+        {
+            effectAmount += Time.deltaTime * 2f;
+
+            _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
+            yield return null;
+        }
+        
+        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", 1f);
+        _shockWave.SetActive(false);
+    }
+
+    private IEnumerator DeactivateShockWave()
+    {
+        _shockWave.SetActive(true);
+        float effectAmount = 1f;
+        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
+
+        while (_shockWaveMat.GetFloat("_WaveDistanceFromCenter") > -0.1f)
+        {
+            effectAmount -= Time.deltaTime * 2f;
+
+            _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
+            yield return null;
+        }
+        
+        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", -0.1f);
+        _shockWave.SetActive(false);
     }
 
     private IEnumerator ActivatePP(Material material)
