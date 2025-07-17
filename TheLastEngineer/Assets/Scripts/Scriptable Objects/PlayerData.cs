@@ -22,6 +22,7 @@ public class PlayerData : ScriptableObject
     public float lowRumbleFrequency = default;
     public float highRumbleFrequency = default;
     public float rumbleDuration = default;
+    public float testForce = default;
 
     [Header("Audio")]
     public AudioClip walkClip;

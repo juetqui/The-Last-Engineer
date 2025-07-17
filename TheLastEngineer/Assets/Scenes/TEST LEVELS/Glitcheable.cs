@@ -172,6 +172,7 @@ public abstract class Glitcheable : MonoBehaviour
         if (_player != null)
         {
             _player.SetCanMove(false);
+            _player.StartDesintegratePlayer();
             OnPosChanged?.Invoke(transform.position);
         }
         
@@ -188,6 +189,8 @@ public abstract class Glitcheable : MonoBehaviour
 
             _renderer.material.SetFloat("_Alpha", alpha);
             _feedbackRenderer.material.SetFloat("_Alpha", 1f - alpha);
+            if (_player != null)
+                _player.SetDesintegratePlayer(alpha);
 
             yield return null;
         }
@@ -219,6 +222,8 @@ public abstract class Glitcheable : MonoBehaviour
 
             _renderer.material.SetFloat("_Alpha", 1f - alpha);
             _feedbackRenderer.material.SetFloat("_Alpha", alpha);
+            if (_player != null)
+                _player.SetDesintegratePlayer(1f-alpha);
 
             yield return null;
         }
@@ -231,6 +236,7 @@ public abstract class Glitcheable : MonoBehaviour
         {
             _player.SetCanMove(true);
             _player.UnsetPlatform(this);
+            _player.StopDesintegratePlayer();
             _player = null;
         }
         
