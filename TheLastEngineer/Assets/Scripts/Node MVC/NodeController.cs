@@ -23,7 +23,7 @@ public class NodeController : MonoBehaviour, IInteractable
     [SerializeField] protected LayerMask _floorLayer;
     [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
     [SerializeField] private bool _isChildren;
-
+    [SerializeField] Vector2 _desintegrationVector = new Vector2(-3, 3);
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => true;
@@ -33,12 +33,12 @@ public class NodeController : MonoBehaviour, IInteractable
     private RaycastHit hit = default;
 
     private IConnectable _connectable = default;
-    
+    private Shader _originalShader;
     private bool _isConnected = false;
     private Vector3 _resetPos = Vector3.zero;
-
+    [SerializeField] Shader _desintegrationShader;
     public Action<NodeType> OnUpdatedNodeType = delegate { };
-
+    private Color _myColor;
     public NodeType NodeType { get { return _nodeType; } }
     public Color OutlineColor { get { return _currentOutline; } }
     public bool IsChildren { get { return _isChildren; } }
@@ -51,7 +51,7 @@ public class NodeController : MonoBehaviour, IInteractable
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
         _particles = GetComponentsInChildren<ParticleSystem>();
-
+        _originalShader = _renderer.material.shader;
         _resetPos = transform.position;
 
         _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
@@ -65,7 +65,28 @@ public class NodeController : MonoBehaviour, IInteractable
         _nodeView.OnStart();
         _nodeView.UpdateNodeType(_nodeType, _currentOutline);
     }
+    public void StartDesintegrateShader()
+    {
+        _renderer.material.shader = _desintegrationShader;
+        _renderer.material.shader = _desintegrationShader;
+        _renderer.material.SetFloat("_ColorController", 1);
+        _renderer.material.SetColor("_StartingColor", _myColor);
+        _renderer.material.SetVector("_MinMaxPos", _desintegrationVector);
+        _renderer.material.SetFloat("_Alpha", 1);
+        _outline.enabled = false;
 
+    }
+    public void SetDesintegrateShader(float alpha)
+    {
+        _renderer.material.SetFloat("_Alpha", alpha);
+    }
+    public void StopDesintegrateShader()
+    {
+        //StartCoroutine(DesintegrateCo());
+        _renderer.material.shader = _originalShader;
+        _outline.enabled = true;
+
+    }
     protected void Update()
     {
         //_nodeModel.RotateToTarget(_target);

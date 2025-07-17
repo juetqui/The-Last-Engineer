@@ -199,7 +199,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
             StartCoroutine(_playerModel.Dash(GetMovement(), _currentNodeType));
-            _impulseSource.GenerateImpulseWithForce(1f);
+            _impulseSource.GenerateImpulseWithForce(_playerData.testForce);
             _playerView.DashSound();
             OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
             StartCoroutine(_playerModel.DashCD());
@@ -336,7 +336,23 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
     }
+    public void StartDesintegratePlayer()
+    {
+        _solvingController.StartDesintegrateShader();
+        _node.StartDesintegrateShader();
 
+    }
+    public void StopDesintegratePlayer()
+    {
+        _solvingController.StopDesintegrateShader();
+        _node.StopDesintegrateShader();
+
+    }
+    public void SetDesintegratePlayer(float alpha)
+    {
+        _solvingController.SetDesintegrateShader(alpha);
+        _node.SetDesintegrateShader(alpha);
+    }
     public void LaserNotRecived() { return; }
 
     private void OnDissolveCompleted()

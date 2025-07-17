@@ -26,16 +26,29 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public float timeModifier;
     public bool _canBeUnfilled= false;
 
+    [SerializeField] private List<ParticleSystem> _hitPS = new List<ParticleSystem>();
+
+    private AudioSource _audioSource = default;
+
     private void Awake()
     {
+        _audioSource = GetComponent<AudioSource>();
         //_myMeshRenderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<Collider>();
+        _hitPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
         //_myMaterial = _myMeshRenderer.material;
         //_myMaterial.SetFloat("_MinBound", minBound);
         //_myMaterial.SetFloat("_MaxBound", maxBound);
     }
     public void ChargeCompleted()
     {
+        //stop audio source, cambiamos audio clip y play
+        _audioSource.Stop();
+        foreach (var ps in _hitPS)
+        {
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
+        
         OnCompleated?.Invoke();
         _isCompleted = true;
     }
@@ -49,6 +62,8 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     }
     public void LaserRecived()
     {
+        
+        
         OnHit?.Invoke();
         if (!_isCompleted && !_isCurrentlyLoading)
         {
@@ -64,7 +79,11 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     }
     public void LaserNotRecived()
     {
-
+        _audioSource.Stop();
+        foreach (var ps in _hitPS)
+        {
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
         if (!_isCompleted||_canBeUnfilled)
         {
             OnEndHit?.Invoke();
@@ -82,6 +101,12 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     //}
     private IEnumerator LoadRoutine(float loadTime)
     {
+        _audioSource.Stop();
+        _audioSource.Play();
+        foreach (var ps in _hitPS)
+        {
+            ps.Play();
+        }
         while (_currentLoad <= 1f)
         {
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
