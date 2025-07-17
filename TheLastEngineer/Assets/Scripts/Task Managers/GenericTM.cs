@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System;
 
 public class GenericTM : MonoBehaviour
 {
@@ -18,8 +19,10 @@ public class GenericTM : MonoBehaviour
     private Dictionary<NodeType, int> _totalRequired = new Dictionary<NodeType, int>();
     private Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
 
-    public delegate void OnRunning(bool isRunning);
-    public event OnRunning onRunning = default;
+    //public delegate void OnRunning(bool isRunning);
+    //public event OnRunning onRunning = default;
+
+    public Action<bool> OnRunning;
 
     public bool Running { get { return _running; } }
 
@@ -68,7 +71,7 @@ public class GenericTM : MonoBehaviour
 
         }
 
-        onRunning?.Invoke(_running);
+        OnRunning?.Invoke(_running);
     }
 
     protected bool CheckRequirements()
