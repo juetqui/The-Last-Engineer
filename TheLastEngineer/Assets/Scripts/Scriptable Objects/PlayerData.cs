@@ -32,4 +32,5 @@ public class PlayerData : ScriptableObject
     public AudioClip putDownClip;
     public AudioClip emptyHand;
     public AudioClip deathClip;
+    public AudioClip fallClip;
 }

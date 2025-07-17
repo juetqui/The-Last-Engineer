@@ -332,6 +332,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         
         _isDead = true;
         _playerView.SetAnimatorSpeed(0f);
+        _playerView.DeathSound();
         _solvingController?.BurnShader();
         
         if (InputManager.Instance.playerInputs.Player.enabled) OnDisableInputs();
@@ -380,7 +381,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     {
         if (_currentPlatform != null) UnsetPlatform(_currentPlatform);
 
-        _playerView.DeathSound();
         GlitchDeathController.Instance.TriggerGlitch();
         yield return new WaitForSeconds(1f);
 
@@ -461,6 +461,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         else if (coll.CompareTag("Void")) 
         {
             _isDead = true;
+            _playerView.FallSound();
             StartCoroutine(RespawnPlayer());
         }
     }
