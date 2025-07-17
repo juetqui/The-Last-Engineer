@@ -1,5 +1,3 @@
-using UnityEngine.Rendering.Universal;
-
 public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 {
     private void Awake()
