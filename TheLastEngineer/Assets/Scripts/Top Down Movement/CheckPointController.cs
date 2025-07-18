@@ -13,6 +13,8 @@ public class CheckPointController : MonoBehaviour
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _enabledFresnelColor;
 
+    [SerializeField] private GameObject _objectToActivate;
+
     private SkinnedMeshRenderer _renderer = default;
     private Light _light = default;
     private AudioSource _source = default;
@@ -90,6 +92,9 @@ public class CheckPointController : MonoBehaviour
             StartCoroutine(SetMaterialsCoroutine());
             
             if (_taskManager != null) _taskManager.CloseDoor();
+
+            if (_objectToActivate != null)
+                _objectToActivate.SetActive(true);
         }
     }
 }
