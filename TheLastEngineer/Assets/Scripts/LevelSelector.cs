@@ -62,17 +62,17 @@ public class LevelSelector : MonoBehaviour
             StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[4]);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha8))
-        {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[7].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
-            //SceneManager.LoadScene(sceneNames[4]);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[1].position);
-            //StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
-            //SceneManager.LoadScene(sceneNames[1]);
-        }
+        //else if (Input.GetKeyDown(KeyCode.Alpha8))
+        //{
+        //    PlayerTDController.Instance.SetCheckPointPos(_checkpoints[7].position);
+        //    StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+        //    //SceneManager.LoadScene(sceneNames[4]);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.Alpha9))
+        //{
+        //    PlayerTDController.Instance.SetCheckPointPos(_checkpoints[1].position);
+        //    //StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+        //    //SceneManager.LoadScene(sceneNames[1]);
+        //}
     }
 }
