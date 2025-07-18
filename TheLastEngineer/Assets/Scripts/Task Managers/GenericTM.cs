@@ -62,13 +62,20 @@ public class GenericTM : MonoBehaviour
             _animator.SetBool("DoorActivated", true);
             _source.Play();
             _windParticle.Play();
+            foreach (var item in _connections)
+            {
+                item.SetPositiveFeedback(true);
+            }
         }
         else
         {
             _animator.SetBool("DoorActivated", false);
             _source.Stop();
             _windParticle.Stop();
-
+            foreach (var item in _connections)
+            {
+                item.SetPositiveFeedback(false);
+            }
         }
 
         OnRunning?.Invoke(_running);
