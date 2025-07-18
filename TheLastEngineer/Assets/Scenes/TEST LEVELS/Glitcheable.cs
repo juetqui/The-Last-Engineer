@@ -16,7 +16,8 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = -4.91f;
     [SerializeField] protected bool _isCorrupted = true;
-    
+    [SerializeField] PlatformWalls[] platformWalls;
+    [SerializeField] GameObject _feedBackPlane;
     protected TimerController _timerController;
     public DecalProjector decalProjector;
     protected List<Transform> _currentList = default;
@@ -161,16 +162,26 @@ public abstract class Glitcheable : MonoBehaviour
         var ps = _ps.velocityOverLifetime;
         ps.radial = _radialDonutPS;
         _ps.Play();
-
+        if (_feedBackPlane != null)
+        {
+            _feedBackPlane.SetActive(false);
+        }
         while (_timerController.CurrentPhase == Phase.Transparency && _timerController.CurrentFillAmount > 0f)
         {
             float alpha = _timerController.CurrentFillAmount;
 
             _renderer.material.SetFloat("_Alpha", alpha);
             _feedbackRenderer.material.SetFloat("_Alpha", 1f - alpha);
+            
             if (_player != null)
                 _player.SetDesintegratePlayer(alpha);
-
+            if (platformWalls != null)
+            {
+                for (int i = 0; i < platformWalls.Length; i++)
+                {
+                    platformWalls[i].SetDesintegrateWall(alpha);
+                }
+            }
             yield return null;
         }
 
@@ -202,8 +213,19 @@ public abstract class Glitcheable : MonoBehaviour
             _renderer.material.SetFloat("_Alpha", 1f - alpha);
             _feedbackRenderer.material.SetFloat("_Alpha", alpha);
             if (_player != null)
-                _player.SetDesintegratePlayer(1f-alpha);
-
+            {
+                _player.SetDesintegratePlayer(1f - alpha);
+                
+            }
+           
+            if (platformWalls != null)
+            {
+                for (int i = 0; i < platformWalls.Length; i++)
+                {
+                    platformWalls[i].SetDesintegrateWall(1f - alpha);
+                }
+            }
+            
             yield return null;
         }
 
@@ -217,8 +239,19 @@ public abstract class Glitcheable : MonoBehaviour
             _player.UnsetPlatform(this);
             _player.StopDesintegratePlayer();
             _player = null;
+            if (_feedBackPlane != null)
+            {
+                _feedBackPlane.SetActive(true);
+            }
         }
-        
+        if (platformWalls != null)
+        {
+            for (int i = 0; i < platformWalls.Length; i++)
+            {
+                platformWalls[i].ResetDesintegrateWall();
+                
+            }
+        }
         _isIntargeteable = false;
     }
 
@@ -264,6 +297,8 @@ public abstract class Glitcheable : MonoBehaviour
             _player = player;
             _player.SetPlatform(this);
             _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
+            _feedBackPlane.SetActive(true);
+
         }
     }
 
@@ -283,6 +318,8 @@ public abstract class Glitcheable : MonoBehaviour
         {
             _player.UnsetPlatform(this);
             _player = null;
+            _feedBackPlane.SetActive(false);
+
         }
     }
 

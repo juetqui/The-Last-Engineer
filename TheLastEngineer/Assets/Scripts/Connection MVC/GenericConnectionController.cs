@@ -5,7 +5,6 @@ using UnityEngine;
 public class GenericConnectionController : Connection<GenericTM>
 {
     [SerializeField] private Transform _nodePos;
-
     private List<GenericTM> _secTaskManagers = new List<GenericTM>();
     public Action<NodeType, bool> OnNodeConnected;
 

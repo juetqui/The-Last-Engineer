@@ -119,9 +119,11 @@ public class SolvingController : MonoBehaviour
         {
             foreach (var item in skinnedMaterials)
             {
+
                 item.SetFloat("_Alpha", alpha);
             }
         }
+
     }
     public void StopDesintegrateShader()
     {
