@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 8716506064208933694}
   - component: {fileID: 9018049923107932072}
   - component: {fileID: 3081731395212546421}
+  - component: {fileID: 9012416793114071167}
   - component: {fileID: 388869991194834864}
   m_Layer: 8
   m_Name: Corrupted Laser Container
@@ -181,10 +182,25 @@ MonoBehaviour:
   _newPosList:
   - {fileID: 0}
   - {fileID: 0}
-  _timerController: {fileID: 0}
   _isPlatform: 0
   _radialDonutPS: -4.91
   _isCorrupted: 1
+  decalProjector: {fileID: 0}
+--- !u!114 &9012416793114071167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332061995615490714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e536375507b95ba41b3470bd661bf187, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredNode: 2
+  _transparencyDuration: 1
+  _moveDuration: 0.5
 --- !u!82 &388869991194834864
 AudioSource:
   m_ObjectHideFlags: 0

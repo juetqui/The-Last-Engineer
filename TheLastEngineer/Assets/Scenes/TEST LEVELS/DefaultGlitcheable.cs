@@ -7,30 +7,25 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
 
     void Start()
     {
-        GlitchActive.Instance.OnStopObject += StopObject;
-
+        _timerController.OnTimerCycleComplete += UpdateTarget;
+        _timerController.OnPhaseChanged += CheckTimerPhase;
+        
         if (_isCorrupted)
         {
-            _timerController.OnTimerCycleComplete += UpdateTarget;
-            _timerController.OnPhaseChanged += CheckTimerPhase;
-        }
-        else
-        {
-            var ps = _ps.main;
-            var psVel = _ps.velocityOverLifetime;
-            psVel.radial = 1f;
-            ps.loop = true;
-            _ps.Play();
-        }
-        if (IsCorrupted)
-        {
             if(decalProjector!=null)
-            decalProjector.material.SetFloat("_CorrruptedControl", 1f);
+                decalProjector.material.SetFloat("_CorrruptedControl", 1f);
         }
         else
         {
             if (decalProjector != null)
                 decalProjector.material.SetFloat("_CorrruptedControl", 0f);
+
+            _timerController.PauseCycle();
+            var ps = _ps.main;
+            var psVel = _ps.velocityOverLifetime;
+            psVel.radial = 1f;
+            ps.loop = true;
+            _ps.Play();
         }
     }
 

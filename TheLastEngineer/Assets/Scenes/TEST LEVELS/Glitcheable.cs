@@ -13,10 +13,11 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected ParticleSystem _ps;
     [SerializeField] private Transform _feedbackPos;
     [SerializeField] protected List<Transform> _newPosList;
-    [SerializeField] protected TimerController _timerController;
     [SerializeField] protected bool _isPlatform = false;
     [SerializeField] protected float _radialDonutPS = -4.91f;
     [SerializeField] protected bool _isCorrupted = true;
+    
+    protected TimerController _timerController;
     public DecalProjector decalProjector;
     protected List<Transform> _currentList = default;
     protected bool _canMove = true;
@@ -46,6 +47,7 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (_renderer == null) _renderer = GetComponent<Renderer>();
 
+        _timerController = GetComponent<TimerController>();
         _audioSource = GetComponent<AudioSource>();
         _feedbackRenderer = _feedbackPos.GetComponent<Renderer>();
 
@@ -54,8 +56,6 @@ public abstract class Glitcheable : MonoBehaviour
         _targetRot = _currentList[_index].rotation;
 
         decalProjector = GetComponentInChildren<DecalProjector>();
-
-        
 
         _ps.Stop();
     }
@@ -85,25 +85,9 @@ public abstract class Glitcheable : MonoBehaviour
         }
     }
 
-    protected void StopObject(Glitcheable glitcheable)
-    {
-        if (glitcheable != this)
-        {
-            _isStopped = false;
-            return;
-        }
-
-        _isStopped = !_isStopped;
-    }
-
     public bool ChangeCorruptionState(NodeType nodeType, bool newState)
     {
-        if (newState == _isCorrupted) 
-        {
-         return false;
-
-        }
-
+        if (newState == _isCorrupted) return false;
 
         _isCorrupted = newState;
 
@@ -114,13 +98,16 @@ public abstract class Glitcheable : MonoBehaviour
 
         if (_isCorrupted)
         {
-            _timerController.OnTimerCycleStarted += StartMovingAfterCycle;
+            //_timerController.OnTimerCycleStarted += StartMovingAfterCycle;
+            _timerController.ResumeCycle();
         }
         else
         {
-            StopAllCoroutines();
-            _timerController.OnPhaseChanged -= CheckTimerPhase;
-            _timerController.OnTimerCycleComplete -= UpdateTarget;
+            //StopAllCoroutines();
+            //_timerController.OnPhaseChanged -= CheckTimerPhase;
+            //_timerController.OnTimerCycleComplete -= UpdateTarget;
+
+            _timerController.PauseCycle();
 
             _renderer.material.SetFloat("_Alpha", 1f);
             _feedbackRenderer.material.SetFloat("_Alpha", 0f);
@@ -133,14 +120,6 @@ public abstract class Glitcheable : MonoBehaviour
         }
 
         return true;
-    }
-
-    private void StartMovingAfterCycle()
-    {
-        _timerController.OnTimerCycleStarted -= StartMovingAfterCycle;
-        _timerController.OnPhaseChanged += CheckTimerPhase;
-        _timerController.OnTimerCycleComplete += UpdateTarget;
-        _ps.Stop();
     }
 
     protected void UpdateTarget()

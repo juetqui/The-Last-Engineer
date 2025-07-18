@@ -13,9 +13,10 @@ public class TimerController : MonoBehaviour
     private float _currentTransparencyDuration, _currentMoveDuration;
     private float _currentFillAmount = 1f;
     private Phase _currentPhase = Phase.Transparency;
+    private Coroutine _dissolveCoroutine = null;
 
-    public event Action OnTimerCycleStarted = delegate { };
-    public event Action OnTimerCycleComplete = delegate { };
+    public Action OnTimerCycleStarted = delegate { };
+    public Action OnTimerCycleComplete = delegate { };
 
     public float CurrentFillAmount => _currentFillAmount;
     public float CurrentDuration => _currentMoveDuration;
@@ -32,7 +33,22 @@ public class TimerController : MonoBehaviour
     private void Start()
     {
         PlayerTDController.Instance.OnNodeGrabed += SetDuration;
-        StartCoroutine(DissolveTimer());
+        _dissolveCoroutine = StartCoroutine(DissolveTimer());
+    }
+
+    public void PauseCycle()
+    {
+        if (_dissolveCoroutine != null)
+        {
+            StopCoroutine(_dissolveCoroutine);
+            _dissolveCoroutine = null;
+        }
+    }
+
+    public void ResumeCycle()
+    {
+        PauseCycle();
+        _dissolveCoroutine = StartCoroutine(DissolveTimer());
     }
 
     public void SetDuration(bool hasNode, NodeType nodeType)

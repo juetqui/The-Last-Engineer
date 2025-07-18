@@ -9768,6 +9768,7 @@ GameObject:
   - component: {fileID: 5504065015034907512}
   - component: {fileID: 1583707382683174556}
   - component: {fileID: 1922366780360905216}
+  - component: {fileID: 4859024861286645155}
   - component: {fileID: 2171017448946635016}
   m_Layer: 6
   m_Name: Glitchable Object
@@ -9903,15 +9904,31 @@ MonoBehaviour:
   _sounds: {fileID: 11400000, guid: 78250e8c4e3f351419546d7464dba6ef, type: 2}
   _coll: {fileID: 5504065015034907512}
   _triggerColl: {fileID: 1583707382683174556}
+  _renderer: {fileID: 0}
   _ps: {fileID: 4361909140706651713}
   _feedbackPos: {fileID: 5635136317562696430}
   _newPosList:
   - {fileID: 6375590604925209171}
   - {fileID: 7614535063491349066}
-  _timerController: {fileID: 0}
   _isPlatform: 1
   _radialDonutPS: -4.91
   _isCorrupted: 1
+  decalProjector: {fileID: 0}
+--- !u!114 &4859024861286645155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6603664990825718928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e536375507b95ba41b3470bd661bf187, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredNode: 2
+  _transparencyDuration: 1
+  _moveDuration: 0.5
 --- !u!82 &2171017448946635016
 AudioSource:
   m_ObjectHideFlags: 0

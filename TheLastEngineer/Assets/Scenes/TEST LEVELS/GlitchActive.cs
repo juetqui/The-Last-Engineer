@@ -18,7 +18,6 @@ public class GlitchActive : MonoBehaviour
     private bool _enabled = false;
     private Coroutine _currentCoroutine = null;
 
-    public Action<Glitcheable> OnStopObject = delegate { };
     public Action<Glitcheable> OnStopableSelected = delegate { };
     public Action<Glitcheable, InteractionOutcome> OnChangeObjectState = delegate { };
 

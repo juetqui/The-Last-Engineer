@@ -18,7 +18,6 @@ public class MultipleListsGlitcheable : Glitcheable
 
     void Start()
     {
-        GlitchActive.Instance.OnStopObject += StopObject;
         _timerController.OnTimerCycleComplete += UpdateTarget;
         _timerController.OnPhaseChanged += CheckTimerPhase;
     }
