@@ -37,7 +37,16 @@ public class PlatformController : MonoBehaviour
     private void AvailableToMove(NodeType node, bool isActive)
     {
         _canMove = (node == _requiredNode && isActive);
+        if (node == _requiredNode && isActive)
+        {
+            _connection.SetPositiveFeedback(true);
 
+        }
+        else
+        {
+            _connection.SetPositiveFeedback(false);
+
+        }
         if (_canMove && _waitingToMove == null)
         {
             _waitingToMove = StartCoroutine(WaitToNextTarget());

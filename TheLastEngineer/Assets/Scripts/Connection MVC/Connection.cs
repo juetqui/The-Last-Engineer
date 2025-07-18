@@ -9,7 +9,7 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
     #endregion
 
     [SerializeField] protected NodeController _recievedNode = null;
-    
+    [SerializeField] protected GameObject refuerzoPositivo;
     protected MainTM _mainTM = default;
     public bool StartsConnected { get; private set; }
 
@@ -50,5 +50,11 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
         {
             succededInteraction = false;
         }
+    }
+    public void SetPositiveFeedback(bool Active)
+    {
+        refuerzoPositivo.SetActive(Active);
+     
+     
     }
 }
