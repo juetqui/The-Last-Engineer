@@ -20,7 +20,7 @@ public class DefaultGlitcheable : Glitcheable, ICorruptionCanceler
             if (decalProjector != null)
                 decalProjector.material.SetFloat("_CorrruptedControl", 0f);
 
-            _timerController.PauseCycle();
+            _timerController.StopCycle();
             var ps = _ps.main;
             var psVel = _ps.velocityOverLifetime;
             psVel.radial = 1f;

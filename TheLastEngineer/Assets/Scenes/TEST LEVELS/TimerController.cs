@@ -12,8 +12,11 @@ public class TimerController : MonoBehaviour
 
     private float _currentTransparencyDuration, _currentMoveDuration;
     private float _currentFillAmount = 1f;
+    private bool _cycleEnabled = true;
     private Phase _currentPhase = Phase.Transparency;
     private Coroutine _dissolveCoroutine = null;
+
+    public bool IsDebug = false;
 
     public Action OnTimerCycleStarted = delegate { };
     public Action OnTimerCycleComplete = delegate { };
@@ -36,18 +39,34 @@ public class TimerController : MonoBehaviour
         _dissolveCoroutine = StartCoroutine(DissolveTimer());
     }
 
-    public void PauseCycle()
+    //private void Update()
+    //{
+    //    if (IsDebug)
+    //    {
+    //        Debug.Log("PHASE: " + _currentPhase);
+    //        Debug.Log("COROUTINE: " + _dissolveCoroutine);
+    //    }
+    //}
+
+    public void StopCycle()
     {
+        _cycleEnabled = false;
+
         if (_dissolveCoroutine != null)
         {
             StopCoroutine(_dissolveCoroutine);
             _dissolveCoroutine = null;
         }
+        
+        _currentPhase = Phase.Transparency;
+        _currentFillAmount = 1f;
     }
 
     public void ResumeCycle()
     {
-        PauseCycle();
+        if (_cycleEnabled) return;
+
+        _cycleEnabled = true;
         _dissolveCoroutine = StartCoroutine(DissolveTimer());
     }
 
@@ -93,6 +112,10 @@ public class TimerController : MonoBehaviour
         
         _currentFillAmount = 0f;
         OnTimerCycleComplete?.Invoke();
-        StartCoroutine(DissolveTimer());
+
+        if (_cycleEnabled)
+            _dissolveCoroutine = StartCoroutine(DissolveTimer());
+        else
+            _dissolveCoroutine = null;
     }
 }

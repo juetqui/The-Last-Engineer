@@ -18,6 +18,7 @@ public abstract class Glitcheable : MonoBehaviour
     [SerializeField] protected bool _isCorrupted = true;
     [SerializeField] PlatformWalls[] platformWalls;
     [SerializeField] GameObject _feedBackPlane;
+    
     protected TimerController _timerController;
     public DecalProjector decalProjector;
     protected List<Transform> _currentList = default;
@@ -89,29 +90,27 @@ public abstract class Glitcheable : MonoBehaviour
     public bool ChangeCorruptionState(NodeType nodeType, bool newState)
     {
         if (newState == _isCorrupted) return false;
+        
+        StopAllCoroutines();
 
         _isCorrupted = newState;
 
-        if (decalProjector != null && IsCorrupted)
-            decalProjector.material.SetFloat("_CorrruptedControl", 1f);
-        if (decalProjector != null && !IsCorrupted)
-            decalProjector.material.SetFloat("_CorrruptedControl", 0f);
-
         if (_isCorrupted)
         {
-            //_timerController.OnTimerCycleStarted += StartMovingAfterCycle;
             _timerController.ResumeCycle();
+            
+            if (decalProjector != null)
+                decalProjector.material.SetFloat("_CorrruptedControl", 1f);
         }
         else
         {
-            //StopAllCoroutines();
-            //_timerController.OnPhaseChanged -= CheckTimerPhase;
-            //_timerController.OnTimerCycleComplete -= UpdateTarget;
-
-            _timerController.PauseCycle();
+            _timerController.StopCycle();
 
             _renderer.material.SetFloat("_Alpha", 1f);
             _feedbackRenderer.material.SetFloat("_Alpha", 0f);
+            
+            if (decalProjector != null)
+                decalProjector.material.SetFloat("_CorrruptedControl", 0f);
 
             var ps = _ps.main;
             var psVel = _ps.velocityOverLifetime;
