@@ -6,13 +6,13 @@ public class TubeLight : MonoBehaviour
     [SerializeField] private GenericConnectionController _connection;
     [SerializeField] private TubeLight _nextConnection;
 
-    private Material _material;
+    private Renderer _renderer;
     private NodeType _requiredNode = NodeType.Default;
     private bool _connected = false;
 
     private void Start()
     {
-        _material = GetComponent<Renderer>().material;
+        _renderer = GetComponent<Renderer>();
 
         if (_connection != null) _connection.OnNodeConnected += TurnOnOff;
     }
@@ -49,11 +49,11 @@ public class TubeLight : MonoBehaviour
         while (timer < 1f)
         {
             timer += Time.deltaTime * 10f;
-            _material.SetFloat("_Step", timer);
+            _renderer.material.SetFloat("_Step", timer);
             yield return null;
         }
 
-        _material.SetFloat("_Step", 1f);
+        _renderer.material.SetFloat("_Step", 1f);
 
         if (_nextConnection != null) StartCoroutine(_nextConnection.TurnOn());
     }
@@ -66,11 +66,11 @@ public class TubeLight : MonoBehaviour
         while (timer > 0f)
         {
             timer -= Time.deltaTime * 10f;
-            _material.SetFloat("_Step", timer);
+            _renderer.material.SetFloat("_Step", timer);
             yield return null;
         }
 
-        _material.SetFloat("_Step", 0f);
+        _renderer.material.SetFloat("_Step", 0f);
         
         if (_nextConnection != null) StartCoroutine(_nextConnection.TurnOff());
     }
