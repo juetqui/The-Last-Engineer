@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using MaskTransitions;
 using System.Collections.Generic;
 using System.Linq;
 using System;
