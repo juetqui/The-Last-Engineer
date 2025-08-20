@@ -56,14 +56,17 @@ public class GlobalVolumeController : MonoBehaviour
         if (effect == null) yield break;
 
         var intensityProperty = effect.GetType().GetField("intensity", BindingFlags.Public | BindingFlags.Instance);
+        
         if (intensityProperty == null || intensityProperty.FieldType != typeof(ClampedFloatParameter)) yield break;
 
         var intensity = (ClampedFloatParameter)intensityProperty.GetValue(effect);
+        
         while (intensity.value < targetIntensity)
         {
             intensity.value += Time.deltaTime * speed;
             yield return null;
         }
+        
         intensity.value = targetIntensity;
     }
 
@@ -72,14 +75,17 @@ public class GlobalVolumeController : MonoBehaviour
         if (effect == null) yield break;
 
         var intensityProperty = effect.GetType().GetField("intensity", BindingFlags.Public | BindingFlags.Instance);
+        
         if (intensityProperty == null || intensityProperty.FieldType != typeof(ClampedFloatParameter)) yield break;
 
         var intensity = (ClampedFloatParameter)intensityProperty.GetValue(effect);
+        
         while (intensity.value > 0)
         {
             intensity.value -= Time.deltaTime * speed;
             yield return null;
         }
+        
         intensity.value = 0f;
     }
 
