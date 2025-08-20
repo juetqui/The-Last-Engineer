@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlatformController : MonoBehaviour
@@ -11,21 +10,34 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private GenericConnectionController _connection = default;
 
-    private RouteManager _route = default;
-    private PlatformMotor _motor = default;
+    // --- Runtime
+    private RouteManager _route;
+    private PlatformMotor _motor;
+    private IMovablePassenger _passenger;
 
-    private Coroutine _moveRoutine = default;
-    private Coroutine _waitRoutine = default;
+    // Estado actual y objetos-estado (cacheados para evitar GC)
+    private IPlatformState _state;
+    private readonly InactiveState _inactiveState = new InactiveState();
+    private readonly WaitingState _waitingState = new WaitingState();
+    private readonly MovingState _movingState = new MovingState();
 
-    private IMovablePassenger _passenger = null;
-    private float _currentSpeed = default;
+    // Datos compartidos por los estados
+    internal float CurrentSpeed { get; private set; }
+    internal float MoveSpeed => _moveSpeed;
+    internal float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
+    internal float WaitCD => _waitCD;
+    internal float WaitTimer { get; set; }
+
+    internal IMovablePassenger Passenger => _passenger;
+    internal PlatformMotor Motor => _motor;
+    internal RouteManager Route => _route;
+    internal Vector3 CurrentTarget => _route.CurrentPoint;
 
     private void Awake()
     {
         _route = new RouteManager(_positions);
-
+        CurrentSpeed = _moveSpeed;
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
-        _currentSpeed = _moveSpeed;
     }
 
     private void Start()
@@ -35,7 +47,10 @@ public class PlatformController : MonoBehaviour
         _connection.OnNodeConnected += OnConnectionChanged;
         PlayerTDController.Instance.OnNodeGrabed += OnNodeGrabbed;
 
-        OnConnectionChanged(_requiredNode, _connection.StartsConnected);
+        // Estado inicial según el cable
+        bool canMove = _connection.StartsConnected && _requiredNode == _requiredNode; // mantiene semántica original
+        SetState(canMove ? (IPlatformState)_waitingState : _inactiveState);
+        _connection.SetPositiveFeedback(canMove);
     }
 
     private void OnDestroy()
@@ -44,70 +59,65 @@ public class PlatformController : MonoBehaviour
         PlayerTDController.Instance.OnNodeGrabed -= OnNodeGrabbed;
     }
 
-    /* -------------------- EVENTOS -------------------- */
+    private void Update()
+    {
+        _state?.Tick(this);
+    }
 
+    /* -------------------- Eventos externos -------------------- */
     private void OnConnectionChanged(NodeType type, bool active)
     {
-        bool canMove = type == _requiredNode && active;
-        
+        bool canMove = (type == _requiredNode) && active;
         _connection.SetPositiveFeedback(canMove);
 
-        if (canMove && _waitRoutine == null) _waitRoutine = StartCoroutine(WaitAndMoveRoutine());
+        if (canMove)
+            SetState(_waitingState);
         else
-        {
-            StopAndNull(ref _waitRoutine);
-            StopAndNull(ref _moveRoutine);
-        }
+            SetState(_inactiveState);
     }
 
     private void OnNodeGrabbed(bool hasNode, NodeType nodeType)
     {
-        _currentSpeed = (hasNode && nodeType == NodeType.Corrupted) ? _corruptedMoveSpeed : _moveSpeed;
+        CurrentSpeed = (hasNode && nodeType == NodeType.Corrupted) ? CorruptedMoveSpeed : MoveSpeed;
     }
 
-    /* -------------------- RUTINAS -------------------- */
+    /* -------------------- API interna usada por los estados -------------------- */
 
-    private IEnumerator WaitAndMoveRoutine()
+    internal void AdvanceRouteAndWait()
     {
-        yield return new WaitForSeconds(_waitCD);
-        _waitRoutine = null;
-
-        if (_moveRoutine == null)
-            _moveRoutine = StartCoroutine(MoveRoutine());
-    }
-
-    private IEnumerator MoveRoutine()
-    {
-        Vector3 target = _route.CurrentPoint;
-        _motor = new PlatformMotor(transform, _passenger);
-
-        while (!_motor.InTarget(target))
-        {
-            _motor.MoveTowards(target, _currentSpeed, _passenger);
-            yield return null;
-        }
-
-        if (_passenger != null) _motor.Stop(_passenger);
-
         _route.Advance();
-        _moveRoutine = null;
-
-        if (_waitRoutine == null)
-            _waitRoutine = StartCoroutine(WaitAndMoveRoutine());
+        SetState(_waitingState);
     }
 
-    /* -------------------- UTIL -------------------- */
-
-    private void StopAndNull(ref Coroutine routine)
+    internal void BeginWait()
     {
-        if (routine != null)
-        {
-            StopCoroutine(routine);
-            routine = null;
-        }
+        WaitTimer = _waitCD;
     }
 
-    /* -------------------- PASAJERO -------------------- */
+    internal void StopPassenger()
+    {
+        if (_passenger != null) _motor.Stop(_passenger);
+    }
+
+    internal bool ReachedTarget()
+    {
+        return _motor.InTarget(CurrentTarget);
+    }
+
+    internal void MoveStep()
+    {
+        _motor.MoveTowards(CurrentTarget, CurrentSpeed, _passenger);
+    }
+
+    internal void SetState(IPlatformState next)
+    {
+        if (_state == next) return;
+        _state?.Exit(this);
+        _state = next;
+        _state.Enter(this);
+    }
+
+    /* -------------------- Trigger pasajero -------------------- */
 
     private void OnTriggerEnter(Collider col)
     {
@@ -123,4 +133,78 @@ public class PlatformController : MonoBehaviour
             _passenger = null;
         }
     }
+}
+
+/* ========================================================================== */
+/*                              Patrón de Estados                              */
+/* ========================================================================== */
+
+public interface IPlatformState
+{
+    void Enter(PlatformController ctx);
+    void Tick(PlatformController ctx);
+    void Exit(PlatformController ctx);
+}
+
+public class InactiveState : IPlatformState
+{
+    public void Enter(PlatformController ctx)
+    {
+        ctx.WaitTimer = 0f;
+        ctx.StopPassenger(); // asegura desplazamiento cero
+    }
+
+    public void Tick(PlatformController ctx)
+    {
+        // No hace nada mientras el cable/condición no habilite
+        // El cambio a Waiting lo dispara el evento OnConnectionChanged
+    }
+
+    public void Exit(PlatformController ctx) { }
+}
+
+public class WaitingState : IPlatformState
+{
+    public void Enter(PlatformController ctx)
+    {
+        // Reinicia la cuenta
+        ctx.BeginWait();
+        ctx.StopPassenger(); // por si venía de Moving
+    }
+
+    public void Tick(PlatformController ctx)
+    {
+        if (ctx.WaitTimer > 0f)
+        {
+            ctx.WaitTimer -= Time.deltaTime;
+            if (ctx.WaitTimer <= 0f)
+            {
+                ctx.SetState(new MovingState()); // O usar instancia cacheada si preferís (ver nota abajo)
+            }
+        }
+    }
+
+    public void Exit(PlatformController ctx) { }
+}
+
+public class MovingState : IPlatformState
+{
+    public void Enter(PlatformController ctx)
+    {
+        // Nada especial; el target se evalúa cada frame desde RouteManager
+    }
+
+    public void Tick(PlatformController ctx)
+    {
+        if (ctx.ReachedTarget())
+        {
+            ctx.StopPassenger();
+            ctx.AdvanceRouteAndWait(); // Avanza al próximo punto y vuelve a esperar
+            return;
+        }
+
+        ctx.MoveStep();
+    }
+
+    public void Exit(PlatformController ctx) { }
 }
