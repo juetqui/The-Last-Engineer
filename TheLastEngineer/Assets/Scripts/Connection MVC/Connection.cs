@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
@@ -10,6 +11,8 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
 
     [SerializeField] protected NodeController _recievedNode = null;
     [SerializeField] protected GameObject refuerzoPositivo;
+
+    private Coroutine _changingColor = null;
     protected MainTM _mainTM = default;
     public bool StartsConnected { get; private set; }
 
@@ -51,10 +54,34 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
             succededInteraction = false;
         }
     }
+    
     public void SetPositiveFeedback(bool Active)
     {
         refuerzoPositivo.SetActive(Active);
-     
-     
+
+        if (_changingColor != null) StopCoroutine(_changingColor);
+
+        Color targetColor = Active ? Color.cyan : Color.red;
+        _changingColor = StartCoroutine(ChangeColor(targetColor));
+    }
+
+    private IEnumerator ChangeColor(Color targetColor)
+    {
+        Renderer renderer = GetComponent<Renderer>();
+        float counter = 0f;
+
+        while (counter < 1f)
+        {
+            counter += Time.deltaTime * 0.05f;
+
+            Color currentColor = renderer.material.GetColor("_EmissiveColor");
+            Color newColor = Color.Lerp(currentColor, targetColor, counter);
+
+            renderer.material.SetColor("_EmissiveColor", newColor);
+            yield return null;
+        }
+
+        renderer.material.SetColor("_EmissiveColor", targetColor);
+        _changingColor = null;
     }
 }

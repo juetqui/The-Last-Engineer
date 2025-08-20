@@ -9,6 +9,7 @@ public class GenericTM : MonoBehaviour
     [SerializeField] private List<GenericConnectionController> _connections;
     [SerializeField] private List<NodeType> _requiredTypes;
     [SerializeField] private ParticleSystem _windParticle;
+    
     [Header("MVC View")]
     private Animator _animator;
     private AudioSource _source;
@@ -18,9 +19,6 @@ public class GenericTM : MonoBehaviour
 
     private Dictionary<NodeType, int> _totalRequired = new Dictionary<NodeType, int>();
     private Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
-
-    //public delegate void OnRunning(bool isRunning);
-    //public event OnRunning onRunning = default;
 
     public Action<bool> OnRunning;
 
