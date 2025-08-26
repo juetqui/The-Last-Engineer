@@ -9,7 +9,7 @@ public class GenericTM : MonoBehaviour
     [SerializeField] private List<GenericConnectionController> _connections;
     [SerializeField] private List<NodeType> _requiredTypes;
     [SerializeField] private ParticleSystem _windParticle;
-    
+    [SerializeField] bool IsBroken;
     [Header("MVC View")]
     private Animator _animator;
     private AudioSource _source;
@@ -38,6 +38,11 @@ public class GenericTM : MonoBehaviour
 
     private void SetUp()
     {
+        if (IsBroken)
+        {
+            _animator.SetBool("IsBroken", true);
+            return;
+        }
         foreach (var connection in _connections) connection.SetSecTM(this);
 
         _connections.ForEach(c => c.OnNodeConnected += HandleConnectedNode);
