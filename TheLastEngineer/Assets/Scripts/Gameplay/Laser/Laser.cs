@@ -73,6 +73,8 @@ public class Laser : MonoBehaviour
         else _lineRenderer.enabled = false;
     }
 
+    #region castLaserViejo
+    /*
     private void CastLaser()
     {
         Vector3 laserPos = GetFixedLaserPos();
@@ -155,6 +157,87 @@ public class Laser : MonoBehaviour
             _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
         }
     }
+    */
+    #endregion
+
+    #region castLaserNuevo
+    private void CastLaser()
+    {
+        Vector3 laserPos = GetFixedLaserPos();
+
+        _ray = new Ray(laserPos, transform.forward);
+        _rightRay = new Ray(laserPos + transform.right * _raycastOffsetX, transform.forward);
+        _leftRay = new Ray(laserPos - transform.right * _raycastOffsetX, transform.forward);
+
+        if (Physics.Raycast(_ray, out _rayHit, _maxDist, _laserLayer))
+        {
+            // Obtenemos todos los impactos en la dirección del rayo
+            RaycastHit[] hits = Physics.RaycastAll(_ray, _maxDist, _laserLayer);
+
+            // Ordenamos por distancia (de menor a mayor)
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (var hit in hits)
+            {
+                if (hit.collider.TryGetComponent(out PlayerTDController player))
+                {
+                    // Cortamos el rayo en el player
+                    _lineRenderer.SetPosition(0, laserPos);
+                    _lineRenderer.SetPosition(1, hit.point);
+                    player.LaserRecived();
+                   _lastHit = player;
+
+                    _hitLaser.transform.position = hit.point;
+                    _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);
+                    if (!_hitLaser.isPlaying) _hitLaser.Play();
+
+                    // Si querés que el láser siga "más allá del player" y pegue en la pared,
+                    // sacá el "break;" de abajo
+                    break;
+                }
+                else if (hit.collider.TryGetComponent(out ILaserReceptor receptor))
+                {
+                    if (_lastHit != null && _lastHit != receptor)
+                        _lastHit.LaserNotRecived();
+
+                    _lineRenderer.SetPosition(0, laserPos);
+                    _lineRenderer.SetPosition(1, hit.point);
+                    receptor.LaserRecived();
+                    _lastHit = receptor;
+
+                    // Partícula
+                    _hitLaser.transform.position = hit.point;
+                    _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);
+                    if (!_hitLaser.isPlaying) _hitLaser.Play();
+
+                    break;
+                }
+                else
+                {
+                    // Cualquier otra cosa (pared, etc.)
+                    _lineRenderer.SetPosition(0, laserPos);
+                    _lineRenderer.SetPosition(1, hit.point);
+
+                    // Partícula
+                    _hitLaser.transform.position = hit.point;
+                    _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);
+                    if (!_hitLaser.isPlaying) _hitLaser.Play();
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // No pegó nada => láser al máximo
+            _lineRenderer.SetPosition(0, laserPos);
+            _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
+
+            if (_hitLaser.isPlaying) _hitLaser.Stop();
+        }
+
+    }
+    #endregion
 
     private Vector3 GetFixedLaserPos()
     {

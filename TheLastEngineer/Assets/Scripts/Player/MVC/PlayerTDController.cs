@@ -27,6 +27,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     public static PlayerTDController Instance = null;
     [SerializeField] private SolvingController _solvingController;
 
+    public Collider playerCollider;
     public CharacterController _cc = default;
     private CinemachineImpulseSource _impulseSource = default;
 
@@ -416,6 +417,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _isDead = false;
         _playerView.SetAnimatorSpeed(1f);
         _solvingController?.RespawnPlayer();
+        playerCollider.enabled = true;
         OnEnableInputs();
     }
 

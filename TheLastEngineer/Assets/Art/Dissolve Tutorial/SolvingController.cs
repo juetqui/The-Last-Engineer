@@ -8,6 +8,8 @@ public class SolvingController : MonoBehaviour
 {
     public Action OnDissolveCompleted = delegate { };
 
+    public CharacterController playerController;
+    public Collider playerCollider;
     public SkinnedMeshRenderer MySkinnedMeshRenderer;
     public float MaxBound;
     public float MinBound;
@@ -182,6 +184,7 @@ public class SolvingController : MonoBehaviour
 
             while (skinnedMaterials[0].GetFloat("_DisolveProgress") > 0)
             {
+
                 vector3 += Vector3.up * (_killerDistance / _rateQty);
                 VFXGraph.SetInt("initialParticleRate", particlesCount += particleIncreaseRate);
                 VFXGraph.SetVector3("StartKillerSize", (killerSize + vector3 * 1.5f));
@@ -260,9 +263,10 @@ public class SolvingController : MonoBehaviour
                 //for (int i = 0; i < skinnedMaterials.Length; i++)
                 foreach (var item in skinnedMaterials)
                 {
+                    playerController.enabled = false;
+                    playerCollider.enabled = false;
                     item.SetFloat("_DisolveProgress", _totalDissolve - counter);
                 }
-               
                 yield return new WaitForSeconds(refreshRate);
             }
         }
