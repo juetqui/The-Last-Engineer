@@ -21,13 +21,13 @@ public class NodeModel
 
     public void MoveObject()
     {
-        float offset = Mathf.Lerp(_minY, _maxY, (Mathf.Sin(Time.time * _moveSpeed) + 1f) / 2f);
-        float newGlobalY = _transform.position.y + offset;
-
-        _initialY += _rotSpeed * Time.deltaTime;
-        _transform.position = new Vector3(_transform.position.x, newGlobalY, _transform.position.z);
+        // Oscila entre [minY, maxY] alrededor de la altura inicial
+        float t = (Mathf.Sin(Time.time * _moveSpeed) + 1f) * 0.5f;
+        float offset = Mathf.Lerp(_minY, _maxY, t);
+        float newY = _initialY + offset;
+        _transform.position = new Vector3(_transform.position.x, newY, _transform.position.z);
     }
-    
+
     public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
     {
         _initialGlobalPosition = newPos;

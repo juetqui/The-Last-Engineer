@@ -65,28 +65,10 @@ public class NodeController : MonoBehaviour, IInteractable
         _nodeView.OnStart();
         _nodeView.UpdateNodeType(_nodeType, _currentOutline);
     }
-    public void StartDesintegrateShader()
-    {
-        _renderer.material.shader = _desintegrationShader;
-        _renderer.material.shader = _desintegrationShader;
-        _renderer.material.SetFloat("_ColorController", 1);
-        _renderer.material.SetColor("_StartingColor", _myColor);
-        _renderer.material.SetVector("_MinMaxPos", _desintegrationVector);
-        _renderer.material.SetFloat("_Alpha", 1);
-        _outline.enabled = false;
+    public void StartDesintegrateShader() => _nodeView.StartDisintegrate(_desintegrationShader, _myColor, _desintegrationVector);
+    public void SetDesintegrateShader(float alpha) => _nodeView.SetDisintegrateAlpha(alpha);
+    public void StopDesintegrateShader() => _nodeView.StopDisintegrate(_originalShader);
 
-    }
-    public void SetDesintegrateShader(float alpha)
-    {
-        _renderer.material.SetFloat("_Alpha", alpha);
-    }
-    public void StopDesintegrateShader()
-    {
-        //StartCoroutine(DesintegrateCo());
-        _renderer.material.shader = _originalShader;
-        _outline.enabled = true;
-
-    }
     protected void Update()
     {
         //_nodeModel.RotateToTarget(_target);
@@ -245,6 +227,13 @@ public class NodeController : MonoBehaviour, IInteractable
             _nodeView.SetIdleAnim();
         }
     }
+
+    void OnDisable()
+    {
+        if (GlitchActive.Instance != null)
+            GlitchActive.Instance.OnChangeObjectState -= InteractWithGlitcheable;
+    }
+
 
     public void Interact(GameObject interactor)
     {

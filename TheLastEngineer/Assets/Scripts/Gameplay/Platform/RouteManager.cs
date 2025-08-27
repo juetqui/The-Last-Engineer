@@ -1,4 +1,4 @@
-using UnityEngine;
+    using UnityEngine;
 
 public class RouteManager
 {
@@ -7,10 +7,7 @@ public class RouteManager
 
     public RouteManager(Transform[] points) => _points = points;
 
-    public Vector3 CurrentPoint => _points[_index].position;
-
-    public void Advance()
-    {
-        _index = (_index + 1) % _points.Length;
-    }
+    public bool IsValid => _points != null && _points.Length > 0;
+    public Vector3 CurrentPoint => IsValid ? _points[_index].position : Vector3.zero;
+    public void Advance() { if (IsValid) _index = (_index + 1) % _points.Length; }
 }

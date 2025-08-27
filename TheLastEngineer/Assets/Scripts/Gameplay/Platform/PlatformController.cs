@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlatformController : MonoBehaviour
@@ -36,33 +37,43 @@ public class PlatformController : MonoBehaviour
     private void Awake()
     {
         _route = new RouteManager(_positions);
+        _motor = new PlatformMotor(transform, null);   // INSTANCIAR EL MOTOR
         CurrentSpeed = _moveSpeed;
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
     }
 
+
     private void Start()
     {
-        _motor = new PlatformMotor(transform, null);
-
+        // Subscripción a cambios de conexión
         _connection.OnNodeConnected += OnConnectionChanged;
-        PlayerTDController.Instance.OnNodeGrabed += OnNodeGrabbed;
-
-        // Estado inicial según el cable
-        bool canMove = _connection.StartsConnected && _requiredNode == _requiredNode; // mantiene semántica original
-        SetState(canMove ? (IPlatformState)_waitingState : _inactiveState);
+        
+         // Velocidad según si el jugador porta un nodo corrupto (opcional)
+         if (PlayerTDController.Instance != null)
+            PlayerTDController.Instance.OnNodeGrabed += OnNodeGrabbed;
+        
+         // Estado inicial
+        bool canMove = _connection.StartsConnected; // y si hay filtro por tipo: && _connection.CurrentType == _requiredNode;
+        SetState(canMove ? _waitingState : _inactiveState);
         _connection.SetPositiveFeedback(canMove);
     }
 
     private void OnDestroy()
     {
-        _connection.OnNodeConnected -= OnConnectionChanged;
-        PlayerTDController.Instance.OnNodeGrabed -= OnNodeGrabbed;
+        if (_connection != null)
+            _connection.OnNodeConnected -= OnConnectionChanged;
+
+        if (PlayerTDController.Instance != null)
+            PlayerTDController.Instance.OnNodeGrabed -= OnNodeGrabbed;
     }
+
 
     private void Update()
     {
+        if (!_route.IsValid) return;
         _state?.Tick(this);
     }
+
 
     /* -------------------- Eventos externos -------------------- */
     private void OnConnectionChanged(NodeType type, bool active)

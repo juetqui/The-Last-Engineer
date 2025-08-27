@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NodeView
 {
@@ -48,6 +49,30 @@ public class NodeView
     {
         _myAnimator.SetBool("IsOnRange", true);
         _myAnimator.SetBool("IsCollected", false);
+    }
+
+    // --- Shader control centralizado ---
+    public void StartDisintegrate(Shader shader, Color startColor, Vector2 minMax, float alpha = 1f)
+    {
+        var mat = _renderer.material;
+        mat.shader = shader;
+        mat.SetFloat("_ColorController", 1);
+        mat.SetColor("_StartingColor", startColor);
+        mat.SetVector("_MinMaxPos", minMax);
+        mat.SetFloat("_Alpha", alpha);
+        _outline.enabled = false;
+    }
+
+    public void SetDisintegrateAlpha(float alpha)
+    {
+        _renderer.material.SetFloat("_Alpha", alpha);
+    }
+
+    public void StopDisintegrate(Shader originalShader)
+    {
+        var mat = _renderer.material;
+        mat.shader = originalShader;
+        _outline.enabled = true;
     }
 
     public void UpdateNodeType(NodeType nodeType, Color currentOutline)
