@@ -13,7 +13,7 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
     [SerializeField] protected GameObject refuerzoPositivo;
 
     private Coroutine _changingColor = null;
-    protected MainTM _mainTM = default;
+
     public bool StartsConnected { get; private set; }
 
     private void Start()
@@ -26,15 +26,9 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
         else StartsConnected = false;
     }
 
-    public abstract void SetSecTM(T secTM);
+    public abstract void SetSecTM(T secTM);               // compat: hoy es no-op
     protected abstract void SetNode(NodeController node);
     public abstract void UnsetNode(NodeController node = null);
-
-    public void SetMainTM()
-    {
-        _mainTM = MainTM.Instance;
-    }
-
     public abstract bool CanInteract(PlayerTDController player);
 
     public void Interact(PlayerTDController player, out bool succededInteraction)
@@ -54,30 +48,29 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
             succededInteraction = false;
         }
     }
-    
-    public void SetPositiveFeedback(bool Active)
+
+    public void SetPositiveFeedback(bool active)
     {
-        refuerzoPositivo.SetActive(Active);
+        if (refuerzoPositivo != null) refuerzoPositivo.SetActive(active);
 
         if (_changingColor != null) StopCoroutine(_changingColor);
 
-        Color targetColor = Active ? Color.cyan : Color.red;
+        var targetColor = active ? Color.cyan : Color.red;
         _changingColor = StartCoroutine(ChangeColor(targetColor));
     }
 
     private IEnumerator ChangeColor(Color targetColor)
     {
-        Renderer renderer = GetComponent<Renderer>();
-        float counter = 0f;
+        var renderer = GetComponent<Renderer>();
+        if (renderer == null || renderer.material == null) yield break;
 
-        while (counter < 1f)
+        float t = 0f;
+        while (t < 1f)
         {
-            counter += Time.deltaTime * 0.05f;
-
-            Color currentColor = renderer.material.GetColor("_EmissiveColor");
-            Color newColor = Color.Lerp(currentColor, targetColor, counter);
-
-            renderer.material.SetColor("_EmissiveColor", newColor);
+            t += Time.deltaTime * 0.05f;
+            var current = renderer.material.GetColor("_EmissiveColor");
+            var next = Color.Lerp(current, targetColor, t);
+            renderer.material.SetColor("_EmissiveColor", next);
             yield return null;
         }
 
@@ -85,13 +78,7 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
         _changingColor = null;
     }
 
-    public void Interact(GameObject interactor)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public bool CanInteract(GameObject interactor)
-    {
-        throw new System.NotImplementedException();
-    }
+    // No usados por tu gameplay actual
+    public void Interact(GameObject interactor) => throw new System.NotImplementedException();
+    public bool CanInteract(GameObject interactor) => throw new System.NotImplementedException();
 }

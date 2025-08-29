@@ -2,54 +2,67 @@ using UnityEngine;
 
 public class MainDoorLights : MonoBehaviour
 {
-    [SerializeField] private float _lerpTime;
+    [SerializeField] private TaskManager _tm;
+    [SerializeField] private float _lerpTime = 0.5f;
 
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _closedColor;
-
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _openedColor;
+    [ColorUsage(true, true)][SerializeField] private Color _closedColor;
+    [ColorUsage(true, true)][SerializeField] private Color _openedColor;
 
     private MeshRenderer _renderer;
-    private Color _currentColor = default, _startColor = default, _targetColor = default;
-    private int _index = 0;
-    private float _time = 0;
-    private bool _isLerping = false;
+    private Color _startColor, _targetColor;
+    private float _t;
+    private bool _isLerping;
+    private bool _firstEventSkipped; // para replicar tu _index
+
+    void Awake()
+    {
+        _renderer = GetComponent<MeshRenderer>();
+        if (_tm == null) _tm = FindObjectOfType<TaskManager>();
+        if (_tm != null)
+        {
+            _tm.RunningChanged += StartLerp;
+            // _tm.onRunning += StartLerp;
+        }
+    }
 
     void Start()
     {
-        _renderer = GetComponent<MeshRenderer>();
-        _renderer.material.SetColor("_EmissionColor", _closedColor);
-        MainTM.Instance.onRunning += StartLerp;
+        SetEmission(_closedColor);
+    }
+
+    void OnDestroy()
+    {
+        if (_tm != null)
+        {
+            _tm.RunningChanged -= StartLerp;
+            // _tm.onRunning -= StartLerp;
+        }
     }
 
     void Update()
     {
-        if (_isLerping) LerpColors();
+        if (!_isLerping) return;
+
+        _t += Time.deltaTime / Mathf.Max(0.0001f, _lerpTime);
+        var c = Color.Lerp(_startColor, _targetColor, Mathf.Clamp01(_t));
+        SetEmission(c);
+
+        if (_t >= 1f) _isLerping = false;
     }
 
     private void StartLerp(bool isRunning)
     {
-        if (!isRunning && _index == 0)
-        {
-            _index++;
-            return;
-        }
+        if (!_firstEventSkipped) { _firstEventSkipped = true; return; }
 
         _startColor = isRunning ? _closedColor : _openedColor;
         _targetColor = isRunning ? _openedColor : _closedColor;
-
-        _time = 0;
+        _t = 0f;
         _isLerping = true;
     }
 
-    private void LerpColors()
+    private void SetEmission(Color c)
     {
-        _time += Time.deltaTime / _lerpTime;
-        _time = Mathf.Clamp01(_time);
-        _currentColor = Color.Lerp(_startColor, _targetColor, _time);
-        _renderer.material.SetColor("_EmissionColor", _currentColor);
-
-        if (_time >= 1.0f) _isLerping = false;
+        if (_renderer && _renderer.material)
+            _renderer.material.SetColor("_EmissionColor", c);
     }
 }

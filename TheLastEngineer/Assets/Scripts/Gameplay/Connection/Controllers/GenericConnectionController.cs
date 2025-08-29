@@ -1,16 +1,16 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class GenericConnectionController : Connection<GenericTM>
+public class GenericConnectionController : Connection<TaskManager>
 {
     [SerializeField] private Transform _nodePos;
-    private List<GenericTM> _secTaskManagers = new List<GenericTM>();
+
+    // El TaskManager universal se suscribe a este evento
     public Action<NodeType, bool> OnNodeConnected;
 
-    public override void SetSecTM(GenericTM secTM)
+    public override void SetSecTM(TaskManager _)
     {
-        _secTaskManagers.Add(secTM);
+        // No-op: el TaskManager central se suscribe a OnNodeConnected
     }
 
     public override bool CanInteract(PlayerTDController player)
@@ -20,19 +20,26 @@ public class GenericConnectionController : Connection<GenericTM>
 
     protected override void SetNode(NodeController node)
     {
-        node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f);
+        if (_nodePos != null)
+            node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f);
+        else
+            node.Attach(Vector3.zero, transform, Vector3.one * 0.15f);
+
         _recievedNode = node;
         OnNodeConnected?.Invoke(node.NodeType, true);
     }
 
     public override void UnsetNode(NodeController node = null)
     {
+        if (_recievedNode == null) return;
+
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _recievedNode = null;
     }
+
     public void EjectNode(Vector3 position = default)
     {
-        _recievedNode.gameObject.transform.position = position;
-
+        if (_recievedNode == null) return;
+        _recievedNode.transform.position = position;
     }
 }

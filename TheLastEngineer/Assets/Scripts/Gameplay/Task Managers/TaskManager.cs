@@ -1,74 +1,171 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public abstract class TaskManager : MonoBehaviour
+public class TaskManager : MonoBehaviour
 {
-    [Header("Lists")]
-    [SerializeField] protected List<SpecificConnectionController> connections;
-    //[SerializeField] protected ElectricityController _elecController;
+    [Header("Connections")]
+    [Tooltip("Arrastrá aquí TODOS los GenericConnectionController de la escena")]
+    [SerializeField] private List<GenericConnectionController> _genericConnections = new();
+    [Tooltip("Arrastrá aquí TODOS los SpecificConnectionController de la escena")]
+    [SerializeField] private List<SpecificConnectionController> _specificConnections = new();
 
-    [Header("MVC View")]
-    [SerializeField] protected AudioSource _source;
+    [Tooltip("Si es true, solo valida que TODAS las conexiones estén activas, sin importar los tipos.")]
+    [SerializeField] private bool _simpleCountMode = true;
 
-    protected int _workingNodes = default, _totalToFinish = default, _totalForDictionary = default;
-    protected bool _running = false;
-    
-    public delegate void OnRunning(bool isRunning);
-    public event OnRunning onRunning = default;
+    [Tooltip("Si el modo no es simple, estos son los tipos requeridos y su cantidad (puede repetir tipos).")]
+    [SerializeField] private List<NodeType> _requiredTypes = new();
 
-    protected Dictionary<NodeType, int> _nodesSet = new Dictionary<NodeType, int>();
+    [Header("Feedback / FX opcional")]
+    [SerializeField] private Animator _animator;             // bool "DoorActivated"
+    [SerializeField] private AudioSource _source;            // loop/one-shot cuando corre
+    [SerializeField] private ParticleSystem _particle;       // partículas al correr
+    [SerializeField] private Light _light;                   // luz que sube al correr
+    [SerializeField] private float _lightTarget = 30f;
+    [SerializeField] private float _lightRiseSpeed = 5f;
+    [SerializeField] private AudioSource _winAS;             // audio de “win” opcional
 
-    public bool Running { get { return _running; } }
+    // --- Runtime ---
+    private readonly Dictionary<NodeType, int> _required = new();
+    private readonly Dictionary<NodeType, int> _current = new();
 
-    protected abstract void OnAllNodesConnected();
-    protected abstract void SetUp();
+    private int _working;      // conexiones activas actuales (todas)
+    private int _total;        // total de conexiones que deben estar activas
+    private bool _running;
 
-    protected void OnAwake()
+    public event Action<bool> RunningChanged = delegate { };
+    public bool IsRunning => _running;
+
+    private void Awake()
     {
-        _totalForDictionary = _nodesSet.Count;
-    }
+        // Autoreferencias seguras
+        if (_animator == null) _animator = GetComponent<Animator>();
+        if (_source == null) _source = GetComponent<AudioSource>();
 
-    protected void OnStart()
-    {
-        _totalToFinish = connections.Count;
-        ValidateAllConnections();
-    }
+        // Suscribirse a TODOS los controladores disponibles
+        foreach (var c in _genericConnections.Where(c => c != null))
+            c.OnNodeConnected += OnNodeChanged;
 
-    protected void ValidateAllConnections()
-    {
-        if (_workingNodes == _totalToFinish)
+        foreach (var c in _specificConnections.Where(c => c != null))
+            c.OnNodeConnected += OnNodeChanged;
+
+        _total = _genericConnections.Count + _specificConnections.Count;
+
+        // Si NO es simple, armamos requeridos por tipo (Tipo -> Cantidad)
+        if (!_simpleCountMode)
         {
-            _running = true;
-            OnAllNodesConnected();
+            foreach (var g in _requiredTypes.GroupBy(t => t))
+                _required[g.Key] = g.Count();
+        }
+
+        // Inicial (por si hay conexiones que empiezan puestas)
+        PreloadAlreadyConnected();
+
+        Validate();
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var c in _genericConnections.Where(c => c != null))
+            c.OnNodeConnected -= OnNodeChanged;
+
+        foreach (var c in _specificConnections.Where(c => c != null))
+            c.OnNodeConnected -= OnNodeChanged;
+    }
+
+    private void Update()
+    {
+        // Efecto de luz opcional
+        if (_running && _light != null && _light.intensity < _lightTarget)
+            _light.intensity = Mathf.Min(_lightTarget, _light.intensity + _lightRiseSpeed * Time.deltaTime);
+    }
+
+    /// <summary>
+    /// Si alguna conexión marcó StartsConnected en su Start(), levantamos ese estado acá.
+    /// </summary>
+    private void PreloadAlreadyConnected()
+    {
+        // Ojo: sólo sabemos el tipo cuando lo emite la conexión;
+        // si necesitás precarga real por tipo, deberías consultar cada controller.
+        // Para flujo normal (conectar jugando) esto no es imprescindible.
+    }
+
+    private void OnNodeChanged(NodeType type, bool active)
+    {
+        // Conteo global de conexiones activas
+        _working += active ? 1 : -1;
+        _working = Mathf.Max(0, _working);
+
+        if (!_simpleCountMode)
+        {
+            // Validación por tipos
+            if (!_required.ContainsKey(type))
+            {
+                // Tipo no requerido: invalida la corrida si estamos en modo estricto
+                // (opción: ignorarlo, pero el diseño original exigía tipos exactos)
+                // Igual, validamos el resto:
+                Validate();
+                return;
+            }
+
+            int cur = _current.ContainsKey(type) ? _current[type] : 0;
+            cur = Mathf.Clamp(cur + (active ? 1 : -1), 0, _required[type]);
+            _current[type] = cur;
+        }
+
+        Validate();
+    }
+
+    private void Validate()
+    {
+        bool ok;
+
+        if (_simpleCountMode)
+        {
+            ok = (_working == _total);
         }
         else
-            _running = false;
-
-        onRunning?.Invoke(_running);
-    }
-
-    public void AddConnection(NodeType nodeType)
-    {
-        if (_nodesSet.ContainsKey(nodeType)) _nodesSet[nodeType]++;
-        else _nodesSet.Add(nodeType, 1);
-
-        //if (_elecController != null)
-        //    _elecController.MoveSpline();
-
-        _workingNodes++;
-        ValidateAllConnections();
-    }
-
-    public void RemoveConnection(NodeType nodeType)
-    {
-        if (_nodesSet.ContainsKey(nodeType))
         {
-            _nodesSet[nodeType]--;
+            bool allTypesOk = _required.All(req =>
+                _current.TryGetValue(req.Key, out var count) && count == req.Value);
 
-            if (_nodesSet[nodeType] <= 0) _nodesSet.Remove(nodeType);
+            ok = allTypesOk && (_working == _total);
         }
 
-        _workingNodes--;
-        ValidateAllConnections();
+        SetRunning(ok);
     }
+
+    private void SetRunning(bool value)
+    {
+        if (_running == value) return;
+        _running = value;
+
+        // Evento público para VFX externos (DoorLights, ParticlesColorChanger, etc.)
+        RunningChanged.Invoke(_running);
+
+        // Feedback local (opcional)
+        if (_animator) _animator.SetBool("DoorActivated", _running);
+
+        if (_particle)
+        {
+            if (_running && !_particle.isPlaying) _particle.Play();
+            else if (!_running && _particle.isPlaying) _particle.Stop();
+        }
+
+        if (_source)
+        {
+            if (_running && !_source.isPlaying) _source.Play();
+            else if (!_running && _source.isPlaying) _source.Stop();
+        }
+
+        if (_winAS && _running) _winAS.Play();
+
+        // Reset de luz si se cerró
+        if (!_running && _light) _light.intensity = 0f;
+    }
+
+    // Compat: por si algún script antiguo lo llama
+    public void OpenDoor() => SetRunning(true);
+    public void CloseDoor() => SetRunning(false);
 }
