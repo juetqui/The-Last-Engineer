@@ -5,28 +5,18 @@ using System;
 public class SpecificConnectionController : Connection<TaskManager>
 {
     [SerializeField] private NodeType _requiredType;
-
     [Header("MVC View")]
     private MeshRenderer _renderer;
     private AudioSource _audioSrc;
-
     [SerializeField] private Collider _triggerCollider;
-    [SerializeField] private AudioClip _placedClip;
-    [SerializeField] private AudioClip _errorClip;
-    [SerializeField] private Color _color;
-    [SerializeField] private Color _secColor;
-    [SerializeField] private ParticleSystem idlePSystem;
-    [SerializeField] private ParticleSystem correctPSystem;
+    [SerializeField] private AudioClip _placedClip, _errorClip;
+    [SerializeField] private Color _color, _secColor, _fresnelColor;
+    [SerializeField] private ParticleSystem idlePSystem, correctPSystem;
     [SerializeField] private GameObject correcNodeIndicator;
 
-    [ColorUsage(true, true)][SerializeField] private Color _fresnelColor;
-    [SerializeField] private ParticleSystem _ps;
-
     private SpecificConnectionView _connectionView;
-
     private bool _isDisabled = false, _isWorking = false;
 
-    // El TaskManager universal se suscribe a este evento
     public Action<NodeType, bool> OnNodeConnected;
 
     public bool IsDisabled => _isDisabled;
@@ -36,31 +26,18 @@ public class SpecificConnectionController : Connection<TaskManager>
     {
         _renderer = GetComponent<MeshRenderer>();
         _audioSrc = GetComponent<AudioSource>();
-
-        _connectionView = new SpecificConnectionView(
-            _requiredType, _renderer, _triggerCollider,
-            _color, _secColor, _fresnelColor, _ps, _audioSrc
-        );
+        _connectionView = new SpecificConnectionView(_requiredType, _renderer, _triggerCollider, _color, _secColor, _fresnelColor, correctPSystem, _audioSrc);
         _connectionView.OnStart();
     }
 
-    public override void SetSecTM(TaskManager _)
-    {
-        // No-op: el TaskManager central se suscribe a OnNodeConnected
-    }
+    public override void SetSecTM(TaskManager _) { }
 
-    public override bool CanInteract(PlayerTDController player)
-    {
-        if (correctPSystem) correctPSystem.Stop();
-        if (correcNodeIndicator) correcNodeIndicator.SetActive(false);
-        if (idlePSystem) idlePSystem.Stop();
-        return player.HasNode() && !_isDisabled;
-    }
+    public override bool CanInteract(PlayerTDController player) =>
+        player.HasNode() && !_isDisabled;
 
     protected override void SetNode(NodeController node)
     {
         if (_isDisabled || node == null) return;
-
         node.Attach(Vector3.zero, transform);
         _recievedNode = node;
         CheckReceivedNode();
@@ -69,7 +46,6 @@ public class SpecificConnectionController : Connection<TaskManager>
     public override void UnsetNode(NodeController node = null)
     {
         if (_recievedNode == null) return;
-
         if (_recievedNode.NodeType == _requiredType)
             OnNodeConnected?.Invoke(_requiredType, false);
 
@@ -80,26 +56,28 @@ public class SpecificConnectionController : Connection<TaskManager>
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.TryGetComponent(out PlayerTDController playerTDController)) return;
-
-        bool hasRequired = playerTDController.HasNode() &&
-                           playerTDController.GetCurrentNode().NodeType == _requiredType;
-
-        if (hasRequired)
+        if (other.TryGetComponent(out PlayerTDController playerTDController))
         {
-            if (idlePSystem) { idlePSystem.Stop(); idlePSystem.Clear(); }
-            if (correctPSystem) correctPSystem.Play();
-            if (correcNodeIndicator) correcNodeIndicator.SetActive(true);
+            bool hasRequired = playerTDController.HasNode() &&
+                               playerTDController.GetCurrentNode().NodeType == _requiredType;
+
+            if (hasRequired)
+            {
+                idlePSystem.SafeStop();
+                correctPSystem.SafePlay();
+                correcNodeIndicator.SetActive(true);
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.TryGetComponent(out PlayerTDController _)) return;
-
-        if (correctPSystem) correctPSystem.Stop();
-        if (correcNodeIndicator) correcNodeIndicator.SetActive(false);
-        if (idlePSystem) idlePSystem.Play();
+        if (other.TryGetComponent(out PlayerTDController _))
+        {
+            correctPSystem.SafeStop();
+            correcNodeIndicator.SetActive(false);
+            idlePSystem.SafePlay();
+        }
     }
 
     private void CheckReceivedNode()
@@ -120,17 +98,8 @@ public class SpecificConnectionController : Connection<TaskManager>
     private void HandleReceivedNode(bool isValid, bool playEffects)
     {
         _isWorking = isValid;
-
-        if (isValid)
-        {
-            OnNodeConnected?.Invoke(_requiredType, true);
-            _connectionView.PlayClip(_placedClip, 3f);
-        }
-        else
-        {
-            _connectionView.PlayClip(_errorClip ? _errorClip : _placedClip, 1f);
-        }
-
+        OnNodeConnected?.Invoke(_requiredType, isValid);
+        _connectionView.PlayClip(isValid ? _placedClip : (_errorClip ?? _placedClip), 1f);
         _recievedNode.IsConnected = isValid;
         _connectionView.Enable(playEffects);
         _connectionView.PlayEffect(playEffects);
@@ -140,9 +109,7 @@ public class SpecificConnectionController : Connection<TaskManager>
     {
         _isDisabled = true;
         _connectionView.ChangeColor(Color.red);
-
         yield return new WaitForSeconds(3f);
-
         _isDisabled = false;
         _connectionView.ChangeColor(_color);
         _connectionView.EnableTrigger(true);

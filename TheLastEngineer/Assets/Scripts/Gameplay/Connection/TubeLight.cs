@@ -7,71 +7,42 @@ public class TubeLight : MonoBehaviour
     [SerializeField] private TubeLight _nextConnection;
 
     private Renderer _renderer;
-    private NodeType _requiredNode = NodeType.Default;
     private bool _connected = false;
 
     private void Start()
     {
         _renderer = GetComponent<Renderer>();
-
-        if (_connection != null) _connection.OnNodeConnected += TurnOnOff;
+        _connection.OnNodeConnected += TurnOnOff;
     }
 
     private void TurnOnOff(NodeType nodeType, bool connected)
     {
-        if (!_connected && connected && nodeType == _requiredNode)
-        {
-            _connected = true;
-            StartCoroutine(TurnOn());
-        }
-        else if (_connected && !connected && nodeType == _requiredNode)
-        {
-            _connected = false;
-            StartCoroutine(TurnOff());
-        }
-    }
-    
-    public void ReceptorTurnOn()
-    {
-        StartCoroutine(TurnOn());
-    }
-
-    public void ReceptorTurnOff()
-    {
-        StartCoroutine(TurnOff());
+        if (!_connected && connected) StartCoroutine(TurnOn());
+        else if (_connected && !connected) StartCoroutine(TurnOff());
     }
 
     public IEnumerator TurnOn()
     {
         _connected = true;
-        float timer = 0;
-
-        while (timer < 1f)
-        {
-            timer += Time.deltaTime * 10f;
-            _renderer.material.SetFloat("_Step", timer);
-            yield return null;
-        }
-
-        _renderer.material.SetFloat("_Step", 1f);
-
-        if (_nextConnection != null) StartCoroutine(_nextConnection.TurnOn());
+        yield return LerpLight(0f, 1f);
+        _nextConnection?.StartCoroutine(_nextConnection.TurnOn());
     }
-    
+
     public IEnumerator TurnOff()
     {
         _connected = false;
-        float timer = 1f;
+        yield return LerpLight(1f, 0f);
+        _nextConnection?.StartCoroutine(_nextConnection.TurnOff());
+    }
 
-        while (timer > 0f)
+    private IEnumerator LerpLight(float from, float to)
+    {
+        float t = 0f;
+        while (t < 1f)
         {
-            timer -= Time.deltaTime * 10f;
-            _renderer.material.SetFloat("_Step", timer);
+            t += Time.deltaTime * 10f;
+            _renderer.material.SetFloat("_Step", Mathf.Lerp(from, to, t));
             yield return null;
         }
-
-        _renderer.material.SetFloat("_Step", 0f);
-        
-        if (_nextConnection != null) StartCoroutine(_nextConnection.TurnOff());
     }
 }

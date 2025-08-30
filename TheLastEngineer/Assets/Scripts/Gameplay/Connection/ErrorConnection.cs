@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +8,6 @@ public class ErrorConnection : MonoBehaviour
 
     private void Start()
     {
-
         _errorPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
         _puertaRequirement = GetComponentInParent<GenericConnectionController>();
         _puertaRequirement.OnNodeConnected += playPS;
@@ -17,20 +15,13 @@ public class ErrorConnection : MonoBehaviour
 
     void playPS(NodeType nodeType, bool connected)
     {
-        if(connected && nodeType == NodeType.Corrupted)
+        if (connected && nodeType == NodeType.Corrupted)
         {
-            foreach (var ps in _errorPS)
-            {
-                ps.Play();
-            }
+            foreach (var ps in _errorPS) ps.SafePlay();
         }
         else
         {
-            foreach (var ps in _errorPS)
-            {
-                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            }
-            
+            foreach (var ps in _errorPS) ps.SafeStop();
         }
     }
 }

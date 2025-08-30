@@ -8,10 +8,8 @@ public class ConnectionModuleController : MonoBehaviour
     [SerializeField] private ParticleSystem _orbitPs;
     [SerializeField] private ParticleSystem _completedPs;
     [SerializeField] private SplineAnimate _animator;
-
-    [Header("Light Management")]
     [SerializeField] private Light _light;
-    [SerializeField] private float _turnTime = 1f;   // segs hasta objetivo
+    [SerializeField] private float _turnTime = 1f;
     [SerializeField] private float _maxLight = 5f;
 
     private Coroutine _lightRoutine;
@@ -19,49 +17,39 @@ public class ConnectionModuleController : MonoBehaviour
     void Awake()
     {
         if (_tm == null) _tm = FindObjectOfType<TaskManager>();
-        if (_tm != null)
-        {
-            _tm.RunningChanged += SetFX;           // o _tm.onRunning += SetFX;
-            // _tm.onRunning += SetFX;
-        }
+        if (_tm != null) _tm.RunningChanged += SetFX;
     }
 
-    void Start()
-    {
-        StopFX();
-    }
+    void Start() => StopFX();
 
     void OnDestroy()
     {
-        if (_tm != null)
-        {
-            _tm.RunningChanged -= SetFX;
-            // _tm.onRunning -= SetFX;
-        }
+        if (_tm != null) _tm.RunningChanged -= SetFX;
     }
 
     private void SetFX(bool running)
     {
-        if (running) PlayFX();
-        else StopFX();
+        if (running)
+            PlayFX();
+        else
+            StopFX();
     }
+
 
     private void StopFX()
     {
-        if (_orbitPs) _orbitPs.Stop();
-        if (_completedPs) _completedPs.Stop();
-        if (_animator) _animator.Pause();
-
-        StartLightRoutine(target: 0f);
+        _orbitPs.SafeStop();
+        _completedPs.SafeStop();
+        _animator?.Pause();
+        StartLightRoutine(0f);
     }
 
     private void PlayFX()
     {
-        if (_orbitPs && !_orbitPs.isPlaying) _orbitPs.Play();
-        if (_completedPs && !_completedPs.isPlaying) _completedPs.Play();
-        if (_animator) _animator.Play();
-
-        StartLightRoutine(target: _maxLight);
+        _orbitPs.SafePlay();
+        _completedPs.SafePlay();
+        _animator?.Play();
+        StartLightRoutine(_maxLight);
     }
 
     private void StartLightRoutine(float target)
@@ -74,7 +62,6 @@ public class ConnectionModuleController : MonoBehaviour
     private IEnumerator LerpLight(float from, float to, float duration)
     {
         if (duration <= 0f) { _light.intensity = to; yield break; }
-
         float t = 0f;
         while (t < 1f)
         {
