@@ -50,11 +50,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     #region -----STATES VARIABLES-----
     private IPlayerState _currentState = default;
+    private IPlayerState _lastState = default;
     private PlayerEmptyState _playerEmptyState = default;
     private PlayerGrabState _playerGrabState = default;
+    private PlayerInspectionState _playerInspectionState = default;
 
+    public IPlayerState LastState {  get { return _lastState; } }
     public PlayerEmptyState EmptyState { get { return _playerEmptyState; } }
     public PlayerGrabState GrabState { get { return _playerGrabState; } }
+    public PlayerInspectionState InspectionState { get { return _playerInspectionState; } }
     #endregion
 
     public Action<float, float> OnDash;
@@ -123,7 +127,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         _currentState?.Tick();
     }
 
-    private void CanceledHoldIInteraction(InputAction.CallbackContext _)
+    private void CanceledHoldIInteraction(InputAction.CallbackContext context)
     {
         _currentState?.Cancel();
     }
@@ -159,15 +163,15 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private void OnDestroy()
     {
         if (InputManager.Instance == null) return;
-        InputManager.Instance.onInputsEnabled -= OnEnableInputs;
-        InputManager.Instance.onInputsDisabled -= OnDisableInputs;
+        InputManager.Instance.OnInputsEnabled -= OnEnableInputs;
+        InputManager.Instance.OnInputsDisabled -= OnDisableInputs;
     }
 
 
     private void StartInputs()
     {
-        InputManager.Instance.onInputsEnabled += OnEnableInputs;
-        InputManager.Instance.onInputsDisabled += OnDisableInputs;
+        InputManager.Instance.OnInputsEnabled += OnEnableInputs;
+        InputManager.Instance.OnInputsDisabled += OnDisableInputs;
 
         if (InputManager.Instance.playerInputs.Player.enabled) OnEnableInputs();
     }
@@ -177,7 +181,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         InputManager.Instance.dashInput.performed += GetDashKey;
         InputManager.Instance.interactInput.started += GetInteractionKey;
         InputManager.Instance.interactInput.canceled += CanceledHoldIInteraction;
-        InputManager.Instance.shieldInput.performed += GetShieldKey;
         InputManager.Instance.corruptionChangeInput.performed += GetCorruptionChangeKey;
     }
 
@@ -186,7 +189,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         InputManager.Instance.dashInput.performed -= GetDashKey;
         InputManager.Instance.interactInput.started -= GetInteractionKey;
         InputManager.Instance.interactInput.canceled -= CanceledHoldIInteraction;
-        InputManager.Instance.shieldInput.performed -= GetShieldKey;
         InputManager.Instance.corruptionChangeInput.performed -= GetCorruptionChangeKey;
     }
 
@@ -195,13 +197,6 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         if (CheckCorruptionChangeAvailable() && _glitchActive != null)
             _glitchActive.ChangeObjectState();
         else
-            _playerView.PlayErrorSound(_playerData.emptyHand);
-    }
-    private void GetShieldKey(InputAction.CallbackContext context)
-    {
-        //if (CheckCorruptionAvailable() && _corruptionAbsorved == null)
-        //    _corruptionAbsorved = StartCoroutine(StartCorruption());
-        //else
             _playerView.PlayErrorSound(_playerData.emptyHand);
     }
 
@@ -271,6 +266,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
     public void SetState(IPlayerState newState)
     {
+        _lastState = _currentState;
         _currentState?.Exit();
         _currentState = newState;
         _currentState?.Enter(this);
