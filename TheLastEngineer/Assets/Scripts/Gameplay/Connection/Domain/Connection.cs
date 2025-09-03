@@ -94,4 +94,9 @@ public abstract class Connection<T> : MonoBehaviour, IInteractable, IConnectable
     {
         throw new System.NotImplementedException();
     }
+
+    public void UnsetNode(NodeController2 node)
+    {
+        throw new System.NotImplementedException();
+    }
 }
