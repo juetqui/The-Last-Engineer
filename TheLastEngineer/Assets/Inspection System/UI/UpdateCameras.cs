@@ -3,20 +3,38 @@ using UnityEngine;
 
 public class UpdateCameras : MonoBehaviour
 {
-    [SerializeField] CinemachineFreeLook _mainCam;
-    [SerializeField] CinemachineFreeLook _targetLockCam;
+    [SerializeField] private CinemachineBrain _CMBrain;
+    [SerializeField] private CinemachineFreeLook _mainCam;
+    [SerializeField] private CinemachineFreeLook _targetLockCam;
 
-    // REPLANTEAR LA SELECCION DE INTERACTUABLES EN EL JUGADOR PARA QUE RECIBA UN BOOL EL CUAL LE DIGA A ESTE SCRIPT SI DEBE CAMBIAR DE CAMARAS
+    private bool _camIsLeaving = false;
 
     void Start()
     {
-        //Player.Instance.OnTargetSelected += OnTargetSelected;
+        PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
+        _CMBrain.m_CameraActivatedEvent.AddListener(OnCameraActivated);
+    }
+
+    private void OnDestroy()
+    {
+        PlayerTDController.Instance.OnInteractableSelected -= OnTargetSelected;
+        _CMBrain.m_CameraActivatedEvent.RemoveListener(OnCameraActivated);
+    }
+
+    private void OnCameraActivated(ICinemachineCamera newCamera, ICinemachineCamera oldCamera)
+    {
+        return;
+        //if (_camIsLeaving)
+        //    Time.timeScale = 1f;
+        //else
+        //    Time.timeScale = 0f;
     }
 
     private void OnTargetSelected(IInteractable target)
     {
-        if (target != null)
+        if (target != null && target is Inspectionable)
         {
+            _camIsLeaving = true;
             _targetLockCam.Follow = target.Transform;
             _targetLockCam.LookAt = target.Transform;
 
@@ -26,6 +44,7 @@ public class UpdateCameras : MonoBehaviour
             return;
         }
 
+        _camIsLeaving = false;
         _targetLockCam.Follow = null;
         _targetLockCam.LookAt = null;
 

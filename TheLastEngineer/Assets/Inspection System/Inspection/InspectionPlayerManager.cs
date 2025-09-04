@@ -3,49 +3,49 @@ using UnityEngine.InputSystem;
 
 public class InspectionPlayerManager : MonoBehaviour
 {
-    private InspectionSystem _inspectionSystem;
     private Inspectionable _currentInteractable;
     private bool _isInspecting = false;
 
-    // REPLANTEAR LA SELECCION DE INTERACTUABLES EN EL JUGADOR PARA QUE RECIBA UN BOOL EL CUAL LE DIGA A ESTE SCRIPT SI DEBE CAMBIAR DE CAMARAS O NO
-
     void Start()
     {
-        _inspectionSystem = GetComponent<InspectionSystem>();
-        //Player.Instance.OnTargetSelected += OnTargetSelected;
+        PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
+        InspectionSystem.Instance.enabled = false;
     }
 
     private void OnDestroy()
     {
-        //Player.Instance.OnTargetSelected -= OnTargetSelected;
+        PlayerTDController.Instance.OnInteractableSelected -= OnTargetSelected;
     }
 
-    // REVISAR LA SUSCRIPCION AL EVENTO DEL PLAYER PARA QUE SE COMPORTE COMO UNA INTERACCION ENVIANDOSE A SI MISMO ENTRE LOS PARAMETROS
-    private void OnTargetSelected(IInteractable target, PlayerTDController player)
+    private void OnTargetSelected(IInteractable target)
     {
-        if (!(Inspectionable)target) return;
-
-        if (target == null) StopInspection();
-        else StartInspection((Inspectionable)target, player);
+        if (target == null || target is not Inspectionable)
+            StopInspection();
+        else
+            StartInspection((Inspectionable)target);
     }
 
-    public void StartInspection(Inspectionable interactable, PlayerTDController player)
+    public void StartInspection(Inspectionable interactable)
     {
         if (interactable == null || _isInspecting) return;
 
+        Time.timeScale = 0;
+        InspectionSystem.Instance.enabled = true;
         InputManager.Instance.UpdateActionMap(ActionMaps.UI);
         _currentInteractable = interactable;
 
         _currentInteractable.OnFinished += HandleFinishedInteraction;
-        _currentInteractable.Interact(player, out bool succeded);
+        _currentInteractable.Interact(PlayerTDController.Instance, out bool succeded);
 
-        _isInspecting = succeded;
+        _isInspecting = true;
     }
 
     public void StopInspection(InputAction.CallbackContext context = default)
     {
         if (!_isInspecting) return;
 
+        Time.timeScale = 1;
+        InspectionSystem.Instance.enabled = false;
         _currentInteractable.OnFinished -= HandleFinishedInteraction;
         _currentInteractable.StopInteraction();
         HandleFinishedInteraction();
@@ -55,7 +55,6 @@ public class InspectionPlayerManager : MonoBehaviour
     {
         InputManager.Instance.UpdateActionMap(ActionMaps.Player);
         _currentInteractable = null;
-
         _isInspecting = false;
     }
 }

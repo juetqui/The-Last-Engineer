@@ -4,14 +4,17 @@ public class UIController : MonoBehaviour
 {
     private Canvas _canvas = default;
 
-    // REPLANTEAR LA SELECCION DE INTERACTUABLES EN EL JUGADOR PARA QUE RECIBA UN BOOL EL CUAL LE DIGA A ESTE SCRIPT SI DEBE ENCENDER EL CANVAS
-
     void Start()
     {
         _canvas = GetComponent<Canvas>();
 
         OnTargetSelected(null);
-        //Player.Instance.OnTargetSelected += OnTargetSelected;
+        PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
+    }
+
+    private void OnDestroy()
+    {
+        PlayerTDController.Instance.OnInteractableSelected -= OnTargetSelected;
     }
 
     private void OnTargetSelected(IInteractable target)

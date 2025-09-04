@@ -8,13 +8,13 @@ public class GamepadCursor : MonoBehaviour
     public static GamepadCursor Instance;
 
     [SerializeField] private RectTransform _cursorTransform;
+    [SerializeField] private RectTransform _canvasTransform = default;
     [SerializeField] private Canvas _canvas;
     
     [SerializeField] private float _cursorSpeed = 1000f;
     [SerializeField] private float _cursorPadding = 35f;
 
     private PlayerInput _playerInput = default;
-    private RectTransform _canvasTransform = default;
     private Mouse _virtualMouse = default;
     private Mouse _currentMouse = default;
     private Camera _mainCamera = default;
@@ -33,7 +33,6 @@ public class GamepadCursor : MonoBehaviour
         if (Instance == null) Instance = this;
 
         _playerInput = GetComponent<PlayerInput>();
-        _canvasTransform = _canvasTransform.GetComponent<RectTransform>();
         _mainCamera = Camera.main;
         _currentMouse = Mouse.current;
         _prevControlScheme = _playerInput.currentControlScheme;

@@ -72,8 +72,8 @@ public class InspectionSystem : MonoBehaviour
         Vector3 currentMousePosition = (Vector3)InputManager.Instance.rotate.ReadValue<Vector2>();
         Vector3 deltaMousePos = currentMousePosition - _lastMousePosition;
 
-        float xRotation = deltaMousePos.y * _rotSpeed * Time.deltaTime;
-        float yRotation = -deltaMousePos.x * _rotSpeed * Time.deltaTime;
+        float xRotation = deltaMousePos.y * _rotSpeed * Time.unscaledDeltaTime;
+        float yRotation = -deltaMousePos.x * _rotSpeed * Time.unscaledDeltaTime;
 
         _inspectedObject.Rotate(xRotation, yRotation, 0, Space.World);
 
@@ -89,8 +89,10 @@ public class InspectionSystem : MonoBehaviour
     {
         Vector2 inputValue = InputManager.Instance.rotate.ReadValue<Vector2>();
 
-        float xRotation = inputValue.y * _gamepadRotSpeed * Time.deltaTime;
-        float yRotation = -inputValue.x * _gamepadRotSpeed * Time.deltaTime;
+        if (inputValue == Vector2.zero) return;
+
+        float xRotation = inputValue.y * _gamepadRotSpeed * Time.unscaledDeltaTime;
+        float yRotation = -inputValue.x * _gamepadRotSpeed * Time.unscaledDeltaTime;
 
         _inspectedObject.Rotate(xRotation, yRotation, 0, Space.World);
     }
@@ -110,7 +112,7 @@ public class InspectionSystem : MonoBehaviour
 
     private void ResetPos()
     {
-        _timer += Time.deltaTime * _resetRotSpeed;
+        _timer += Time.unscaledDeltaTime * _resetRotSpeed;
         _inspectedObject.rotation = Quaternion.Lerp(_inspectedObject.rotation, _initialObjectRot, _timer);
 
         if (Quaternion.Angle(_inspectedObject.rotation, _initialObjectRot) <= _resetRotThreshhold)

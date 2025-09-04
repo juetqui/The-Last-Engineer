@@ -11,8 +11,6 @@ public class InspectorController : MonoBehaviour
 
     public Action<UIInspectionable> OnTargetEnabled = delegate { };
     
-    // REPLANTEAR LA SELECCION DE INTERACTUABLES EN EL JUGADOR PARA QUE RECIBA UN BOOL EL CUAL LE DIGA A ESTE SCRIPT SI DEBE ENCENDER EL OBJETO EN LA UI
-
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -24,7 +22,12 @@ public class InspectorController : MonoBehaviour
         _inspectionables = new List<UIInspectionable>();
         _inspectionables = GetComponentsInChildren<UIInspectionable>().ToList();
 
-        //Player.Instance.OnTargetSelected += TargetSelected;
+        PlayerTDController.Instance.OnInteractableSelected += TargetSelected;
+    }
+
+    private void OnDestroy()
+    {
+        PlayerTDController.Instance.OnInteractableSelected -= TargetSelected;
     }
 
     private void TargetSelected(IInteractable target)

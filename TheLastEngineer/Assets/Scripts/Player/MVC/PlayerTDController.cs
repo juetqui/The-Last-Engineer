@@ -53,18 +53,17 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private IPlayerState _lastState = default;
     private PlayerEmptyState _playerEmptyState = default;
     private PlayerGrabState _playerGrabState = default;
-    private PlayerInspectionState _playerInspectionState = default;
 
     public IPlayerState LastState {  get { return _lastState; } }
     public PlayerEmptyState EmptyState { get { return _playerEmptyState; } }
     public PlayerGrabState GrabState { get { return _playerGrabState; } }
-    public PlayerInspectionState InspectionState { get { return _playerInspectionState; } }
     #endregion
 
     public Action<float, float> OnDash;
     public Action<NodeController> OnChangeActiveShield;
     public Action<bool, NodeType> OnNodeGrabed;
     public Action<bool> OnAbsorbCorruption;
+    public Action<IInteractable> OnInteractableSelected;
 
     [HideInInspector] public Vector3 attachPos = new Vector3(0, 1f, 1.2f);
 
@@ -182,6 +181,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         InputManager.Instance.interactInput.started += GetInteractionKey;
         InputManager.Instance.interactInput.canceled += CanceledHoldIInteraction;
         InputManager.Instance.corruptionChangeInput.performed += GetCorruptionChangeKey;
+        InputManager.Instance.cancelInput.performed += CancelInteraction;
     }
 
     public void OnDisableInputs()
@@ -190,6 +190,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         InputManager.Instance.interactInput.started -= GetInteractionKey;
         InputManager.Instance.interactInput.canceled -= CanceledHoldIInteraction;
         InputManager.Instance.corruptionChangeInput.performed -= GetCorruptionChangeKey;
+        InputManager.Instance.cancelInput.performed -= CancelInteraction;
     }
 
     private void GetCorruptionChangeKey(InputAction.CallbackContext context)
@@ -228,7 +229,13 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
             }
 
             _currentState?.HandleInteraction(interactableTarget);
+            OnInteractableSelected?.Invoke(interactableTarget);
         }
+    }
+    
+    private void CancelInteraction(InputAction.CallbackContext context)
+    {
+        OnInteractableSelected?.Invoke(null);
     }
 
     #endregion
