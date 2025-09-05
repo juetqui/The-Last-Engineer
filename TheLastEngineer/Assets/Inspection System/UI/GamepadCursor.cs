@@ -8,7 +8,7 @@ public class GamepadCursor : MonoBehaviour
     public static GamepadCursor Instance;
 
     [SerializeField] private RectTransform _cursorTransform;
-    [SerializeField] private RectTransform _canvasTransform = default;
+    [SerializeField] private RectTransform _canvasTransform;
     [SerializeField] private Canvas _canvas;
     
     [SerializeField] private float _cursorSpeed = 1000f;

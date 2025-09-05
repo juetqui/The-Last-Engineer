@@ -38,13 +38,13 @@ public class CorruptionRemover : MonoBehaviour
         _UICamera = GetComponent<Camera>();
         _cameraShake = GetComponent<CinemachineImpulseSource>();
         
-        InputManager.Instance.click.performed += CheckForCorruptionUI;
+        InputManager.Instance.click.started += CheckForCorruptionUI;
         InputManager.Instance.click.canceled += CancelCorruptionRemove;
     }
 
     private void OnDestroy()
     {
-        InputManager.Instance.click.performed -= CheckForCorruptionUI;
+        InputManager.Instance.click.started -= CheckForCorruptionUI;
         InputManager.Instance.click.canceled -= CancelCorruptionRemove;
     }
 
@@ -63,6 +63,7 @@ public class CorruptionRemover : MonoBehaviour
             {
                 _targetCorruption = corruption;
             }
+            
             OnCorruptionHit(corruption);
             SetHoldValues(true, false);
         }
@@ -99,7 +100,7 @@ public class CorruptionRemover : MonoBehaviour
 
     private void StartHoldTimer()
     {
-        _timer += Time.deltaTime;
+        _timer += Time.unscaledDeltaTime;
         InputManager.Instance.RumblePulse(_timer, _timer);
 
         float t = Mathf.PingPong(_timer, 1f);

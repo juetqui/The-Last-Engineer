@@ -37,6 +37,7 @@ public class Corruption : MonoBehaviour
         if (hitted != this) return;
 
         _generator.RemoveCorruption(this);
+        _audioSource.Stop();
         _ps.Stop();
     }
 }

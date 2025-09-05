@@ -82,7 +82,7 @@ public class InputManager : MonoBehaviour
     {
         _gamepad = Gamepad.current;
         
-        bool hasGamepadScheme = playerInput.currentControlScheme != "Gamepad";
+        bool hasGamepadScheme = playerInput.currentControlScheme == "Gamepad";
         bool hasGamepad = _gamepad != null;
 
         return hasGamepadScheme && hasGamepad;

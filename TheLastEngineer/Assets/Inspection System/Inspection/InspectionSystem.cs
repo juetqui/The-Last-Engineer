@@ -87,6 +87,8 @@ public class InspectionSystem : MonoBehaviour
 
     private void RotateObjectForGamepad()
     {
+        if (!_canRotate || !GamepadCursor.Instance.IsUsingGamepad()) return;
+
         Vector2 inputValue = InputManager.Instance.rotate.ReadValue<Vector2>();
 
         if (inputValue == Vector2.zero) return;

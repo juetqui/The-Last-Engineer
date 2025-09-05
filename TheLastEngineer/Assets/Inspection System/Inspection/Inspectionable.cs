@@ -10,7 +10,8 @@ public class Inspectionable : MonoBehaviour, IInteractable
     #endregion
 
     [SerializeField] private InspectionType _type = InspectionType.None;
-    //[SerializeField] private ParticleSystem _ps = default;
+    
+    private ParticleSystem _ps = default;
 
     public event Action OnFinished;
 
@@ -18,7 +19,7 @@ public class Inspectionable : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        //_ps = GetComponentInChildren<ParticleSystem>();
+        _ps = GetComponentInChildren<ParticleSystem>();
     }
 
     public bool CanInteract(PlayerTDController player)
@@ -28,13 +29,13 @@ public class Inspectionable : MonoBehaviour, IInteractable
 
     public void Interact(PlayerTDController player, out bool succededInteraction)
     {
-        //_ps.Play();
+        _ps.Play();
         succededInteraction = true;
     }
 
     public void StopInteraction()
     {
-        //_ps.Stop();
+        _ps.Stop();
         OnFinished?.Invoke();
     }
 }
@@ -42,8 +43,6 @@ public class Inspectionable : MonoBehaviour, IInteractable
 public enum InspectionType
 {
     None,
-    Cube,
-    Sphere,
-    Capsule,
-    Cylinder
+    Panel,
+    Battery
 }

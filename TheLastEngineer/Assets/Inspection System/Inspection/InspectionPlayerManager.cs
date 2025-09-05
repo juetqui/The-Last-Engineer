@@ -3,11 +3,14 @@ using UnityEngine.InputSystem;
 
 public class InspectionPlayerManager : MonoBehaviour
 {
-    private Inspectionable _currentInteractable;
+    private Camera _camera = default;
+    private Inspectionable _currentInteractable = default;
     private bool _isInspecting = false;
 
     void Start()
     {
+        _camera = GetComponent<Camera>();
+        _camera.enabled = false;
         PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
         InspectionSystem.Instance.enabled = false;
     }
@@ -30,6 +33,7 @@ public class InspectionPlayerManager : MonoBehaviour
         if (interactable == null || _isInspecting) return;
 
         Time.timeScale = 0;
+        _camera.enabled = true;
         InspectionSystem.Instance.enabled = true;
         InputManager.Instance.UpdateActionMap(ActionMaps.UI);
         _currentInteractable = interactable;
@@ -45,6 +49,7 @@ public class InspectionPlayerManager : MonoBehaviour
         if (!_isInspecting) return;
 
         Time.timeScale = 1;
+        _camera.enabled = false;
         InspectionSystem.Instance.enabled = false;
         _currentInteractable.OnFinished -= HandleFinishedInteraction;
         _currentInteractable.StopInteraction();
