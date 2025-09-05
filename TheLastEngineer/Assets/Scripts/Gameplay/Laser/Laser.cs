@@ -217,7 +217,7 @@ public class Laser : MonoBehaviour
                     // Cualquier otra cosa (pared, etc.)
                     _lineRenderer.SetPosition(0, laserPos);
                     _lineRenderer.SetPosition(1, hit.point);
-
+                    if (_lastHit != null) _lastHit.LaserNotRecived();
                     // Partícula
                     _hitLaser.transform.position = hit.point;
                     _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);

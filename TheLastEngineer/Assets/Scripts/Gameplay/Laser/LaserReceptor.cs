@@ -79,6 +79,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     }
     public void LaserNotRecived()
     {
+        print("laserFailed");
         _audioSource.Stop();
         foreach (var ps in _hitPS)
         {
