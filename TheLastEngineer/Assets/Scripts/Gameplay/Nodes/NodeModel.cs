@@ -3,30 +3,14 @@ using UnityEngine;
 public class NodeModel
 {
     private Transform _transform = default;
-    private float _minY = default, _maxY = default, _moveSpeed = default, _initialY = default;
+    private float _initialY = default;
     private Vector3 _initialGlobalPosition = Vector3.zero;
-    private LayerMask _floorLayer;
-    private RaycastHit hit = default;
 
-    public NodeModel(Transform transform, Transform feedbackPos, float minY, float maxY, float moveSpeed, float rotSpeed)
+    public NodeModel(Transform transform)
     {
         _transform = transform;
         _initialY = transform.position.y;
-        _minY = minY;
-        _maxY = maxY;
-        _moveSpeed = moveSpeed;
         _initialGlobalPosition = transform.position;
-    }
-
-    public void MoveObject()
-    {
-        float t = (Mathf.Sin(Time.time * _moveSpeed) + 1f) * 0.5f;
-        float offset = Mathf.Lerp(_minY, _maxY, t);
-        float newY = _initialY + offset;
-        _transform.position = new Vector3(_transform.position.x, newY, _transform.position.z);
-
-        if (!Physics.Raycast(_transform.position, -_transform.up, out hit, 3f, _floorLayer)) 
-            _transform.position -= Vector3.up * Time.deltaTime * 15f;
     }
 
     public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)

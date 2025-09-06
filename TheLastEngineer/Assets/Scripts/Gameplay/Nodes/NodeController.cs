@@ -3,21 +3,13 @@ using UnityEngine;
 
 public class NodeController : MonoBehaviour, IInteractable
 {
-    #region MODEL
-    [Header("Model")]
-    [SerializeField] private Transform _feedbackPos;
-    [SerializeField] private bool _isChildren;
     [SerializeField] private NodeType _nodeType;
-    private NodeModel _nodeModel = default;
-    private float _minY = -0.5f, _maxY = 0.5f, _moveSpeed = 5f, _rotSpeed = 5f;
-    private Vector2 _desintegrationVector = new Vector2(-3, 3);
     public NodeType NodeType { get { return _nodeType; } }
     public Action<NodeType> OnUpdatedNodeType = delegate { };
-    #endregion
 
     #region VIEW
-    [SerializeField] Shader _desintegrationShader;
-    private Shader _originalShader;
+    [Header("VIEW")]
+    [SerializeField] private bool _isChildren;
     private NodeView _nodeView = default;
     private BoxCollider _collider = default;
     private Renderer _renderer = default;
@@ -29,19 +21,21 @@ public class NodeController : MonoBehaviour, IInteractable
     private Outline _outline = default;
     #endregion
 
+    [Header("SHADER")]
+    [SerializeField] Shader _desintegrationShader;
+    private Vector2 _desintegrationVector = new Vector2(-3, 3);
+    private Shader _originalShader;
+
+    private NodeModel _nodeModel = default;
     private Transform _target = default;
     private IConnectable _connectable = default;
     private Vector3 _resetPos = Vector3.zero;
+
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Color CurrentColor { get { return _currentColor; } }
-   
-    //metodos de la interfaz
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => true;
 
-    //ESTO SE USA PARA SPECIFIC CONNECTION, PLANTEAR MEJOR REFACTOR
-    //public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } } // Prop conectado.
-    //private bool _isConnected = false;                // Flag si está conectado (no siempre usado en este fragmento).
 
     protected void Awake()
     {
@@ -55,7 +49,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
         _currentColor = _nodeType == NodeType.Default ? _defaultColor : _corruptionColor;
 
-        _nodeModel = new NodeModel(transform, _feedbackPos, _minY, _maxY, _moveSpeed, _rotSpeed);
+        _nodeModel = new NodeModel(transform);
         _nodeView = new NodeView(_renderer, _collider, _outline, _currentColor, _animator, _particles);
     }
 
@@ -67,15 +61,9 @@ public class NodeController : MonoBehaviour, IInteractable
 
     protected void Update()
     {
-        if (!_isChildren) MoveObject();
+        if (!_isChildren) _nodeView.EnableColl(true);
         else _nodeView.SetCollectedAnim();
     }
-    private void MoveObject()
-    {
-        _nodeView.EnableColl(true);                                 
-        _nodeModel.MoveObject();                                    
-    }
-
     public bool CanInteract(PlayerTDController player) => !player.HasNode();
     public void Interact(PlayerTDController player, out bool succeeded)
     {
@@ -104,6 +92,11 @@ public class NodeController : MonoBehaviour, IInteractable
 
         if (!parentIsPlayer && newParent != null)
             _connectable = newParent.GetComponent<IConnectable>();
+        else
+        {
+            _connectable.UnsetNode(this);
+            _connectable = null;
+        }
 
         if (newParent != null) _isChildren = true;
         else _isChildren = false;

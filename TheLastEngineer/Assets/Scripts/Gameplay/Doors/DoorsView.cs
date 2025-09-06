@@ -9,6 +9,6 @@ public class DoorsView : MonoBehaviour
     }
     public void OpenDoor(bool isRunning)
     {
-        _animator.SetBool("Open", isRunning);
+        _animator.SetBool("DoorActivated", isRunning);
     }
 }
