@@ -9,7 +9,7 @@ public class NodeView
     private bool _isReseting = false;
     Animator _myAnimator;
 
-    // --- Nuevo: estado para FX ---
+    // Estado para FX
     private ParticleSystem[] _particles = System.Array.Empty<ParticleSystem>();
     private bool _isNear = false;
     private NodeType _currentType = NodeType.Default;
@@ -48,6 +48,7 @@ public class NodeView
         _collider.enabled = onOff;
     }
 
+    #region Animation control
     public void SetIdleAnim()
     {
         _myAnimator.SetBool("IsOnRange", false);
@@ -72,8 +73,9 @@ public class NodeView
         _isNear = true;
         RefreshFX();
     }
+    #endregion
 
-    // --- Shader control centralizado ---
+    #region Shader control
     public void StartDisintegrate(Shader shader, Vector2 minMax, float alpha = 1f)
     {
         var mat = _renderer.material;
@@ -96,11 +98,9 @@ public class NodeView
         mat.shader = originalShader;
         _outline.enabled = true;
     }
+    #endregion
 
-
-    // ==========================
-    //        FX Helpers
-    // ==========================
+    #region FX Helpers
     private void RefreshFX()
     {
         // Encender FX solo si está en rango y el nodo está Corrupted
@@ -129,4 +129,5 @@ public class NodeView
             if (ps != null && ps.isPlaying) ps.Stop();
         }
     }
+    #endregion
 }

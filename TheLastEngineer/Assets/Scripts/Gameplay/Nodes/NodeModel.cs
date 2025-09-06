@@ -4,7 +4,6 @@ public class NodeModel
 {
     private Transform _transform = default;
     private float _minY = default, _maxY = default, _moveSpeed = default, _initialY = default;
-    private Vector3 _scaleVector = new Vector3(0.0125f, 0.0125f, 0.0125f);
     private Vector3 _initialGlobalPosition = Vector3.zero;
     private LayerMask _floorLayer;
     private RaycastHit hit = default;
