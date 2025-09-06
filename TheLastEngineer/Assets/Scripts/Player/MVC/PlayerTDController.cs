@@ -75,7 +75,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     private bool CheckDashAvialable() => _playerModel.CanDash;
     public NodeController GetCurrentNode() => _node;
     public NodeType GetCurrentNodeType() => _currentNodeType;
-    public Color CurrentNodeOutlineColor() => _node != null ? _node.OutlineColor : Color.black;
+    public Color CurrentNodeOutlineColor() => _node != null ? _node.CurrentColor : Color.black;
     #endregion
 
     private void Awake()
@@ -296,7 +296,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
             IsCorrupted = false;
         }
 
-        _playerView.GrabNode(true, _node.OutlineColor);
+        _playerView.GrabNode(true, _node.CurrentColor);
         _playerView.PlayNodePS(_node.NodeType);
         OnNodeGrabed?.Invoke(true, _node.NodeType);
     }
@@ -307,7 +307,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
 
         _node = node;
         _currentNodeType = _node.NodeType;
-        _playerView.GrabNode(true, _node.OutlineColor);
+        _playerView.GrabNode(true, _node.CurrentColor);
         _playerView.PlayNodePS(_node.NodeType);
         RemoveInteractable(node);
     }

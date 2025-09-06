@@ -1,48 +1,47 @@
 using System;
 using UnityEngine;
-using static UnityEngine.ParticleSystem;
 
 public class NodeController : MonoBehaviour, IInteractable
 {
-    [Header("View")]
+    #region MODEL
+    [Header("Model")]
     [SerializeField] private Transform _feedbackPos;
+    [SerializeField] private bool _isChildren;
+    [SerializeField] private NodeType _nodeType;
+    private NodeModel _nodeModel = default;
+    private float _minY = -0.5f, _maxY = 0.5f, _moveSpeed = 5f, _rotSpeed = 5f;
+    private Vector2 _desintegrationVector = new Vector2(-3, 3);
+    public NodeType NodeType { get { return _nodeType; } }
+    public Action<NodeType> OnUpdatedNodeType = delegate { };
+    #endregion
+
+    #region VIEW
+    [SerializeField] Shader _desintegrationShader;
+    private Shader _originalShader;
+    private NodeView _nodeView = default;
     private BoxCollider _collider = default;
     private Renderer _renderer = default;
-    protected Animator _animator = default;
-    private Transform _target = default;
+    private Animator _animator = default;
     private ParticleSystem[] _particles = new ParticleSystem[2];
-
-    [Header("Outline")]
-    [SerializeField] private Color _corruptionOutline;
-    [SerializeField] private Color _defaultOutline;
-    private Color _currentOutline = default;
+    private Color _defaultColor = Color.cyan;
+    private Color _corruptionColor = Color.magenta;
+    private Color _currentColor = default;
     private Outline _outline = default;
+    #endregion
 
-    [Header("Model")]
-    [SerializeField] protected NodeType _nodeType;
-    [SerializeField] protected LayerMask _floorLayer;
-    [SerializeField] private float _rotSpeed, _minY, _maxY, _moveSpeed;
-    [SerializeField] private bool _isChildren;
-    [SerializeField] Vector2 _desintegrationVector = new Vector2(-3, 3);
+    private Transform _target = default;
+    private IConnectable _connectable = default;
+    private Vector3 _resetPos = Vector3.zero;
     public InteractablePriority Priority => InteractablePriority.Highest;
+    public Color CurrentColor { get { return _currentColor; } }
+   
+    //metodos de la interfaz
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => true;
 
-    private NodeView _nodeView = default;
-    private NodeModel _nodeModel = default;
-    private RaycastHit hit = default;
-
-    private IConnectable _connectable = default;
-    private Shader _originalShader;
-    private bool _isConnected = false;
-    private Vector3 _resetPos = Vector3.zero;
-    [SerializeField] Shader _desintegrationShader;
-    public Action<NodeType> OnUpdatedNodeType = delegate { };
-    private Color _myColor;
-    public NodeType NodeType { get { return _nodeType; } }
-    public Color OutlineColor { get { return _currentOutline; } }
-    public bool IsChildren { get { return _isChildren; } }
-    public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } }
+    //ESTO SE USA PARA SPECIFIC CONNECTION, PLANTEAR MEJOR REFACTOR
+    //public bool IsConnected { get { return _isConnected; } set { _isConnected = value; } } // Prop conectado.
+    //private bool _isConnected = false;                // Flag si está conectado (no siempre usado en este fragmento).
 
     protected void Awake()
     {
@@ -54,102 +53,40 @@ public class NodeController : MonoBehaviour, IInteractable
         _originalShader = _renderer.material.shader;
         _resetPos = transform.position;
 
-        _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
+        _currentColor = _nodeType == NodeType.Default ? _defaultColor : _corruptionColor;
 
         _nodeModel = new NodeModel(transform, _feedbackPos, _minY, _maxY, _moveSpeed, _rotSpeed);
-        _nodeView = new NodeView(_renderer, _collider, _outline, _currentOutline, _animator);
+        _nodeView = new NodeView(_renderer, _collider, _outline, _currentColor, _animator, _particles);
     }
 
     protected void Start()
     {
-        _nodeView.OnStart();
-        _nodeView.UpdateNodeType(_nodeType, _currentOutline);
+        _nodeView.OnStart(); 
+        _nodeView.UpdateNodeType(_nodeType, _currentColor);
     }
-    public void StartDesintegrateShader() => _nodeView.StartDisintegrate(_desintegrationShader, _myColor, _desintegrationVector);
-    public void SetDesintegrateShader(float alpha) => _nodeView.SetDisintegrateAlpha(alpha);
-    public void StopDesintegrateShader() => _nodeView.StopDisintegrate(_originalShader);
 
     protected void Update()
     {
-        //_nodeModel.RotateToTarget(_target);
-
         if (!_isChildren) MoveObject();
         else _nodeView.SetCollectedAnim();
-
-        if (_target != null && _nodeType == NodeType.Corrupted)
-        {
-            foreach (var ps in _particles)
-            {
-                if (!ps.isPlaying) ps.Play();
-            }
-        }
-        else
-        {
-            foreach (var ps in _particles)
-            {
-                if (ps.isPlaying) ps.Stop();
-            }
-        }
-
     }
-
-    public bool CanInteract(PlayerTDController player)
-    {
-        return !player.HasNode();
-    }
-
-    private void InteractWithGlitcheable(Glitcheable glitcheable, InteractionOutcome interactionResult)
-    {
-        if (glitcheable == null) return;
-
-        bool newObjectState = _nodeType == NodeType.Default ? false : true;
-
-        if (glitcheable.ChangeCorruptionState(_nodeType, newObjectState))
-            UpdateNodeType();
-    }
-
-    private void UpdateNodeType()
-    {
-        _nodeType = _nodeType == NodeType.Default ? NodeType.Corrupted : NodeType.Default;
-        _currentOutline = _nodeType == NodeType.Default ? _defaultOutline : _corruptionOutline;
-
-        _nodeView.UpdateNodeType(_nodeType, _currentOutline);
-        OnUpdatedNodeType?.Invoke(_nodeType);
-    }
-
-    public  void Interact(PlayerTDController player, out bool succededInteraction)
-    {
-        if (CanInteract(player))
-        {
-            Attach(player, player.attachPos);
-            succededInteraction = true;
-        }
-        else
-        {
-            succededInteraction = false;
-        }
-    }
-
     private void MoveObject()
     {
-        _nodeView.EnableColl(true);
-        //_nodeModel.MoveObject();
-
-        if (!Physics.Raycast(transform.position, -transform.up, out hit, 3f, _floorLayer))
-            transform.position -= Vector3.up * Time.deltaTime * 15f;
+        _nodeView.EnableColl(true);                                 
+        _nodeModel.MoveObject();                                    
     }
 
-    protected void Attach(PlayerTDController player, Vector3 newPos)
+    public bool CanInteract(PlayerTDController player) => !player.HasNode();
+    public void Interact(PlayerTDController player, out bool succeeded)
     {
-        Vector3 newScale = new Vector3(0.6f, 0.6f, 0.6f);
-        
-        Attach(newPos, player.transform, newScale, true);
-
-        if (_isChildren && _connectable != null)
+        if (!CanInteract(player))
         {
-            _connectable.UnsetNode(this);
-            _connectable = null;
+            succeeded = false;
+            return;
         }
+
+        Attach(player.attachPos, player.transform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
+        succeeded = true;
     }
 
     public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
@@ -178,70 +115,47 @@ public class NodeController : MonoBehaviour, IInteractable
         else if (newParent == null && newScale == default)
             _nodeModel.SetPos(newPos, NodeType);
     }
+    private void InteractWithGlitcheable(Glitcheable glitcheable, InteractionOutcome interactionResult)
+    {
+        if (glitcheable == null) return;
+
+        bool newObjectState = _nodeType == NodeType.Default ? false : true;
+
+        if (glitcheable.ChangeCorruptionState(_nodeType, newObjectState))
+            UpdateNodeType();
+    }
+
+    private void UpdateNodeType()
+    {
+        _nodeType = _nodeType == NodeType.Default ? NodeType.Corrupted : NodeType.Default;
+        _currentColor = _nodeType == NodeType.Default ? _defaultColor : _corruptionColor;
+
+        _nodeView.UpdateNodeType(_nodeType, _currentColor);
+        OnUpdatedNodeType?.Invoke(_nodeType);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out PlayerTDController player))
         {
-            if (_target == null)
-            {
-                //if (_nodeType == NodeType.Corrupted) foreach (var ps in _particles) ps.Play();
-                //else foreach (var ps in _particles) ps.Stop();
-                
-                _target = player.transform;
-            }
-            
+            if (_target == null) _target = player.transform;
+
             _nodeView.SetRangeAnim();
         }
-        else if (other.CompareTag("Void"))
-            _nodeModel.ResetPos(_resetPos);
+        else if (other.CompareTag("Void")) _nodeModel.ResetPos(_resetPos);
     }
-
-    //private void OnTriggerStay(Collider other)
-    //{
-    //    if (other.gameObject.TryGetComponent(out PlayerTDController player))
-    //    {
-    //        if (_target != null && _nodeType == NodeType.Corrupted)
-    //        {
-    //            foreach (var ps in _particles)
-    //            {
-    //                if (!ps.isPlaying) ps.Play();
-    //            }
-    //        }
-    //        else foreach (var ps in _particles) ps.Stop();
-    //    }
-    //}
 
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.TryGetComponent(out PlayerTDController player))
         {
-            if (_target != null)
-            {
-                //if (_nodeType == NodeType.Corrupted) foreach (var ps in _particles) ps.Play();
-                //else foreach (var ps in _particles) ps.Stop();
-                
-                _target = null;
-            }
+            if (_target != null) _target = null;      
 
             _nodeView.SetIdleAnim();
         }
     }
 
-    void OnDisable()
-    {
-        if (GlitchActive.Instance != null)
-            GlitchActive.Instance.OnChangeObjectState -= InteractWithGlitcheable;
-    }
-
-
-    public void Interact(GameObject interactor)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool CanInteract(GameObject interactor)
-    {
-        throw new NotImplementedException();
-    }
+    public void StartDesintegrateShader() => _nodeView.StartDisintegrate(_desintegrationShader, _desintegrationVector);
+    public void SetDesintegrateShader(float alpha) => _nodeView.SetDisintegrateAlpha(alpha);
+    public void StopDesintegrateShader() => _nodeView.StopDisintegrate(_originalShader);
 }
