@@ -11,7 +11,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     [SerializeField] private NodeController _recievedNode;
     [SerializeField] private Transform _nodePos;
-    private DoorsView _doorsView;
+    [SerializeField] private DoorsView _doorsView;
     public bool StartsConnected { get; private set; }
     public Action<NodeType, bool> OnNodeConnected;
 

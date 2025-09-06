@@ -1,7 +1,7 @@
 using UnityEngine;
 public class DoorsView : MonoBehaviour
 {
-    private Animator _animator = default;
+    [SerializeField] private Animator _animator = default;
 
     private void Awake()
     {
