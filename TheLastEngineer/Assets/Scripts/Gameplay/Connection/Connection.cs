@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Connection : MonoBehaviour, IInteractable, IConnectable
@@ -11,7 +12,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     [SerializeField] private NodeController _recievedNode;
     [SerializeField] private Transform _nodePos;
-    [SerializeField] private DoorsView _doorsView;
+    [SerializeField] private List<DoorsView> _doorsView;
     public bool StartsConnected { get; private set; }
     public Action<NodeType, bool> OnNodeConnected;
 
@@ -48,13 +49,27 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f);
         _recievedNode = node;
         OnNodeConnected?.Invoke(node.NodeType, true);
-        _doorsView.OpenDoor(true);
+        
+        if(_doorsView != null)
+        {
+            foreach (var item in _doorsView)
+            {
+                item.OpenDoor(true);
+            }
+        }
     }
 
     public void UnsetNode(NodeController node)
     {
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _recievedNode = null;
-        _doorsView.OpenDoor(false);
+
+        if (_doorsView != null)
+        {
+            foreach (var item in _doorsView)
+            {
+                item.OpenDoor(true);
+            }
+        }
     }
 }
