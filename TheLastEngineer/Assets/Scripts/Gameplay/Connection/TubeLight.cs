@@ -1,77 +1,85 @@
-using System.Collections;
+using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Renderer))]
 public class TubeLight : MonoBehaviour
 {
+    [Header("Opcional: fuente de conexión")]
     [SerializeField] private Connection _connection;
-    [SerializeField] private TubeLight _nextConnection;
+    [SerializeField] private NodeType _requiredNode = NodeType.Default;
+
+    [Header("Animación")]
+    [SerializeField, Min(0.01f)] private float _speed = 10f; // unidades de step por segundo
 
     private Renderer _renderer;
-    private NodeType _requiredNode = NodeType.Default;
-    private bool _connected = false;
+    private MaterialPropertyBlock _mpb;
+    private static readonly int StepProp = Shader.PropertyToID("_Step");
 
-    private void Start()
+    private enum Mode { Idle, TurningOn, TurningOff }
+    private Mode _mode = Mode.Idle;
+
+    private float _step;        // 0..1
+    private bool _connected;    // estado lógico pedido desde afuera
+
+    public event Action OnFilled;   // se dispara cuando llega a 1
+    public event Action OnEmptied;  // se dispara cuando llega a 0
+
+    public bool IsFull => Mathf.Approximately(_step, 1f);
+    public bool IsEmpty => Mathf.Approximately(_step, 0f);
+
+    private void Awake()
     {
         _renderer = GetComponent<Renderer>();
-
-        if (_connection != null) _connection.OnNodeConnected += TurnOnOff;
+        _mpb = new MaterialPropertyBlock();
+        ApplyStep();
     }
 
-    private void TurnOnOff(NodeType nodeType, bool connected)
+    private void OnEnable()
     {
-        if (!_connected && connected && nodeType == _requiredNode)
+        if (_connection != null)
+            _connection.OnNodeConnected += OnNodeConnected;
+    }
+
+    private void OnDisable()
+    {
+        if (_connection != null)
+            _connection.OnNodeConnected -= OnNodeConnected;
+    }
+
+    private void Update()
+    {
+        if (_mode == Mode.Idle) return;
+
+        float target = _mode == Mode.TurningOn ? 1f : 0f;
+        _step = Mathf.MoveTowards(_step, target, _speed * Time.deltaTime);
+        ApplyStep();
+
+        if (Mathf.Approximately(_step, target))
         {
-            _connected = true;
-            StartCoroutine(TurnOn());
-        }
-        else if (_connected && !connected && nodeType == _requiredNode)
-        {
-            _connected = false;
-            StartCoroutine(TurnOff());
+            var finishedOn = _mode == Mode.TurningOn;
+            _mode = Mode.Idle;
+            if (finishedOn) OnFilled?.Invoke();
+            else OnEmptied?.Invoke();
         }
     }
-    
-    public void ReceptorTurnOn()
+
+    private void ApplyStep()
     {
-        StartCoroutine(TurnOn());
+        _renderer.GetPropertyBlock(_mpb);
+        _mpb.SetFloat(StepProp, _step);
+        _renderer.SetPropertyBlock(_mpb);
     }
 
-    public void ReceptorTurnOff()
+    // --- Integración con Connection (opcional) ---
+    private void OnNodeConnected(NodeType nodeType, bool connected)
     {
-        StartCoroutine(TurnOff());
+        if (nodeType != _requiredNode) return;
+        if (connected) TurnOn();
+        else TurnOff();
     }
 
-    public IEnumerator TurnOn()
-    {
-        _connected = true;
-        float timer = 0;
+    // --- API pública sincrónica ---
+    public void TurnOn() { _connected = true; _mode = Mode.TurningOn; }
+    public void TurnOff() { _connected = false; _mode = Mode.TurningOff; }
 
-        while (timer < 1f)
-        {
-            timer += Time.deltaTime * 10f;
-            _renderer.material.SetFloat("_Step", timer);
-            yield return null;
-        }
-
-        _renderer.material.SetFloat("_Step", 1f);
-
-        if (_nextConnection != null) StartCoroutine(_nextConnection.TurnOn());
-    }
-    
-    public IEnumerator TurnOff()
-    {
-        _connected = false;
-        float timer = 1f;
-
-        while (timer > 0f)
-        {
-            timer -= Time.deltaTime * 10f;
-            _renderer.material.SetFloat("_Step", timer);
-            yield return null;
-        }
-
-        _renderer.material.SetFloat("_Step", 0f);
-        
-        if (_nextConnection != null) StartCoroutine(_nextConnection.TurnOff());
-    }
 }
