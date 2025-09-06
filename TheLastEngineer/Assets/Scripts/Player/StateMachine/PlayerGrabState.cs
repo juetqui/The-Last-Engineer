@@ -21,7 +21,7 @@ public class PlayerGrabState : IPlayerState
                 _player.DropOrGrabNode(false);
                 _player.ReleaseNode();
 
-                if (!(interactable is GenericConnectionController) && !(interactable is SpecificConnectionController))
+                if (!(interactable is Connection))
                     _player.RemoveInteractable(interactable);
 
                 _player.SetState(_player.EmptyState);

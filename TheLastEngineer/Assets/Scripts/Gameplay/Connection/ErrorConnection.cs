@@ -5,13 +5,12 @@ using UnityEngine;
 public class ErrorConnection : MonoBehaviour
 {
     [SerializeField] private List<ParticleSystem> _errorPS = new List<ParticleSystem>();
-    [SerializeField] private GenericConnectionController _puertaRequirement;
+    [SerializeField] private Connection _puertaRequirement;
 
     private void Start()
     {
-
         _errorPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
-        _puertaRequirement = GetComponentInParent<GenericConnectionController>();
+        _puertaRequirement = GetComponentInParent<Connection>();
         _puertaRequirement.OnNodeConnected += playPS;
     }
 

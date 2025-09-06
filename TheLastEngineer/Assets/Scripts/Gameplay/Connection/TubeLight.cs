@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TubeLight : MonoBehaviour
 {
-    [SerializeField] private GenericConnectionController _connection;
+    [SerializeField] private Connection _connection;
     [SerializeField] private TubeLight _nextConnection;
 
     private Renderer _renderer;

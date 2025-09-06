@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EmissiveControl : MonoBehaviour
 {
-    [SerializeField] private GenericConnectionController _connection;
+    [SerializeField] private Connection  _connection;
     [SerializeField] private NodeType _requiredNode = NodeType.None;
     [SerializeField] Material m_EmissiveOn;
     [SerializeField] Material m_EmissiveOff;
