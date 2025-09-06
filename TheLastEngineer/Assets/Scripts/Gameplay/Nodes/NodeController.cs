@@ -92,7 +92,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
         if (!parentIsPlayer && newParent != null)
             _connectable = newParent.GetComponent<IConnectable>();
-        else
+        else if(_connectable != null)
         {
             _connectable.UnsetNode(this);
             _connectable = null;
