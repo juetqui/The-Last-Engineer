@@ -26,7 +26,7 @@ public abstract class Glitcheable : MonoBehaviour
     protected bool _isStopped = false;
     private bool _isIntargeteable = false;
     protected int _index = 0;
-    private PlayerTDController _player = null;
+    private PlayerController _player = null;
     private Renderer _feedbackRenderer = default;
     private Coroutine _coroutine = null;
     private AudioSource _audioSource = default;
@@ -279,19 +279,19 @@ public abstract class Glitcheable : MonoBehaviour
         OnPosChanged?.Invoke(transform.position);
     }
 
-    private bool CanSetPlayerPlatform(PlayerTDController player)
+    private bool CanSetPlayerPlatform(PlayerController player)
     {
         return _isCorrupted && !_isStopped && _isPlatform && player.GetCurrentNodeType() == _requiredNode;
     }
 
-    private bool CanUnsetPlayerPlatform(PlayerTDController player)
+    private bool CanUnsetPlayerPlatform(PlayerController player)
     {
         return _isCorrupted && _isPlatform && _player != null && player == _player;
     }
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && CanSetPlayerPlatform(player) && _player == null)
+        if (coll.TryGetComponent(out PlayerController player) && CanSetPlayerPlatform(player) && _player == null)
         {
             _player = player;
             _player.SetPlatform(this);
@@ -303,7 +303,7 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerStay(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && CanSetPlayerPlatform(player) && _player == null)
+        if (coll.TryGetComponent(out PlayerController player) && CanSetPlayerPlatform(player) && _player == null)
         {
             _player = player;
             _player.SetPlatform(this);
@@ -313,7 +313,7 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && CanUnsetPlayerPlatform(player))
+        if (coll.TryGetComponent(out PlayerController player) && CanUnsetPlayerPlatform(player))
         {
             _player.UnsetPlatform(this);
             _player = null;

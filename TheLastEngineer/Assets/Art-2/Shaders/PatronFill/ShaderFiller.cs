@@ -53,7 +53,7 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isLoading == true)
             {
-                if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                if (PlayerController.Instance.HasNode() && PlayerController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
                 {
                     _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
                 }
@@ -102,7 +102,7 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isUnloading == true)
             {
-                if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                if (PlayerController.Instance.HasNode() && PlayerController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
                 {
                     _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
                 }

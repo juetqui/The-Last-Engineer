@@ -7,7 +7,7 @@ using System.Collections;
 using UnityEngine.UI;
 using Cinemachine;
 
-public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserReceptor
+public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
     [SerializeField] private PlayerData _playerData;
     public bool IsCorrupted;
@@ -24,7 +24,7 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
     [SerializeField] private Image _dashImage;
     [SerializeField] private float _deadTimer;
 
-    public static PlayerTDController Instance = null;
+    public static PlayerController Instance = null;
     [SerializeField] private SolvingController _solvingController;
 
     public Collider playerCollider;
@@ -137,6 +137,8 @@ public class PlayerTDController : MonoBehaviour, IMovablePassenger, ILaserRecept
         if (_isDead || !_canMove) return Vector3.zero;
         
         _movement = InputManager.Instance.moveInput.ReadValue<Vector2>();
+
+        if (_playerModel.IsDashing) _movement *= 0.01f;
 
         return new Vector3(_movement.x, 0, _movement.y);
     }

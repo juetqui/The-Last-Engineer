@@ -1,8 +1,8 @@
 public class PlayerGrabState : IPlayerState
 {
-    private PlayerTDController _player;
+    private PlayerController _player;
 
-    public void Enter(PlayerTDController player)
+    public void Enter(PlayerController player)
     {
         _player = player;
         _player.DropOrGrabNode(true);

@@ -34,15 +34,15 @@ public class CorruptedCorridor : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //print("dasdasd");
-        if (other.gameObject.GetComponent<PlayerTDController>())
+        if (other.gameObject.GetComponent<PlayerController>())
         {
-            if (!PlayerTDController.Instance.IsCorrupted)
+            if (!PlayerController.Instance.IsCorrupted)
             {
                 transportSphere.SetActive(true);
-                transportSphere.transform.position = PlayerTDController.Instance.gameObject.transform.position + transportOffset;
-                PlayerTDController.Instance._cc.enabled = false;
-                PlayerTDController.Instance.GetComponent<Collider>().enabled = false;
-                PlayerTDController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
+                transportSphere.transform.position = PlayerController.Instance.gameObject.transform.position + transportOffset;
+                PlayerController.Instance._cc.enabled = false;
+                PlayerController.Instance.GetComponent<Collider>().enabled = false;
+                PlayerController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = false;
                 _isActive = true;
                 acum = GetCloserNode();
             }
@@ -51,7 +51,7 @@ public class CorruptedCorridor : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.GetComponent<PlayerTDController>())
+        if (collision.gameObject.GetComponent<PlayerController>())
         {
             _isActive = false;
         }
@@ -66,9 +66,9 @@ public class CorruptedCorridor : MonoBehaviour
         {
             _isActive = false;
             transportSphere.SetActive(false);
-            PlayerTDController.Instance._cc.enabled = true;
-            PlayerTDController.Instance.GetComponent<Collider>().enabled = true;
-            PlayerTDController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
+            PlayerController.Instance._cc.enabled = true;
+            PlayerController.Instance.GetComponent<Collider>().enabled = true;
+            PlayerController.Instance.GetComponentInChildren<SkinnedMeshRenderer>().enabled = true;
 
 
         }
@@ -79,7 +79,7 @@ public class CorruptedCorridor : MonoBehaviour
         if (_safetyDistance < Vector3.Distance(transform.position, transportSphere.transform.position))
         {
             transportSphere.transform.position = transportSphere.transform.position + velocity * sphereSpeed * Time.deltaTime;
-            PlayerTDController.Instance.gameObject.transform.position = transportSphere.transform.position;
+            PlayerController.Instance.gameObject.transform.position = transportSphere.transform.position;
         }
         else
         {
@@ -91,9 +91,9 @@ public class CorruptedCorridor : MonoBehaviour
         float distance=9999999f;
         foreach (var item in nodesTransform)
         {
-            if (Vector3.Distance(item.position, PlayerTDController.Instance.gameObject.transform.position) <distance)
+            if (Vector3.Distance(item.position, PlayerController.Instance.gameObject.transform.position) <distance)
             {
-                distance = Vector3.Distance(item.position, PlayerTDController.Instance.gameObject.transform.position);
+                distance = Vector3.Distance(item.position, PlayerController.Instance.gameObject.transform.position);
                 closestNodeIndex =nodesTransform.IndexOf(item);
             }
         }

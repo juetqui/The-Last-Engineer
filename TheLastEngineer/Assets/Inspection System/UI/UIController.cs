@@ -9,12 +9,12 @@ public class UIController : MonoBehaviour
         _canvas = GetComponent<Canvas>();
 
         OnTargetSelected(null);
-        PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected += OnTargetSelected;
     }
 
     private void OnDestroy()
     {
-        PlayerTDController.Instance.OnInteractableSelected -= OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected -= OnTargetSelected;
     }
 
     private void OnTargetSelected(IInteractable target)

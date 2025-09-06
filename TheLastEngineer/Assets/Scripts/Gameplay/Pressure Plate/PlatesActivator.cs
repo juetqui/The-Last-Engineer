@@ -14,7 +14,7 @@ public class PlatesActivator : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player))
+        if (coll.TryGetComponent(out PlayerController player))
         {
             OnActivatePlates?.Invoke(true);
         }
@@ -22,7 +22,7 @@ public class PlatesActivator : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player))
+        if (coll.TryGetComponent(out PlayerController player))
         {
             OnActivatePlates?.Invoke(false);
         }

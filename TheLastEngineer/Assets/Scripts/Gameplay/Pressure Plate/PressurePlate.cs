@@ -58,7 +58,7 @@ public class PressurePlate : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.GetComponent<PlayerTDController>() && !_taskFinished)
+        if (coll.GetComponent<PlayerController>() && !_taskFinished)
         {
             _renderer.material = _successMat;
         }
@@ -66,7 +66,7 @@ public class PressurePlate : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.GetComponent<PlayerTDController>() && !_taskFinished)
+        if (coll.GetComponent<PlayerController>() && !_taskFinished)
         {
             StartCoroutine(PressedCD());
         }

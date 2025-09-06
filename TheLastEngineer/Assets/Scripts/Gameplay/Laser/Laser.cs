@@ -179,7 +179,7 @@ public class Laser : MonoBehaviour
 
             foreach (var hit in hits)
             {
-                if (hit.collider.TryGetComponent(out PlayerTDController player))
+                if (hit.collider.TryGetComponent(out PlayerController player))
                 {
                     // Cortamos el rayo en el player
                     _lineRenderer.SetPosition(0, laserPos);

@@ -76,8 +76,8 @@ public class NodeController : MonoBehaviour, IInteractable
         _nodeModel.MoveObject();                                    
     }
 
-    public bool CanInteract(PlayerTDController player) => !player.HasNode();
-    public void Interact(PlayerTDController player, out bool succeeded)
+    public bool CanInteract(PlayerController player) => !player.HasNode();
+    public void Interact(PlayerController player, out bool succeeded)
     {
         if (!CanInteract(player))
         {
@@ -136,7 +136,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.TryGetComponent(out PlayerTDController player))
+        if (other.gameObject.TryGetComponent(out PlayerController player))
         {
             if (_target == null) _target = player.transform;
 
@@ -147,7 +147,7 @@ public class NodeController : MonoBehaviour, IInteractable
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.TryGetComponent(out PlayerTDController player))
+        if (other.gameObject.TryGetComponent(out PlayerController player))
         {
             if (_target != null) _target = null;      
 

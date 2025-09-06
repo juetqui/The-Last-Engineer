@@ -22,12 +22,12 @@ public class InspectorController : MonoBehaviour
         _inspectionables = new List<UIInspectionable>();
         _inspectionables = GetComponentsInChildren<UIInspectionable>().ToList();
 
-        PlayerTDController.Instance.OnInteractableSelected += TargetSelected;
+        PlayerController.Instance.OnInteractableSelected += TargetSelected;
     }
 
     private void OnDestroy()
     {
-        PlayerTDController.Instance.OnInteractableSelected -= TargetSelected;
+        PlayerController.Instance.OnInteractableSelected -= TargetSelected;
     }
 
     private void TargetSelected(IInteractable target)

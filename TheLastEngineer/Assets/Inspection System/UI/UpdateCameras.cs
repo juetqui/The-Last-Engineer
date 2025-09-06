@@ -11,13 +11,13 @@ public class UpdateCameras : MonoBehaviour
 
     void Start()
     {
-        PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected += OnTargetSelected;
         _CMBrain.m_CameraActivatedEvent.AddListener(OnCameraActivated);
     }
 
     private void OnDestroy()
     {
-        PlayerTDController.Instance.OnInteractableSelected -= OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected -= OnTargetSelected;
         _CMBrain.m_CameraActivatedEvent.RemoveListener(OnCameraActivated);
     }
 

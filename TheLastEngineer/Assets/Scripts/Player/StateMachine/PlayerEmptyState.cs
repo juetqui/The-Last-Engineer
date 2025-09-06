@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class PlayerEmptyState : IPlayerState
 {
-    private PlayerTDController _player;
+    private PlayerController _player;
     private float _holdTimer;
     private bool _holding;
     private IInteractable _target;
 
-    public void Enter(PlayerTDController player)
+    public void Enter(PlayerController player)
     {
         _player = player;
         _holding = false;

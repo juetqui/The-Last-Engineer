@@ -56,8 +56,8 @@ public class UpdateCrosshair : MonoBehaviour
     private void CompareGlitchWithPlayerNode(Glitcheable glitcheable, Vector3 screenPosition)
     {
         bool compatible =
-            (PlayerTDController.Instance.GetCurrentNode().NodeType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
-            (PlayerTDController.Instance.GetCurrentNode().NodeType == NodeType.Default && !glitcheable.IsCorrupted);
+            (PlayerController.Instance.GetCurrentNode().NodeType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
+            (PlayerController.Instance.GetCurrentNode().NodeType == NodeType.Default && !glitcheable.IsCorrupted);
 
         //_crossImage.enabled = compatible;
         _circleImage.enabled = !compatible;

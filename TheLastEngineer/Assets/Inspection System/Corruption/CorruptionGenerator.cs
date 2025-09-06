@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.ProBuilder.Shapes;
 
 public class CorruptionGenerator : MonoBehaviour
 {
@@ -13,7 +14,9 @@ public class CorruptionGenerator : MonoBehaviour
     private List<Corruption> _corruptionList = default;
     private Corruption _currentActive = default;
     private Mesh _mesh = default;
-    
+    private ParticleSystem _ps = default;
+
+    private float _maxParticles = 10000f;
     private float[] _triangleAreas = default;
     private float _totalArea = default;
 
@@ -29,7 +32,9 @@ public class CorruptionGenerator : MonoBehaviour
     void Start()
     {
         _mesh = GetComponent<MeshFilter>().mesh;
+        _ps = GetComponentInChildren<ParticleSystem>();
         SetUpObjectCorruption();
+        SetParticlesAmount();
     }
 
     private void SetUpObjectCorruption()
@@ -144,5 +149,13 @@ public class CorruptionGenerator : MonoBehaviour
         _cleanedInstances++;
         OnUpdatedInstances?.Invoke();
         SetUpNextCorruption();
+        SetParticlesAmount();
+    }
+
+    private void SetParticlesAmount()
+    {
+        float amount = _maxParticles * (1f - ((float)_index / _corruptionList.Count()));
+        var psShape = _ps.emission;
+        psShape.rateOverTime = amount;
     }
 }

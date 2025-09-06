@@ -52,8 +52,15 @@ public class PlayerTDView
 
     public void Walk(Vector3 moveVector)
     {
-        if (moveVector.magnitude > 0f) _animator.SetBool("IsWalking", true);
-        else _animator.SetBool("IsWalking", false);
+        if (moveVector.magnitude > 0f)
+        {
+            _animator.SetBool("IsWalking", true);
+            _walkPS.Play();
+            return;
+        }
+        
+        _animator.SetBool("IsWalking", false);
+        _walkPS.Stop();
     }
 
     public void DashSound()

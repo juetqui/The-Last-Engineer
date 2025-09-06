@@ -83,7 +83,7 @@ public class CheckPointController : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerTDController player) && _enabled)
+        if (coll.TryGetComponent(out PlayerController player) && _enabled)
         {
             GetComponentInChildren<ParticleSystem>().Play();
             //Vector3 checkPointPos = player.transform.position;

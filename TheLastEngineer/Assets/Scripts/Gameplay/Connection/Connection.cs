@@ -24,9 +24,9 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         }
         else StartsConnected = false;
     }
-    public bool CanInteract(PlayerTDController player){ return player.HasNode() && _recievedNode == null; }
+    public bool CanInteract(PlayerController player){ return player.HasNode() && _recievedNode == null; }
 
-    public void Interact(PlayerTDController player, out bool succededInteraction)
+    public void Interact(PlayerController player, out bool succededInteraction)
     {
         if (_recievedNode != null)
         {

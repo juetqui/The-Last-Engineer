@@ -6,7 +6,7 @@ public class PlatformWalls : MonoBehaviour
 {
     MeshRenderer renderer;
     Material material;
-    PlayerTDController player;
+    PlayerController player;
     Vector2 vector2=new Vector2(-6.5f,2.5f);
     public bool playerHasCorruption;
     public bool IsDisolving;
@@ -15,7 +15,7 @@ public class PlatformWalls : MonoBehaviour
         renderer = GetComponent<MeshRenderer>();
         material = renderer.material;
         material.SetVector("_MinMaxPos",vector2);
-        player = PlayerTDController.Instance;
+        player = PlayerController.Instance;
     }
     private void Update()
     {

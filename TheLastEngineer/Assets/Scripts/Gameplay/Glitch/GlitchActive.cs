@@ -11,7 +11,7 @@ public class GlitchActive : MonoBehaviour
     [SerializeField] private float _detectionRange = 10f;
     [SerializeField] private GameObject _interactionArea;
 
-    private PlayerTDController _player = default;
+    private PlayerController _player = default;
     private Glitcheable _selectedGlitcheable = null;
     private List<Glitcheable> _glitcheables = default;
     private int _index = 0;
@@ -26,13 +26,13 @@ public class GlitchActive : MonoBehaviour
         if (Instance == null)
             Instance = this;
 
-        _player = GetComponent<PlayerTDController>();
+        _player = GetComponent<PlayerController>();
         _glitcheables = new List<Glitcheable>();
     }
 
     void Start()
     {
-        PlayerTDController.Instance.OnNodeGrabed += CheckNode;
+        PlayerController.Instance.OnNodeGrabed += CheckNode;
     }
 
     void Update()

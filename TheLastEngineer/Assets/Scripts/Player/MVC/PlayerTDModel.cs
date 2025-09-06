@@ -10,9 +10,9 @@ public class PlayerTDModel
 
     private float _moveSpeed = default, _rotSpeed = default;
     private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
-    private float _coyoteTimeCounter = 0f, _coyoteTime = 0.3f;
+    private float _coyoteTimeCounter = 0f, _coyoteTime = default;
 
-    private float _gravity = -9.81f;
+    private float _gravity = -50f;
     private bool _isDashing = false, _canDash = true, _useGravity = true;
 
 
@@ -25,6 +25,9 @@ public class PlayerTDModel
 
     public PlayerTDModel(CharacterController cc, Transform transform, PlayerData playerData, Collider colider)
     {
+        if (cc == null || transform == null || playerData == null)
+            throw new System.ArgumentNullException("Dependences can not be null");
+
         _cc = cc;
         _transform = transform;
         _collider = colider;
@@ -33,14 +36,14 @@ public class PlayerTDModel
         _dashSpeed = playerData.dashSpeed;
         _dashDuration = playerData.dashDuration;
         _dashCD = playerData.dashCD;
+        _coyoteTime = playerData.coyoteTime;
     }
 
     public void OnUpdate(Vector3 moveDir, float moveSpeed)
     {
         _moveSpeed = moveSpeed;
         MovePlayer(moveDir);
-
-        _coyoteTimeCounter = _cc.isGrounded ? _coyoteTime : _coyoteTimeCounter - Time.deltaTime;
+        UpdateCoyoteTimer();
     }
 
     private void MovePlayer(Vector3 moveDir)
@@ -48,26 +51,34 @@ public class PlayerTDModel
         if (moveDir.sqrMagnitude > 0.0001f)
             RotatePlayer(moveDir);
 
-        // Gravedad clara
+        Vector3 horizontal = GetHorizontalMovement(moveDir);
+        Vector3 vertical = HandleVerticalMovement();
+        Vector3 totalMovement = horizontal + vertical + _platformDisplacement;
+
+        _cc.Move(totalMovement);
+        _platformDisplacement = Vector3.zero;
+    }
+    
+    private Vector3 GetHorizontalMovement(Vector3 moveDir)
+    {
+        return moveDir.normalized * _moveSpeed * Time.deltaTime;
+    }
+
+    private Vector3 HandleVerticalMovement()
+    {
         if (!_isDashing && _useGravity)
         {
             if (_cc.isGrounded) _velocity.y = -1f;
             else _velocity.y += _gravity * Time.deltaTime;
         }
-        else
-        {
-            _velocity.y = 0f;
-        }
+        else _velocity.y = 0f;
 
-        // Total del frame
-        Vector3 horizontal = moveDir.normalized * _moveSpeed * Time.deltaTime;
-        Vector3 platform = _platformDisplacement; // viene en unidades/ frame
-        Vector3 vertical = _velocity * Time.deltaTime;
+        return _velocity * Time.deltaTime;
+    }
 
-        _cc.Move(horizontal + platform + vertical);
-
-        // Importantísimo: resetear desplazamiento plataforma
-        _platformDisplacement = Vector3.zero;
+    private void UpdateCoyoteTimer()
+    {
+        _coyoteTimeCounter = _cc.isGrounded ? _coyoteTime : _coyoteTimeCounter - Time.deltaTime;
     }
 
     public void OnPlatformMoving(Vector3 displacementPerFrame)

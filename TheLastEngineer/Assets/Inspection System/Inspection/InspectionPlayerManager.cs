@@ -11,13 +11,13 @@ public class InspectionPlayerManager : MonoBehaviour
     {
         _camera = GetComponent<Camera>();
         _camera.enabled = false;
-        PlayerTDController.Instance.OnInteractableSelected += OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected += OnTargetSelected;
         InspectionSystem.Instance.enabled = false;
     }
 
     private void OnDestroy()
     {
-        PlayerTDController.Instance.OnInteractableSelected -= OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected -= OnTargetSelected;
     }
 
     private void OnTargetSelected(IInteractable target)
@@ -39,7 +39,7 @@ public class InspectionPlayerManager : MonoBehaviour
         _currentInteractable = interactable;
 
         _currentInteractable.OnFinished += HandleFinishedInteraction;
-        _currentInteractable.Interact(PlayerTDController.Instance, out bool succeded);
+        _currentInteractable.Interact(PlayerController.Instance, out bool succeded);
 
         _isInspecting = true;
     }
