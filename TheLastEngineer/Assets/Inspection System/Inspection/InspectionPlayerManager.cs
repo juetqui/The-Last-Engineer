@@ -32,7 +32,7 @@ public class InspectionPlayerManager : MonoBehaviour
     {
         if (interactable == null || _isInspecting) return;
 
-        Time.timeScale = 0;
+        //Time.timeScale = 0;
         _camera.enabled = true;
         InspectionSystem.Instance.enabled = true;
         InputManager.Instance.UpdateActionMap(ActionMaps.UI);
@@ -48,7 +48,7 @@ public class InspectionPlayerManager : MonoBehaviour
     {
         if (!_isInspecting) return;
 
-        Time.timeScale = 1;
+        //Time.timeScale = 1;
         _camera.enabled = false;
         InspectionSystem.Instance.enabled = false;
         _currentInteractable.OnFinished -= HandleFinishedInteraction;

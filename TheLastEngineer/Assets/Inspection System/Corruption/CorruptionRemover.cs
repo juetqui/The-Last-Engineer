@@ -13,7 +13,9 @@ public class CorruptionRemover : MonoBehaviour
     [SerializeField] private Canvas _canvas;
     [SerializeField] private LayerMask _inspectionLayer;
     [SerializeField] private float _holdTimer = 1f;
+    [SerializeField] private float _shakeIntenity = 0.25f;
 
+    [Header("DEBUG SETTINGS")]
     [SerializeField] private GameObject _debugObject;
     [SerializeField] private bool _debug = false;
 
@@ -105,8 +107,8 @@ public class CorruptionRemover : MonoBehaviour
 
         float t = Mathf.PingPong(_timer, 1f);
 
-        Vector3 velocityA = new Vector3(_timer, -_timer, 0f) * 0.25f;
-        Vector3 velocityB = new Vector3(-_timer, _timer, 0f) * 0.25f;
+        Vector3 velocityA = new Vector3(_timer, -_timer, 0f) * _shakeIntenity;
+        Vector3 velocityB = new Vector3(-_timer, _timer, 0f) * _shakeIntenity;
         Vector3 oscillatedVelocity = Vector3.Lerp(velocityA, velocityB, t);
 
         _cameraShake.GenerateImpulse(oscillatedVelocity);

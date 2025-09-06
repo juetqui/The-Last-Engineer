@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ApproachToTarget : MonoBehaviour
 {
+    [SerializeField] private float _timeModifier = 0.001f;
+
     private CinemachineFreeLook _camera;
     private float _originalRadius = 0f;
 
@@ -18,7 +20,7 @@ public class ApproachToTarget : MonoBehaviour
 
     private void GetCloseToTarget(float timer)
     {
-        timer *= 0.001f;
+        timer *= _timeModifier;
         _camera.m_Orbits[0].m_Radius -= timer;
     }
 
