@@ -35,7 +35,7 @@ public class PlatformController : MonoBehaviour
     internal RouteManager Route => _route;
     internal Vector3 CurrentTarget => _route.CurrentPoint;
 
-    [SerializeField] protected GameObject refuerzoPositivo;
+    //[SerializeField] protected GameObject refuerzoPositivo;
 
     private Coroutine _changingColor = null;
 
@@ -82,7 +82,7 @@ public class PlatformController : MonoBehaviour
 
     public void SetPositiveFeedback(bool Active)
     {
-        refuerzoPositivo.SetActive(Active);
+        //refuerzoPositivo.SetActive(Active);
 
         if (_changingColor != null) StopCoroutine(_changingColor);
 
