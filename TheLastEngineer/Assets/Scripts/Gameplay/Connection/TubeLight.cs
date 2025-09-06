@@ -82,7 +82,4 @@ public class TubeLight : MonoBehaviour
     public void TurnOn() { _connected = true; _mode = Mode.TurningOn; }
     public void TurnOff() { _connected = false; _mode = Mode.TurningOff; }
 
-    // Métodos instantáneos por si los necesitás en editor o setup
-    public void SetInstantOn() { _step = 1f; ApplyStep(); }
-    public void SetInstantOff() { _step = 0f; ApplyStep(); }
 }
