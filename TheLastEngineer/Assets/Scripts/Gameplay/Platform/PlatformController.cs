@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private float _corruptedMoveSpeed = 0f;
     [SerializeField] private float _waitCD = 1f;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
-    [SerializeField] private GenericConnectionController _connection = default;
+    [SerializeField] private Connection _connection = default;
 
     // --- Runtime
     private RouteManager _route;
@@ -34,6 +35,10 @@ public class PlatformController : MonoBehaviour
     internal RouteManager Route => _route;
     internal Vector3 CurrentTarget => _route.CurrentPoint;
 
+    [SerializeField] protected GameObject refuerzoPositivo;
+
+    private Coroutine _changingColor = null;
+
     private void Awake()
     {
         _route = new RouteManager(_positions);
@@ -55,7 +60,7 @@ public class PlatformController : MonoBehaviour
          // Estado inicial
         bool canMove = _connection.StartsConnected; // y si hay filtro por tipo: && _connection.CurrentType == _requiredNode;
         SetState(canMove ? _waitingState : _inactiveState);
-        _connection.SetPositiveFeedback(canMove);
+        SetPositiveFeedback(canMove);
     }
 
     private void OnDestroy()
@@ -75,11 +80,42 @@ public class PlatformController : MonoBehaviour
     }
 
 
+    public void SetPositiveFeedback(bool Active)
+    {
+        refuerzoPositivo.SetActive(Active);
+
+        if (_changingColor != null) StopCoroutine(_changingColor);
+
+        Color targetColor = Active ? Color.cyan : Color.red;
+        _changingColor = StartCoroutine(ChangeColor(targetColor));
+    }
+
+    private IEnumerator ChangeColor(Color targetColor)
+    {
+        Renderer renderer = GetComponent<Renderer>();
+        float counter = 0f;
+
+        while (counter < 1f)
+        {
+            counter += Time.deltaTime * 0.05f;
+
+            Color currentColor = renderer.material.GetColor("_EmissiveColor");
+            Color newColor = Color.Lerp(currentColor, targetColor, counter);
+
+            renderer.material.SetColor("_EmissiveColor", newColor);
+            yield return null;
+        }
+
+        renderer.material.SetColor("_EmissiveColor", targetColor);
+        _changingColor = null;
+    }
+
+
     /* -------------------- Eventos externos -------------------- */
     private void OnConnectionChanged(NodeType type, bool active)
     {
         bool canMove = (type == _requiredNode) && active;
-        _connection.SetPositiveFeedback(canMove);
+        SetPositiveFeedback(canMove);
 
         if (canMove)
             SetState(_waitingState);

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class EmissiveListener : MonoBehaviour
 {
-    [SerializeField] private GenericConnectionController _connection;
+    [SerializeField] private Connection _connection;
     [SerializeField] private float _transitionDuration = 0.25f;
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _enabledColor;

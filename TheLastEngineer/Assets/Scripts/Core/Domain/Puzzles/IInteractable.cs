@@ -2,9 +2,9 @@ using UnityEngine;
 
 public interface IInteractable
 {
-    public InteractablePriority Priority { get; }
     public Transform Transform {  get; }
-    public bool RequiresHoldInteraction { get; }
+    public InteractablePriority Priority { get; }
     public bool CanInteract(PlayerTDController player);
     public void Interact(PlayerTDController player, out bool succededInteraction);
+    public bool RequiresHoldInteraction { get; }
 }
