@@ -127,7 +127,7 @@ public class SpecificConnectionController : Connection<SecondaryTM>
         else
             _connectionView.PlayClip(_placedClip, 1f);
 
-        _recievedNode.IsConnected = isValid;
+        //_recievedNode.IsConnected = isValid;
         _connectionView.Enable(playEffects);
         _connectionView.PlayEffect(playEffects);
     }
