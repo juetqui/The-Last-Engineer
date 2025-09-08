@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (_model.CanDashWithCoyoteTime() && _move != Vector2.zero && !_isDead)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);
-            StartCoroutine(_model.Dash(GetMovement3D(), _nodeHandler.CurrentType));
+            StartCoroutine(_model.Dash(GetMovement3D()));
             _impulse.GenerateImpulseWithForce(_playerData.testForce);
             View.DashSound();
             OnDash?.Invoke(_playerData.dashDuration, _playerData.dashCD);
@@ -171,7 +171,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private Vector3 GetMovement3D()
     {
         if (_isDead || !_canMove) return Vector3.zero;
-        if (_model.IsDashing) _move *= 0.01f;
         
         return new Vector3(_move.x, 0f, _move.y);
     }

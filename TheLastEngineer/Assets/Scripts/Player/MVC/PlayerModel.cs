@@ -51,6 +51,8 @@ public class PlayerModel
         if (moveDir.sqrMagnitude > 0.0001f)
             RotatePlayer(moveDir);
 
+        if (_isDashing) moveDir *= 0.01f;
+
         Vector3 horizontal = GetHorizontalMovement(moveDir);
         Vector3 vertical = HandleVerticalMovement();
         Vector3 totalMovement = horizontal + vertical + _platformDisplacement;
@@ -111,7 +113,7 @@ public class PlayerModel
         _transform.rotation = Quaternion.Lerp(_transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
     }
 
-    public IEnumerator Dash(Vector3 dashDir, NodeType currentNode)
+    public IEnumerator Dash(Vector3 dashDir)
     {
         float dashTimer = Time.time;
         _isDashing = true;

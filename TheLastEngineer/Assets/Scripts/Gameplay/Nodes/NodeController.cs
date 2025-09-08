@@ -108,13 +108,14 @@ public class NodeController : MonoBehaviour, IInteractable
         else if (newParent == null && newScale == default)
             _nodeModel.SetPos(newPos, NodeType);
     }
+    
     private void InteractWithGlitcheable(Glitcheable glitcheable, InteractionOutcome interactionResult)
     {
         if (glitcheable == null) return;
 
         bool newObjectState = _nodeType == NodeType.Default ? false : true;
 
-        if (glitcheable.ChangeCorruptionState(_nodeType, newObjectState))
+        if (glitcheable.Interrupt())
             UpdateNodeType();
     }
 

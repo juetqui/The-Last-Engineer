@@ -1,22 +1,22 @@
 public class PlatesGlitcheable : Glitcheable
 {
-    public PlateType colorType = default;
+    //public PlateType colorType = default;
 
-    private void Awake()
-    {
-        OnAwake();
-    }
+    //private void Awake()
+    //{
+    //    OnAwake();
+    //}
 
-    void Start()
-    {
-        _timerController.OnTimerCycleComplete += UpdateTarget;
-        _timerController.OnPhaseChanged += CheckTimerPhase;
-    }
+    //void Start()
+    //{
+    //    _timerController.OnTimerCycleComplete += UpdateTarget;
+    //    _timerController.OnPhaseChanged += CheckTimerPhase;
+    //}
 
-    private void OnCycleStart()
-    {
-        if (_isStopped || !_isCorrupted) return;
-    }
+    //private void OnCycleStart()
+    //{
+    //    if (_isStopped || !_isCorrupted) return;
+    //}
 }
 
 public enum PlateType
