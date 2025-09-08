@@ -12,7 +12,7 @@ public class ResetPressurePlate : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.GetComponent<PlayerTDController>() && !_taskFinished)
+        if (coll.GetComponent<PlayerController>() && !_taskFinished)
         {
             OnPress.Invoke();
         }
@@ -20,7 +20,7 @@ public class ResetPressurePlate : MonoBehaviour
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.GetComponent<PlayerTDController>() && !_taskFinished)
+        if (coll.GetComponent<PlayerController>() && !_taskFinished)
         {
             OnRealase.Invoke();
         }

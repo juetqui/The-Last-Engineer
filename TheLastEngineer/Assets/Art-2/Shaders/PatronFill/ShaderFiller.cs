@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using System;
 using UnityEngine.Events;
@@ -53,7 +51,7 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isLoading == true)
             {
-                if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
                 {
                     _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
                 }
@@ -102,7 +100,7 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isUnloading == true)
             {
-                if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
                 {
                     _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
                 }

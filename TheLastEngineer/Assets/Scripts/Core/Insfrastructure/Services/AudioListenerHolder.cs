@@ -9,7 +9,7 @@ public class AudioListenerHolder : MonoBehaviour
     }
     void Update()
     {
-        transform.position = PlayerTDController.Instance.transform.position;
+        transform.position = PlayerController.Instance.transform.position;
         transform.rotation = _startRot;
     }
 }

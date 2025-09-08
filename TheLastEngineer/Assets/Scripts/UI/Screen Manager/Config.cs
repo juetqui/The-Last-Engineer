@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class Config : MonoBehaviour
@@ -9,21 +10,20 @@ public class Config : MonoBehaviour
     private void Awake()
     {
         menuName = SceneManager.GetActiveScene().name;
+        InputManager.Instance.pauseInput.performed += PauseMenu;
     }
-    void Update()
+    void PauseMenu(InputAction.CallbackContext context)
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && menuName != "Menu")
+        if (menuName == "Menu") return;
+
+        if (screenPause == null)
         {
-            if (screenPause != null)
-            {
-                Cursor.visible = false;
-                ScreenManager.Instance.Pop();
-            }
-            else
-            {
-                screenPause = Instantiate(Resources.Load<ScreenPause>("Pause_Menu"));
-                ScreenManager.Instance.Push(screenPause);
-            }
+            screenPause = Instantiate(Resources.Load<ScreenPause>("Pause_Menu"));
+            ScreenManager.Instance.Push(screenPause);
+            return;
         }
+
+        Cursor.visible = false;
+        ScreenManager.Instance.Pop();
     }
 }

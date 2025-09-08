@@ -22,44 +22,44 @@ public class LevelSelector : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[0].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[0].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[0]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[1].position);
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[1].position);
             //StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[1]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[2].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[2].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[2]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[3].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[3].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[3]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[4].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[4].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[4]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[5].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[5].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[4]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha7))
         {
-            PlayerTDController.Instance.SetCheckPointPos(_checkpoints[6].position);
-            StartCoroutine(PlayerTDController.Instance.RespawnPlayer());
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[6].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer());
             //SceneManager.LoadScene(sceneNames[4]);
         }
         //else if (Input.GetKeyDown(KeyCode.Alpha8))

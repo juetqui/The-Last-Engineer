@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 public class LaserReceptor : MonoBehaviour, ILaserReceptor
 {
@@ -113,7 +112,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
                 //print("filleando");
-                if (PlayerTDController.Instance.HasNode()&&PlayerTDController.Instance.GetCurrentNodeType()==NodeType.Corrupted)
+                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
                 {
                     _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
                 }
@@ -147,7 +146,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
 
                 //print("unfilleando");
                 
-                    if (PlayerTDController.Instance.HasNode() && PlayerTDController.Instance.GetCurrentNodeType() == NodeType.Corrupted)
+                    if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
                     {
                         _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
                     }
