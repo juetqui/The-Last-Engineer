@@ -29,9 +29,9 @@ public class PostProcessController : MonoBehaviour
     {
         _passiveMat.SetFloat("_VignetteAmount", 30f);
         _corruptionMat.SetFloat("_VignetteAmount", 30f);
-        
-        PlayerController.Instance.OnNodeGrabed += ActivatePassive;
-        PlayerController.Instance.OnAbsorbCorruption += ActivateCorruption;
+
+        PlayerNodeHandler.Instance.OnNodeGrabbed += ActivatePassive;
+        PlayerNodeHandler.Instance.OnAbsorbCorruption += ActivateCorruption;
 
         _shockWave = _rendererData.rendererFeatures.Where(rf => rf is FullScreenPassRendererFeature).FirstOrDefault();
         _shockWave.SetActive(false);

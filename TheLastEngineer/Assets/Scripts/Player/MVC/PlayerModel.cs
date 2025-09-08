@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class PlayerTDModel
+public class PlayerModel
 {
     private CharacterController _cc = default;
     private Transform _transform = default;
@@ -23,7 +23,7 @@ public class PlayerTDModel
 
     public Action<float> OnDashCDStarted = delegate { };
 
-    public PlayerTDModel(CharacterController cc, Transform transform, PlayerData playerData, Collider colider)
+    public PlayerModel(CharacterController cc, Transform transform, PlayerData playerData, Collider colider)
     {
         if (cc == null || transform == null || playerData == null)
             throw new System.ArgumentNullException("Dependences can not be null");

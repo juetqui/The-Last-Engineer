@@ -1,12 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
 public class UpdateCrosshair : MonoBehaviour
 {
     [SerializeField] Camera _camera;
     [SerializeField] Image _circleImage;
-    //[SerializeField] Image _crossImage;
     
     private Animator _myAnim;
    
@@ -46,9 +44,6 @@ public class UpdateCrosshair : MonoBehaviour
         _circleImage.enabled = false;
         _circleImage.rectTransform.position = Vector3.zero;
         
-        //_crossImage.enabled = false;
-        //_crossImage.rectTransform.position = Vector3.zero;
-        
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", false);
     }
@@ -56,14 +51,11 @@ public class UpdateCrosshair : MonoBehaviour
     private void CompareGlitchWithPlayerNode(Glitcheable glitcheable, Vector3 screenPosition)
     {
         bool compatible =
-            (PlayerController.Instance.GetCurrentNode().NodeType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
-            (PlayerController.Instance.GetCurrentNode().NodeType == NodeType.Default && !glitcheable.IsCorrupted);
+            (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
+            (PlayerNodeHandler.Instance.CurrentType == NodeType.Default && !glitcheable.IsCorrupted);
 
-        //_crossImage.enabled = compatible;
         _circleImage.enabled = !compatible;
         _circleImage.rectTransform.position = screenPosition;
-
-        //(_crossImage.enabled ? _crossImage : _circleImage).rectTransform.position = screenPosition;
     }
 
     private void TryPlayInvalidAnim(Glitcheable glitcheable, InteractionOutcome interactionResult)

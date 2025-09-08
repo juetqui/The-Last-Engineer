@@ -1,42 +1,57 @@
+using UnityEngine;
+
 public class PlayerGrabState : IPlayerState
 {
+    private PlayerStateMachine _stateMachine;
     private PlayerController _player;
+    private PlayerNodeHandler _playerNodeHandler;
 
-    public void Enter(PlayerController player)
+    public PlayerGrabState(PlayerStateMachine stateMachine)
     {
+        _stateMachine = stateMachine;
+    }
+
+    public void Enter(PlayerController player, PlayerNodeHandler playerNodeHandler)
+    {
+        if (player == null)
+            throw new System.ArgumentNullException(nameof(player));
+
         _player = player;
-        _player.DropOrGrabNode(true);
+        _playerNodeHandler = playerNodeHandler;
     }
 
     public void HandleInteraction(IInteractable interactable)
     {
-        if (!_player.DropAvailable || _player.CheckForWalls()) return;
+        if (_player.CheckForWalls()) return;
 
-        if (interactable != null && interactable.CanInteract(_player))
+        if (interactable != null && interactable.CanInteract(_playerNodeHandler))
         {
             bool success;
-            interactable.Interact(_player, out success);
+            interactable.Interact(_playerNodeHandler, out success);
+            
             if (success)
             {
-                _player.DropOrGrabNode(false);
                 _player.ReleaseNode();
-
                 if (!(interactable is Connection))
                     _player.RemoveInteractable(interactable);
-
-                _player.SetState(_player.EmptyState);
-                InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
+                _stateMachine.TransitionToEmptyState();
+                InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
             }
         }
         else
         {
-            _player.DropOrGrabNode(false);
+            Debug.Log("DROP");
             _player.DropNode();
-            _player.SetState(_player.EmptyState);
+            _stateMachine.TransitionToEmptyState();
         }
     }
 
     public void Tick() { }
+
     public void Cancel() { }
-    public void Exit() { _player = null; }
+
+    public void Exit()
+    {
+        _player = null;
+    }
 }

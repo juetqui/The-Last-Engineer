@@ -22,12 +22,12 @@ public class Inspectionable : MonoBehaviour, IInteractable
         _ps = GetComponentInChildren<ParticleSystem>();
     }
 
-    public bool CanInteract(PlayerController player)
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler)
     {
-        return player != null;
+        return playerNodeHandler != null;
     }
 
-    public void Interact(PlayerController player, out bool succededInteraction)
+    public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
         _ps.Play();
         succededInteraction = true;

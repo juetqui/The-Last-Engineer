@@ -1,8 +1,6 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class PlayerTDView
+public class PlayerView
 {
     private Renderer _renderer = default;
     private Material[] _originalMats = default, _corruptionMats = default;
@@ -13,12 +11,14 @@ public class PlayerTDView
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip = default, _fallClip = default;
-    private Image _dashImage = default;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerTDView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController, Image dashImage, ParticleSystem defaultPS, ParticleSystem corruptedPS)
+    public PlayerView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController, ParticleSystem defaultPS, ParticleSystem corruptedPS)
     {
+        if (renderer == null || playerData == null || solvingController == null)
+            throw new System.ArgumentNullException("Core dependencies cannot be null");
+
         _renderer = renderer;
         _outline = outline;
         _walkPS = walkPS;
@@ -34,7 +34,6 @@ public class PlayerTDView
         _deathClip = playerData.deathClip;
         _fallClip = playerData.fallClip;
         _solvingController = solvingController;
-        _dashImage = dashImage;
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
     }
@@ -44,7 +43,9 @@ public class PlayerTDView
         _originalMats = _renderer.materials;
 
         var corruptionMat = Resources.Load<Material>("Materials/M_PlayerCorruption");
+        
         _corruptionMats = new Material[_originalMats.Length];
+        
         for (int i = 0; i < _corruptionMats.Length; i++)
             _corruptionMats[i] = corruptionMat;
     }
@@ -54,26 +55,24 @@ public class PlayerTDView
     {
         if (moveVector.magnitude > 0f)
         {
-            _animator.SetBool("IsWalking", true);
+            //_animator.SetBool("IsWalking", true);
             _walkPS.Play();
             return;
         }
         
-        _animator.SetBool("IsWalking", false);
+        //_animator.SetBool("IsWalking", false);
         _walkPS.Stop();
     }
 
     public void DashSound()
     {
-        if(_dashImage!=null)
-        _dashImage.fillAmount = 0f;
         SetParticlesLT(0.7f, 1f);
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
     
     public void SetAnimatorSpeed(float speed)
     {
-        _animator.speed = speed;
+        //_animator.speed = speed;
     }
 
     public void UpdatePlayerMaterials(bool hasPowerUp)
@@ -84,7 +83,7 @@ public class PlayerTDView
 
     public void RespawnPlayer()
     {
-        _animator.speed = 1;
+        //_animator.speed = 1;
         _solvingController.RespawnPlayer();
     }
 
@@ -174,23 +173,5 @@ public class PlayerTDView
         source.clip = clip;
         source.pitch = pitch;
         source.Play();
-    }
-
-    public IEnumerator DashCD(float cd)
-    {
-        float timer = 0f;
-
-        while (timer < cd)
-        {
-            timer += Time.deltaTime;
-            if (_dashImage != null)
-
-                _dashImage.fillAmount = timer / cd;
-            yield return null;
-        }
-        if (_dashImage != null)
-
-            _dashImage.fillAmount = 1f;
-        SetParticlesLT(0.2f, 0.3f);
     }
 }

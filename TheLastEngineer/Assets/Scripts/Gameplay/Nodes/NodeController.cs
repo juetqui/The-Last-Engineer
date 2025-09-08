@@ -34,7 +34,7 @@ public class NodeController : MonoBehaviour, IInteractable
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Color CurrentColor { get { return _currentColor; } }
     public Transform Transform => transform;
-    public bool RequiresHoldInteraction => true;
+    public bool RequiresHoldInteraction => false;
 
 
     protected void Awake()
@@ -64,16 +64,16 @@ public class NodeController : MonoBehaviour, IInteractable
         if (!_isChildren) _nodeView.EnableColl(true);
         else _nodeView.SetCollectedAnim();
     }
-    public bool CanInteract(PlayerController player) => !player.HasNode();
-    public void Interact(PlayerController player, out bool succeeded)
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => !playerNodeHandler.HasNode;
+    public void Interact(PlayerNodeHandler playerNodeHandler, out bool succeeded)
     {
-        if (!CanInteract(player))
+        if (!CanInteract(playerNodeHandler))
         {
             succeeded = false;
             return;
         }
 
-        Attach(player.attachPos, player.transform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
+        Attach(playerNodeHandler.AttachPos, playerNodeHandler.transform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
         succeeded = true;
     }
 

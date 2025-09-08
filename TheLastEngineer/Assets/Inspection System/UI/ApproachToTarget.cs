@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ApproachToTarget : MonoBehaviour
 {
-    [SerializeField] private float _timeModifier = 0.001f;
+    [SerializeField] private float _timeModifier = 0.00125f;
 
     private CinemachineFreeLook _camera;
     private float _originalRadius = 0f;

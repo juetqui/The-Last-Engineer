@@ -235,7 +235,6 @@ public abstract class Glitcheable : MonoBehaviour
         if (_player != null)
         {
             _player.SetCanMove(true);
-            _player.UnsetPlatform(this);
             _player.StopDesintegratePlayer();
             _player = null;
             if (_feedBackPlane != null)
@@ -279,9 +278,9 @@ public abstract class Glitcheable : MonoBehaviour
         OnPosChanged?.Invoke(transform.position);
     }
 
-    private bool CanSetPlayerPlatform(PlayerController player)
+    private bool CanSetPlayerPlatform(PlayerNodeHandler player)
     {
-        return _isCorrupted && !_isStopped && _isPlatform && player.GetCurrentNodeType() == _requiredNode;
+        return _isCorrupted && !_isStopped && _isPlatform && player.CurrentType == _requiredNode;
     }
 
     private bool CanUnsetPlayerPlatform(PlayerController player)
@@ -291,10 +290,13 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player) && CanSetPlayerPlatform(player) && _player == null)
+        if (coll.TryGetComponent(out PlayerNodeHandler playerNodeHandler) &&
+            coll.TryGetComponent(out PlayerController player) &&
+            CanSetPlayerPlatform(playerNodeHandler) &&
+            _player == null
+        )
         {
             _player = player;
-            _player.SetPlatform(this);
             _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
             _feedBackPlane.SetActive(true);
 
@@ -303,10 +305,13 @@ public abstract class Glitcheable : MonoBehaviour
 
     private void OnTriggerStay(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player) && CanSetPlayerPlatform(player) && _player == null)
+        if (coll.TryGetComponent(out PlayerNodeHandler playerNodeHandler) &&
+            coll.TryGetComponent(out PlayerController player) &&
+            CanSetPlayerPlatform(playerNodeHandler) &&
+            _player == null
+        )
         {
             _player = player;
-            _player.SetPlatform(this);
             _player.SetCanMove(_timerController.CurrentPhase != Phase.Movement);
         }
     }
@@ -315,10 +320,8 @@ public abstract class Glitcheable : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerController player) && CanUnsetPlayerPlatform(player))
         {
-            _player.UnsetPlatform(this);
             _player = null;
             _feedBackPlane.SetActive(false);
-
         }
     }
 

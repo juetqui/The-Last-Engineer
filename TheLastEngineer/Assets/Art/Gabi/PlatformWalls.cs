@@ -19,7 +19,7 @@ public class PlatformWalls : MonoBehaviour
     }
     private void Update()
     {
-        if (player.GetCurrentNodeType() == NodeType.Corrupted)
+        if (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
         {
             material.SetFloat("_Alpha", 0f);
             playerHasCorruption=true;

@@ -39,7 +39,7 @@ public class InspectionPlayerManager : MonoBehaviour
         _currentInteractable = interactable;
 
         _currentInteractable.OnFinished += HandleFinishedInteraction;
-        _currentInteractable.Interact(PlayerController.Instance, out bool succeded);
+        _currentInteractable.Interact(PlayerNodeHandler.Instance, out bool succeded);
 
         _isInspecting = true;
     }

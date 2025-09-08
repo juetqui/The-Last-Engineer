@@ -11,7 +11,7 @@ public class GlitchActive : MonoBehaviour
     [SerializeField] private float _detectionRange = 10f;
     [SerializeField] private GameObject _interactionArea;
 
-    private PlayerController _player = default;
+    private PlayerNodeHandler _player = default;
     private Glitcheable _selectedGlitcheable = null;
     private List<Glitcheable> _glitcheables = default;
     private int _index = 0;
@@ -26,13 +26,13 @@ public class GlitchActive : MonoBehaviour
         if (Instance == null)
             Instance = this;
 
-        _player = GetComponent<PlayerController>();
+        _player = GetComponent<PlayerNodeHandler>();
         _glitcheables = new List<Glitcheable>();
     }
 
     void Start()
     {
-        PlayerController.Instance.OnNodeGrabed += CheckNode;
+        PlayerNodeHandler.Instance.OnNodeGrabbed += CheckNode;
     }
 
     void Update()
@@ -80,8 +80,8 @@ public class GlitchActive : MonoBehaviour
             return new InteractionOutcome(InteractResult.Invalid);
 
         bool incompatible =
-            (_player.GetCurrentNode().NodeType == NodeType.Corrupted && _selectedGlitcheable.IsCorrupted) ||
-            (_player.GetCurrentNode().NodeType == NodeType.Default   && !_selectedGlitcheable.IsCorrupted);
+            (_player.CurrentType == NodeType.Corrupted && _selectedGlitcheable.IsCorrupted) ||
+            (_player.CurrentType == NodeType.Default   && !_selectedGlitcheable.IsCorrupted);
 
         if (incompatible)
             return new InteractionOutcome(InteractResult.Invalid);

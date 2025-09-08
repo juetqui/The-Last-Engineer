@@ -54,8 +54,8 @@ public class PlatformController : MonoBehaviour
         _connection.OnNodeConnected += OnConnectionChanged;
         
          // Velocidad según si el jugador porta un nodo corrupto (opcional)
-         if (PlayerController.Instance != null)
-            PlayerController.Instance.OnNodeGrabed += OnNodeGrabbed;
+         if (PlayerNodeHandler.Instance != null)
+            PlayerNodeHandler.Instance.OnNodeGrabbed += OnNodeGrabbed;
         
          // Estado inicial
         bool canMove = _connection.StartsConnected; // y si hay filtro por tipo: && _connection.CurrentType == _requiredNode;
@@ -68,8 +68,8 @@ public class PlatformController : MonoBehaviour
         if (_connection != null)
             _connection.OnNodeConnected -= OnConnectionChanged;
 
-        if (PlayerController.Instance != null)
-            PlayerController.Instance.OnNodeGrabed -= OnNodeGrabbed;
+        if (PlayerNodeHandler.Instance != null)
+            PlayerNodeHandler.Instance.OnNodeGrabbed -= OnNodeGrabbed;
     }
 
 

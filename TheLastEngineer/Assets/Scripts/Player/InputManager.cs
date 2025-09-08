@@ -6,11 +6,24 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     public static InputManager Instance = default;
-    
+
+    #region PLAYER INPUTS
     [HideInInspector] public PlayerInput playerInput = default;
     [HideInInspector] public PlayerInputs playerInputs = default;
-    [HideInInspector] public InputAction moveInput = default, interactInput = default, dashInput = default, corruptionChangeInput = default;
-    [HideInInspector] public InputAction rotate = default, click = default, rightClick = default, resetRot = default, cancelInput = default;
+    [HideInInspector] public InputAction moveInput = default;
+    [HideInInspector] public InputAction interactInput = default;
+    [HideInInspector] public InputAction dashInput = default;
+    [HideInInspector] public InputAction corruptionChangeInput = default;
+    [HideInInspector] public InputAction pauseInput = default;
+    #endregion
+
+    #region UI INPUTS
+    [HideInInspector] public InputAction rotate = default;
+    [HideInInspector] public InputAction click = default;
+    [HideInInspector] public InputAction rightClick = default;
+    [HideInInspector] public InputAction resetRot = default;
+    [HideInInspector] public InputAction cancelInput = default;
+    #endregion
 
     private Gamepad _gamepad = default;
 
@@ -36,6 +49,7 @@ public class InputManager : MonoBehaviour
         dashInput = playerInputs.Player.Dash;
         corruptionChangeInput = playerInputs.Player.CorruptionChange;
         interactInput = playerInputs.Player.Interact;
+        pauseInput = playerInputs.Player.Pause;
 
         rotate = playerInputs.UI.Rotate;
         click = playerInputs.UI.Click;

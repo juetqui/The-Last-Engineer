@@ -20,7 +20,7 @@ public class GlobalVolumeController : MonoBehaviour
 
     void Start()
     {
-        PlayerController.Instance.OnNodeGrabed += AddEffects;
+        PlayerNodeHandler.Instance.OnNodeGrabbed += AddEffects;
     }
 
     private void AddEffects(bool hasNode, NodeType nodeType)

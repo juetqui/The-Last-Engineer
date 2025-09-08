@@ -25,17 +25,17 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         }
         else StartsConnected = false;
     }
-    public bool CanInteract(PlayerController player){ return player.HasNode() && _recievedNode == null; }
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) { return playerNodeHandler.HasNode && _recievedNode == null; }
 
-    public void Interact(PlayerController player, out bool succededInteraction)
+    public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
         if (_recievedNode != null)
         {
             succededInteraction = false;
         }
-        else if (CanInteract(player) && player.GetCurrentNode() != null)
+        else if (CanInteract(playerNodeHandler))
         {
-            NodeController node = player.GetCurrentNode();
+            NodeController node = playerNodeHandler.CurrentNode;
             SetNode(node);
             succededInteraction = true;
         }

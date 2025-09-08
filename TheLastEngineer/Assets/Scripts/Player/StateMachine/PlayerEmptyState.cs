@@ -2,14 +2,25 @@ using UnityEngine;
 
 public class PlayerEmptyState : IPlayerState
 {
+    private PlayerStateMachine _stateMachine;
     private PlayerController _player;
+    private PlayerNodeHandler _playerNodeHandler;
     private float _holdTimer;
     private bool _holding;
     private IInteractable _target;
 
-    public void Enter(PlayerController player)
+    public PlayerEmptyState(PlayerStateMachine stateMachine)
     {
+        _stateMachine = stateMachine;
+    }
+
+    public void Enter(PlayerController player, PlayerNodeHandler playerNodeHandler)
+    {
+        if (player == null)
+            throw new System.ArgumentNullException(nameof(player));
+
         _player = player;
+        _playerNodeHandler = playerNodeHandler;
         _holding = false;
         _target = null;
         _holdTimer = 0f;
@@ -20,25 +31,24 @@ public class PlayerEmptyState : IPlayerState
         if (interactable == null || _player.CheckForWalls()) return;
 
         _target = interactable;
+        
         if (interactable.RequiresHoldInteraction)
         {
             _holding = true;
             _holdTimer = 0f;
         }
-        else
-        {
-            TryDoInteraction(interactable);
-        }
+        else TryDoInteraction(interactable);
     }
 
     private void TryDoInteraction(IInteractable interactable)
     {
         bool success;
-        interactable.Interact(_player, out success);
+        interactable.Interact(_playerNodeHandler, out success);
+        
         if (success && interactable is NodeController node)
         {
-            _player.PickUpNode(node);
-            _player.SetState(_player.GrabState);
+            _player.RemoveInteractable(node);
+            _stateMachine.TransitionToGrabState(node);
         }
     }
 
@@ -47,6 +57,7 @@ public class PlayerEmptyState : IPlayerState
         if (!_holding || _target == null) return;
 
         _holdTimer += Time.deltaTime;
+        
         if (_holdTimer >= _player.GetHoldInteractionTime())
         {
             _holding = false;
@@ -57,17 +68,17 @@ public class PlayerEmptyState : IPlayerState
 
     public void Cancel()
     {
-        if (_holding)
-        {
-            _holding = false;
-            _target = null;
-            InputManager.Instance.RumblePulse(0.25f, 1f, 0.25f);
-        }
+        if (!_holding) return;
+
+        _holding = false;
+        _target = null;
+        InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
     }
 
     public void Exit()
     {
         _player = null;
+        _playerNodeHandler = null;
         _target = null;
         _holding = false;
     }

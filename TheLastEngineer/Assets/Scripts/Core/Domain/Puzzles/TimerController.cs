@@ -35,7 +35,7 @@ public class TimerController : MonoBehaviour
 
     private void Start()
     {
-        PlayerController.Instance.OnNodeGrabed += SetDuration;
+        PlayerNodeHandler.Instance.OnNodeGrabbed += SetDuration;
         _dissolveCoroutine = StartCoroutine(DissolveTimer());
     }
 
