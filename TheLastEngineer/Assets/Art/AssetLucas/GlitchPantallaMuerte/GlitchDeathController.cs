@@ -76,6 +76,3 @@ public class GlitchDeathController : MonoBehaviour
         isGlitching = true;
     }
 }
-
-
-
