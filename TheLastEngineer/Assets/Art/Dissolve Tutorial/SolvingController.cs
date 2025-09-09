@@ -10,7 +10,7 @@ public class SolvingController : MonoBehaviour
 
     public CharacterController playerController;
     public Collider playerCollider;
-    public SkinnedMeshRenderer MySkinnedMeshRenderer;
+    public MeshRenderer MySkinnedMeshRenderer;
     public float MaxBound;
     public float MinBound;
     public float secondToDissolve;

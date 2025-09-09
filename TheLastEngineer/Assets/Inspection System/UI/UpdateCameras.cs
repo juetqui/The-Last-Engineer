@@ -7,34 +7,20 @@ public class UpdateCameras : MonoBehaviour
     [SerializeField] private CinemachineFreeLook _mainCam;
     [SerializeField] private CinemachineFreeLook _targetLockCam;
 
-    private bool _camIsLeaving = false;
-
     void Start()
     {
         PlayerController.Instance.OnInteractableSelected += OnTargetSelected;
-        _CMBrain.m_CameraActivatedEvent.AddListener(OnCameraActivated);
     }
 
     private void OnDestroy()
     {
         PlayerController.Instance.OnInteractableSelected -= OnTargetSelected;
-        _CMBrain.m_CameraActivatedEvent.RemoveListener(OnCameraActivated);
-    }
-
-    private void OnCameraActivated(ICinemachineCamera newCamera, ICinemachineCamera oldCamera)
-    {
-        return;
-        //if (_camIsLeaving)
-        //    Time.timeScale = 1f;
-        //else
-        //    Time.timeScale = 0f;
     }
 
     private void OnTargetSelected(IInteractable target)
     {
         if (target != null && target is Inspectionable)
         {
-            _camIsLeaving = true;
             _targetLockCam.Follow = target.Transform;
             _targetLockCam.LookAt = target.Transform;
 
@@ -44,7 +30,6 @@ public class UpdateCameras : MonoBehaviour
             return;
         }
 
-        _camIsLeaving = false;
         _targetLockCam.Follow = null;
         _targetLockCam.LookAt = null;
 

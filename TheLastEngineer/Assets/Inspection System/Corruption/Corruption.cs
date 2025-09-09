@@ -13,8 +13,6 @@ public class Corruption : MonoBehaviour
     private ParticleSystem _ps = default;
     private AudioSource _audioSource = default;
 
-    private float _maxPSAmount = 20000f;
-
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();

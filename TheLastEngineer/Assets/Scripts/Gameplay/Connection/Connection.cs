@@ -68,7 +68,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         {
             foreach (var item in _doorsView)
             {
-                item.OpenDoor(true);
+                item.OpenDoor(false);
             }
         }
     }

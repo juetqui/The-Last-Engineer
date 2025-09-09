@@ -92,7 +92,7 @@ public class PlatformController : MonoBehaviour
 
     private IEnumerator ChangeColor(Color targetColor)
     {
-        Renderer renderer = GetComponent<Renderer>();
+        Renderer renderer = GetComponentInChildren<Renderer>();
         float counter = 0f;
 
         while (counter < 1f)
