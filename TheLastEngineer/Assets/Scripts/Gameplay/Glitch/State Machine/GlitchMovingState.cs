@@ -21,7 +21,8 @@ public class GlitchMovingState : IState
     public void Enter()
     {
         t = g._timer;
-        _elapsed = 0f; _duration = t ? t.MoveDuration : 0.5f;
+        _elapsed = 0f; 
+        _duration = t ? t.MoveDuration : 0.5f;
         _startPos = g.transform.position; _startRot = g.transform.rotation;
         _targetPos = g.CurrentTargetPos; _targetRot = g.CurrentTargetRot;
 

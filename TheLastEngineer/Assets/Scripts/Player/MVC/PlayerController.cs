@@ -5,6 +5,7 @@ using Cinemachine;
 
 public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {
+    #region Variables
     public static PlayerController Instance = null;
 
     [Header("Data & MVC")]
@@ -38,7 +39,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private bool _isDead = false, _canMove = true;
 
     private Vector3 _checkPointPos;
-
+    #endregion
     private void Awake()
     {
         if (Instance != null)
@@ -78,6 +79,14 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         HookInputs(true);
     }
 
+    private void Update()
+    {
+        var mv3 = GetMovement3D();
+        _model.OnUpdate(mv3, _currentSpeed);
+        View.Walk(mv3);
+        StateMachine.Tick();
+    }
+
     private void OnDestroy()
     {
         HookInputs(false);
@@ -89,14 +98,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         //    _solvingController.OnDissolveCompleted -= OnDissolveCompleted;
     }
 
-    private void Update()
-    {
-        var mv3 = GetMovement3D();
-        _model.OnUpdate(mv3, _currentSpeed);
-        View.Walk(mv3);
-        StateMachine.Tick();
-    }
-
+    #region INPUTS MANAGEMENT
     private void HookInputs(bool enable)
     {
         if (_input == null) return;
@@ -120,10 +122,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnCancelSelect -= OnCancelSelect;
         }
     }
-
-    #region INPUTS MANAGEMENT
     private void OnMove(Vector2 mv) => _move = _isDead || !_canMove ? Vector2.zero : mv;
-
     private void OnDashPressed()
     {
         if (_model.CanDashWithCoyoteTime() && _move != Vector2.zero && !_isDead)
@@ -224,6 +223,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void OnDissolveCompleted() => StartCoroutine(RespawnPlayer());
     #endregion
 
+    #region CheckPoint y Respawn
     public void SetCheckPointPos(Vector3 newPos)
     {
         _checkPointPos = newPos;
@@ -246,6 +246,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _collider.enabled = true;
         HookInputs(true);
     }
+    #endregion
 
     #region TRIGGERS MANAGEMENT
     private void OnTriggerEnter(Collider coll)
