@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
-    [SerializeField] private SolvingController _solvingController;
+    //[SerializeField] private SolvingController _solvingController;
 
     public CharacterController CC { get; private set; }
     private Collider _collider = default;
@@ -67,11 +67,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _currentSpeed = _playerData.moveSpeed;
 
         _model = new PlayerModel(CC, transform, _playerData, _collider);
-        View = new PlayerView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _solvingController, _defaultPS, _corruptedPS);
+        View = new PlayerView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS);
         View.OnStart();
 
         StateMachine = new PlayerStateMachine(this, _nodeHandler);
-        _solvingController.OnDissolveCompleted += OnDissolveCompleted;
+        //_solvingController.OnDissolveCompleted += OnDissolveCompleted;
         
         GlitchActive.Instance.OnChangeObjectState += CheckInteractionOutcome;
 
@@ -85,8 +85,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (GlitchActive.Instance != null)
             GlitchActive.Instance.OnChangeObjectState -= CheckInteractionOutcome;
         
-        if (_solvingController != null)
-            _solvingController.OnDissolveCompleted -= OnDissolveCompleted;
+        //if (_solvingController != null)
+        //    _solvingController.OnDissolveCompleted -= OnDissolveCompleted;
     }
 
     private void Update()
@@ -210,7 +210,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _isDead = true;
         View.SetAnimatorSpeed(0f);
         View.DeathSound();
-        _solvingController?.BurnShader();
+        //_solvingController?.BurnShader();
         HookInputs(false);
     }
     
@@ -218,9 +218,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     #endregion
 
     #region DESINTEGRATION MANAGEMENT
-    public void StartDesintegratePlayer() { _solvingController.StartDesintegrateShader(); }
-    public void StopDesintegratePlayer() { _solvingController.StopDesintegrateShader(); }
-    public void SetDesintegratePlayer(float a) { _solvingController.SetDesintegrateShader(a); }
+    //public void StartDesintegratePlayer() { _solvingController.StartDesintegrateShader(); }
+    //public void StopDesintegratePlayer() { _solvingController.StopDesintegrateShader(); }
+    //public void SetDesintegratePlayer(float a) { _solvingController.SetDesintegrateShader(a); }
     private void OnDissolveCompleted() => StartCoroutine(RespawnPlayer());
     #endregion
 
@@ -242,7 +242,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         _isDead = false;
         View.SetAnimatorSpeed(1f);
-        _solvingController?.RespawnPlayer();
+        //_solvingController?.RespawnPlayer();
         _collider.enabled = true;
         HookInputs(true);
     }

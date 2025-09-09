@@ -7,16 +7,16 @@ public class PlayerView
     private Outline _outline = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
     private ParticleSystem _defaultPS = default, _corruptedPS = default;
-    private SolvingController _solvingController;
+    //private SolvingController _solvingController;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip = default, _fallClip = default;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, SolvingController solvingController, ParticleSystem defaultPS, ParticleSystem corruptedPS)
+    public PlayerView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS)
     {
-        if (renderer == null || playerData == null || solvingController == null)
+        if (renderer == null || playerData == null)//|| solvingController == null
             throw new System.ArgumentNullException("Core dependencies cannot be null");
 
         _renderer = renderer;
@@ -33,7 +33,7 @@ public class PlayerView
         _putDownClip = playerData.putDownClip;
         _deathClip = playerData.deathClip;
         _fallClip = playerData.fallClip;
-        _solvingController = solvingController;
+        //_solvingController = solvingController;
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
     }
@@ -84,7 +84,7 @@ public class PlayerView
     public void RespawnPlayer()
     {
         //_animator.speed = 1;
-        _solvingController.RespawnPlayer();
+        //_solvingController.RespawnPlayer();
     }
 
     public void DashChargedSound()
