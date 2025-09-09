@@ -13,7 +13,7 @@ public class PlayerModel
     private float _coyoteTimeCounter = 0f, _coyoteTime = default;
 
     private float _gravity = -50f;
-    private bool _isDashing = false, _canDash = true, _useGravity = true;
+    private bool _isDashing = false, _canDash = true;
 
 
     private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
@@ -68,7 +68,7 @@ public class PlayerModel
 
     private Vector3 HandleVerticalMovement()
     {
-        if (!_isDashing && _useGravity)
+        if (!_isDashing)
         {
             if (_cc.isGrounded) _velocity.y = -1f;
             else _velocity.y += _gravity * Time.deltaTime;
@@ -100,11 +100,6 @@ public class PlayerModel
         _cc.enabled = false;
         _transform.position = new Vector3(newPos.x, _transform.position.y, newPos.z);
         _cc.enabled = wasEnabled;
-    }
-
-    public void SetGravity(bool useGravity)
-    {
-        _useGravity = useGravity;
     }
 
     public void RotatePlayer(Vector3 rotDir)
