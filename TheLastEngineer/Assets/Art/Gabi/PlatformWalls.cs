@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlatformWalls : MonoBehaviour
 {
+    private PlayerNodeHandler _player = default;
+
     MeshRenderer renderer;
     Material material;
     PlayerController player;
@@ -16,10 +18,12 @@ public class PlatformWalls : MonoBehaviour
         material = renderer.material;
         material.SetVector("_MinMaxPos",vector2);
         player = PlayerController.Instance;
+        _player = GetComponent<PlayerNodeHandler>();
+
     }
     private void Update()
     {
-        if (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
+        if (_player.CurrentType == NodeType.Corrupted)
         {
             material.SetFloat("_Alpha", 0f);
             playerHasCorruption=true;
