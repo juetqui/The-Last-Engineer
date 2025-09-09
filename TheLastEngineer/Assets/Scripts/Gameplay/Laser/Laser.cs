@@ -64,12 +64,12 @@ public class Laser : MonoBehaviour
             CastLaser();
             CorruptionCheck();
         }
-        //else if (!_glitcheable.IsIntargeteable)
-        //{
-        //    _lineRenderer.enabled = true;
-        //    CastLaser();
-        //    CorruptionCheck();
-        //}
+        else if (_glitcheable._sm.Current is IGlitchInterruptible)
+        {
+            _lineRenderer.enabled = true;
+            CastLaser();
+            CorruptionCheck();
+        }
         else _lineRenderer.enabled = false;
     }
 

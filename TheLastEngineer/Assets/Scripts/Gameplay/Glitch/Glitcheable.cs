@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine.Rendering.Universal;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class Glitcheable : MonoBehaviour
 {
     [Header("Refs")]
-    [DoNotSerialize] public Collider _coll;
-    [DoNotSerialize] public Renderer _renderer;
+    [HideInInspector] public Collider _coll;
+    [HideInInspector] public Renderer _renderer;
     [SerializeField] public ParticleSystem _ps;
     [SerializeField] public List<Transform> _newPosList;
-    [DoNotSerialize] public AudioSource _audioSource;
+    [HideInInspector] public AudioSource _audioSource;
 
     [Header("Visual")]
     [SerializeField] public GlitchSounds _sounds;
@@ -19,9 +18,9 @@ public class Glitcheable : MonoBehaviour
     [Header("Estados iniciales")]
     [SerializeField] public bool _startInIdle = false;
 
-    [DoNotSerialize] public TimerController _timer;
-    [DoNotSerialize] public DecalProjector _decalProjector;
-    public int _index = 0;
+    [HideInInspector] public TimerController _timer;
+    [HideInInspector] public DecalProjector _decalProjector;
+    [HideInInspector] public int _index = 0;
 
     public Renderer _feedbackRenderer;
 
@@ -39,7 +38,10 @@ public class Glitcheable : MonoBehaviour
     private void Awake()
     {
         _coll = GetComponent<Collider>();
-        _renderer = GetComponent<Renderer>();
+        
+        if (_renderer == null)
+            _renderer = GetComponent<Renderer>();
+        
         _audioSource = GetComponent<AudioSource>();
         _ps.Stop();
         _timer = GetComponent<TimerController>();

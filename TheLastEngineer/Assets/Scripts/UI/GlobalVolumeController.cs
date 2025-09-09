@@ -9,6 +9,8 @@ public class GlobalVolumeController : MonoBehaviour
     [SerializeField] private AudioSource _source;
     [SerializeField] private float _maxCAIntensity = 0.15f;
     [SerializeField] private float _maxLDIntensity = 0.1f;
+    [SerializeField] private float _minPitch = 0.8f;
+    [SerializeField] private float _maxPitch = 1f;
     private NodeType _requiredNode = NodeType.Corrupted;
     private Volume _volume = null;
 
@@ -91,23 +93,23 @@ public class GlobalVolumeController : MonoBehaviour
 
     private IEnumerator ReducePitch()
     {
-        while (_source.pitch > 0.8f)
+        while (_source.pitch > _minPitch)
         {
             _source.pitch -= Time.deltaTime;
             yield return null;
         }
 
-        _source.pitch = 0.8f;
+        _source.pitch = _minPitch;
     }
 
     private IEnumerator IncrementPitch()
     {
-        while (_source.pitch < 1f)
+        while (_source.pitch < _maxPitch)
         {
             _source.pitch += Time.deltaTime;
             yield return null;
         }
 
-        _source.pitch = 1f;
+        _source.pitch = _maxPitch;
     }
 }
