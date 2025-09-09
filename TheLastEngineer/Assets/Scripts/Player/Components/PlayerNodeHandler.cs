@@ -25,6 +25,8 @@ public class PlayerNodeHandler : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
+
+        AttachPos = _attachPos.localPosition;
     }
 
     public void Pick(NodeController node)
@@ -33,7 +35,6 @@ public class PlayerNodeHandler : MonoBehaviour
 
         _node = node;
         CurrentType = node.NodeType;
-        AttachPos = _attachPos.localPosition;
 
         _view = PlayerController.Instance.View;
 

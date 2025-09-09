@@ -40,7 +40,6 @@ public class PlayerGrabState : IPlayerState
         }
         else
         {
-            Debug.Log("DROP");
             _player.DropNode();
             _stateMachine.TransitionToEmptyState();
         }
