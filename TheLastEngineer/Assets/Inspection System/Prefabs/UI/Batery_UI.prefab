@@ -58,6 +58,7 @@ GameObject:
   - component: {fileID: 7957774377187258642}
   - component: {fileID: 1601669178727502019}
   - component: {fileID: 165660832292004894}
+  - component: {fileID: 1262045335118200936}
   m_Layer: 11
   m_Name: Bateria_decoracion
   m_TagString: Untagged
@@ -108,7 +109,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6f0d3b7315655ae44b9c9b2b36aa9812, type: 2}
+  - {fileID: 2100000, guid: 3bc0b1041fe91e1459d346857769a3de, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -130,6 +131,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1262045335118200936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6764162080080979461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e4d30b40331ce4187db1cecc5d0416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  framesPorPaso: 6
+  pasosPorSegundo: 8
+  shaderFloatName: _SteppedTime
 --- !u!1 &6962371164742282509
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,6 +159,7 @@ GameObject:
   - component: {fileID: 3703540063157936349}
   - component: {fileID: 1463963735061630066}
   - component: {fileID: 4836623586681555738}
+  - component: {fileID: 6336099777344088620}
   m_Layer: 12
   m_Name: Bateria_cuerpo
   m_TagString: Untagged
@@ -194,7 +211,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6f0d3b7315655ae44b9c9b2b36aa9812, type: 2}
+  - {fileID: 2100000, guid: 3bc0b1041fe91e1459d346857769a3de, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -253,6 +270,21 @@ MonoBehaviour:
   _minInstances: 3
   _maxInstances: 6
   _offsetAboveSurface: 0.1
+--- !u!114 &6336099777344088620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6962371164742282509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e4d30b40331ce4187db1cecc5d0416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  framesPorPaso: 6
+  pasosPorSegundo: 8
+  shaderFloatName: _SteppedTime
 --- !u!1001 &7351084287207592024
 PrefabInstance:
   m_ObjectHideFlags: 0

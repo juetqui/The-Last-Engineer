@@ -136,6 +136,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e4d30b40331ce4187db1cecc5d0416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  framesPorPaso: 6
+  pasosPorSegundo: 8
+  shaderFloatName: _SteppedTime
 --- !u!1 &4203522920347545830
 GameObject:
   m_ObjectHideFlags: 0
@@ -195,6 +198,7 @@ GameObject:
   - component: {fileID: 1944101097712267217}
   - component: {fileID: 3223830981988089201}
   - component: {fileID: 1790526070551282282}
+  - component: {fileID: 3316082851346694229}
   m_Layer: 11
   m_Name: Panel_detalles
   m_TagString: Untagged
@@ -245,7 +249,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6f0d3b7315655ae44b9c9b2b36aa9812, type: 2}
+  - {fileID: 2100000, guid: 3bc0b1041fe91e1459d346857769a3de, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -267,6 +271,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3316082851346694229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7332708250054166625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e4d30b40331ce4187db1cecc5d0416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  framesPorPaso: 6
+  pasosPorSegundo: 8
+  shaderFloatName: _SteppedTime
 --- !u!1 &8887563800281633129
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,6 +297,7 @@ GameObject:
   - component: {fileID: 4842063349491830999}
   - component: {fileID: 2946232715383200178}
   - component: {fileID: 8039258383214061315}
+  - component: {fileID: 4306195889501231785}
   m_Layer: 11
   m_Name: Pantalla_Panel
   m_TagString: Untagged
@@ -328,7 +348,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6f0d3b7315655ae44b9c9b2b36aa9812, type: 2}
+  - {fileID: 2100000, guid: 3bc0b1041fe91e1459d346857769a3de, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -350,6 +370,21 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4306195889501231785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8887563800281633129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91e4d30b40331ce4187db1cecc5d0416, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  framesPorPaso: 6
+  pasosPorSegundo: 8
+  shaderFloatName: _SteppedTime
 --- !u!1001 &9174850336366166309
 PrefabInstance:
   m_ObjectHideFlags: 0

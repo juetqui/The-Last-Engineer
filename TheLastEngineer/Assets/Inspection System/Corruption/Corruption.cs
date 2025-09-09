@@ -4,13 +4,14 @@ public class Corruption : MonoBehaviour
 {
     [SerializeField] private float _minSpeed = 2;
     [SerializeField] private float _maxSpeed = 10;
-    
+    [SerializeField] private ParticleSystem _psHitting = default;
+    [SerializeField] private ParticleSystem _psRemoved = default;
+
     private CorruptionGenerator _generator = default;
     
     private Renderer _renderer = default;
     private Collider _collider = default;
     private Light _light = default;
-    private ParticleSystem _ps = default;
     private AudioSource _audioSource = default;
 
     private void Awake()
@@ -18,7 +19,6 @@ public class Corruption : MonoBehaviour
         _renderer = GetComponent<Renderer>();
         _collider = GetComponent<Collider>();
         _light = GetComponentInChildren<Light>();
-        _ps = GetComponentInChildren<ParticleSystem>();
         _audioSource = GetComponent<AudioSource>();
     }
 
@@ -38,12 +38,12 @@ public class Corruption : MonoBehaviour
     {
         if (hitted == this)
         {
-            _ps.Play();
+            _psHitting.Play();
             _audioSource.Play();
         }
         else
         {
-            _ps.Stop();
+            _psHitting.Stop();
             _audioSource.Stop();
             _light.intensity = 0.1f;
         }
@@ -52,7 +52,7 @@ public class Corruption : MonoBehaviour
     private void Hitting(float timer)
     {
         float amount = Mathf.Lerp(_minSpeed, _maxSpeed, timer);
-        var ps = _ps.velocityOverLifetime;
+        var ps = _psHitting.velocityOverLifetime;
         ps.speedModifier = amount;
         _light.intensity = timer;
     }
@@ -63,7 +63,8 @@ public class Corruption : MonoBehaviour
 
         _generator.RemoveCorruption(this);
         _audioSource.Stop();
-        _ps.Stop();
+        _psHitting.Stop();
+        _psRemoved.Play();
     }
 
     public void TurnOnOff(bool turnOnOff)

@@ -49,15 +49,16 @@ public class InspectionPlayerManager : MonoBehaviour
         if (!_isInspecting) return;
 
         //Time.timeScale = 1;
-        _camera.enabled = false;
-        InspectionSystem.Instance.enabled = false;
-        _currentInteractable.OnFinished -= HandleFinishedInteraction;
-        _currentInteractable.StopInteraction();
         HandleFinishedInteraction();
     }
 
     private void HandleFinishedInteraction()
     {
+        _camera.enabled = false;
+        InspectionSystem.Instance.enabled = false;
+        _currentInteractable.OnFinished -= HandleFinishedInteraction;
+        _currentInteractable.StopInteraction();
+
         InputManager.Instance.UpdateActionMap(ActionMaps.Player);
         _currentInteractable = null;
         _isInspecting = false;
