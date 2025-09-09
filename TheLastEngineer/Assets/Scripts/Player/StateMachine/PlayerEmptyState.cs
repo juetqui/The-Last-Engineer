@@ -44,11 +44,25 @@ public class PlayerEmptyState : IPlayerState
     {
         bool success;
         interactable.Interact(_playerNodeHandler, out success);
-        
-        if (success && interactable is NodeController node)
+
+        if (!success)
+        {
+            Debug.Log("FAIL TO GRAB");
+            return;
+        }
+
+        if (interactable is NodeController node)
         {
             _player.RemoveInteractable(node);
             _stateMachine.TransitionToGrabState(node);
+            return;
+        }
+
+        if (interactable is PlatformTeleport teleport)
+        {
+            _player.SetTeleport(teleport.TargetPos);
+            _player.RemoveInteractable(interactable);
+            InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
         }
     }
 

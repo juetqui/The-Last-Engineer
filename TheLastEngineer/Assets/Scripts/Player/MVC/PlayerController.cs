@@ -141,12 +141,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (!CC.isGrounded || _model.IsDashing) return;
 
         var target = _interactableHandler.GetInteractable(_nodeHandler, transform.position);
-        
-        if (target != null)
-        {
-            var look = new Vector3(target.Transform.position.x, transform.position.y, target.Transform.position.z);
-            transform.LookAt(look);
-        }
 
         StateMachine.CurrentState?.HandleInteraction(target);
         OnInteractableSelected?.Invoke(target);
@@ -195,6 +189,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
 
     public void RemoveInteractable(IInteractable interactable) => _interactableHandler.Remove(interactable);
+
+    public void SetTeleport(Vector3 targetPos) => _model.SetPos(targetPos);
     #endregion
 
     #region PLATFORM TP MANAGEMENT
@@ -210,7 +206,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         View.SetAnimatorSpeed(0f);
         View.DeathSound();
         //_solvingController?.BurnShader();
-        HookInputs(false);
+        StartCoroutine(RespawnPlayer());
     }
     
     public void LaserNotRecived() { }
@@ -231,6 +227,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public IEnumerator RespawnPlayer()
     {
+        HookInputs(false);
         GlitchDeathController.Instance.TriggerGlitch();
         yield return new WaitForSeconds(1f);
 

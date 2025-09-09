@@ -20,31 +20,6 @@ public class PlayerGrabState : IPlayerState
         _playerNodeHandler = playerNodeHandler;
     }
 
-    public void HandleInteraction(IInteractable interactable)
-    {
-        if (_player.CheckForWalls()) return;
-
-        if (interactable != null && interactable.CanInteract(_playerNodeHandler))
-        {
-            bool success;
-            interactable.Interact(_playerNodeHandler, out success);
-            
-            if (success)
-            {
-                _player.ReleaseNode();
-                if (!(interactable is Connection))
-                    _player.RemoveInteractable(interactable);
-                _stateMachine.TransitionToEmptyState();
-                InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
-            }
-        }
-        else
-        {
-            _player.DropNode();
-            _stateMachine.TransitionToEmptyState();
-        }
-    }
-
     public void Tick() { }
 
     public void Cancel() { }
@@ -52,5 +27,53 @@ public class PlayerGrabState : IPlayerState
     public void Exit()
     {
         _player = null;
+    }
+
+    public void HandleInteraction(IInteractable interactable)
+    {
+        if (_player.CheckForWalls()) return;
+
+        if (interactable == null || !interactable.CanInteract(_playerNodeHandler))
+        {
+            HandleFailedInteraction();
+            return;
+        }
+
+        interactable.Interact(_playerNodeHandler, out bool success);
+
+        if (!success)
+        {
+            HandleFailedInteraction();
+            return;
+        }
+
+        if (interactable is PlatformTeleport teleport)
+        {
+            _player.SetTeleport(teleport.TargetPos);
+            _player.RemoveInteractable(interactable);
+            InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
+            return;
+        }
+
+        HandleSuccessfulInteraction(interactable);
+    }
+
+    private void HandleFailedInteraction()
+    {
+        Debug.Log("FAIL AND DROP");
+        _player.DropNode();
+        _stateMachine.TransitionToEmptyState();
+    }
+
+    private void HandleSuccessfulInteraction(IInteractable interactable)
+    {
+        Debug.Log("SUCCESS AND RELEASE");
+        _player.ReleaseNode();
+
+        if (interactable is not Connection)
+            _player.RemoveInteractable(interactable);
+
+        _stateMachine.TransitionToEmptyState();
+        InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
     }
 }

@@ -10,10 +10,13 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     [SerializeField] private Renderer _renderer;
     [SerializeField] private PlatformTeleport _targetPlatform;
 
+    public Vector3 TargetPos {  get; private set; }
+
     public Action<bool> OnPlayerStepped = delegate { };
 
     private void Start()
     {
+        TargetPos = _targetPlatform.transform.position;
         PlayerOn(false);
         OnPlayerStepped += PlayerOn;
         _targetPlatform.OnPlayerStepped += PlayerOn;
@@ -38,7 +41,6 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         }
         
         succededInteraction = true;
-        Debug.Log("GOING TO: " + _targetPlatform.transform.position);
     }
 
     private void OnTriggerEnter(Collider coll)
