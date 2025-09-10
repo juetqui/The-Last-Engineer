@@ -102,6 +102,14 @@ public class PlayerModel
         _cc.enabled = wasEnabled;
     }
 
+    public void SetRespawnPos(Vector3 respawnPos)
+    {
+        bool wasEnabled = _cc.enabled;
+        _cc.enabled = false;
+        _transform.position = respawnPos;
+        _cc.enabled = wasEnabled;
+    }
+
     public void RotatePlayer(Vector3 rotDir)
     {
         Quaternion toRotation = Quaternion.LookRotation(rotDir.normalized, Vector3.up);

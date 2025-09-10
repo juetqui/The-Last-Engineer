@@ -190,7 +190,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public void RemoveInteractable(IInteractable interactable) => _interactableHandler.Remove(interactable);
 
-    public void SetTeleport(Vector3 targetPos) => _model.SetPos(targetPos);
+    public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
     #endregion
 
     #region PLATFORM TP MANAGEMENT
@@ -204,9 +204,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (_isDead) return;
         _isDead = true;
         View.SetAnimatorSpeed(0f);
-        View.DeathSound();
         //_solvingController?.BurnShader();
-        StartCoroutine(RespawnPlayer());
+        StartCoroutine(RespawnPlayer(CauseOfDeath.Laser));
     }
     
     public void LaserNotRecived() { }
@@ -216,7 +215,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     //public void StartDesintegratePlayer() { _solvingController.StartDesintegrateShader(); }
     //public void StopDesintegratePlayer() { _solvingController.StopDesintegrateShader(); }
     //public void SetDesintegratePlayer(float a) { _solvingController.SetDesintegrateShader(a); }
-    private void OnDissolveCompleted() => StartCoroutine(RespawnPlayer());
+    private void OnDissolveCompleted() => StartCoroutine(RespawnPlayer(CauseOfDeath.Teleport));
     #endregion
 
     #region CheckPoint y Respawn
@@ -225,15 +224,17 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _checkPointPos = newPos;
     }
 
-    public IEnumerator RespawnPlayer()
+    public IEnumerator RespawnPlayer(CauseOfDeath cause)
     {
-        HookInputs(false);
+        if (cause == CauseOfDeath.Laser)
+            View.DeathSound();
+        else if (cause == CauseOfDeath.Fall)
+            View.FallSound();
+
         GlitchDeathController.Instance.TriggerGlitch();
         yield return new WaitForSeconds(1f);
 
-        CC.enabled = false;
-        transform.position = _checkPointPos;
-        CC.enabled = true;
+        _model.SetRespawnPos(_checkPointPos);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -241,7 +242,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         View.SetAnimatorSpeed(1f);
         //_solvingController?.RespawnPlayer();
         _collider.enabled = true;
-        HookInputs(true);
     }
     #endregion
 
@@ -252,8 +252,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         else if (coll.CompareTag("Void"))
         {
             _isDead = true;
-            View.FallSound();
-            StartCoroutine(RespawnPlayer());
+            StartCoroutine(RespawnPlayer(CauseOfDeath.Fall));
         }
     }
 
@@ -262,4 +261,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (coll.TryGetComponent(out IInteractable interactable)) _interactableHandler.Remove(interactable);
     }
     #endregion
+}
+public enum CauseOfDeath
+{
+    Teleport,
+    Fall,
+    Laser
 }

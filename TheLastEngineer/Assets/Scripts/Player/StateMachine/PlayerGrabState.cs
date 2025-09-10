@@ -49,7 +49,7 @@ public class PlayerGrabState : IPlayerState
 
         if (interactable is PlatformTeleport teleport)
         {
-            _player.SetTeleport(teleport.TargetPos);
+            _player.SetPos(teleport.TargetPos);
             _player.RemoveInteractable(interactable);
             InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
             return;
@@ -60,14 +60,12 @@ public class PlayerGrabState : IPlayerState
 
     private void HandleFailedInteraction()
     {
-        Debug.Log("FAIL AND DROP");
         _player.DropNode();
         _stateMachine.TransitionToEmptyState();
     }
 
     private void HandleSuccessfulInteraction(IInteractable interactable)
     {
-        Debug.Log("SUCCESS AND RELEASE");
         _player.ReleaseNode();
 
         if (interactable is not Connection)

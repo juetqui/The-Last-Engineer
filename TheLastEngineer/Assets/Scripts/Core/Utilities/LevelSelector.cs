@@ -23,7 +23,7 @@ public class LevelSelector : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[0].position);
-            StartCoroutine(PlayerController.Instance.RespawnPlayer());
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
             //SceneManager.LoadScene(sceneNames[0]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -35,31 +35,31 @@ public class LevelSelector : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[2].position);
-            StartCoroutine(PlayerController.Instance.RespawnPlayer());
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
             //SceneManager.LoadScene(sceneNames[2]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[3].position);
-            StartCoroutine(PlayerController.Instance.RespawnPlayer());
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
             //SceneManager.LoadScene(sceneNames[3]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[4].position);
-            StartCoroutine(PlayerController.Instance.RespawnPlayer());
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
             //SceneManager.LoadScene(sceneNames[4]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[5].position);
-            StartCoroutine(PlayerController.Instance.RespawnPlayer());
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
             //SceneManager.LoadScene(sceneNames[4]);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha7))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[6].position);
-            StartCoroutine(PlayerController.Instance.RespawnPlayer());
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
             //SceneManager.LoadScene(sceneNames[4]);
         }
         //else if (Input.GetKeyDown(KeyCode.Alpha8))

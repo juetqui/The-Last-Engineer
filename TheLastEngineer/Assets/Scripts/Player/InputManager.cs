@@ -7,9 +7,10 @@ public class InputManager : MonoBehaviour
 {
     public static InputManager Instance = default;
 
-    #region PLAYER INPUTS
     [HideInInspector] public PlayerInput playerInput = default;
     [HideInInspector] public PlayerInputs playerInputs = default;
+    
+    #region PLAYER INPUTS
     [HideInInspector] public InputAction moveInput = default;
     [HideInInspector] public InputAction interactInput = default;
     [HideInInspector] public InputAction dashInput = default;

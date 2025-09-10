@@ -24,7 +24,6 @@ public class PlayerStateMachine
     public void Tick()
     {
         _currentState?.Tick();
-        UnityEngine.Debug.Log(CurrentState);
     }
 
     public void TransitionToState(IPlayerState newState)
