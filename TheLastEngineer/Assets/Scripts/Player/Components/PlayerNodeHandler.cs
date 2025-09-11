@@ -33,8 +33,7 @@ public class PlayerNodeHandler : MonoBehaviour
         if (Instance == null) Instance = this;
 
         AttachTransform = _attachPos;
-        //AttachPos = _attachPos.localPosition;
-        AttachPos = _attachPos.position;
+        AttachPos = _attachPos.localPosition;
     }
 
     public void Pick(NodeController node)

@@ -81,11 +81,8 @@ public class NodeController : MonoBehaviour, IInteractable
 
         _playerNodeHandler = playerNodeHandler;
 
-        Vector3 newScale = Vector3.one  * 5f;
-        Vector3 newPos = new Vector3(-0.337430835f, 11.6011648f, -8.1723814f);
-
-        //Attach(playerNodeHandler.AttachPos, playerNodeHandler.AttachTransform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
-        Attach(newPos, playerNodeHandler.AttachTransform, newScale, parentIsPlayer: true);
+        Vector3 newScale = Vector3.one  * 0.75f;
+        Attach(Vector3.zero, playerNodeHandler.AttachTransform, newScale, parentIsPlayer: true);
         succeeded = true;
     }
 

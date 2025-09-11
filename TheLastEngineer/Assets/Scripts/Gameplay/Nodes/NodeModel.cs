@@ -27,6 +27,7 @@ public class NodeModel
         {
             _transform.SetParent(null);
             _transform.position = newPos;
+            _transform.rotation = Quaternion.identity;
         }
 
         _initialY = _transform.position.y;
