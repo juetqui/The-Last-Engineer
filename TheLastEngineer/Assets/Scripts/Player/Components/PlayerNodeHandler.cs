@@ -8,6 +8,7 @@ public class PlayerNodeHandler : MonoBehaviour
     public static PlayerNodeHandler Instance = null;
 
     [SerializeField] private Transform _attachPos;
+    [SerializeField] private Transform _dropPos;
 
     private PlayerView _view;
     private NodeController _node;
@@ -59,7 +60,7 @@ public class PlayerNodeHandler : MonoBehaviour
         _node.OnUpdatedNodeType -= OnNodeTypeUpdated;
 
         if (isDropping)
-            _node.Attach(_node.transform.position);
+            _node.Attach(_dropPos.position);
 
         ResetNode();
     }

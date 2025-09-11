@@ -3,13 +3,19 @@ using UnityEngine;
 
 public class NodeController : MonoBehaviour, IInteractable
 {
+    #region INTERFACE VARIABLES
+    public InteractablePriority Priority => InteractablePriority.Highest;
+    public Color CurrentColor { get { return _currentColor; } }
+    public Transform Transform => transform;
+    public bool RequiresHoldInteraction => false;
+    #endregion
+
     [SerializeField] private NodeType _nodeType;
     public NodeType NodeType { get { return _nodeType; } }
     public Action<NodeType> OnUpdatedNodeType = delegate { };
 
     #region VIEW
     [Header("VIEW")]
-    [SerializeField] private bool _isChildren;
     private NodeView _nodeView = default;
     private BoxCollider _collider = default;
     private Renderer _renderer = default;
@@ -31,11 +37,7 @@ public class NodeController : MonoBehaviour, IInteractable
     private Transform _target = default;
     private IConnectable _connectable = default;
     private Vector3 _resetPos = Vector3.zero;
-
-    public InteractablePriority Priority => InteractablePriority.Highest;
-    public Color CurrentColor { get { return _currentColor; } }
-    public Transform Transform => transform;
-    public bool RequiresHoldInteraction => false;
+    private bool _isChildren = false;
 
 
     protected void Awake()
@@ -79,8 +81,8 @@ public class NodeController : MonoBehaviour, IInteractable
 
         _playerNodeHandler = playerNodeHandler;
 
-        Vector3 newScale = Vector3.one  * 25f;
-        Vector3 newPos = new Vector3(-0.25f, 69f, -54.5f);
+        Vector3 newScale = Vector3.one  * 5f;
+        Vector3 newPos = new Vector3(-0.337430835f, 11.6011648f, -8.1723814f);
 
         //Attach(playerNodeHandler.AttachPos, playerNodeHandler.AttachTransform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
         Attach(newPos, playerNodeHandler.AttachTransform, newScale, parentIsPlayer: true);
