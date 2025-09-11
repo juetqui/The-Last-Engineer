@@ -9,6 +9,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     [SerializeField] private Renderer _renderer;
     [SerializeField] private PlatformTeleport _targetPlatform;
+    public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
 
     public Vector3 TargetPos {  get; private set; }
 

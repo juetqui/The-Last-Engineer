@@ -50,28 +50,22 @@ public class PlayerGrabState : IPlayerState
         if (interactable is PlatformTeleport teleport)
         {
             _player.SetPos(teleport.TargetPos);
+            _player.AddInteractable(teleport.TargetPlatform);
             _player.RemoveInteractable(interactable);
             InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
             return;
         }
-
-        HandleSuccessfulInteraction(interactable);
+        else if (interactable is Connection)
+        {
+            _player.ReleaseNode();
+            _stateMachine.TransitionToEmptyState();
+            InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
+        }
     }
 
     private void HandleFailedInteraction()
     {
         _player.DropNode();
         _stateMachine.TransitionToEmptyState();
-    }
-
-    private void HandleSuccessfulInteraction(IInteractable interactable)
-    {
-        _player.ReleaseNode();
-
-        if (interactable is not Connection)
-            _player.RemoveInteractable(interactable);
-
-        _stateMachine.TransitionToEmptyState();
-        InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
     }
 }

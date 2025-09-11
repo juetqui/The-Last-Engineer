@@ -187,6 +187,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
 
+    public void AddInteractable(IInteractable interactable) => _interactableHandler.Add(interactable);
     public void RemoveInteractable(IInteractable interactable) => _interactableHandler.Remove(interactable);
 
     public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
