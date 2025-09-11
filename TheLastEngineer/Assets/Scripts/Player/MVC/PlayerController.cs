@@ -11,7 +11,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     [Header("Data & MVC")]
     [SerializeField] private PlayerData _playerData;
     [SerializeField] private Renderer _renderer;
-    [SerializeField] private Outline _outline;
     [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
     //[SerializeField] private SolvingController _solvingController;
@@ -68,7 +67,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _currentSpeed = _playerData.moveSpeed;
 
         _model = new PlayerModel(CC, transform, _playerData, _collider);
-        View = new PlayerView(_renderer, _outline, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS);
+        View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS);
         View.OnStart();
 
         StateMachine = new PlayerStateMachine(this, _nodeHandler);
@@ -82,6 +81,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void Update()
     {
         var mv3 = GetMovement3D();
+        Debug.Log(mv3);
         _model.OnUpdate(mv3, _currentSpeed);
         View.Walk(mv3);
         StateMachine.Tick();

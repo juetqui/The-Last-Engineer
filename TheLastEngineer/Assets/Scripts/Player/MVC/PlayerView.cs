@@ -4,7 +4,6 @@ public class PlayerView
 {
     private Renderer _renderer = default;
     private Material[] _originalMats = default, _corruptionMats = default;
-    private Outline _outline = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
     private ParticleSystem _defaultPS = default, _corruptedPS = default;
     //private SolvingController _solvingController;
@@ -14,13 +13,12 @@ public class PlayerView
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
-    public PlayerView(Renderer renderer, Outline outline, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS)
+    public PlayerView(Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS)
     {
         if (renderer == null || playerData == null)//|| solvingController == null
             throw new System.ArgumentNullException("Core dependencies cannot be null");
 
         _renderer = renderer;
-        _outline = outline;
         _walkPS = walkPS;
         _orbitPS = orbitPS;
         _animator = animator;
@@ -53,15 +51,16 @@ public class PlayerView
 
     public void Walk(Vector3 moveVector)
     {
+
         if (moveVector.magnitude > 0f)
         {
-            //_animator.SetBool("IsWalking", true);
-            _walkPS.Play();
+            _animator.SetBool("IsWalking", true);
+            if (!_walkPS.isPlaying) _walkPS.Play();
             return;
         }
-        
-        //_animator.SetBool("IsWalking", false);
-        _walkPS.Stop();
+
+        _animator.SetBool("IsWalking", false);
+        if (_walkPS.isPlaying) _walkPS.Stop();
     }
 
     public void DashSound()
@@ -72,7 +71,7 @@ public class PlayerView
     
     public void SetAnimatorSpeed(float speed)
     {
-        //_animator.speed = speed;
+        _animator.speed = speed;
     }
 
     public void UpdatePlayerMaterials(bool hasPowerUp)
@@ -83,7 +82,7 @@ public class PlayerView
 
     public void RespawnPlayer()
     {
-        //_animator.speed = 1;
+        _animator.speed = 1;
         //_solvingController.RespawnPlayer();
     }
 
@@ -146,17 +145,9 @@ public class PlayerView
             PlayAudioWithRandomPitch(_fxSource, _putDownClip);
 
         if (outlineColor != Color.black)
-        {
             PlayPS(outlineColor);
-            _outline.OutlineColor = outlineColor;
-            _outline.OutlineWidth = 5;
-        }
         else
-        {
             StopPS();
-            _outline.OutlineColor = _defaultOutline;
-            _outline.OutlineWidth = 0;
-        }
     }
 
     public void PlayErrorSound(AudioClip clip)
