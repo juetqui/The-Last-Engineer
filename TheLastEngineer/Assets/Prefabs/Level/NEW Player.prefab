@@ -753,7 +753,6 @@ GameObject:
   - component: {fileID: 1003385001025871253}
   - component: {fileID: 3156403094411963407}
   - component: {fileID: 8660092158971689740}
-  - component: {fileID: 1633981911113508484}
   - component: {fileID: 5006840802130871716}
   - component: {fileID: 7706525547897074516}
   - component: {fileID: 4174438192924241526}
@@ -834,7 +833,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.7
   m_Height: 3
   m_Direction: 1
   m_Center: {x: 0, y: 1.5, z: 0}
@@ -858,7 +857,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 3
-  m_Radius: 0.5
+  m_Radius: 0.7
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -896,7 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76ac8791f00e2b94184d52dc65d99fa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attachPos: {fileID: 4162636666471046875}
+  _attachPos: {fileID: 6063009325105685151}
 --- !u!114 &8660092158971689740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -911,20 +910,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   glitchMaterial: {fileID: 2100000, guid: f5960303e1cb61d4dba776e2cc5f7d0f, type: 2}
   glitchDuration: 2
---- !u!114 &1633981911113508484
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2091603815914027958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7df3122e422f06a4a85e8f6413f3e0dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _detectionRange: 8
-  _interactionArea: {fileID: 0}
 --- !u!114 &5006840802130871716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7178,7 +7163,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6336788067860318082}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7537,7 +7522,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7701941999582747493}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

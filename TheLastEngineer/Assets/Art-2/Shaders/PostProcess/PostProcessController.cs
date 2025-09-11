@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -42,13 +41,13 @@ public class PostProcessController : MonoBehaviour
         if (!hasNode || nodeType != _requiredNode)
         {
             StartCoroutine(DeactivatePP(_passiveMat));
-            GlitchActive.Instance.OnChangeObjectState -= RefNegVignette;
+            PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
             return;
         }
 
         StartCoroutine(ActivatePP(_passiveMat));
         StartCoroutine(ActivateShockWave());
-        GlitchActive.Instance.OnChangeObjectState += RefNegVignette;
+        PlayerNodeHandler.Instance.OnGlitchChange += RefNegVignette;
     }
 
     private void ActivateCorruption(bool hasEffect)
@@ -115,10 +114,13 @@ public class PostProcessController : MonoBehaviour
         material.SetFloat("_VignetteAmount", _vignetteAmount);
     }
 
-    private void RefNegVignette(Glitcheable gltich, InteractionOutcome interact)
+    private bool RefNegVignette(Glitcheable gltich)
     {
-        if (!animated && interact.Result == InteractResult.Invalid)
-            StartCoroutine(LerpColorRefNeg(_passiveMat));
+        if (animated) return false;
+        
+        StartCoroutine(LerpColorRefNeg(_passiveMat));
+        return true;
+        
     }
 
     private IEnumerator LerpColorRefNeg(Material material)

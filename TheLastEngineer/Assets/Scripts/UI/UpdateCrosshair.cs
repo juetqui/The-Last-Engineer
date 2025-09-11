@@ -17,8 +17,8 @@ public class UpdateCrosshair : MonoBehaviour
 
     void Start()
     {
-        GlitchActive.Instance.OnStopableSelected += UpdatePos;
-        GlitchActive.Instance.OnChangeObjectState += TryPlayInvalidAnim;
+        //GlitcheableDetector.Instance.OnStopableSelected += UpdatePos;
+        //GlitcheableDetector.Instance.OnChangeObjectState += TryPlayInvalidAnim;
     }
 
     private void UpdatePos(Glitcheable glitcheable)
@@ -58,13 +58,13 @@ public class UpdateCrosshair : MonoBehaviour
         _circleImage.rectTransform.position = screenPosition;
     }
 
-    private void TryPlayInvalidAnim(Glitcheable glitcheable, InteractionOutcome interactionResult)
-    {
-        if (glitcheable == null) return;
+    //private void TryPlayInvalidAnim(Glitcheable glitcheable, InteractionOutcome interactionResult)
+    //{
+    //    if (glitcheable == null) return;
         
-        if (interactionResult.Result == InteractResult.Invalid)
-            _myAnim.SetTrigger("InvalidAction");
-    }
+    //    if (interactionResult.Result == InteractResult.Invalid)
+    //        _myAnim.SetTrigger("InvalidAction");
+    //}
 
     public void SetUpdateAnim()
     {

@@ -33,7 +33,7 @@ public class Glitcheable : MonoBehaviour
     public Vector3 CurrentTargetPos => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].position : transform.position;
     public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].rotation : transform.rotation;
 
-    public bool IsCorrupted { get { return _startInIdle; } }
+    public bool IsCorrupted { get { return _sm.Current != _idle; } }
 
     private void Awake()
     {
@@ -78,14 +78,24 @@ public class Glitcheable : MonoBehaviour
         _sm.Change(_dis.ResetAndReturn());
     }
 
-    public bool Interrupt()
+    private bool CheckStateChange(NodeType nodeType)
     {
-        if (_sm.Current is IGlitchInterruptible ii)
-        {
-            ii.Interrupt();
-            return true;
-        }
-        else return false;
+        if (nodeType == NodeType.None)
+            return false;
+
+        bool toIdleCase = _sm.Current != _idle && nodeType == NodeType.Default;
+        bool toGlitchedCase = _sm.Current == _idle && nodeType == NodeType.Corrupted;
+
+        return toIdleCase || toGlitchedCase;
+    }
+
+    public bool Interrupt(NodeType nodeType)
+    {
+        if (_sm.Current is not IGlitchInterruptible ii || !CheckStateChange(nodeType))
+            return false;
+
+        ii.Interrupt();
+        return true;
     }
 
     public void SetAlpha(float a)

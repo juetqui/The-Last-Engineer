@@ -9,24 +9,31 @@ public class PlayerNodeHandler : MonoBehaviour
 
     [SerializeField] private Transform _attachPos;
 
-    public event Action<bool, NodeType> OnNodeGrabbed;
-    public event Action<bool> OnAbsorbCorruption;
-    public NodeController CurrentNode => _node;
-    public NodeType CurrentType { get; private set; } = NodeType.None;
-    public bool HasNode => _node != null;
-    public bool IsCorrupted { get; private set; }
-    public Vector3 AttachPos { get; private set; }
-
     private PlayerView _view;
     private NodeController _node;
     private Coroutine _corruptionRoutine;
     private Vector3 _absorbedPos;
 
+    #region GETTERS
+    public NodeController CurrentNode => _node;
+    public NodeType CurrentType { get; private set; } = NodeType.None;
+    public bool HasNode => _node != null;
+    public bool IsCorrupted { get; private set; }
+    public Transform AttachTransform { get; private set; }
+    public Vector3 AttachPos { get; private set; }
+    #endregion
+
+    public Action<bool, NodeType> OnNodeGrabbed;
+    public Action<bool> OnAbsorbCorruption;
+    public Func<Glitcheable, bool> OnGlitchChange;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
 
-        AttachPos = _attachPos.localPosition;
+        AttachTransform = _attachPos;
+        //AttachPos = _attachPos.localPosition;
+        AttachPos = _attachPos.position;
     }
 
     public void Pick(NodeController node)

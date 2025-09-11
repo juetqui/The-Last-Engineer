@@ -10,6 +10,7 @@ public class PlayerData : ScriptableObject
     public float fovAngle = default;
     public float coyoteTime = default;
     public LayerMask wallMask = default;
+    public LayerMask glitchDetectionLayer = default;
 
     [Header("Dash")]
     public float dashSpeed = default;

@@ -27,6 +27,7 @@ public class NodeController : MonoBehaviour, IInteractable
     private Shader _originalShader;
 
     private NodeModel _nodeModel = default;
+    private PlayerNodeHandler _playerNodeHandler = null;
     private Transform _target = default;
     private IConnectable _connectable = default;
     private Vector3 _resetPos = Vector3.zero;
@@ -64,16 +65,25 @@ public class NodeController : MonoBehaviour, IInteractable
         if (!_isChildren) _nodeView.EnableColl(true);
         else _nodeView.SetCollectedAnim();
     }
-    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => !playerNodeHandler.HasNode;
+    
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler != null && !playerNodeHandler.HasNode;
+    
     public void Interact(PlayerNodeHandler playerNodeHandler, out bool succeeded)
     {
         if (!CanInteract(playerNodeHandler))
         {
+            _playerNodeHandler = null;
             succeeded = false;
             return;
         }
 
-        Attach(playerNodeHandler.AttachPos, playerNodeHandler.transform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
+        _playerNodeHandler = playerNodeHandler;
+
+        Vector3 newScale = Vector3.one  * 25f;
+        Vector3 newPos = new Vector3(-0.25f, 69f, -54.5f);
+
+        //Attach(playerNodeHandler.AttachPos, playerNodeHandler.AttachTransform, new Vector3(0.6f, 0.6f, 0.6f), parentIsPlayer: true);
+        Attach(newPos, playerNodeHandler.AttachTransform, newScale, parentIsPlayer: true);
         succeeded = true;
     }
 
@@ -81,12 +91,13 @@ public class NodeController : MonoBehaviour, IInteractable
     {
         if (parentIsPlayer)
         {
-            GlitchActive.Instance.OnChangeObjectState += InteractWithGlitcheable;
+            _playerNodeHandler.OnGlitchChange += InteractWithGlitcheable;
             _nodeView.EnableColl(false);
         }
         else
         {
-            GlitchActive.Instance.OnChangeObjectState -= InteractWithGlitcheable;
+            _playerNodeHandler.OnGlitchChange -= InteractWithGlitcheable;
+            _playerNodeHandler = null;
             _nodeView.EnableColl(true);
         }
 
@@ -109,14 +120,16 @@ public class NodeController : MonoBehaviour, IInteractable
             _nodeModel.SetPos(newPos, NodeType);
     }
     
-    private void InteractWithGlitcheable(Glitcheable glitcheable, InteractionOutcome interactionResult)
+    private bool InteractWithGlitcheable(Glitcheable glitcheable)
     {
-        if (glitcheable == null) return;
+        if (glitcheable == null) return false;
 
-        bool newObjectState = _nodeType == NodeType.Default ? false : true;
-
-        if (glitcheable.Interrupt())
+        if (glitcheable.Interrupt(_nodeType))
+        {
             UpdateNodeType();
+            return true;
+        }
+        else return false;
     }
 
     private void UpdateNodeType()

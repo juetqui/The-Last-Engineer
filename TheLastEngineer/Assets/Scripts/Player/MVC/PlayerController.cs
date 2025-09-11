@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public PlayerStateMachine StateMachine { get; private set; }
     
     private InputHandler _input;
-    private GlitchActive _glitchActive;
+    private GlitcheableDetector _glitcheableDetector;
     private PlayerNodeHandler _nodeHandler;
     private CinemachineImpulseSource _impulse;
     private InteractableHandler _interactableHandler;
@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _animator = GetComponent<Animator>();
         
         _input = GetComponent<InputHandler>();
-        _glitchActive = GetComponent<GlitchActive>();
+        _glitcheableDetector = new GlitcheableDetector(10f, _playerData.glitchDetectionLayer);
         _nodeHandler = GetComponent<PlayerNodeHandler>();
         _impulse = GetComponent<CinemachineImpulseSource>();
         _interactableHandler = new InteractableHandler();
@@ -72,8 +72,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         StateMachine = new PlayerStateMachine(this, _nodeHandler);
         //_solvingController.OnDissolveCompleted += OnDissolveCompleted;
-        
-        GlitchActive.Instance.OnChangeObjectState += CheckInteractionOutcome;
 
         HookInputs(true);
     }
@@ -89,9 +87,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void OnDestroy()
     {
         HookInputs(false);
-
-        if (GlitchActive.Instance != null)
-            GlitchActive.Instance.OnChangeObjectState -= CheckInteractionOutcome;
         
         //if (_solvingController != null)
         //    _solvingController.OnDissolveCompleted -= OnDissolveCompleted;
@@ -152,8 +147,14 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private void OnCorruptionChange()
     {
-        if (_glitchActive != null && _nodeHandler.CurrentType != NodeType.None)
-            _glitchActive.ChangeObjectState();
+        if (_nodeHandler.CurrentType != NodeType.None)
+        {
+            Glitcheable glitch = _glitcheableDetector.GetNearestGlitcheable(transform.position);
+            var success = _nodeHandler.OnGlitchChange?.Invoke(glitch);
+
+            if (!(bool)success)
+                View.PlayErrorSound(_playerData.emptyHand);
+        }
         else
             View.PlayErrorSound(_playerData.emptyHand);
     }
@@ -167,10 +168,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         return new Vector3(_move.x, 0f, _move.y);
     }
 
-    private void CheckInteractionOutcome(Glitcheable g, InteractionOutcome outcome)
+    private void CheckInteractionOutcome(Glitcheable g)
     {
-        if (outcome.Result == InteractResult.Invalid)
-            View.PlayErrorSound(_playerData.emptyHand);
+        View.PlayErrorSound(_playerData.emptyHand);
     }
 
     public bool CheckForWalls()
