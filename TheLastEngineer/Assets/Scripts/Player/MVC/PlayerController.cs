@@ -81,7 +81,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void Update()
     {
         var mv3 = GetMovement3D();
-        Debug.Log(mv3);
         _model.OnUpdate(mv3, _currentSpeed);
         View.Walk(mv3);
         StateMachine.Tick();
