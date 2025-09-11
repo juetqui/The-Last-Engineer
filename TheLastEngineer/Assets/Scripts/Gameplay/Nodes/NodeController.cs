@@ -95,8 +95,12 @@ public class NodeController : MonoBehaviour, IInteractable
         }
         else
         {
-            _playerNodeHandler.OnGlitchChange -= InteractWithGlitcheable;
-            _playerNodeHandler = null;
+            if (_playerNodeHandler != null)
+            {
+                _playerNodeHandler.OnGlitchChange -= InteractWithGlitcheable;
+                _playerNodeHandler = null;
+            }
+            
             _nodeView.EnableColl(true);
         }
 
