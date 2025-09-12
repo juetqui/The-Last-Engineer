@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public Action<float, float> OnDash;
     public Action<IInteractable> OnInteractableSelected;
+    public Action OnPlayerFell;
 
     // --- Internals
     private PlayerModel _model;
@@ -229,7 +230,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (cause == CauseOfDeath.Laser)
             View.DeathSound();
         else if (cause == CauseOfDeath.Fall)
+        {
             View.FallSound();
+            yield return new WaitForSeconds(1f);
+            OnPlayerFell?.Invoke();
+        }
 
         GlitchDeathController.Instance.TriggerGlitch();
         yield return new WaitForSeconds(1f);

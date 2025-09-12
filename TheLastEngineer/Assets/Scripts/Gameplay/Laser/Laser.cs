@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
@@ -73,171 +74,75 @@ public class Laser : MonoBehaviour
         else _lineRenderer.enabled = false;
     }
 
-    #region castLaserViejo
-    /*
     private void CastLaser()
     {
-        Vector3 laserPos = GetFixedLaserPos();
-
-        _ray = new Ray(laserPos, transform.forward);
-        _rightRay = new Ray(laserPos + transform.right * _raycastOffsetX, transform.forward);
-        _leftRay = new Ray(laserPos - transform.right * _raycastOffsetX, transform.forward);
-
-        if (Physics.Raycast(_rightRay, out _rayHit, _maxDist, _laserLayer))
+        Vector3 laserOrigin = GetFixedLaserPos();
+        Ray mainRay = new Ray(laserOrigin, transform.forward);
+        RaycastHit[] hits = Physics.RaycastAll(mainRay, _maxDist, _laserLayer);
+        
+        if (hits.Length > 0)
         {
-            if(_rayHit.collider.TryGetComponent(out PlayerTDController player))
-            {
-                //if (_lastHit != null)
-                //    _lastHit.LaserNotRecived();
-
-                _lineRenderer.SetPosition(0, laserPos);
-                _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
-                player.LaserRecived();
-                _lastHit = null;
-            }
-        }
-
-        if (Physics.Raycast(_leftRay, out _rayHit, _maxDist, _laserLayer))
-        {
-            if(_rayHit.collider.TryGetComponent(out PlayerTDController player))
-            {
-                //if (_lastHit != null)
-                //    _lastHit.LaserNotRecived();
-
-                _lineRenderer.SetPosition(0, laserPos);
-                _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
-                player.LaserRecived();
-                _lastHit = null;
-            }
-        }
-
-        if (Physics.Raycast(_ray, out _rayHit, _maxDist, _laserLayer))
-        {
-            if (_rayHit.collider.TryGetComponent(out PlayerTDController player))
-            {
-                //if (_lastHit != null)
-                //    _lastHit.LaserNotRecived();
-
-                _lineRenderer.SetPosition(0, laserPos);
-                _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
-                player.LaserRecived();
-                _lastHit = null;
-            }
-            else if (_rayHit.collider.TryGetComponent(out ILaserReceptor receptor))
-            {
-                if (_lastHit != null && _lastHit != receptor)
-                    _lastHit.LaserNotRecived();
-
-                _lineRenderer.SetPosition(0, laserPos);
-                _lineRenderer.SetPosition(1, _rayHit.point);
-                receptor.LaserRecived();
-                _lastHit = receptor;
-            }
-            else
-            {
-                if (_lastHit != null)
-                {
-                    _lastHit.LaserNotRecived();
-                    _lastHit = null;
-                }
-
-                _lineRenderer.SetPosition(0, laserPos);
-                _lineRenderer.SetPosition(1, _rayHit.point);
-            }
+            var closestHit = hits.OrderBy(h => h.distance).First();
+            ProcessHit(laserOrigin, closestHit);
         }
         else
         {
-            if (_lastHit != null)
-            {
-                _lastHit.LaserNotRecived();
-                _lastHit = null;
-            }
-
-            _lineRenderer.SetPosition(0, laserPos);
-            _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
+            SetLaserEnd(laserOrigin, laserOrigin + transform.forward * _maxDist);
+            StopLaserEffect();
         }
     }
-    */
-    #endregion
 
-    #region castLaserNuevo
-    private void CastLaser()
+    private void ProcessHit(Vector3 origin, RaycastHit hit)
     {
-        Vector3 laserPos = GetFixedLaserPos();
+        SetLaserEnd(origin, hit.point);
 
-        _ray = new Ray(laserPos, transform.forward);
-        _rightRay = new Ray(laserPos + transform.right * _raycastOffsetX, transform.forward);
-        _leftRay = new Ray(laserPos - transform.right * _raycastOffsetX, transform.forward);
+        PlayLaserEffect(hit.point, hit.normal);
 
-        if (Physics.Raycast(_ray, out _rayHit, _maxDist, _laserLayer))
+        if (hit.collider.TryGetComponent(out ILaserReceptor receptor))
         {
-            // Obtenemos todos los impactos en la dirección del rayo
-            RaycastHit[] hits = Physics.RaycastAll(_ray, _maxDist, _laserLayer);
-
-            // Ordenamos por distancia (de menor a mayor)
-            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-
-            foreach (var hit in hits)
-            {
-                if (hit.collider.TryGetComponent(out PlayerController player))
-                {
-                    // Cortamos el rayo en el player
-                    _lineRenderer.SetPosition(0, laserPos);
-                    _lineRenderer.SetPosition(1, hit.point);
-                    player.LaserRecived();
-                   _lastHit = player;
-
-                    _hitLaser.transform.position = hit.point;
-                    _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);
-                    if (!_hitLaser.isPlaying) _hitLaser.Play();
-
-                    // Si querés que el láser siga "más allá del player" y pegue en la pared,
-                    // sacá el "break;" de abajo
-                    break;
-                }
-                else if (hit.collider.TryGetComponent(out ILaserReceptor receptor))
-                {
-                    if (_lastHit != null && _lastHit != receptor)
-                        _lastHit.LaserNotRecived();
-
-                    _lineRenderer.SetPosition(0, laserPos);
-                    _lineRenderer.SetPosition(1, hit.point);
-                    receptor.LaserRecived();
-                    _lastHit = receptor;
-
-                    // Partícula
-                    _hitLaser.transform.position = hit.point;
-                    _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);
-                    if (!_hitLaser.isPlaying) _hitLaser.Play();
-
-                    break;
-                }
-                else
-                {
-                    // Cualquier otra cosa (pared, etc.)
-                    _lineRenderer.SetPosition(0, laserPos);
-                    _lineRenderer.SetPosition(1, hit.point);
-                    if (_lastHit != null) _lastHit.LaserNotRecived();
-                    // Partícula
-                    _hitLaser.transform.position = hit.point;
-                    _hitLaser.transform.rotation = Quaternion.LookRotation(hit.normal);
-                    if (!_hitLaser.isPlaying) _hitLaser.Play();
-
-                    break;
-                }
-            }
+            NotifyReceptor(receptor);
+            receptor.LaserRecived();
         }
         else
         {
-            // No pegó nada => láser al máximo
-            _lineRenderer.SetPosition(0, laserPos);
-            _lineRenderer.SetPosition(1, laserPos + (transform.forward * _maxDist));
-
-            if (_hitLaser.isPlaying) _hitLaser.Stop();
+            ClearLastHit();
         }
-
     }
-    #endregion
+
+    private void SetLaserEnd(Vector3 start, Vector3 end)
+    {
+        _lineRenderer.SetPosition(0, start);
+        _lineRenderer.SetPosition(1, end);
+    }
+
+    private void PlayLaserEffect(Vector3 pos, Vector3 normal)
+    {
+        _hitLaser.transform.position = pos;
+        _hitLaser.transform.rotation = Quaternion.LookRotation(normal);
+        
+        if (!_hitLaser.isPlaying) _hitLaser.Play();
+    }
+
+    private void StopLaserEffect()
+    {
+        if (_hitLaser.isPlaying) _hitLaser.Stop();
+    }
+
+    private void NotifyReceptor(ILaserReceptor receptor)
+    {
+        if (_lastHit != null && _lastHit != receptor)
+            _lastHit.LaserNotRecived();
+
+        _lastHit = receptor;
+    }
+
+    private void ClearLastHit()
+    {
+        if (_lastHit == null) return;
+
+        _lastHit.LaserNotRecived();
+        _lastHit = null;
+    }
 
     private Vector3 GetFixedLaserPos()
     {
@@ -252,8 +157,8 @@ public class Laser : MonoBehaviour
     public void LaserNotRecived()
     {
         Vector3 laserPos = GetFixedLaserPos();
-        if(!_startsInitialized)
-        _isInitialized = false;
+        
+        if(!_startsInitialized) _isInitialized = false;
 
         _lineRenderer.SetPosition(0, laserPos);
         _lineRenderer.SetPosition(1, laserPos);
