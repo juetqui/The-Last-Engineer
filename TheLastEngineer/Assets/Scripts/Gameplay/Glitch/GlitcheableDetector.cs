@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GlitcheableDetector : MonoBehaviour
+public class GlitcheableDetector
 {
     public GlitcheableDetector(float detectionRange, LayerMask selectionLayer)
     {
