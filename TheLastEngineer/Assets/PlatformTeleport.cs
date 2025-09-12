@@ -31,7 +31,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
             _renderer.material.SetFloat("_TRansparencyREduction", 1f);
     }
 
-    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler != null;
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.CurrentType == NodeType.Corrupted && playerNodeHandler != null;
 
     public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
