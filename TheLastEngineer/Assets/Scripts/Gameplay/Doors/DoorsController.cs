@@ -8,16 +8,9 @@ public class DoorController : MonoBehaviour
     [SerializeField] private DoorsView _door;
     [SerializeField] private List<Connection> _connections = new List<Connection>();
 
-    [Header("Condición de apertura")]
-    [Tooltip("Si está activo, se requiere que TODAS las conexiones estén activas.")]
-    [SerializeField] private bool _requireAllConnections = true;
-
-    [Tooltip("Si requireAllConnections = false, se abrirá cuando la cantidad de conexiones activas alcance este umbral.")]
-    [SerializeField] private int _requiredConnectionsCount = 1;
-
     // Runtime
     private int _activeCount = 0;
-    private bool _isOpen = false;
+    private bool _isOpen = false, _shouldOpen;
 
     private void OnEnable()
     {
@@ -60,7 +53,7 @@ public class DoorController : MonoBehaviour
 
     private void OnConnectionStateChanged(NodeType type, bool connected)
     {
-        _activeCount += connected ? 1 : -1;
+        if(type == NodeType.Default) _activeCount += connected ? 1 : -1;
         _activeCount = Mathf.Clamp(_activeCount, 0, _connections.Count);
         EvaluateAndApply();
     }
@@ -76,21 +69,11 @@ public class DoorController : MonoBehaviour
 
     private void EvaluateAndApply()
     {
-        bool shouldOpen;
+        _shouldOpen = (_activeCount == _connections.Count && _connections.Count > 0);
 
-        if (_requireAllConnections)
-        {
-            shouldOpen = (_activeCount == _connections.Count && _connections.Count > 0);
-        }
-        else
-        {
-            var threshold = Mathf.Clamp(_requiredConnectionsCount, 1, Mathf.Max(1, _connections.Count));
-            shouldOpen = (_activeCount >= threshold);
-        }
+        if (_shouldOpen == _isOpen) return;
 
-        if (shouldOpen == _isOpen) return; // nada que cambiar
-
-        _isOpen = shouldOpen;
+        _isOpen = _shouldOpen;
         _door.OpenDoor(_isOpen);
     }
 }
