@@ -86,7 +86,7 @@ public class NodeController : MonoBehaviour, IInteractable
         succeeded = true;
     }
 
-    public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false)
+    public void Attach(Vector3 newPos, Transform newParent = null, Vector3 newScale = default, bool parentIsPlayer = false, Quaternion newRot = default)
     {
         if (parentIsPlayer)
         {
@@ -116,7 +116,7 @@ public class NodeController : MonoBehaviour, IInteractable
         else _isChildren = false;
 
         if (newParent != null && newScale != default)
-            _nodeModel.SetPos(newPos, NodeType, newParent, newScale);
+            _nodeModel.SetPos(newPos, NodeType, newParent, newScale, newRot);
         else if (newParent != null && newScale == default)
             _nodeModel.SetPos(newPos, NodeType, newParent);
         else if (newParent == null && newScale == default)

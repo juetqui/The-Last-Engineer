@@ -47,7 +47,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     }
     private void SetNode(NodeController node)
     {
-        node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f);
+        node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f,false, _nodePos.rotation);
         _recievedNode = node;
         OnNodeConnected?.Invoke(node.NodeType, true);
     }

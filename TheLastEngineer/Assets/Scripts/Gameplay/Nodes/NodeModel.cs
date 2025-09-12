@@ -13,7 +13,7 @@ public class NodeModel
         _initialGlobalPosition = transform.position;
     }
 
-    public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default)
+    public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default, Quaternion newRot = default)
     {
         _initialGlobalPosition = newPos;
 
@@ -21,13 +21,13 @@ public class NodeModel
         {
             _transform.SetParent(newParent, false);
             _transform.localPosition = newPos;
-            _transform.rotation = Quaternion.LookRotation(newParent.forward);
+            _transform.rotation = newRot;
         }
         else
         {
             _transform.SetParent(null);
             _transform.position = newPos;
-            _transform.rotation = Quaternion.identity;
+            _transform.rotation = newRot;
         }
 
         _initialY = _transform.position.y;
