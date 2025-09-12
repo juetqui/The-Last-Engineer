@@ -137,6 +137,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         var target = _interactableHandler.GetInteractable(_nodeHandler, transform.position);
 
+        if (target == null)
+            View.PlayErrorSound(_playerData.emptyHand);
+
         StateMachine.CurrentState?.HandleInteraction(target);
         OnInteractableSelected?.Invoke(target);
     }

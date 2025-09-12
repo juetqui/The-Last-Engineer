@@ -26,6 +26,6 @@ public class InteractableHandler
         return _interactables.Where(i => i.CanInteract(nodeHandler))
             .OrderBy(i => i.Priority)
             .OrderBy(i => Vector3.Distance(i.Transform.position, playerPos))
-            .First();
+            .FirstOrDefault();
     }
 }
