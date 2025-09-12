@@ -12,8 +12,9 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     [SerializeField] private NodeController _recievedNode;
     [SerializeField] private Transform _nodePos;
-    [SerializeField] private List<DoorsView> _doorsView;
     public bool StartsConnected { get; private set; }
+    public bool IsConnected => _recievedNode != null;
+
     public Action<NodeType, bool> OnNodeConnected;
 
     private void Start()
@@ -25,7 +26,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         }
         else StartsConnected = false;
     }
-    public bool CanInteract(PlayerNodeHandler playerNodeHandler) { return playerNodeHandler.HasNode && _recievedNode == null; }
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.HasNode && _recievedNode == null;
 
     public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
@@ -49,27 +50,11 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f);
         _recievedNode = node;
         OnNodeConnected?.Invoke(node.NodeType, true);
-        
-        if(_doorsView != null)
-        {
-            foreach (var item in _doorsView)
-            {
-                item.OpenDoor(true);
-            }
-        }
     }
 
     public void UnsetNode(NodeController node)
     {
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _recievedNode = null;
-
-        if (_doorsView != null)
-        {
-            foreach (var item in _doorsView)
-            {
-                item.OpenDoor(false);
-            }
-        }
     }
 }
