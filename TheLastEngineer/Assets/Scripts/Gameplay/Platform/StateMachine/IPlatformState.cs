@@ -1,6 +1,6 @@
-//public interface IPlatformState
-//{
-//    void Enter();
-//    void Tick();
-//    void Exit();
-//}
+public interface IPlatformState
+{
+    void Enter();
+    void Tick(float deltaTime);
+    void Exit();
+}

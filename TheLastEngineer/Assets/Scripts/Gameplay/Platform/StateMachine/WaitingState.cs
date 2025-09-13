@@ -1,28 +1,32 @@
-//using UnityEngine;
+using UnityEngine;
 
-//public class WaitingState : IPlatformState
-//{
-//    private PlatformController _pc;
-//    private PlatformStateMachine _FSM;
+public class WaitingState : IPlatformState
+{
+    private PlatformController _pc;
+    private PlatformStateMachine _FSM;
 
-//    public void Enter()
-//    {
-//        // Reinicia la cuenta
-//        _pc.BeginWait();
-//        _pc.StopPassenger(); // por si venía de Moving
-//    }
+    private float _timer = 0f;
 
-//    public void Tick()
-//    {
-//        if (_pc.WaitTimer > 0f)
-//        {
-//            _pc.WaitTimer -= Time.deltaTime;
-//            if (_pc.WaitTimer <= 0f)
-//            {
-//                _FSM.TransitionTo(new MovingState()); // O usar instancia cacheada si preferís (ver nota abajo)
-//            }
-//        }
-//    }
+    public WaitingState(PlatformController pc, PlatformStateMachine fSM)
+    {
+        _pc = pc;
+        _FSM = fSM;
+    }
 
-//    public void Exit() { }
-//}
+    public void Enter()
+    {
+        _pc.BeginWait();
+        _pc.StopPassenger();
+        _timer = 0f;
+    }
+
+    public void Tick(float d)
+    {
+        _timer += d;
+
+        if (_timer >= _pc.WaitTimer)
+            _FSM.TransitionTo(_FSM.Moving);
+    }
+
+    public void Exit() { }
+}

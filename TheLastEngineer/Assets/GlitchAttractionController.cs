@@ -33,7 +33,9 @@ public class GlitchAttractionController : MonoBehaviour
     {
         if (coll.TryGetComponent(out Glitcheable glitcheable))
         {
-            _currentTarget = glitcheable;
+            if (glitcheable != _currentTarget)
+                _currentTarget = glitcheable;
+
             _vfx.Play();
             _vfx.SetVector3("AttractTarget", glitcheable.transform.position);
         }

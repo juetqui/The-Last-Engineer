@@ -19,30 +19,26 @@ public class PlatformController : MonoBehaviour
 
     // Estado actual y objetos-estado (cacheados para evitar GC)
     private IPlatformState _state;
-    private readonly InactiveState _inactiveState = new InactiveState();
-    private readonly WaitingState _waitingState = new WaitingState();
-    private readonly MovingState _movingState = new MovingState();
+    private PlatformStateMachine _fsm;
 
     // Datos compartidos por los estados
-    internal float CurrentSpeed { get; private set; }
-    internal float MoveSpeed => _moveSpeed;
-    internal float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
-    internal float WaitCD => _waitCD;
-    internal float WaitTimer { get; set; }
+    public float CurrentSpeed { get; private set; }
+    public float MoveSpeed => _moveSpeed;
+    public float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
+    public float WaitCD => _waitCD;
+    public float WaitTimer { get; set; }
 
-    internal IMovablePassenger Passenger => _passenger;
-    internal PlatformMotor Motor => _motor;
-    internal RouteManager Route => _route;
-    internal Vector3 CurrentTarget => _route.CurrentPoint;
-
-    //[SerializeField] protected GameObject refuerzoPositivo;
+    public IMovablePassenger Passenger => _passenger;
+    public PlatformMotor Motor => _motor;
+    public RouteManager Route => _route;
+    public Vector3 CurrentTarget => _route.CurrentPoint;
 
     private Coroutine _changingColor = null;
 
     private void Awake()
     {
         _route = new RouteManager(_positions);
-        _motor = new PlatformMotor(transform, null);   // INSTANCIAR EL MOTOR
+        _motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
     }
@@ -50,17 +46,14 @@ public class PlatformController : MonoBehaviour
 
     private void Start()
     {
-        // Subscripción a cambios de conexión
         _connection.OnNodeConnected += OnConnectionChanged;
         
-         // Velocidad según si el jugador porta un nodo corrupto (opcional)
          if (PlayerNodeHandler.Instance != null)
             PlayerNodeHandler.Instance.OnNodeGrabbed += OnNodeGrabbed;
-        
-         // Estado inicial
-        bool canMove = _connection.StartsConnected; // y si hay filtro por tipo: && _connection.CurrentType == _requiredNode;
-        SetState(canMove ? _waitingState : _inactiveState);
-        SetPositiveFeedback(canMove);
+
+        _fsm = new PlatformStateMachine(this, _connection.StartsConnected);
+
+        SetPositiveFeedback(_connection.StartsConnected);
     }
 
     private void OnDestroy()
@@ -76,9 +69,8 @@ public class PlatformController : MonoBehaviour
     private void Update()
     {
         if (!_route.IsValid) return;
-        _state?.Tick(this);
+        _fsm?.Tick(Time.deltaTime);
     }
-
 
     public void SetPositiveFeedback(bool Active)
     {
@@ -118,9 +110,9 @@ public class PlatformController : MonoBehaviour
         SetPositiveFeedback(canMove);
 
         if (canMove)
-            SetState(_waitingState);
+            _fsm.ToWaiting();
         else
-            SetState(_inactiveState);
+            _fsm.ToInactive();
     }
 
     private void OnNodeGrabbed(bool hasNode, NodeType nodeType)
@@ -130,41 +122,33 @@ public class PlatformController : MonoBehaviour
 
     /* -------------------- API interna usada por los estados -------------------- */
 
-    internal void AdvanceRouteAndWait()
+    public void AdvanceRouteAndWait()
     {
         _route.Advance();
-        SetState(_waitingState);
+        _fsm.ToWaiting();
     }
 
-    internal void BeginWait()
+    public void BeginWait()
     {
         WaitTimer = _waitCD;
     }
 
-    internal void StopPassenger()
+    public void StopPassenger()
     {
-        if (_passenger != null) _motor.Stop(_passenger);
+        if (_passenger != null) return;
+
+        _motor.Stop(_passenger);
     }
 
-    internal bool ReachedTarget()
+    public bool ReachedTarget()
     {
         return _motor.InTarget(CurrentTarget);
     }
 
-    internal void MoveStep()
+    public void MoveStep()
     {
         _motor.MoveTowards(CurrentTarget, CurrentSpeed, _passenger);
     }
-
-    internal void SetState(IPlatformState next)
-    {
-        if (_state == next) return;
-        _state?.Exit(this);
-        _state = next;
-        _state.Enter(this);
-    }
-
-    /* -------------------- Trigger pasajero -------------------- */
 
     private void OnTriggerEnter(Collider col)
     {
@@ -180,78 +164,4 @@ public class PlatformController : MonoBehaviour
             _passenger = null;
         }
     }
-}
-
-/* ========================================================================== */
-/*                              Patrón de Estados                              */
-/* ========================================================================== */
-
-public interface IPlatformState
-{
-    void Enter(PlatformController ctx);
-    void Tick(PlatformController ctx);
-    void Exit(PlatformController ctx);
-}
-
-public class InactiveState : IPlatformState
-{
-    public void Enter(PlatformController ctx)
-    {
-        ctx.WaitTimer = 0f;
-        ctx.StopPassenger(); // asegura desplazamiento cero
-    }
-
-    public void Tick(PlatformController ctx)
-    {
-        // No hace nada mientras el cable/condición no habilite
-        // El cambio a Waiting lo dispara el evento OnConnectionChanged
-    }
-
-    public void Exit(PlatformController ctx) { }
-}
-
-public class WaitingState : IPlatformState
-{
-    public void Enter(PlatformController ctx)
-    {
-        // Reinicia la cuenta
-        ctx.BeginWait();
-        ctx.StopPassenger(); // por si venía de Moving
-    }
-
-    public void Tick(PlatformController ctx)
-    {
-        if (ctx.WaitTimer > 0f)
-        {
-            ctx.WaitTimer -= Time.deltaTime;
-            if (ctx.WaitTimer <= 0f)
-            {
-                ctx.SetState(new MovingState()); // O usar instancia cacheada si preferís (ver nota abajo)
-            }
-        }
-    }
-
-    public void Exit(PlatformController ctx) { }
-}
-
-public class MovingState : IPlatformState
-{
-    public void Enter(PlatformController ctx)
-    {
-        // Nada especial; el target se evalúa cada frame desde RouteManager
-    }
-
-    public void Tick(PlatformController ctx)
-    {
-        if (ctx.ReachedTarget())
-        {
-            ctx.StopPassenger();
-            ctx.AdvanceRouteAndWait(); // Avanza al próximo punto y vuelve a esperar
-            return;
-        }
-
-        ctx.MoveStep();
-    }
-
-    public void Exit(PlatformController ctx) { }
 }

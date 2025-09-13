@@ -1,22 +1,22 @@
-//public class MovingState : IPlatformState
-//{
-//    private PlatformController _pc;
-//    public void Enter()
-//    {
-//        // Nada especial; el target se evalúa cada frame desde RouteManager
-//    }
+public class MovingState : IPlatformState
+{
+    private PlatformController _pc;
 
-//    public void Tick()
-//    {
-//        if (_pc.ReachedTarget())
-//        {
-//            _pc.StopPassenger();
-//            _pc.AdvanceRouteAndWait(); // Avanza al próximo punto y vuelve a esperar
-//            return;
-//        }
+    public MovingState(PlatformController pc) { _pc = pc; }
 
-//        _pc.MoveStep();
-//    }
+    public void Enter() { }
 
-//    public void Exit() { }
-//}
+    public void Tick(float d)
+    {
+        if (_pc.ReachedTarget())
+        {
+            _pc.StopPassenger();
+            _pc.AdvanceRouteAndWait();
+            return;
+        }
+
+        _pc.MoveStep();
+    }
+
+    public void Exit() { }
+}

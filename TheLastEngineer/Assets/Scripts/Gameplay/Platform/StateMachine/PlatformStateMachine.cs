@@ -1,36 +1,39 @@
-//public class PlatformStateMachine
-//{
-//    private IPlatformState _current, _last;
+public class PlatformStateMachine
+{
+    private IPlatformState _current, _last;
 
-//    private readonly PlatformController _controller;
+    private PlatformController _controller;
 
-//    // Estados cacheados (evita allocs)
-//    public readonly InactiveState Inactive = new InactiveState();
-//    public readonly WaitingState Waiting = new WaitingState();
-//    public readonly MovingState Moving = new MovingState();
+    public IPlatformState Inactive { get; private set; }
+    public IPlatformState Waiting { get; private set; }
+    public IPlatformState Moving { get; private set; }
 
-//    public IPlatformState Current => _current;
-//    public IPlatformState Last => _last;
+    public IPlatformState Current => _current;
+    public IPlatformState Last => _last;
 
-//    public PlatformStateMachine(PlatformController controller, bool startsActive)
-//    {
-//        _controller = controller;
-//        TransitionTo(startsActive ? Waiting : Inactive);
-//    }
+    public PlatformStateMachine(PlatformController controller, bool startsActive)
+    {
+        _controller = controller;
+        TransitionTo(startsActive ? Waiting : Inactive);
 
-//    public void Tick() => _current?.Tick();
+        Inactive = new InactiveState(_controller);
+        Waiting = new WaitingState(_controller, this);
+        Moving = new MovingState(_controller);
+    }
 
-//    public void TransitionTo(IPlatformState next)
-//    {
-//        if (_current == next) return;
-//        _last = _current;
-//        _current?.Exit();
-//        _current = next;
-//        _current?.Enter();
-//    }
+    public void Tick(float deltaTime) => _current?.Tick(deltaTime);
 
-//    // Azúcares para legibilidad
-//    public void ToInactive() => TransitionTo(Inactive);
-//    public void ToWaiting() => TransitionTo(Waiting);
-//    public void ToMoving() => TransitionTo(Moving);
-//}
+    public void TransitionTo(IPlatformState next)
+    {
+        if (_current == next) return;
+
+        _last = _current;
+        _current?.Exit();
+        _current = next;
+        _current?.Enter();
+    }
+
+    public void ToInactive() => TransitionTo(Inactive);
+    public void ToWaiting() => TransitionTo(Waiting);
+    public void ToMoving() => TransitionTo(Moving);
+}
