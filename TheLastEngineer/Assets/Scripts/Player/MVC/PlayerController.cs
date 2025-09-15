@@ -180,7 +180,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public bool CheckForWalls()
     {
         Vector3 rayPos = new(transform.position.x, transform.position.y + 2f, transform.position.z);
-        return Physics.Raycast(rayPos, transform.forward, 3f, _playerData.wallMask);
+        return Physics.Raycast(rayPos, transform.forward, _playerData.maxWallDist, _playerData.wallMask);
     }
     #endregion
 
@@ -266,7 +266,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out IInteractable interactable)) _interactableHandler.Remove(interactable);
+        if (coll.TryGetComponent(out IInteractable interactable))
+            _interactableHandler.Remove(interactable);
     }
     #endregion
 }

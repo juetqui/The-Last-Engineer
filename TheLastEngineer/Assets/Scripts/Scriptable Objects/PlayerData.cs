@@ -9,6 +9,7 @@ public class PlayerData : ScriptableObject
     public float rotSpeed = default;
     public float fovAngle = default;
     public float coyoteTime = default;
+    public float maxWallDist = default;
     public LayerMask wallMask = default;
     public LayerMask glitchDetectionLayer = default;
 

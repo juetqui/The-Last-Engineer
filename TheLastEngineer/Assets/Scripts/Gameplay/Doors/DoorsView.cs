@@ -19,8 +19,12 @@ public class DoorsView : MonoBehaviour
     public void OpenDoor(bool isRunning)
     {
         _animator.SetBool("DoorActivated", isRunning);
-        _openDoor.Play();
-        if (isRunning) _particulas.Play();
+        
+        if (isRunning)
+        {
+            _particulas.Play();
+            _openDoor.Play();
+        }
         else _particulas.Stop();
     }
 }

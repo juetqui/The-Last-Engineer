@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlatformController : MonoBehaviour
@@ -12,16 +11,11 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private Connection _connection = default;
 
-    // --- Runtime
-    private RouteManager _route;
-    private PlatformMotor _motor;
     private IMovablePassenger _passenger;
-
-    // Estado actual y objetos-estado (cacheados para evitar GC)
     private IPlatformState _state;
     private PlatformStateMachine _fsm;
+    private Coroutine _changingColor = null;
 
-    // Datos compartidos por los estados
     public float CurrentSpeed { get; private set; }
     public float MoveSpeed => _moveSpeed;
     public float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
@@ -29,16 +23,14 @@ public class PlatformController : MonoBehaviour
     public float WaitTimer { get; set; }
 
     public IMovablePassenger Passenger => _passenger;
-    public PlatformMotor Motor => _motor;
-    public RouteManager Route => _route;
-    public Vector3 CurrentTarget => _route.CurrentPoint;
-
-    private Coroutine _changingColor = null;
+    public PlatformMotor Motor { get; private set; }
+    public RouteManager Route { get; private set; }
+    public Vector3 CurrentTarget => Route.CurrentPoint;
 
     private void Awake()
     {
-        _route = new RouteManager(_positions);
-        _motor = new PlatformMotor(transform, null);
+        Route = new RouteManager(_positions);
+        Motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
     }
@@ -68,7 +60,7 @@ public class PlatformController : MonoBehaviour
 
     private void Update()
     {
-        if (!_route.IsValid) return;
+        if (!Route.IsValid) return;
         _fsm?.Tick(Time.deltaTime);
     }
 
@@ -78,7 +70,7 @@ public class PlatformController : MonoBehaviour
 
         if (_changingColor != null) StopCoroutine(_changingColor);
 
-        Color targetColor = Active ? Color.cyan : Color.red;
+        Color targetColor = Active ? Color.cyan : Color.black;
         _changingColor = StartCoroutine(ChangeColor(targetColor));
     }
 
@@ -112,7 +104,7 @@ public class PlatformController : MonoBehaviour
         if (canMove)
             _fsm.ToWaiting();
         else
-            _fsm.ToInactive();
+            _fsm.ToReturning();
     }
 
     private void OnNodeGrabbed(bool hasNode, NodeType nodeType)
@@ -124,8 +116,10 @@ public class PlatformController : MonoBehaviour
 
     public void AdvanceRouteAndWait()
     {
-        _route.Advance();
-        _fsm.ToWaiting();
+        if (Route.HasToWait())
+            _fsm.ToWaiting();
+
+        Route.Advance();
     }
 
     public void BeginWait()
@@ -137,17 +131,17 @@ public class PlatformController : MonoBehaviour
     {
         if (_passenger != null) return;
 
-        _motor.Stop(_passenger);
+        Motor.Stop(_passenger);
     }
 
     public bool ReachedTarget()
     {
-        return _motor.InTarget(CurrentTarget);
+        return Motor.InTarget(CurrentTarget);
     }
 
     public void MoveStep()
     {
-        _motor.MoveTowards(CurrentTarget, CurrentSpeed, _passenger);
+        Motor.MoveTowards(CurrentTarget, CurrentSpeed, _passenger);
     }
 
     private void OnTriggerEnter(Collider col)
