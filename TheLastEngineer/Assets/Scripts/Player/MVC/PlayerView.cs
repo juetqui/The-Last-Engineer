@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerView
@@ -12,6 +13,8 @@ public class PlayerView
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip = default, _fallClip = default;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
+
+    public Action OnDashViewPlayed = delegate { };
 
     public PlayerView(Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS)
     {
@@ -65,7 +68,9 @@ public class PlayerView
 
     public void DashSound()
     {
-        SetParticlesLT(0.7f, 1f);
+        OnDashViewPlayed?.Invoke();
+        _walkPS.Stop();
+        //SetParticlesLT(0.7f, 1f);
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
     
@@ -159,7 +164,7 @@ public class PlayerView
 
     private void PlayAudioWithRandomPitch(AudioSource source, AudioClip clip, float pitch = 0)
     {
-        if (pitch == 0) pitch = Random.Range(0.95f, 1.125f);
+        if (pitch == 0) pitch = UnityEngine.Random.Range(0.95f, 1.125f);
 
         source.clip = clip;
         source.pitch = pitch;

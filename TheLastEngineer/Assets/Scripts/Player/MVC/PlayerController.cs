@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private Vector3 _checkPointPos;
     #endregion
+
     private void Awake()
     {
         if (Instance != null)
@@ -60,15 +61,15 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _impulse = GetComponent<CinemachineImpulseSource>();
         _interactableHandler = new InteractableHandler();
 
+        _model = new PlayerModel(CC, transform, _playerData, _collider);
+        View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS);
+
         _checkPointPos = transform.position;
     }
 
     private void Start()
     {
         _currentSpeed = _playerData.moveSpeed;
-
-        _model = new PlayerModel(CC, transform, _playerData, _collider);
-        View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS);
         View.OnStart();
 
         StateMachine = new PlayerStateMachine(this, _nodeHandler);
