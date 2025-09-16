@@ -48,6 +48,7 @@ public class InspectorController : MonoBehaviour
             if (enableTarget != null && enableTarget.Type == item.Type)
             {
                 item.gameObject.SetActive(true);
+                item.CorruptionGenerator.OnObjectCleaned += enableTarget.CorruptionCleaned;
                 OnTargetEnabled?.Invoke(item);
             }
         }

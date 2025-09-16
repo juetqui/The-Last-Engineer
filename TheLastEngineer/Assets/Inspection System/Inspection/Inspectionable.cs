@@ -10,8 +10,9 @@ public class Inspectionable : MonoBehaviour, IInteractable
     #endregion
 
     [SerializeField] private InspectionType _type = InspectionType.None;
-    
-    private ParticleSystem _ps = default;
+    [SerializeField] private Collider _collider = default;
+    [SerializeField] private ParticlesFeedbackManager _positiveFM = default;
+    [SerializeField] private ParticlesFeedbackManager _negativeFM = default;
 
     public event Action OnFinished;
 
@@ -19,7 +20,7 @@ public class Inspectionable : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        _ps = GetComponentInChildren<ParticleSystem>();
+        _collider = GetComponent<Collider>();
     }
 
     public bool CanInteract(PlayerNodeHandler playerNodeHandler)
@@ -29,13 +30,23 @@ public class Inspectionable : MonoBehaviour, IInteractable
 
     public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
-        _ps.Play();
         succededInteraction = true;
     }
 
     public void StopInteraction()
     {
-        _ps.Stop();
+        OnFinished?.Invoke();
+    }
+
+    public void CorruptionCleaned(CorruptionGenerator generator)
+    {
+        if (generator == null)
+            throw new Exception("CorruptionGenerator not set in method's call");
+
+        generator.OnObjectCleaned -= CorruptionCleaned;
+        _collider.enabled = false;
+        _negativeFM.StopParticles();
+        _positiveFM.StartParticles();
         OnFinished?.Invoke();
     }
 }

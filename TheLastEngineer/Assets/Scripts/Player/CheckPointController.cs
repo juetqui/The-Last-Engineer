@@ -4,7 +4,6 @@ using UnityEngine;
 public class CheckPointController : MonoBehaviour
 {
     [SerializeField] private Renderer _vfxRenderer;
-    //[SerializeField] private GenericTM _taskManager;
     [SerializeField] private float _transitionDuration = 0.5f;
     
     [SerializeField] private Color _enabledMainColor;
@@ -86,11 +85,8 @@ public class CheckPointController : MonoBehaviour
         if (coll.TryGetComponent(out PlayerController player) && _enabled)
         {
             GetComponentInChildren<ParticleSystem>().Play();
-            //Vector3 checkPointPos = player.transform.position;
             player.SetCheckPointPos(_renderer.transform.position);
             StartCoroutine(SetMaterialsCoroutine());
-            
-            //if (_taskManager != null) _taskManager.CloseDoor();
 
             if (_objectToActivate != null)
                 _objectToActivate.SetActive(true);

@@ -8,7 +8,7 @@ public class LevelSelector : MonoBehaviour
 
     private void Start()
     {
-        PlayerController.Instance.OnPlayerFell += RestarLevel;
+        //PlayerController.Instance.OnPlayerFell += RestarLevel;
     }
 
     void Update()

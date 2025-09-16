@@ -7,33 +7,46 @@ public class UpdateCameras : MonoBehaviour
     [SerializeField] private CinemachineFreeLook _mainCam;
     [SerializeField] private CinemachineFreeLook _targetLockCam;
 
+    private Inspectionable _inspectionable = default;
+
     void Start()
     {
-        PlayerController.Instance.OnInteractableSelected += OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected += TargetSelected;
     }
 
     private void OnDestroy()
     {
-        PlayerController.Instance.OnInteractableSelected -= OnTargetSelected;
+        PlayerController.Instance.OnInteractableSelected -= TargetSelected;
     }
 
-    private void OnTargetSelected(IInteractable target)
+    private void TargetSelected(IInteractable target)
     {
-        if (target != null && target is Inspectionable)
+        if (target == null || target is not Inspectionable)
         {
-            _targetLockCam.Follow = target.Transform;
-            _targetLockCam.LookAt = target.Transform;
+            _inspectionable = null;
 
-            _mainCam.Priority = 0;
-            _targetLockCam.Priority = 1;
-            
+            _targetLockCam.Follow = null;
+            _targetLockCam.LookAt = null;
+
+            _mainCam.Priority = 1;
+            _targetLockCam.Priority = 0;
+
             return;
         }
 
-        _targetLockCam.Follow = null;
-        _targetLockCam.LookAt = null;
+        _inspectionable = (Inspectionable)target;
+        _inspectionable.OnFinished += CorruptionCleaned;
 
-        _mainCam.Priority = 1;
-        _targetLockCam.Priority = 0;
+        _targetLockCam.Follow = target.Transform;
+        _targetLockCam.LookAt = target.Transform;
+
+        _mainCam.Priority = 0;
+        _targetLockCam.Priority = 1;
+    }
+
+    private void CorruptionCleaned()
+    {
+        _inspectionable.OnFinished -= CorruptionCleaned;
+        TargetSelected(null);
     }
 }

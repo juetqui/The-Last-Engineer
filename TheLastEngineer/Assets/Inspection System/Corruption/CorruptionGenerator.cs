@@ -27,6 +27,7 @@ public class CorruptionGenerator : MonoBehaviour
     public int CleanedInstances { get { return _cleanedInstances; } }
 
     public Action OnUpdatedInstances = delegate { };
+    public Action<CorruptionGenerator> OnObjectCleaned = delegate { };
 
     void Start()
     {
@@ -131,7 +132,7 @@ public class CorruptionGenerator : MonoBehaviour
 
         if (_index >= _corruptionList.Count())
         {
-            Debug.Log("Corruption list is empty or null");
+            OnObjectCleaned?.Invoke(this);
             _currentActive = null;
             return;
         }
