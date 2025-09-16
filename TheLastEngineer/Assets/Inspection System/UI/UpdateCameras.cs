@@ -23,7 +23,8 @@ public class UpdateCameras : MonoBehaviour
     {
         if (target == null || target is not Inspectionable)
         {
-            _inspectionable = null;
+            if (_inspectionable != null)
+                _inspectionable.OnFinished -= CorruptionCleaned;
 
             _targetLockCam.Follow = null;
             _targetLockCam.LookAt = null;
@@ -34,8 +35,14 @@ public class UpdateCameras : MonoBehaviour
             return;
         }
 
-        _inspectionable = (Inspectionable)target;
-        _inspectionable.OnFinished += CorruptionCleaned;
+        Inspectionable incomingInspectionable = (Inspectionable)target;
+
+        if (incomingInspectionable != _inspectionable)
+        {
+            _inspectionable = incomingInspectionable;
+            _inspectionable.OnFinished += CorruptionCleaned;
+        }
+
 
         _targetLockCam.Follow = target.Transform;
         _targetLockCam.LookAt = target.Transform;

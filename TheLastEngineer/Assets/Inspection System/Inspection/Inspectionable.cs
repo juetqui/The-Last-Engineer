@@ -40,9 +40,6 @@ public class Inspectionable : MonoBehaviour, IInteractable
 
     public void CorruptionCleaned(CorruptionGenerator generator)
     {
-        if (generator == null)
-            throw new Exception("CorruptionGenerator not set in method's call");
-
         generator.OnObjectCleaned -= CorruptionCleaned;
         _collider.enabled = false;
         _negativeFM.StopParticles();

@@ -34,6 +34,7 @@ public class InspectionPlayerManager : MonoBehaviour
 
         _camera.enabled = true;
         InspectionSystem.Instance.enabled = true;
+        PlayerController.Instance.SetCanMove(false);
         InputManager.Instance.UpdateActionMap(ActionMaps.UI);
         _currentInteractable = interactable;
 
@@ -57,6 +58,7 @@ public class InspectionPlayerManager : MonoBehaviour
         _currentInteractable.OnFinished -= HandleFinishedInteraction;
 
         InputManager.Instance.UpdateActionMap(ActionMaps.Player);
+        PlayerController.Instance.SetCanMove(true);
         _currentInteractable = null;
         _isInspecting = false;
     }

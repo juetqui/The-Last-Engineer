@@ -22,21 +22,28 @@ public class InspectionCanvasController : MonoBehaviour
     {
         if (target == null || target is not Inspectionable)
         {
-            _inspectionable = null;
+            if (_inspectionable != null)
+                _inspectionable.OnFinished -= ClearReferences;
+
             _canvas.enabled = false;
             return;
         }
 
-        _inspectionable = (Inspectionable)target;
-        _inspectionable.OnFinished += CorruptionCleaned;
+        Inspectionable incomingInspectionable = (Inspectionable)target;
+
+        if (incomingInspectionable != _inspectionable)
+        {
+            _inspectionable = incomingInspectionable;
+            _inspectionable.OnFinished += ClearReferences;
+        }
 
         _canvas.enabled = true;
         GamepadCursor.Instance.CenterCursor();
     }
 
-    private void CorruptionCleaned()
+    private void ClearReferences()
     {
-        _inspectionable.OnFinished -= CorruptionCleaned;
+        _inspectionable.OnFinished -= ClearReferences;
         TargetSelected(null);
     }
 }
