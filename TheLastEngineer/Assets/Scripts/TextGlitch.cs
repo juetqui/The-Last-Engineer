@@ -5,32 +5,35 @@ using TMPro;
 public class TextGlitch : MonoBehaviour
 {
     [Header("Referencia")]
-    [SerializeField] public TMP_Text tmpText; // Asigná tu TextMeshPro en el inspector
+    [SerializeField] private string _tutorialText;
 
     [Header("Configuración Glitch")]
-    [SerializeField] private float glitchDuration = 0.5f;  // Duración total del glitch
-    [SerializeField] private float glitchInterval = 0.05f; // Cada cuánto cambiar los caracteres
+    [SerializeField] private float glitchDuration = 0.5f;
+    [SerializeField] private float glitchInterval = 0.05f;
     [SerializeField] private string randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&?"; 
 
-    private string originalText; // Guarda el texto original
-    private Coroutine glitchCoroutine;
+    private TMP_Text tmpText = default;
+    private string originalText = default;
+
+    private Coroutine glitchCoroutine = default;
 
     private void Awake()
     {
         if (tmpText == null)
             tmpText = GetComponent<TMP_Text>();
 
-        originalText = tmpText.text;
+        originalText = _tutorialText;
+        tmpText.text = originalText;
     }
 
     /// <summary>
     /// Muestra un texto específico inmediatamente.
     /// Se puede llamar desde un AnimationEvent.
     /// </summary>
-    public void ShowText(string newText)
+    public void ShowText()
     {
         if (glitchCoroutine != null) StopCoroutine(glitchCoroutine);
-        tmpText.text = newText;
+        tmpText.text = originalText;
     }
 
     /// <summary>
