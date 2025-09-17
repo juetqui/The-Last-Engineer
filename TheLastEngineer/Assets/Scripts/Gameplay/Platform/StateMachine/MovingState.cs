@@ -10,9 +10,15 @@ public class MovingState : IPlatformState
     {
         if (_pc.ReachedTarget())
         {
-            _pc.StopPassenger();
-            _pc.AdvanceRouteAndWait();
-            return;
+            if (_pc.CheckStop())
+            {
+             
+                _pc.StopPassenger();
+                _pc.AdvanceRouteAndWait();
+                return;
+            }
+            _pc.Route.Advance();
+            
         }
 
         _pc.MoveStep();

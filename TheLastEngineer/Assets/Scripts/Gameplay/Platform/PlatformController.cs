@@ -1,21 +1,32 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 using UnityEngine;
-
+[System.Serializable]
+public class StationsStops
+{
+    public Transform Position;
+    public bool IsStation;
+}
 public class PlatformController : MonoBehaviour
 {
     [Header("Configuración")]
-    [SerializeField] private Transform[] _positions;
+    //[SerializeField] private Transform[] _positions;
     [SerializeField] private float _moveSpeed = 2f;
     [SerializeField] private float _corruptedMoveSpeed = 0f;
     [SerializeField] private float _waitCD = 1f;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private Connection _connection = default;
-
+    [SerializeField] private StationsStops[] _positions2;
+    private bool[] _stationList;
+    private Transform[] _positions;
+    public Dictionary<Vector3,bool > myDictionary;
     private IMovablePassenger _passenger;
     private IPlatformState _state;
     private PlatformStateMachine _fsm;
     private Coroutine _changingColor = null;
-
+    public bool isStopped;
     public float CurrentSpeed { get; private set; }
     public float MoveSpeed => _moveSpeed;
     public float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
@@ -29,7 +40,15 @@ public class PlatformController : MonoBehaviour
 
     private void Awake()
     {
-        Route = new RouteManager(_positions);
+        myDictionary = new Dictionary<Vector3, bool>();
+        for(int i = 0; i < _positions2.Length; i++)
+        {
+            if (!myDictionary.ContainsKey(_positions2[i].Position.position))
+            {
+                myDictionary.Add(_positions2[i].Position.position, _positions2[i].IsStation);
+            }
+        }
+        Route = new RouteManager(myDictionary.Keys.ToArray());
         Motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
@@ -71,28 +90,28 @@ public class PlatformController : MonoBehaviour
         if (_changingColor != null) StopCoroutine(_changingColor);
 
         Color targetColor = Active ? Color.cyan : Color.black;
-        _changingColor = StartCoroutine(ChangeColor(targetColor));
+        //_changingColor = StartCoroutine(ChangeColor(targetColor));
     }
 
-    private IEnumerator ChangeColor(Color targetColor)
-    {
-        Renderer renderer = GetComponentInChildren<Renderer>();
-        float counter = 0f;
+    //private IEnumerator ChangeColor(Color targetColor)
+    //{
+    //    Renderer renderer = GetComponentInChildren<Renderer>();
+    //    float counter = 0f;
 
-        while (counter < 1f)
-        {
-            counter += Time.deltaTime * 0.05f;
+    //    while (counter < 1f)
+    //    {
+    //        counter += Time.deltaTime * 0.05f;
 
-            Color currentColor = renderer.material.GetColor("_EmissiveColor");
-            Color newColor = Color.Lerp(currentColor, targetColor, counter);
+    //        Color currentColor = renderer.material.GetColor("_EmissiveColor");
+    //        Color newColor = Color.Lerp(currentColor, targetColor, counter);
 
-            renderer.material.SetColor("_EmissiveColor", newColor);
-            yield return null;
-        }
+    //        renderer.material.SetColor("_EmissiveColor", newColor);
+    //        yield return null;
+    //    }
 
-        renderer.material.SetColor("_EmissiveColor", targetColor);
-        _changingColor = null;
-    }
+    //    renderer.material.SetColor("_EmissiveColor", targetColor);
+    //    _changingColor = null;
+    //}
 
 
     /* -------------------- Eventos externos -------------------- */
@@ -101,10 +120,20 @@ public class PlatformController : MonoBehaviour
         bool canMove = (type == _requiredNode) && active;
         SetPositiveFeedback(canMove);
 
-        if (canMove)
-            _fsm.ToWaiting();
+        if (canMove) 
+        {
+            if (isStopped)
+                _fsm.ToWaiting();
+            else
+                _fsm.ToMoving();
+        }
+        else if(!(_fsm.Current==_fsm.Waiting))
+            _fsm.ToStop();
         else
-            _fsm.ToReturning();
+        {
+            _fsm.ToInactive();
+        }
+        //_fsm.ToReturning();
     }
 
     private void OnNodeGrabbed(bool hasNode, NodeType nodeType)
@@ -116,7 +145,7 @@ public class PlatformController : MonoBehaviour
 
     public void AdvanceRouteAndWait()
     {
-        if (Route.HasToWait())
+        if (Route.HasToWait(myDictionary[CurrentTarget]))
             _fsm.ToWaiting();
 
         Route.Advance();
@@ -137,6 +166,11 @@ public class PlatformController : MonoBehaviour
     public bool ReachedTarget()
     {
         return Motor.InTarget(CurrentTarget);
+    }
+    public bool CheckStop()
+    {
+        print(myDictionary[CurrentTarget]);
+        return myDictionary[CurrentTarget];
     }
 
     public void MoveStep()

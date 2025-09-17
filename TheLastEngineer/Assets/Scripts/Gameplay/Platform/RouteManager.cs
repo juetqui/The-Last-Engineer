@@ -1,17 +1,21 @@
 using UnityEngine;
 
+
 public class RouteManager
 {
-    private readonly Transform[] _points;
+    private readonly Vector3[] _points;
     private int _index;
     private int _dir = 1;
 
-    public RouteManager(Transform[] points) => _points = points;
+    public RouteManager(Vector3[] points)
+    {
+        _points = points;
+    }
 
     public bool IsValid => _points != null && _points.Length > 0;
-    public Vector3 CurrentPoint => IsValid ? _points[_index].position : Vector3.zero;
+    public Vector3 CurrentPoint => IsValid ? _points[_index] : Vector3.zero;
     public bool AtStart() => _index == 0;
-    public bool HasToWait() => _points.Length > 1 && (_index == 0 || _index == _points.Length - 1);
+    public bool HasToWait(bool algo) =>/*( _points.Length > 1 && (_index == 0 || _index == _points.Length - 1))||*/algo;
 
     public void Advance()
     {
@@ -24,6 +28,7 @@ public class RouteManager
 
         _index += _dir;
     }
+    
 
     public void ForceReverse()
     {

@@ -25,8 +25,15 @@ public class WaitingState : IPlatformState
         _timer += d;
 
         if (_timer >= _pc.WaitTimer)
+        {
             _FSM.TransitionTo(_FSM.Moving);
+
+            _pc.isStopped = false;
+
+        }
     }
 
-    public void Exit() { }
+    public void Exit() 
+    {
+    }
 }

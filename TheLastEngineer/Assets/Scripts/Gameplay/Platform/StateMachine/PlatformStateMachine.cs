@@ -8,6 +8,7 @@ public class PlatformStateMachine
     public IPlatformState Waiting { get; private set; }
     public IPlatformState Moving { get; private set; }
     public IPlatformState Returning { get; private set; }
+    public IPlatformState Tostop { get; private set; }
 
     public IPlatformState Current => _current;
     public IPlatformState Last => _last;
@@ -21,6 +22,7 @@ public class PlatformStateMachine
         Waiting = new WaitingState(_controller, this);
         Moving = new MovingState(_controller);
         Returning = new ReturningState(_controller, this);
+        Tostop = new ToStopState(_controller, this);
     }
 
     public void Tick(float deltaTime) => _current?.Tick(deltaTime);
@@ -39,4 +41,5 @@ public class PlatformStateMachine
     public void ToWaiting() => TransitionTo(Waiting);
     public void ToMoving() => TransitionTo(Moving);
     public void ToReturning() => TransitionTo(Returning);
+    public void ToStop() => TransitionTo(Tostop);
 }
