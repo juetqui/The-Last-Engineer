@@ -7,8 +7,12 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => false;
 
-    [SerializeField] private Renderer _renderer;
     [SerializeField] private PlatformTeleport _targetPlatform;
+    [SerializeField] private Camera portalCamera;
+    [SerializeField] private Renderer _renderer;
+
+    private RenderTexture portalTexture;
+
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
 
     public Vector3 TargetPos {  get; private set; }
@@ -21,6 +25,13 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         PlayerOn(false);
         OnPlayerStepped += PlayerOn;
         _targetPlatform.OnPlayerStepped += PlayerOn;
+
+        // Creamos RenderTexture para mostrar la cámara del portal vinculado
+        portalTexture = new RenderTexture(Screen.width, Screen.height, 24);
+        _targetPlatform.portalCamera.targetTexture = portalTexture;
+
+        // Asignamos la RT al material del Quad
+        _renderer.material.SetTexture("_MainTex", portalTexture);
     }
 
     private void PlayerOn(bool playerStepped)
