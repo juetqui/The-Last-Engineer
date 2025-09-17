@@ -216,7 +216,8 @@ GameObject:
   - component: {fileID: 1373903878010351083}
   - component: {fileID: 517534996442320963}
   - component: {fileID: 6363066846860092068}
-  - component: {fileID: 8497110735768632732}
+  - component: {fileID: 7709691475260662454}
+  - component: {fileID: 5003657954398134175}
   m_Layer: 0
   m_Name: TUTO-DASH
   m_TagString: Untagged
@@ -380,7 +381,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 517534996442320963}
   m_maskType: 0
---- !u!114 &8497110735768632732
+--- !u!114 &7709691475260662454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -389,14 +390,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 7790042271215792497}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fbbb6c4e846ceb4db76e1454033011f, type: 3}
+  m_Script: {fileID: 11500000, guid: 3aec9d7e7b57b0b468f432ec4a36bf85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textMesh: {fileID: 0}
-  originalTextDuration: 2
-  glitchDuration: 1
-  glitchChangeFrequency: 0.1
-  characters: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#
+  tmpText: {fileID: 6363066846860092068}
+  glitchDuration: 0.5
+  glitchInterval: 0.05
+  randomChars: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&?
+--- !u!95 &5003657954398134175
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7790042271215792497}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8ec8ce41854e03b4d98e0f9197e42388, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8389787998568374022
 GameObject:
   m_ObjectHideFlags: 0
