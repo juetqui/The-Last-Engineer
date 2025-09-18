@@ -20,7 +20,7 @@ public class FractureColorController : MonoBehaviour
         int randomColor = Random.Range(0, _colors.Count);
 
         _renderer.material.SetColor("_MainColor", _colors[randomColor]);
-        _renderer.material.SetVector("_Parent", _parent.position);
+        _renderer.material.SetVector("_Center", _parent.position);
     }
 
 }
