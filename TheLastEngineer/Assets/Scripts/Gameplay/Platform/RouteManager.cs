@@ -4,12 +4,14 @@ using UnityEngine;
 public class RouteManager
 {
     private readonly Vector3[] _points;
+    private readonly PlatformController _pc;
     private int _index;
     private int _dir = 1;
 
-    public RouteManager(Vector3[] points)
+    public RouteManager(Vector3[] points, PlatformController platformController)
     {
         _points = points;
+        _pc=platformController;
     }
 
     public bool IsValid => _points != null && _points.Length > 0;
@@ -23,10 +25,23 @@ public class RouteManager
 
         int last = _points.Length - 1;
 
-        if (_index + _dir > last || _index + _dir < 0)
-            _dir *= -1;
+        if ((_index + _dir > last || _index + _dir < 0))
+            if (!_pc.isReversed)
+             {
+                _dir *= -1;
+                _index += _dir;
+             }   
+            else
+            {
+                last = 0;
+                _index = 0;
+            }
+        else
+        {
+            _index += _dir;
 
-        _index += _dir;
+        }
+
     }
     
 

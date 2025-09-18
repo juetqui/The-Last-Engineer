@@ -14,6 +14,7 @@ public class PlatformController : MonoBehaviour
     [Header("Configuración")]
     //[SerializeField] private Transform[] _positions;
     [SerializeField] private float _moveSpeed = 2f;
+    public bool isReversed;
     [SerializeField] private float _corruptedMoveSpeed = 0f;
     [SerializeField] private float _waitCD = 1f;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
@@ -48,7 +49,7 @@ public class PlatformController : MonoBehaviour
                 myDictionary.Add(_positions2[i].Position.position, _positions2[i].IsStation);
             }
         }
-        Route = new RouteManager(myDictionary.Keys.ToArray());
+        Route = new RouteManager(myDictionary.Keys.ToArray(),this);
         Motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
