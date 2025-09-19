@@ -128,7 +128,7 @@ public class PlatformController : MonoBehaviour
             else
                 _fsm.ToMoving();
         }
-        else if(!(_fsm.Current==_fsm.Waiting))
+        else if(!(_fsm.Current==_fsm.Waiting)&& !(_fsm.Current == _fsm.Inactive))
             _fsm.ToStop();
         else
         {
