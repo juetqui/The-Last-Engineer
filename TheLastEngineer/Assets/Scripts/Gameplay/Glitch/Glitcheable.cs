@@ -5,7 +5,7 @@ using UnityEngine;
 public class Glitcheable : MonoBehaviour
 {
     [Header("Refs")]
-    [HideInInspector] public Collider _coll;
+    public Collider _coll;
     [HideInInspector] public Renderer _renderer;
     [SerializeField] public ParticleSystem _ps;
     [SerializeField] public List<Transform> _newPosList;
@@ -37,7 +37,8 @@ public class Glitcheable : MonoBehaviour
 
     private void Awake()
     {
-        _coll = GetComponent<Collider>();
+        if (_coll != null)
+            _coll = GetComponent<Collider>();
         
         if (_renderer == null)
             _renderer = GetComponent<Renderer>();
