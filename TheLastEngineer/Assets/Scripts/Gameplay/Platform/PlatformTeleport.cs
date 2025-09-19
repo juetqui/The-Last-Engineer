@@ -13,7 +13,6 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     private RenderTexture portalTexture;
     private Camera _portalCamera;
-    private Renderer _renderer;
 
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
 
