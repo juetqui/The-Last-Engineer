@@ -94,27 +94,6 @@ public class PlatformController : MonoBehaviour
         //_changingColor = StartCoroutine(ChangeColor(targetColor));
     }
 
-    //private IEnumerator ChangeColor(Color targetColor)
-    //{
-    //    Renderer renderer = GetComponentInChildren<Renderer>();
-    //    float counter = 0f;
-
-    //    while (counter < 1f)
-    //    {
-    //        counter += Time.deltaTime * 0.05f;
-
-    //        Color currentColor = renderer.material.GetColor("_EmissiveColor");
-    //        Color newColor = Color.Lerp(currentColor, targetColor, counter);
-
-    //        renderer.material.SetColor("_EmissiveColor", newColor);
-    //        yield return null;
-    //    }
-
-    //    renderer.material.SetColor("_EmissiveColor", targetColor);
-    //    _changingColor = null;
-    //}
-
-
     /* -------------------- Eventos externos -------------------- */
     private void OnConnectionChanged(NodeType type, bool active)
     {

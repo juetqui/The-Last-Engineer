@@ -42,6 +42,7 @@ public class PlayerView
     public void OnStart()
     {
         _originalMats = _renderer.materials;
+        _renderer.material.SetColor("_EmissiveColor", Color.black);
 
         var corruptionMat = Resources.Load<Material>("Materials/M_PlayerCorruption");
         
