@@ -149,7 +149,6 @@ public class PlatformController : MonoBehaviour
     }
     public bool CheckStop()
     {
-        print(myDictionary[CurrentTarget]);
         return myDictionary[CurrentTarget];
     }
 

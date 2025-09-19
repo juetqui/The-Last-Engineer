@@ -37,7 +37,7 @@ public class Glitcheable : MonoBehaviour
 
     private void Awake()
     {
-        if (_coll != null)
+        if (_coll == null)
             _coll = GetComponent<Collider>();
         
         if (_renderer == null)

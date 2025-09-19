@@ -21,10 +21,17 @@ public class GlitcheableDetector
 
         foreach (var hit in hitColliders)
         {
+            Glitcheable glitcheableInParent = hit.GetComponentInParent<Glitcheable>();
+
             if (hit.TryGetComponent(out Glitcheable glitcheable))
             {
                 if (glitcheables.Contains(glitcheable)) glitcheables.Remove(glitcheable);
                 else glitcheables.Add(glitcheable);
+            }
+            else if (glitcheableInParent != null)
+            {
+                if (glitcheables.Contains(glitcheableInParent)) glitcheables.Remove(glitcheableInParent);
+                else glitcheables.Add(glitcheableInParent);
             }
         }
 

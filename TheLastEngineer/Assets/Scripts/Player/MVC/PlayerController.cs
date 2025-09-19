@@ -257,7 +257,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     #region TRIGGERS MANAGEMENT
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out IInteractable interactable)) _interactableHandler.Add(interactable);
+        if (coll.TryGetComponent(out IInteractable interactable))
+            _interactableHandler.Add(interactable);
         else if (coll.CompareTag("Void"))
         {
             _isDead = true;
