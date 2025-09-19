@@ -92,6 +92,7 @@ public class NodeController : MonoBehaviour, IInteractable
         {
             _playerNodeHandler.OnGlitchChange += InteractWithGlitcheable;
             _nodeView.EnableColl(false);
+            _nodeView.EnableOutline(false);
         }
         else
         {
@@ -102,6 +103,7 @@ public class NodeController : MonoBehaviour, IInteractable
             }
             
             _nodeView.EnableColl(true);
+            _nodeView.EnableOutline(true);
         }
 
         if (!parentIsPlayer && newParent != null)

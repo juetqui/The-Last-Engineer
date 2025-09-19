@@ -41,6 +41,13 @@ public class NodeView
         RefreshFX();
     }
 
+    public void EnableOutline(bool onOff)
+    {
+        if (_outline.enabled == onOff) return;
+
+        _outline.enabled = onOff;
+    }
+
     public void EnableColl(bool onOff)
     {
         if (_collider.enabled == onOff) return;
