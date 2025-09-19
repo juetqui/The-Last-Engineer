@@ -8,6 +8,8 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     public bool RequiresHoldInteraction => false;
 
     [SerializeField] private PlatformTeleport _targetPlatform;
+   // [SerializeField] private Camera portalCamera;
+    [SerializeField] private Renderer _renderer;
 
     private RenderTexture portalTexture;
     private Camera _portalCamera;
@@ -29,9 +31,9 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         _portalCamera = GetComponentInChildren<Camera>();
         _renderer = GetComponentInChildren<Renderer>();
 
-        // Creamos RenderTexture para mostrar la cámara del portal vinculado
+        // Creamos RenderTexture para mostrar la cï¿½mara del portal vinculado
         portalTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        _targetPlatform._portalCamera.targetTexture = portalTexture;
+       // _targetPlatform.portalCamera.targetTexture = portalTexture;
 
         // Asignamos la RT al material del Quad
         _renderer.material.SetTexture("_MainTex", portalTexture);
