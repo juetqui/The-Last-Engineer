@@ -26,7 +26,7 @@ public class GlitchMovingState : IState
         _startPos = g.transform.position; _startRot = g.transform.rotation;
         _targetPos = g.CurrentTargetPos; _targetRot = g.CurrentTargetRot;
 
-        g.SetBoolCorrupted(0f);
+        g.SetDecal(0f);
         g.SetParticles(false, 1f);
         g.SetColliders(false);
     }

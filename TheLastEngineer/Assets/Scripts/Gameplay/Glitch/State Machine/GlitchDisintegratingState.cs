@@ -21,7 +21,7 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
         _elapsed = 0f; _collidersOff = false;
         _duration = t ? t.TransparencyDuration : 1f;
 
-        g.SetBoolCorrupted(1f);
+        g.SetDecal(1f);
         g.SetParticles(true, g._radialDonutPS);
         g.PlaySfx(g._sounds ? g._sounds.startSFX : null);
     }

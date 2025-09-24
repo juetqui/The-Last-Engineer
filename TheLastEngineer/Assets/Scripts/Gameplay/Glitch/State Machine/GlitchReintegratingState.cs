@@ -33,7 +33,7 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         _startAlpha = ReadCurrentAlpha();
 
 
-        g.SetBoolCorrupted(1f);
+        g.SetDecal(1f);
         g.SetParticles(true, 1f);
         g.PlaySfx(g._sounds ? g._sounds.endSFX : null);
         g.SetColliders(true);
@@ -53,7 +53,7 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         if (raw >= 1f)
         {
             g.SetParticles(false, 1f);
-            g.SetBoolCorrupted(0f);
+            g.SetDecal(0f);
             g._sm?.Change(_next);
         }
     }
