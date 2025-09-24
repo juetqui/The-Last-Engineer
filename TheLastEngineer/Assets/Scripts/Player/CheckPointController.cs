@@ -25,6 +25,7 @@ public class CheckPointController : MonoBehaviour
         _source = GetComponent<AudioSource>();
     }
 
+
     private IEnumerator SetMaterialsCoroutine()
     {
         _enabled = false;
