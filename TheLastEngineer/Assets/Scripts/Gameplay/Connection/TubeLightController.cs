@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class TubeLightController : MonoBehaviour
 {
-    [SerializeField] private List<TubeLight> _tubes = new List<TubeLight>();
     [SerializeField] private bool _autoReverseOnComplete = true; // invierte la lista al completar una corrida
+    [SerializeField] private List<TubeLight> _tubes = new List<TubeLight>();
     private Connection _connection;
 
     public int Index => _index;

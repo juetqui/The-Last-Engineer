@@ -1,5 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5455202230374769733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4262277490474461214}
+  - component: {fileID: 7217814819362999962}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4262277490474461214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5455202230374769733}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.22832237, y: 0.000000029802317, z: -0.000000014901161, w: 0.9735856}
+  m_LocalPosition: {x: 0, y: -0.46, z: -0.23}
+  m_LocalScale: {x: 5.6310697, y: 1, z: 12.997662}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1243440582716109280}
+  m_LocalEulerAnglesHint: {x: 26.397, y: 0, z: 0}
+--- !u!65 &7217814819362999962
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5455202230374769733}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0658121, y: 1, z: 1}
+  m_Center: {x: 0.0018072125, y: -3.650061e-17, z: -5.6865073e-18}
 --- !u!1 &6476566097082544073
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,6 +64,7 @@ GameObject:
   - component: {fileID: 1243440582716109280}
   - component: {fileID: 6159833844355256696}
   - component: {fileID: 8372434734310167013}
+  - component: {fileID: 5989691542975377082}
   m_Layer: 0
   m_Name: EscaleraIzq01
   m_TagString: Untagged
@@ -30,7 +84,8 @@ Transform:
   m_LocalPosition: {x: 78, y: 3, z: -108}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4262277490474461214}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6159833844355256696
@@ -83,3 +138,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &5989691542975377082
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6476566097082544073}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 8328022974818976524, guid: dcbc66ee5ed817e4dad3a7247f1b095a, type: 3}
