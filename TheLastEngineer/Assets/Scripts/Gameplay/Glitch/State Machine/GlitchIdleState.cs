@@ -15,7 +15,7 @@ public class GlitchIdleState : IState, IGlitchInterruptible
     {
         g.SetAlpha(1f);
         g.SetFeedbackAlpha(0f);
-        g.SetDecal(0f);
+        g.SetBoolCorrupted(0f);
         g.SetParticles(false, 1f);
         g.SetColliders(true);
     }

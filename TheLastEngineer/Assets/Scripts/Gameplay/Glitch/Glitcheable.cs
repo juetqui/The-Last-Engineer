@@ -19,7 +19,6 @@ public class Glitcheable : MonoBehaviour
     [SerializeField] public bool _startInIdle = false;
 
     [HideInInspector] public TimerController _timer;
-    [HideInInspector] public DecalProjector _decalProjector;
     [HideInInspector] public int _index = 0;
 
     public Renderer _feedbackRenderer;
@@ -46,11 +45,10 @@ public class Glitcheable : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _ps.Stop();
         _timer = GetComponent<TimerController>();
-        _decalProjector = GetComponentInChildren<DecalProjector>();
 
         SetAlpha(1f);
         SetFeedbackAlpha(0f);
-        SetDecal(0f);
+        SetBoolCorrupted(0f);
         SetParticles(false, 1f);
         SetColliders(true);
 
@@ -109,9 +107,9 @@ public class Glitcheable : MonoBehaviour
         _feedbackRenderer.material.SetFloat("_Alpha", Mathf.Clamp01(a));
     }
 
-    public void SetDecal(float v)
+    public void SetBoolCorrupted(float v)
     {
-        _decalProjector.material.SetFloat("_CorrruptedControl", v);
+        _renderer.material.SetFloat("_IsCorrupted", v);
     }
 
     public void SetParticles(bool on, float radial)
