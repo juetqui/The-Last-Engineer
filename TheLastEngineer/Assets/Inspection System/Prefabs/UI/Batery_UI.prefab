@@ -88,7 +88,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6764162080080979461}
-  m_Mesh: {fileID: 2667042056421083095, guid: 8f07017b0d41b034cb06773169e53483, type: 3}
+  m_Mesh: {fileID: 2667042056421083095, guid: e4adbf1f2d8f1684f955a9f2460cb392, type: 3}
 --- !u!23 &165660832292004894
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -190,7 +190,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6962371164742282509}
-  m_Mesh: {fileID: -1549756420542670859, guid: 8f07017b0d41b034cb06773169e53483, type: 3}
+  m_Mesh: {fileID: -1549756420542670859, guid: e4adbf1f2d8f1684f955a9f2460cb392, type: 3}
 --- !u!23 &3703540063157936349
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -299,15 +299,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6854402809101558677, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.25
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6854402809101558677, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.25
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6854402809101558677, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.25
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6854402809101558677, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -426,6 +426,10 @@ PrefabInstance:
       value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: VelocityModule.orbitalX.scalar
       value: -0.5
       objectReference: {fileID: 0}
@@ -436,6 +440,10 @@ PrefabInstance:
     - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: VelocityModule.orbitalZ.scalar
       value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 0.03
       objectReference: {fileID: 0}
     - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: VelocityModule.orbitalX.minScalar
@@ -451,7 +459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 2000
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 8148265982529232573, guid: 774ca79364d8eab44a73c9494ca8cecb, type: 3}
       propertyPath: ShapeModule.m_UseMeshMaterialIndex
