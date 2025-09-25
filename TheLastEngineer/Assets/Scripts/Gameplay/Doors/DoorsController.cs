@@ -32,6 +32,7 @@ public class DoorController : MonoBehaviour
             if (c != null && c.IsConnected) _activeCount++;
         }
     }
+
     private void OnConnectionStateChanged(NodeType type, bool connected)
     {
         //if(type == NodeType.Default) _activeCount += connected ? 1 : -1;
@@ -40,6 +41,7 @@ public class DoorController : MonoBehaviour
         _activeCount = Mathf.Clamp(_activeCount, 0, _connections.Count);
         EvaluateAndApply();
     }
+
     private void Subscribe(bool subscribe)
     {
         if (_connections == null) return;
