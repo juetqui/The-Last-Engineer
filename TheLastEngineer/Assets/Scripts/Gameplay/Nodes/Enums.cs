@@ -17,5 +17,5 @@ public enum InteractablePriority
     Medium = 1,
     High = 2,
     Highest = 3,
-    Villero = 4,
+    MaxPriority = 4,
 }

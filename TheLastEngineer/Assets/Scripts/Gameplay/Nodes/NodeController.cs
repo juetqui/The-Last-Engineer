@@ -4,7 +4,7 @@ using UnityEngine;
 public class NodeController : MonoBehaviour, IInteractable
 {
     #region INTERFACE VARIABLES
-    public InteractablePriority Priority => InteractablePriority.Highest;
+    public InteractablePriority Priority => InteractablePriority.High;
     public Color CurrentColor { get { return _currentColor; } }
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => false;

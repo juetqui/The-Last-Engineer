@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlatformTeleport : MonoBehaviour, IInteractable
 {
-    public InteractablePriority Priority => InteractablePriority.Villero;
+    public InteractablePriority Priority => InteractablePriority.MaxPriority;
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => false;
 
