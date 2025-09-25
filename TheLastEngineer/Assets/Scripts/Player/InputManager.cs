@@ -14,7 +14,6 @@ public class InputManager : MonoBehaviour
     [HideInInspector] public InputAction moveInput = default;
     [HideInInspector] public InputAction interactInput = default;
     [HideInInspector] public InputAction dashInput = default;
-    [HideInInspector] public InputAction corruptionChangeInput = default;
     [HideInInspector] public InputAction pauseInput = default;
     #endregion
 
@@ -48,7 +47,6 @@ public class InputManager : MonoBehaviour
 
         moveInput = playerInputs.Player.Move;
         dashInput = playerInputs.Player.Dash;
-        corruptionChangeInput = playerInputs.Player.CorruptionChange;
         interactInput = playerInputs.Player.Interact;
         pauseInput = playerInputs.Player.Pause;
 

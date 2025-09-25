@@ -106,7 +106,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnDash += OnDashPressed;
             _input.OnInteractStart += OnInteractPressed;
             _input.OnInteractCancel += OnInteractCanceled;
-            //_input.OnCorruptionChange += OnCorruptionChange;
             _input.OnCancelSelect += OnCancelSelect;
         }
         else
@@ -115,7 +114,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnDash -= OnDashPressed;
             _input.OnInteractStart -= OnInteractPressed;
             _input.OnInteractCancel -= OnInteractCanceled;
-            //_input.OnCorruptionChange -= OnCorruptionChange;
             _input.OnCancelSelect -= OnCancelSelect;
         }
     }
@@ -150,20 +148,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     {
         StateMachine.CurrentState?.Cancel();
     }
-
-    //private void OnCorruptionChange()
-    //{
-    //    if (_nodeHandler.CurrentType != NodeType.None)
-    //    {
-    //        Glitcheable glitch = _glitcheableDetector.GetNearestGlitcheable(transform.position);
-    //        var success = _nodeHandler.OnGlitchChange?.Invoke(glitch);
-
-    //        if (!(bool)success)
-    //            View.PlayErrorSound(_playerData.emptyHand);
-    //    }
-    //    else
-    //        View.PlayErrorSound(_playerData.emptyHand);
-    //}
 
     private void OnCancelSelect() => OnInteractableSelected?.Invoke(null);
 

@@ -26,7 +26,6 @@ public class InputHandler : MonoBehaviour
         _inputManager.dashInput.performed += DashPerformed;
         _inputManager.interactInput.started += InteractStarted;
         _inputManager.interactInput.canceled += InteractCanceled;
-        _inputManager.corruptionChangeInput.performed += CorruptionChangePerformed;
         _inputManager.cancelInput.performed += CancelPerformed;
     }
 
@@ -37,7 +36,6 @@ public class InputHandler : MonoBehaviour
         _inputManager.dashInput.performed -= DashPerformed;
         _inputManager.interactInput.started -= InteractStarted;
         _inputManager.interactInput.canceled -= InteractCanceled;
-        _inputManager.corruptionChangeInput.performed -= CorruptionChangePerformed;
         _inputManager.cancelInput.performed -= CancelPerformed;
     }
 
@@ -52,6 +50,5 @@ public class InputHandler : MonoBehaviour
     private void DashPerformed(InputAction.CallbackContext _) => OnDash?.Invoke();
     private void InteractStarted(InputAction.CallbackContext _) => OnInteractStart?.Invoke();
     private void InteractCanceled(InputAction.CallbackContext _) => OnInteractCancel?.Invoke();
-    private void CorruptionChangePerformed(InputAction.CallbackContext _) => OnCorruptionChange?.Invoke();
     private void CancelPerformed(InputAction.CallbackContext _) => OnCancelSelect?.Invoke();
 }
