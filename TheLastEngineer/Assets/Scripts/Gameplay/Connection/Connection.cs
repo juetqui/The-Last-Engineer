@@ -12,6 +12,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     [SerializeField] private NodeController _recievedNode;
     [SerializeField] private Transform _nodePos;
+    [SerializeField] private NodeType _requiredType = NodeType.Default;
     public bool StartsConnected { get; private set; }
     public bool IsConnected => _recievedNode != null;
 
@@ -49,7 +50,9 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     {
         node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f,false, _nodePos.rotation);
         _recievedNode = node;
-        OnNodeConnected?.Invoke(node.NodeType, true);
+
+        if (_recievedNode.NodeType == _requiredType)
+            OnNodeConnected?.Invoke(node.NodeType, true);
     }
 
     public void UnsetNode(NodeController node)

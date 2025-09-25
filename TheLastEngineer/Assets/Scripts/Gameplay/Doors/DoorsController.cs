@@ -34,7 +34,9 @@ public class DoorController : MonoBehaviour
     }
     private void OnConnectionStateChanged(NodeType type, bool connected)
     {
-        if(type == NodeType.Default) _activeCount += connected ? 1 : -1;
+        //if(type == NodeType.Default) _activeCount += connected ? 1 : -1;
+
+        _activeCount += connected ? 1 : -1;
         _activeCount = Mathf.Clamp(_activeCount, 0, _connections.Count);
         EvaluateAndApply();
     }
