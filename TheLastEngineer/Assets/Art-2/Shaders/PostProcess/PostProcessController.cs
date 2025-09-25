@@ -114,13 +114,11 @@ public class PostProcessController : MonoBehaviour
         material.SetFloat("_VignetteAmount", _vignetteAmount);
     }
 
-    private bool RefNegVignette(Glitcheable gltich)
+    private void RefNegVignette(Glitcheable gltich)
     {
-        if (animated) return false;
+        if (animated) return;
         
         StartCoroutine(LerpColorRefNeg(_passiveMat));
-        return true;
-        
     }
 
     private IEnumerator LerpColorRefNeg(Material material)

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using UnityEngine;
 
 public class Glitcheable : MonoBehaviour, IInteractable
 {
     #region -----INTERFACE VARIABLES-----
-    public InteractablePriority Priority => InteractablePriority.Low;
+    public InteractablePriority Priority => InteractablePriority.Highest;
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => false;
     #endregion
@@ -96,9 +95,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     public bool CanInteract(PlayerNodeHandler player)
     {
-        if (player.CurrentType != NodeType.Corrupted || !CheckStateChange(player.CurrentType) || _sm.Current is not IGlitchInterruptible ii) return false;
+        if (!CheckStateChange(player.CurrentType) || _sm.Current is not IGlitchInterruptible ii) return false;
 
-        ii.Interrupt();
         return true;
     }
 
@@ -114,6 +112,12 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
     {
         succeededInteraction = CanInteract(player);
+        
+        if (succeededInteraction)
+        {
+            IGlitchInterruptible ii = (IGlitchInterruptible) _sm.Current;
+            ii.Interrupt();
+        }
     }
 
     public void SetAlpha(float a)
