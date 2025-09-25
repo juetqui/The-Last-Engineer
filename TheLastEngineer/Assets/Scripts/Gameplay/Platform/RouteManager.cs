@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 public class RouteManager
 {
     private readonly Vector3[] _points;
@@ -44,7 +43,6 @@ public class RouteManager
 
     }
     
-
     public void ForceReverse()
     {
         _dir = -1;

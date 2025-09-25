@@ -5,7 +5,7 @@ using UnityEngine;
 public class Connection : MonoBehaviour, IInteractable, IConnectable
 {
     #region -----INTERFACE VARIABLES-----
-    public InteractablePriority Priority => InteractablePriority.High;
+    public InteractablePriority Priority => InteractablePriority.Medium;
     public Transform Transform => transform;
     public bool RequiresHoldInteraction => false;
     #endregion
