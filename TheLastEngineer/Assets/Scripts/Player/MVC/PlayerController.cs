@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnDash += OnDashPressed;
             _input.OnInteractStart += OnInteractPressed;
             _input.OnInteractCancel += OnInteractCanceled;
-            _input.OnCorruptionChange += OnCorruptionChange;
+            //_input.OnCorruptionChange += OnCorruptionChange;
             _input.OnCancelSelect += OnCancelSelect;
         }
         else
@@ -115,7 +115,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnDash -= OnDashPressed;
             _input.OnInteractStart -= OnInteractPressed;
             _input.OnInteractCancel -= OnInteractCanceled;
-            _input.OnCorruptionChange -= OnCorruptionChange;
+            //_input.OnCorruptionChange -= OnCorruptionChange;
             _input.OnCancelSelect -= OnCancelSelect;
         }
     }
@@ -151,19 +151,19 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         StateMachine.CurrentState?.Cancel();
     }
 
-    private void OnCorruptionChange()
-    {
-        if (_nodeHandler.CurrentType != NodeType.None)
-        {
-            Glitcheable glitch = _glitcheableDetector.GetNearestGlitcheable(transform.position);
-            var success = _nodeHandler.OnGlitchChange?.Invoke(glitch);
+    //private void OnCorruptionChange()
+    //{
+    //    if (_nodeHandler.CurrentType != NodeType.None)
+    //    {
+    //        Glitcheable glitch = _glitcheableDetector.GetNearestGlitcheable(transform.position);
+    //        var success = _nodeHandler.OnGlitchChange?.Invoke(glitch);
 
-            if (!(bool)success)
-                View.PlayErrorSound(_playerData.emptyHand);
-        }
-        else
-            View.PlayErrorSound(_playerData.emptyHand);
-    }
+    //        if (!(bool)success)
+    //            View.PlayErrorSound(_playerData.emptyHand);
+    //    }
+    //    else
+    //        View.PlayErrorSound(_playerData.emptyHand);
+    //}
 
     private void OnCancelSelect() => OnInteractableSelected?.Invoke(null);
 
@@ -208,7 +208,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void LaserRecived()
     {
         if (_isDead) return;
-        _isDead = true;
         View.SetAnimatorSpeed(0f);
         //_solvingController?.BurnShader();
         StartCoroutine(RespawnPlayer(CauseOfDeath.Laser));
@@ -232,6 +231,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public IEnumerator RespawnPlayer(CauseOfDeath cause)
     {
+        _isDead = true;
         OnDied?.Invoke();
 
         if (cause == CauseOfDeath.Laser)
@@ -262,9 +262,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     {
         if (coll.TryGetComponent(out IInteractable interactable))
             _interactableHandler.Add(interactable);
-        else if (coll.CompareTag("Void"))
+        else if (coll.CompareTag("Void") && !_isDead)
         {
-            _isDead = true;
             StartCoroutine(RespawnPlayer(CauseOfDeath.Fall));
         }
     }

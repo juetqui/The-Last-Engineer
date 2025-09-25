@@ -1,9 +1,15 @@
 using System.Collections.Generic;
-using UnityEngine.Rendering.Universal;
+using System.Net.NetworkInformation;
 using UnityEngine;
 
-public class Glitcheable : MonoBehaviour
+public class Glitcheable : MonoBehaviour, IInteractable
 {
+    #region -----INTERFACE VARIABLES-----
+    public InteractablePriority Priority => InteractablePriority.Low;
+    public Transform Transform => transform;
+    public bool RequiresHoldInteraction => false;
+    #endregion
+
     [Header("Refs")]
     public Collider _coll;
     [HideInInspector] public Renderer _renderer;
@@ -88,13 +94,26 @@ public class Glitcheable : MonoBehaviour
         return toIdleCase || toGlitchedCase;
     }
 
-    public bool Interrupt(NodeType nodeType)
+    public bool CanInteract(PlayerNodeHandler player)
     {
-        if (_sm.Current is not IGlitchInterruptible ii || !CheckStateChange(nodeType))
-            return false;
+        if (player.CurrentType != NodeType.Corrupted || !CheckStateChange(player.CurrentType) || _sm.Current is not IGlitchInterruptible ii) return false;
 
         ii.Interrupt();
         return true;
+    }
+
+    //public bool Interrupt(NodeType nodeType)
+    //{
+    //    if (_sm.Current is not IGlitchInterruptible ii || !CheckStateChange(nodeType))
+    //        return false;
+
+    //    ii.Interrupt();
+    //    return true;
+    //}
+
+    public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
+    {
+        succeededInteraction = CanInteract(player);
     }
 
     public void SetAlpha(float a)

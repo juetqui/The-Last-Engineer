@@ -125,16 +125,21 @@ public class NodeController : MonoBehaviour, IInteractable
             _nodeModel.SetPos(newPos, NodeType);
     }
     
-    private bool InteractWithGlitcheable(Glitcheable glitcheable)
+    private void InteractWithGlitcheable(Glitcheable glitcheable)
     {
-        if (glitcheable == null) return false;
+        if (glitcheable == null) return;
+        
+        UpdateNodeType();
 
-        if (glitcheable.Interrupt(_nodeType))
-        {
-            UpdateNodeType();
-            return true;
-        }
-        else return false;
+        //bool succceededInteraction = false;
+        //glitcheable.Interact();
+
+        //if (glitcheable.Interrupt(_nodeType))
+        //{
+        //    UpdateNodeType();
+        //    return true;
+        //}
+        //else return false;
     }
 
     private void UpdateNodeType()

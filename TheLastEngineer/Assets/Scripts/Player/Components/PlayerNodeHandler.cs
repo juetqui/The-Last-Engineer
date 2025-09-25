@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 
 public class PlayerNodeHandler : MonoBehaviour
@@ -26,7 +25,7 @@ public class PlayerNodeHandler : MonoBehaviour
 
     public Action<bool, NodeType> OnNodeGrabbed;
     public Action<bool> OnAbsorbCorruption;
-    public Func<Glitcheable, bool> OnGlitchChange;
+    public Action<Glitcheable> OnGlitchChange;
 
     private void Awake()
     {

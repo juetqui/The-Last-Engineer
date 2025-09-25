@@ -52,15 +52,18 @@ public class PlayerGrabState : IPlayerState
             _player.SetPos(teleport.TargetPos);
             _player.AddInteractable(teleport.TargetPlatform);
             _player.RemoveInteractable(interactable);
-            InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
-            return;
+        }
+        else if (interactable is Glitcheable glitcheable)
+        {
+            _playerNodeHandler.OnGlitchChange(glitcheable);
         }
         else if (interactable is Connection)
         {
             _player.ReleaseNode();
             _stateMachine.TransitionToEmptyState();
-            InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
         }
+        
+        InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
     }
 
     private void HandleFailedInteraction()

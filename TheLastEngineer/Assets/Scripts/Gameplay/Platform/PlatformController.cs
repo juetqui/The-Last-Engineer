@@ -163,7 +163,11 @@ public class PlatformController : MonoBehaviour
     private void CleanPlayerReferences()
     {
         if (_player != null)
+        {
             _player.OnDied -= CleanPlayerReferences;
+            _passenger.OnPlatformMoving(Vector3.zero);
+            _passenger = null;
+        }
 
     }
 
