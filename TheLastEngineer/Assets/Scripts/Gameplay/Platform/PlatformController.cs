@@ -1,33 +1,36 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using UnityEngine;
+
 [System.Serializable]
 public class StationsStops
 {
     public Transform Position;
     public bool IsStation;
 }
+
 public class PlatformController : MonoBehaviour
 {
     [Header("Configuración")]
-    //[SerializeField] private Transform[] _positions;
     [SerializeField] private float _moveSpeed = 2f;
-    public bool isReversed;
     [SerializeField] private float _corruptedMoveSpeed = 0f;
     [SerializeField] private float _waitCD = 1f;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private Connection _connection = default;
     [SerializeField] private StationsStops[] _positions2;
+    
     private bool[] _stationList;
     private Transform[] _positions;
-    public Dictionary<Vector3,bool > myDictionary;
+    public Dictionary<Vector3, bool> myDictionary;
     private IMovablePassenger _passenger;
     private IPlatformState _state;
     private PlatformStateMachine _fsm;
     private Coroutine _changingColor = null;
+    private PlayerController _player = default;
+
     public bool isStopped;
+    public bool isReversed;
+    
     public float CurrentSpeed { get; private set; }
     public float MoveSpeed => _moveSpeed;
     public float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
@@ -42,19 +45,19 @@ public class PlatformController : MonoBehaviour
     private void Awake()
     {
         myDictionary = new Dictionary<Vector3, bool>();
+        
         for(int i = 0; i < _positions2.Length; i++)
         {
             if (!myDictionary.ContainsKey(_positions2[i].Position.position))
-            {
                 myDictionary.Add(_positions2[i].Position.position, _positions2[i].IsStation);
-            }
         }
+        
         Route = new RouteManager(myDictionary.Keys.ToArray(),this);
         Motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
+        
         if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
     }
-
 
     private void Start()
     {
@@ -157,10 +160,25 @@ public class PlatformController : MonoBehaviour
         Motor.MoveTowards(CurrentTarget, CurrentSpeed, _passenger);
     }
 
+    private void CleanPlayerReferences()
+    {
+        if (_player != null)
+            _player.OnDied -= CleanPlayerReferences;
+
+    }
+
     private void OnTriggerEnter(Collider col)
     {
         if (col.TryGetComponent(out IMovablePassenger passenger))
+        {
             _passenger = passenger;
+
+            if (_passenger is PlayerController)
+            {
+                _player = (PlayerController) _passenger;
+                _player.OnDied += CleanPlayerReferences;
+            }
+        }
     }
 
     private void OnTriggerExit(Collider col)

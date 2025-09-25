@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action<float, float> OnDash;
     public Action<IInteractable> OnInteractableSelected;
     public Action OnPlayerFell;
+    public Action OnDied;
 
     // --- Internals
     private PlayerModel _model;
@@ -231,6 +232,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public IEnumerator RespawnPlayer(CauseOfDeath cause)
     {
+        OnDied?.Invoke();
+
         if (cause == CauseOfDeath.Laser)
             View.DeathSound();
         else if (cause == CauseOfDeath.Fall)

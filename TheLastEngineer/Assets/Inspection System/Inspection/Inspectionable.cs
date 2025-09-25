@@ -15,6 +15,7 @@ public class Inspectionable : MonoBehaviour, IInteractable
     [SerializeField] private ParticlesFeedbackManager _negativeFM = default;
 
     public event Action OnFinished;
+    public event Action OnCleaned;
 
     public InspectionType Type { get { return _type; } }
 
@@ -45,6 +46,7 @@ public class Inspectionable : MonoBehaviour, IInteractable
         _negativeFM.StopParticles();
         _positiveFM.StartParticles();
         OnFinished?.Invoke();
+        OnCleaned?.Invoke();
     }
 }
 
