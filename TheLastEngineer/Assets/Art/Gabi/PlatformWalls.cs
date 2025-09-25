@@ -14,7 +14,7 @@ public class PlatformWalls : MonoBehaviour
     {
         renderer = GetComponent<MeshRenderer>();
         material = renderer.material;
-        material.SetVector("_MinMaxPos",vector2);
+       // material.SetVector("_MinMaxPos",vector2);
         player = PlayerController.Instance;
     }
     private void Update()
