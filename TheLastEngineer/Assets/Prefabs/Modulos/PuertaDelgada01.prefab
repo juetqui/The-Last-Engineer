@@ -53,6 +53,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.500007, y: 0.99999803, z: 0.02000037}
   m_Center: {x: 0.25000343, y: -0.49999753, z: 0.010000573}
+--- !u!1 &3737141334416686708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8324020766887131246}
+  - component: {fileID: 2246384128981950510}
+  m_Layer: 6
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8324020766887131246
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3737141334416686708}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5209242591599312245}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2246384128981950510
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3737141334416686708}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.9462662, y: 1.4860967, z: 0.3896739}
+  m_Center: {x: -0.5026487, y: 0.24304774, z: -0.21905772}
 --- !u!1 &7678746892419829973
 GameObject:
   m_ObjectHideFlags: 0
@@ -96,6 +149,7 @@ Transform:
   - {fileID: 5804996570333789566}
   - {fileID: 3431354846385529805}
   - {fileID: 2095521774804740764}
+  - {fileID: 8324020766887131246}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4015690340094248271
@@ -332,7 +386,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 198b24421ed4fa54db8ba2c1f74a1413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _door: {fileID: 1504894378950930119}
   _connections: []
 --- !u!1001 &1698118869101677622
 PrefabInstance:
