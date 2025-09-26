@@ -1,22 +1,21 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ErrorConnection : MonoBehaviour
+public class ConnectionNegativeFeedback : MonoBehaviour
 {
-    [SerializeField] private List<ParticleSystem> _errorPS = new List<ParticleSystem>();
-    [SerializeField] private Connection _puertaRequirement;
+    private List<ParticleSystem> _errorPS = new List<ParticleSystem>();
+    private Connection _connection;
 
     private void Start()
     {
         _errorPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
-        _puertaRequirement = GetComponentInParent<Connection>();
-        _puertaRequirement.OnNodeConnected += playPS;
+        _connection = GetComponentInParent<Connection>();
+        _connection.OnNodeConnected += playPS;
     }
 
     void playPS(NodeType nodeType, bool connected)
     {
-        if(connected && nodeType == NodeType.Corrupted)
+        if(connected && nodeType != _connection.RequiredType)
         {
             foreach (var ps in _errorPS)
             {
@@ -29,7 +28,6 @@ public class ErrorConnection : MonoBehaviour
             {
                 ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
-            
         }
     }
 }

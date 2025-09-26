@@ -23,6 +23,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     private Renderer _renderer = default;
 
+    public NodeType RequiredType {  get { return _requiredType; } }
     public bool StartsConnected { get; private set; }
     public bool IsConnected => _recievedNode != null;
 
