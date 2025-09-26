@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 public class DoorsView : MonoBehaviour
 {
@@ -6,7 +7,7 @@ public class DoorsView : MonoBehaviour
     private ParticleSystem _particulas = default;
     private AudioSource _openDoor = default;
 
-    [SerializeField] private Renderer _doorLight;
+    [SerializeField] private List<Renderer> _doorLight;
 
     [ColorUsageAttribute(true, true)]
     private Color _doorOpen = Color.green;
@@ -15,7 +16,10 @@ public class DoorsView : MonoBehaviour
 
     public void Initialize()
     {
-        _doorLight.material.SetColor("_EmissiveColor", _doorClosed);
+        if (_doorLight != null)
+            for (int i = 0; i < _doorLight.Count; i++)
+                _doorLight[i].material.SetColor("_EmissiveColor", _doorClosed);
+
         _animator = GetComponent<Animator>();
         _openDoor = GetComponent<AudioSource>();
         _particulas = GetComponentInChildren<ParticleSystem>();
@@ -33,7 +37,8 @@ public class DoorsView : MonoBehaviour
         if (isRunning)
         {
             if (_doorLight != null)
-                _doorLight.material.SetColor("_EmissiveColor", _doorOpen);
+                for (int i = 0; i < _doorLight.Count; i++)
+                    _doorLight[i].material.SetColor("_EmissiveColor", _doorOpen);
 
             _particulas.Play();
             _openDoor.Play();
@@ -42,7 +47,8 @@ public class DoorsView : MonoBehaviour
         {
             _particulas.Stop();
             if (_doorLight != null)
-                _doorLight.material.SetColor("_EmissiveColor", _doorClosed);
+                for (int i = 0; i < _doorLight.Count; i++)
+                    _doorLight[i].material.SetColor("_EmissiveColor", _doorClosed);
         }
     }
 }
