@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6622573030770761945}
   - component: {fileID: 5569323615469767385}
   - component: {fileID: 4639057647756485585}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Particle System (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4910,7 +4910,6 @@ GameObject:
   - component: {fileID: 4045016863836570219}
   - component: {fileID: 8680820858142016983}
   - component: {fileID: 8214760584733028459}
-  - component: {fileID: 6478222560771906638}
   - component: {fileID: 2504770883454504056}
   - component: {fileID: 4442715723211267266}
   - component: {fileID: 2060325497639247304}
@@ -4941,6 +4940,7 @@ Transform:
   - {fileID: 4911349713852570661}
   - {fileID: 6043912139333263214}
   - {fileID: 7345204024712259013}
+  - {fileID: 5436461710995805483}
   m_Father: {fileID: 5776403491329064273}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8680820858142016983
@@ -4993,27 +4993,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &6478222560771906638
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1540787378253248326}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.0546931, y: 1.054693, z: 0.55431086}
-  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!65 &2504770883454504056
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5047,7 +5026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6feac3a6e3b124a48af816f77cb30c45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _coll: {fileID: 6478222560771906638}
+  _coll: {fileID: 0}
   _renderer: {fileID: 8214760584733028459}
   _ps: {fileID: 5375492317787239883}
   _newPosList:
@@ -5181,7 +5160,7 @@ GameObject:
   - component: {fileID: 4911349713852570661}
   - component: {fileID: 2078661097148658113}
   - component: {fileID: 5063293732857129786}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Particle System (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9999,6 +9978,59 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!1 &3247127552220510698
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5436461710995805483}
+  - component: {fileID: 6911021503701084968}
+  m_Layer: 6
+  m_Name: Glitcheable Object (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5436461710995805483
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3247127552220510698}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 4045016863836570219}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6911021503701084968
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3247127552220510698}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0546931, y: 1.054693, z: 0.55431086}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &3871082351994513476
 GameObject:
   m_ObjectHideFlags: 0
@@ -10106,7 +10138,7 @@ GameObject:
   - component: {fileID: 6043912139333263214}
   - component: {fileID: 8301119984829714747}
   - component: {fileID: 7672798766777683271}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Glitchable Feedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10189,7 +10221,7 @@ GameObject:
   - component: {fileID: 3576800593818850351}
   - component: {fileID: 2924790856894543484}
   - component: {fileID: 9146551859587475715}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Particle System (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15093,7 +15125,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5857082574178549785, guid: 9fdac549a87d3db498e0602dfbdc8028, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
