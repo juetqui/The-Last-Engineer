@@ -9,11 +9,11 @@ public class DoorController : MonoBehaviour
     private int _activeCount = 0;
     private bool _isOpen = false, _shouldOpen;
 
-    private void Start()
+    private void Awake()
     {
         _door = GetComponent<DoorsView>();
-        EvaluateAndApply();
         RecountActiveConnections();
+        EvaluateAndApply();
     }
     private void EvaluateAndApply()
     {

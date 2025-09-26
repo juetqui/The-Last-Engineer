@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Connection : MonoBehaviour, IInteractable, IConnectable
@@ -16,8 +15,10 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     public bool StartsConnected { get; private set; }
     public bool IsConnected => _recievedNode != null;
 
+    public Action OnInitialized;
     public Action<NodeType, bool> OnNodeConnected;
 
+    // OnEnable is used because the method SetNode requires that the variable _recievedNode is initialized in the Awake method. And the value StartsConnected needs to be set before the Start method for another classes to use this variable to initialize themselves.
     private void Start()
     {
         if (_recievedNode != null)
@@ -26,6 +27,8 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
             StartsConnected = true;
         }
         else StartsConnected = false;
+
+        OnInitialized?.Invoke();
     }
     public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.HasNode && _recievedNode == null;
 
@@ -49,7 +52,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     private void SetNode(NodeController node)
     {
-        node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f,false, _nodePos.rotation);
+        node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f, false, _nodePos.rotation);
         _recievedNode = node;
 
         if (_recievedNode.NodeType == _requiredType)

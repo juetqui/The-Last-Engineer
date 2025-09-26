@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class Config : MonoBehaviour
 {
+    [SerializeField] private GameObject _pauseMenuPrefab;
+
     ScreenPause screenPause = default;
     string menuName = default;
 
@@ -18,7 +20,7 @@ public class Config : MonoBehaviour
 
         if (screenPause == null)
         {
-            screenPause = Instantiate(Resources.Load<ScreenPause>("Pause_Menu"));
+            screenPause = Instantiate(_pauseMenuPrefab).GetComponent<ScreenPause>();
             ScreenManager.Instance.Push(screenPause);
             return;
         }

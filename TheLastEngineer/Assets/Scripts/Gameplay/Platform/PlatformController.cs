@@ -53,14 +53,15 @@ public class PlatformController : MonoBehaviour
         Route = new RouteManager(myDictionary.Keys.ToArray(),this);
         Motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
+
+        if (_connection != null)
+            _connection.OnInitialized += Initialize;
     }
 
-    private void Start()
+    private void Initialize()
     {
         _connection.OnNodeConnected += OnConnectionChanged;
-
         _fsm = new PlatformStateMachine(this, _connection.StartsConnected);
-
         SetPositiveFeedback(_connection.StartsConnected);
     }
 

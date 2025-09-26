@@ -13,11 +13,17 @@ public class EmissiveListener : MonoBehaviour
     private NodeType _requiredNode = NodeType.Default;
     private Coroutine _currentCoroutine = null;
 
-    void Start()
+    void Awake()
     {
         _renderer = GetComponent<Renderer>();
-        _connection.OnNodeConnected += CheckConnectedNode;
 
+        if (_connection != null)
+            _connection.OnInitialized += Initialize;
+    }
+
+    private void Initialize()
+    {
+        _connection.OnNodeConnected += CheckConnectedNode;
         CheckConnectedNode(_requiredNode, _connection.StartsConnected);
     }
 
