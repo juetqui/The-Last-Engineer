@@ -12,11 +12,16 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     [SerializeField] private NodeController _recievedNode;
     [SerializeField] private Transform _nodePos;
     [SerializeField] private NodeType _requiredType = NodeType.Default;
-    
+    [SerializeField] private Renderer _doorLight;
+
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionDefault;
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionCorrupted;
+    [ColorUsageAttribute(true, true)]
+    private Color _doorOpen = Color.green;
+    [ColorUsageAttribute(true, true)]
+    private Color _doorClosed = Color.red;
 
     private Color _emissionOn;
     private Color _emissionOff;
@@ -74,6 +79,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         {
             OnNodeConnected?.Invoke(node.NodeType, true);
             _renderer.material.SetColor("_EmissiveColor", _emissionOn);
+            _doorLight.material.SetColor("_EmissiveColor", _doorOpen);
         }
     }
 
@@ -81,6 +87,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     {
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _renderer.material.SetColor("_EmissiveColor", _emissionOff);
+        _doorLight.material.SetColor("_EmissiveColor", _doorClosed);
         _recievedNode = null;
     }
 }
