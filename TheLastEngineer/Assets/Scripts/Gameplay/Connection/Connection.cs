@@ -30,12 +30,13 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     public Action OnInitialized;
     public Action<NodeType, bool> OnNodeConnected;
 
-    // OnEnable is used because the method SetNode requires that the variable _recievedNode is initialized in the Awake method. And the value StartsConnected needs to be set before the Start method for another classes to use this variable to initialize themselves.
     private void Start()
     {
         _renderer = GetComponent<Renderer>();
         _emissionOff = _renderer.material.GetColor("_EmissiveColor");
         _emissionOn = _requiredType == NodeType.Corrupted ? _emissionCorrupted : _emissionDefault;
+
+        OnInitialized?.Invoke();
 
         if (_recievedNode != null)
         {
@@ -43,8 +44,6 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
             StartsConnected = true;
         }
         else StartsConnected = false;
-
-        OnInitialized?.Invoke();
     }
     public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.HasNode && _recievedNode == null;
 
