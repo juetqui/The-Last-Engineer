@@ -10,7 +10,6 @@ public class EmissiveListener : MonoBehaviour
     [SerializeField] private Color _disabledColor;
 
     private Renderer _renderer = default;
-    [SerializeField] NodeType _requiredNode = NodeType.Default;
     private Coroutine _currentCoroutine = null;
 
     void Awake()
@@ -24,12 +23,12 @@ public class EmissiveListener : MonoBehaviour
     private void Initialize()
     {
         _connection.OnNodeConnected += CheckConnectedNode;
-        CheckConnectedNode(_requiredNode, _connection.StartsConnected);
+        //CheckConnectedNode(NodeType.Default, _connection.StartsConnected);
     }
 
     private void CheckConnectedNode(NodeType nodeType, bool connected)
     {
-        if (connected && nodeType == _requiredNode)
+        if (connected)
         {
             if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
             _currentCoroutine = StartCoroutine(ChangeEmissive(_enabledColor));
