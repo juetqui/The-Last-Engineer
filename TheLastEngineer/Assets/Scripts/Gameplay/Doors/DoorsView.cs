@@ -15,7 +15,7 @@ public class DoorsView : MonoBehaviour
 
     public void Initialize()
     {
-        _doorLight.material.color = _doorClosed;
+        _doorLight.material.SetColor("_EmissiveColor", _doorClosed);
         _animator = GetComponent<Animator>();
         _openDoor = GetComponent<AudioSource>();
         _particulas = GetComponentInChildren<ParticleSystem>();
