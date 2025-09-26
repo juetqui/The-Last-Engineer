@@ -8,7 +8,10 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     public bool RequiresHoldInteraction => false;
 
     [SerializeField] private PlatformTeleport _targetPlatform;
-   // [SerializeField] private Renderer _renderer;
+    [SerializeField] private ParticleSystem _entrada;
+    [SerializeField] private ParticleSystem _salida;
+
+    // [SerializeField] private Renderer _renderer;
 
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
 
@@ -28,12 +31,15 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     private void PlayerOn(bool playerStepped)
     {
-        /*
+        
         if (playerStepped)
-            _renderer.material.SetFloat("_TRansparencyREduction", 0f);
+        {
+           _entrada.Play();
+        }
         else
-            _renderer.material.SetFloat("_TRansparencyREduction", 1f);
-        */
+        {
+            _entrada.Stop();
+        } 
     }
 
     public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.CurrentType == NodeType.Corrupted && playerNodeHandler != null;
