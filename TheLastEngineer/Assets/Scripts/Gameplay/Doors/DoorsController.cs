@@ -12,6 +12,7 @@ public class DoorController : MonoBehaviour
     private void Awake()
     {
         _door = GetComponent<DoorsView>();
+        _door.Initialize();
         RecountActiveConnections();
         EvaluateAndApply();
     }
