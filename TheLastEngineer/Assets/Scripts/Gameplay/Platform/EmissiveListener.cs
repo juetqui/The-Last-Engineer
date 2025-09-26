@@ -10,7 +10,7 @@ public class EmissiveListener : MonoBehaviour
     [SerializeField] private Color _disabledColor;
 
     private Renderer _renderer = default;
-    private NodeType _requiredNode = NodeType.Default;
+    [SerializeField] NodeType _requiredNode = NodeType.Default;
     private Coroutine _currentCoroutine = null;
 
     void Start()
