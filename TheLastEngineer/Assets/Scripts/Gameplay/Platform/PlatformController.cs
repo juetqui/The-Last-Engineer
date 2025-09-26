@@ -13,7 +13,6 @@ public class PlatformController : MonoBehaviour
 {
     [Header("Configuración")]
     [SerializeField] private float _moveSpeed = 2f;
-    [SerializeField] private float _corruptedMoveSpeed = 0f;
     [SerializeField] private float _waitCD = 1f;
     [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private Connection _connection = default;
@@ -33,7 +32,6 @@ public class PlatformController : MonoBehaviour
     
     public float CurrentSpeed { get; private set; }
     public float MoveSpeed => _moveSpeed;
-    public float CorruptedMoveSpeed => (_corruptedMoveSpeed > 0f) ? _corruptedMoveSpeed : _moveSpeed * 0.5f;
     public float WaitCD => _waitCD;
     public float WaitTimer { get; set; }
 
@@ -55,16 +53,11 @@ public class PlatformController : MonoBehaviour
         Route = new RouteManager(myDictionary.Keys.ToArray(),this);
         Motor = new PlatformMotor(transform, null);
         CurrentSpeed = _moveSpeed;
-        
-        if (_corruptedMoveSpeed <= 0f) _corruptedMoveSpeed = _moveSpeed / 2f;
     }
 
     private void Start()
     {
         _connection.OnNodeConnected += OnConnectionChanged;
-        
-         if (PlayerNodeHandler.Instance != null)
-            PlayerNodeHandler.Instance.OnNodeGrabbed += OnNodeGrabbed;
 
         _fsm = new PlatformStateMachine(this, _connection.StartsConnected);
 
@@ -75,9 +68,6 @@ public class PlatformController : MonoBehaviour
     {
         if (_connection != null)
             _connection.OnNodeConnected -= OnConnectionChanged;
-
-        if (PlayerNodeHandler.Instance != null)
-            PlayerNodeHandler.Instance.OnNodeGrabbed -= OnNodeGrabbed;
     }
 
 
@@ -119,11 +109,6 @@ public class PlatformController : MonoBehaviour
         //_fsm.ToReturning();
     }
 
-    private void OnNodeGrabbed(bool hasNode, NodeType nodeType)
-    {
-        CurrentSpeed = (hasNode && nodeType == NodeType.Corrupted) ? CorruptedMoveSpeed : MoveSpeed;
-    }
-
     /* -------------------- API interna usada por los estados -------------------- */
 
     public void AdvanceRouteAndWait()
@@ -162,13 +147,10 @@ public class PlatformController : MonoBehaviour
 
     private void CleanPlayerReferences()
     {
-        if (_player != null)
-        {
-            _player.OnDied -= CleanPlayerReferences;
-            _passenger.OnPlatformMoving(Vector3.zero);
-            _passenger = null;
-        }
-
+        if (_player == null) return;
+        
+        _player.OnDied -= CleanPlayerReferences;
+        _passenger = null;
     }
 
     private void OnTriggerEnter(Collider col)

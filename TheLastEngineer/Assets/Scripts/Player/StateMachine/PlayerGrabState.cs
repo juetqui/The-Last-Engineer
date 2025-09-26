@@ -31,8 +31,6 @@ public class PlayerGrabState : IPlayerState
 
     public void HandleInteraction(IInteractable interactable)
     {
-        Debug.Log(interactable);
-
         if (_player.CheckForWalls()) return;
 
         if (interactable == null || !interactable.CanInteract(_playerNodeHandler))
@@ -57,7 +55,6 @@ public class PlayerGrabState : IPlayerState
         }
         else if (interactable is Glitcheable glitcheable)
         {
-            Debug.Log("GLITCHEABLE");
             _playerNodeHandler.OnGlitchChange(glitcheable);
         }
         else if (interactable is Connection)

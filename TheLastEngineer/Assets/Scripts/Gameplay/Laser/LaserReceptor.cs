@@ -9,7 +9,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public UnityEvent OnHit;
     public UnityEvent OnCompleated;
     public UnityEvent OnDepleated;
-    //private MeshRenderer _myMeshRenderer = default;
+
     private Collider _collider = default;
     public bool _isCompleted = false;
     Material _myMaterial;
@@ -32,17 +32,14 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     private void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
-        //_myMeshRenderer = GetComponent<MeshRenderer>();
         _collider = GetComponent<Collider>();
         _hitPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
-        //_myMaterial = _myMeshRenderer.material;
-        //_myMaterial.SetFloat("_MinBound", minBound);
-        //_myMaterial.SetFloat("_MaxBound", maxBound);
     }
+
     public void ChargeCompleted()
     {
-        //stop audio source, cambiamos audio clip y play
         _audioSource.Stop();
+        
         foreach (var ps in _hitPS)
         {
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -51,19 +48,21 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         OnCompleated?.Invoke();
         _isCompleted = true;
     }
+    
     public void SetUnCompleted()
     {
         _isCompleted = false;
     }
+    
     public void ChargeDepleted()
     {
         OnDepleated?.Invoke();
     }
+
     public void LaserRecived()
     {
-        
-        
         OnHit?.Invoke();
+        
         if (!_isCompleted && !_isCurrentlyLoading)
         {
             _isCurrentlyUnloading = false;
@@ -71,11 +70,12 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             StartCoroutine(LoadRoutine(fillTime));
         }
     }
+
     public void TurnOffObject()
     {
-        //_myMeshRenderer.enabled = false;
         _collider.enabled = false;
     }
+
     public void LaserNotRecived()
     {
         _audioSource.Stop();
@@ -94,10 +94,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
             }
         }
     }
-    //public void SetCompleated()
-    //{
-    //    _isCompleted = true;
-    //}
+
     private IEnumerator LoadRoutine(float loadTime)
     {
         _audioSource.Stop();
@@ -110,18 +107,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         {
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
-                //print("filleando");
-                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
-                {
-                    _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
-                }
-                else
-                {
-                    _currentLoad = _currentLoad + Time.deltaTime / loadTime;
-
-                }
-                //_myMaterial.SetFloat("_Step", _currentLoad);
-
+                _currentLoad = _currentLoad + Time.deltaTime / loadTime;
                 yield return null;
             }
             else if (_isCurrentlyLoading == false || _isCurrentlyUnloading == true)
@@ -132,31 +118,14 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         _currentLoad = 1;
         ChargeCompleted();
     }
-    float TimeModifierController()
-    {
-        return default;
-    }
+
     private IEnumerator UnLoadRoutine(float unloadTime)
     {
         while (_currentLoad >= 0f)
         {
             if (_isCurrentlyLoading == false && _isCurrentlyUnloading == true)
             {
-
-                //print("unfilleando");
-                
-                    if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
-                    {
-                        _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
-                    }
-                    else
-                    {
-                        _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
-                    }
-
-                
-     
-                //_myMaterial.SetFloat("_Step", _currentLoad);
+                _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
                 yield return null;
             }
             else if (_isCurrentlyLoading == true || _isCurrentlyUnloading == false)
@@ -164,8 +133,8 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
                 yield break;
             }
         }
+        
         _currentLoad = 0;
         ChargeDepleted();
-        
     }
 }
