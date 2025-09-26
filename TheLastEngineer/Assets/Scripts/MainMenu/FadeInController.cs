@@ -7,10 +7,14 @@ public class FadeInController : MonoBehaviour
     public Image blackScreen;
     public float fadeDuration = 2f;
 
+    private void Awake()
+    {
+        blackScreen.gameObject.SetActive(true);
+        blackScreen.color = new Color(0, 0, 0, 1);
+    }
+
     void Start()
     {
-        blackScreen.color = new Color(0, 0, 0, 1);
-
         StartCoroutine(FadeIn());
     }
 
