@@ -24,7 +24,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         TargetPos = _targetPlatform.transform.position;
         PlayerOn(false);
         OnPlayerStepped += PlayerOn;
-        _targetPlatform.OnPlayerStepped += PlayerOn;
+        //_targetPlatform.OnPlayerStepped += PlayerOn;
 
        // _renderer = GetComponentInChildren<Renderer>();
     }
@@ -53,6 +53,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         }
         
         succededInteraction = true;
+        _entrada.Stop();
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -60,6 +61,9 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         if (coll.TryGetComponent(out PlayerController player))
         {
             OnPlayerStepped?.Invoke(true);
+            _entrada.Play();
+            TargetPlatform._entrada.Play();
+
         }
     }
 
@@ -68,6 +72,8 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         if (coll.TryGetComponent(out PlayerController player))
         {
             OnPlayerStepped?.Invoke(false);
+            _entrada.Stop();
+            TargetPlatform._entrada.Stop();
         }
     }
 }
