@@ -6,6 +6,8 @@ public class ConnectionPositiveFeedback : MonoBehaviour
 {
     private List<ParticleSystem> _positivePS = new List<ParticleSystem>();
     private Connection _connection;
+    [SerializeField] private Color _defaultColor;
+    [SerializeField] private Color _corruptedColor;
 
     private void Start()
     {
@@ -24,11 +26,11 @@ public class ConnectionPositiveFeedback : MonoBehaviour
 
                 if(nodeType == NodeType.Default)
                 {
-                    module.startColor = Color.cyan;
+                    module.startColor = _defaultColor;
                 }
                 else
                 {
-                    module.startColor = Color.red;
+                    module.startColor = _corruptedColor;
                 }
                 ps.Play();
             }
