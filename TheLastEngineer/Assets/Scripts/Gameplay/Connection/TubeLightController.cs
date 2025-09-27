@@ -24,9 +24,9 @@ public class TubeLightController : MonoBehaviour
         _connection = GetComponent<Connection>();
         if (_connection != null)
             _connection.OnNodeConnected += OnConnectionStateChanged;
-        // Opcional: si tu Connection puede arrancar ya conectada, podés disparar la corrida al inicio.
-        // if (_connection != null && _connection.StartsConnected)
-        //     StartSequence(fill: true);
+        //Opcional: si tu Connection puede arrancar ya conectada, podés disparar la corrida al inicio.
+         if (_connection != null && _connection.StartsConnected)
+            StartSequence(fill: true);
     }
 
     private void OnConnectionStateChanged(NodeType type, bool connected)
