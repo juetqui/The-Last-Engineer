@@ -224,6 +224,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     {
         _isDead = true;
         OnDied?.Invoke();
+        _interactableHandler.Clear();
 
         if (cause == CauseOfDeath.Laser)
             View.DeathSound();
