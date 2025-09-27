@@ -10,6 +10,7 @@ public class DoorInspectionController : MonoBehaviour
     {
         _view = GetComponent<DoorsView>();
         _inspectionable.OnCleaned += OpenDoor;
+        _view.Initialize();
     }
 
     private void OpenDoor()
