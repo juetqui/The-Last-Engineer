@@ -8,7 +8,7 @@ public class DoorController : MonoBehaviour
     private DoorsView _door;
     private int _activeCount = 0;
     private bool _isOpen = false, _shouldOpen;
-
+    [SerializeField] NodeType tipo = NodeType.Default;
     private void Awake()
     {
         _door = GetComponent<DoorsView>();
@@ -19,7 +19,7 @@ public class DoorController : MonoBehaviour
     private void EvaluateAndApply()
     {
         _shouldOpen = (_activeCount == _connections.Count && _connections.Count > 0);
-
+        print(_shouldOpen);
         if (_shouldOpen == _isOpen) return;
 
         _isOpen = _shouldOpen;
@@ -36,9 +36,8 @@ public class DoorController : MonoBehaviour
 
     private void OnConnectionStateChanged(NodeType type, bool connected)
     {
-        //if(type == NodeType.Default) _activeCount += connected ? 1 : -1;
-
-        _activeCount += connected ? 1 : -1;
+        if(type == tipo) _activeCount += connected ? 1 : -1;
+        //_activeCount += connected ? 1 : -1;
         _activeCount = Mathf.Clamp(_activeCount, 0, _connections.Count);
         EvaluateAndApply();
     }
