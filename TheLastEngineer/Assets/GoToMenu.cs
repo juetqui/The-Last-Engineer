@@ -5,6 +5,7 @@ public class GoToMenu : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        SceneManager.LoadScene("MainMenu");
+        if (other.gameObject.TryGetComponent(out PlayerController player))
+            SceneManager.LoadScene("MainMenu");
     }
 }
