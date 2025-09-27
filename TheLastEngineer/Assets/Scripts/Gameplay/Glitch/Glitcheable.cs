@@ -100,15 +100,6 @@ public class Glitcheable : MonoBehaviour, IInteractable
         return true;
     }
 
-    //public bool Interrupt(NodeType nodeType)
-    //{
-    //    if (_sm.Current is not IGlitchInterruptible ii || !CheckStateChange(nodeType))
-    //        return false;
-
-    //    ii.Interrupt();
-    //    return true;
-    //}
-
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
     {
         succeededInteraction = CanInteract(player);
