@@ -21,6 +21,7 @@ public class LevelSelector : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             PlayerController.Instance.SetCheckPointPos(_checkpoints[1].position);
+            StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
