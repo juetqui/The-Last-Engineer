@@ -98,7 +98,8 @@ public class PlayerModel
     {
         bool wasEnabled = _cc.enabled;
         _cc.enabled = false;
-        _transform.position = new Vector3(newPos.x, _transform.position.y, newPos.z);
+        _transform.position = newPos;
+        //_transform.position = new Vector3(newPos.x, _transform.position.y, newPos.z);
         _cc.enabled = wasEnabled;
     }
 
