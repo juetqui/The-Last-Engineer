@@ -157,11 +157,12 @@ public class Laser : MonoBehaviour
     public void LaserNotRecived()
     {
         Vector3 laserPos = GetFixedLaserPos();
-        
-        if(!_startsInitialized) _isInitialized = false;
+
+        if (!_startsInitialized) _isInitialized = false;
 
         _lineRenderer.SetPosition(0, laserPos);
         _lineRenderer.SetPosition(1, laserPos);
+        StopLaserEffect();
     }
 
     protected virtual void CorruptionCheck()
