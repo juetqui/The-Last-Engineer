@@ -42,18 +42,8 @@ public class EmissiveListener : MonoBehaviour
 
     private void CheckConnectedNode(NodeType nodeType, bool connected)
     {
-        if (connected)
-        {
-            _targetColor = _enabledColor;
-            //if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
-            //_currentCoroutine = StartCoroutine(ChangeEmissive(_enabledColor));
-        }
-        else
-        {
-            _targetColor = _disabledColor;
-            //if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
-            //_currentCoroutine = StartCoroutine(ChangeEmissive(_disabledColor));
-        }
+        if (connected) _targetColor = _enabledColor;
+        else _targetColor = _disabledColor;
 
         _changeColor = true;
     }
