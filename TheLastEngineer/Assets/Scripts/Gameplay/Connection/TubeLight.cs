@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class TubeLight : MonoBehaviour
 {
-    private float _speed = 10f; // unidades de step por segundo
+    private float _speed = 7; // unidades de step por segundo
     private float _initialStep = 0f;
     private Renderer _renderer;
     private MaterialPropertyBlock _mpb;
