@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action<IInteractable> OnInteractableSelected;
     public Action OnPlayerFell;
     public Action OnDied;
+    public Action OnRespawned;
     public Action<Glitcheable> OnGlitcheableInArea;
 
     // --- Internals
@@ -78,6 +79,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         //_solvingController.OnDissolveCompleted += OnDissolveCompleted;
 
         HookInputs(true);
+        
+        OnDied += _input.DisableInputs;
+        OnRespawned += _input.EnableInputs;
     }
 
     private void Update()
@@ -241,6 +245,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         View.SetAnimatorSpeed(1f);
         //_solvingController?.RespawnPlayer();
         _collider.enabled = true;
+        OnRespawned?.Invoke();
     }
     #endregion
 

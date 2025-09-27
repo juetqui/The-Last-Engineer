@@ -19,7 +19,7 @@ public class InputHandler : MonoBehaviour
         EnableInputs();
     }
 
-    private void EnableInputs()
+    public void EnableInputs()
     {
         if (_inputManager == null) return;
 
@@ -29,7 +29,7 @@ public class InputHandler : MonoBehaviour
         _inputManager.cancelInput.performed += CancelPerformed;
     }
 
-    private void OnDisable()
+    public void DisableInputs()
     {
         if (_inputManager == null) return;
 
@@ -37,6 +37,11 @@ public class InputHandler : MonoBehaviour
         _inputManager.interactInput.started -= InteractStarted;
         _inputManager.interactInput.canceled -= InteractCanceled;
         _inputManager.cancelInput.performed -= CancelPerformed;
+    }
+
+    private void OnDisable()
+    {
+        DisableInputs();
     }
 
     private void Update()
