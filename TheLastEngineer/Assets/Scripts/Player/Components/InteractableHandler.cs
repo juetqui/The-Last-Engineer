@@ -28,4 +28,11 @@ public class InteractableHandler
             .OrderBy(i => Vector3.Distance(i.Transform.position, playerPos))
             .FirstOrDefault();
     }
+
+    public Glitcheable GetClosestGlitcheable(Vector3 playerPos)
+    {
+        if (_interactables.Count <= 0) return null;
+
+        return _interactables.OfType<Glitcheable>().OrderBy(i => Vector3.Distance(i.transform.position, playerPos)).FirstOrDefault();
+    }
 }

@@ -20,7 +20,10 @@ public class PlayerGrabState : IPlayerState
         _playerNodeHandler = playerNodeHandler;
     }
 
-    public void Tick() { }
+    public void Tick()
+    {
+        _player.GetClosestGlitcheable();
+    }
 
     public void Cancel() { }
 

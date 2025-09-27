@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action<IInteractable> OnInteractableSelected;
     public Action OnPlayerFell;
     public Action OnDied;
+    public Action<Glitcheable> OnGlitcheableInArea;
 
     // --- Internals
     private PlayerModel _model;
@@ -174,13 +175,15 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void PickUpNode(NodeController node) => _nodeHandler.Pick(node);
     public void ReleaseNode() => _nodeHandler.Release();
     public void DropNode() => _nodeHandler.Release(true);
-
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
-
     public void AddInteractable(IInteractable interactable) => _interactableHandler.Add(interactable);
     public void RemoveInteractable(IInteractable interactable) => _interactableHandler.Remove(interactable);
-
     public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
+    public void GetClosestGlitcheable()
+    {
+        Glitcheable nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
+        OnGlitcheableInArea(nearest);
+    }
     #endregion
 
     #region PLATFORM TP MANAGEMENT

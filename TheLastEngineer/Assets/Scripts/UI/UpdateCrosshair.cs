@@ -17,8 +17,7 @@ public class UpdateCrosshair : MonoBehaviour
 
     void Start()
     {
-        //GlitcheableDetector.Instance.OnStopableSelected += UpdatePos;
-        //GlitcheableDetector.Instance.OnChangeObjectState += TryPlayInvalidAnim;
+        PlayerController.Instance.OnGlitcheableInArea += UpdatePos;
     }
 
     private void UpdatePos(Glitcheable glitcheable)
