@@ -20,6 +20,16 @@ public class ConnectionPositiveFeedback : MonoBehaviour
         {
             foreach (var ps in _positivePS)
             {
+                ParticleSystem.MainModule module = ps.main;
+
+                if(nodeType == NodeType.Default)
+                {
+                    module.startColor = Color.cyan;
+                }
+                else
+                {
+                    module.startColor = Color.red;
+                }
                 ps.Play();
             }
         }
