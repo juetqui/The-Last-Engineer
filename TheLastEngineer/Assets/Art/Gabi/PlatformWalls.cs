@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlatformWalls : MonoBehaviour
 {
-    MeshRenderer renderer;
+    private MeshRenderer _renderer;
     Material material;
     PlayerController player;
     Vector2 vector2=new Vector2(-6.5f,2.5f);
@@ -12,8 +10,8 @@ public class PlatformWalls : MonoBehaviour
     public bool IsDisolving;
     private void Start()
     {
-        renderer = GetComponent<MeshRenderer>();
-        material = renderer.material;
+        _renderer = GetComponent<MeshRenderer>();
+        material = _renderer.material;
        // material.SetVector("_MinMaxPos",vector2);
         player = PlayerController.Instance;
     }

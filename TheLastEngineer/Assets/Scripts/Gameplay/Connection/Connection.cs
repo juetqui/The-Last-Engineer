@@ -71,11 +71,9 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     {
         node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f, false, _nodePos.rotation);
         _recievedNode = node;
-        print("seteed");
 
         if (_recievedNode.NodeType == _requiredType)
         {
-            print("seteed correct");
             OnNodeConnected?.Invoke(node.NodeType, true);
             _renderer.material.SetColor("_EmissiveColor", _emissionOn);
             _particleNode.SetActive(false);

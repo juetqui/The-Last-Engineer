@@ -19,7 +19,6 @@ public class DoorController : MonoBehaviour
     private void EvaluateAndApply()
     {
         _shouldOpen = (_activeCount == _connections.Count && _connections.Count > 0);
-        print(_shouldOpen);
         if (_shouldOpen == _isOpen) return;
 
         _isOpen = _shouldOpen;

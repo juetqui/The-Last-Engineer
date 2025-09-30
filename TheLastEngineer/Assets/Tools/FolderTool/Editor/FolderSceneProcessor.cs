@@ -30,7 +30,7 @@ namespace Tools.FolderTool.Editor
 
                 while (_transformsToRemoveParent.Count > 0)
                 {
-                    _transformsToRemoveParent.Dequeue().parent = null;
+                    _transformsToRemoveParent.Dequeue().SetParent(null);
                 }
 
                 Object.DestroyImmediate(actualFolder.gameObject);
