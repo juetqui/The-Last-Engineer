@@ -66,7 +66,7 @@ public class GamepadCursor : MonoBehaviour
         _playerInput.onControlsChanged += OnControlsChanged;
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         if (_virtualMouse != null && _virtualMouse.added)
         {
