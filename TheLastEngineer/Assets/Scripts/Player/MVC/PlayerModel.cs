@@ -119,6 +119,9 @@ public class PlayerModel
 
     public IEnumerator Dash(Vector3 dashDir)
     {
+        if (dashDir == Vector3.zero)
+            dashDir = _transform.forward;
+
         float dashTimer = Time.time;
         _isDashing = true;
         _canDash = false;
