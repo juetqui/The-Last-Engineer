@@ -14,7 +14,6 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     // [SerializeField] private Renderer _renderer;
 
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
-
     public Vector3 TargetPos {  get; private set; }
 
     public Action<bool> OnPlayerStepped = delegate { };
@@ -51,7 +50,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
             succededInteraction = false;
             return;
         }
-        
+
         succededInteraction = true;
         _entrada.Stop();
     }

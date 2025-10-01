@@ -17,10 +17,13 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     [SerializeField] private Color _emissionDefault;
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionCorrupted;
+    [ColorUsageAttribute(true, true)]
+    [SerializeField] private Color _emissionCorrect;
+    [ColorUsageAttribute(true, true)]
+    [SerializeField] private Color _emissionIncorrect;
 
-    private Color _emissionOn;
+    private string _emissiveColor = "_EmissiveColor";
     private Color _emissionOff;
-
     private Renderer _renderer = default;
 
     public NodeType RequiredType {  get { return _requiredType; } }
@@ -34,9 +37,8 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     {
         _particleNode.SetActive(true);
         _renderer = GetComponent<Renderer>();
-        _emissionOn = _renderer.material.GetColor("_EmissiveColor");
         _emissionOff = _requiredType == NodeType.Corrupted ? _emissionCorrupted : _emissionDefault;
-        _renderer.material.SetColor("_EmissiveColor", _emissionOff);
+        _renderer.material.SetColor(_emissiveColor, _emissionOff);
 
         OnInitialized?.Invoke();
 
@@ -75,16 +77,21 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         if (_recievedNode.NodeType == _requiredType)
         {
             OnNodeConnected?.Invoke(node.NodeType, true);
-            _renderer.material.SetColor("_EmissiveColor", _emissionOn);
+            _renderer.material.SetColor(_emissiveColor, _emissionCorrect);
             _particleNode.SetActive(false);
         }
+        else
+        {
+            _renderer.material.SetColor(_emissiveColor, _emissionIncorrect);
+        }
+
     }
 
     public void UnsetNode(NodeController node)
     {
         print("unset");
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
-        _renderer.material.SetColor("_EmissiveColor", _emissionOff);
+        _renderer.material.SetColor(_emissiveColor, _emissionOff);
         _recievedNode = null;
         _particleNode.SetActive(true);
     }
