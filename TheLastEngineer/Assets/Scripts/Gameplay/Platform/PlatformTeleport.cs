@@ -11,6 +11,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     [SerializeField] private ParticleSystem _entrada;
     [SerializeField] private ParticleSystem _salida;
 
+    private NodeType _requiredType = NodeType.Corrupted;
     // [SerializeField] private Renderer _renderer;
 
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
@@ -57,7 +58,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player))
+        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType)
         {
                 OnPlayerStepped?.Invoke(true);
                 _entrada.Play();
@@ -67,7 +68,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player))
+        if (coll.TryGetComponent(out PlayerNodeHandler player))
         {
             OnPlayerStepped?.Invoke(false);
             _entrada.Stop();
@@ -77,9 +78,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     private void OnTriggerStay(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player))
-        {
+        if (coll.TryGetComponent(out PlayerNodeHandler player))
             _salida.Stop();
-        }
     }
 }

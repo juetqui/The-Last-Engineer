@@ -9,7 +9,7 @@ public class ConnectionPositiveFeedback : MonoBehaviour
     [SerializeField] private Color _defaultColor;
     [SerializeField] private Color _corruptedColor;
 
-    private void Start()
+    private void Awake()
     {
         _positivePS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
         _connection = GetComponentInParent<Connection>();
@@ -25,13 +25,10 @@ public class ConnectionPositiveFeedback : MonoBehaviour
                 ParticleSystem.MainModule module = ps.main;
 
                 if(nodeType == NodeType.Default)
-                {
                     module.startColor = _defaultColor;
-                }
                 else
-                {
                     module.startColor = _corruptedColor;
-                }
+
                 ps.Play();
             }
         }
