@@ -60,10 +60,9 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     {
         if (coll.TryGetComponent(out PlayerController player))
         {
-            OnPlayerStepped?.Invoke(true);
-            _entrada.Play();
-            TargetPlatform._entrada.Play();
-
+                OnPlayerStepped?.Invoke(true);
+                _entrada.Play();
+                TargetPlatform._salida.Play();
         }
     }
 
@@ -73,7 +72,15 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         {
             OnPlayerStepped?.Invoke(false);
             _entrada.Stop();
-            TargetPlatform._entrada.Stop();
+            TargetPlatform._salida.Stop();
+        }
+    }
+
+    private void OnTriggerStay(Collider coll)
+    {
+        if (coll.TryGetComponent(out PlayerController player))
+        {
+            _salida.Stop();
         }
     }
 }
