@@ -125,7 +125,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void OnMove(Vector2 mv) => _move = _isDead || !_canMove ? Vector2.zero : mv;
     private void OnDashPressed()
     {
-        //if (_model.CanDashWithCoyoteTime() && _move != Vector2.zero && !_isDead)
         if (_model.CanDashWithCoyoteTime() && !_isDead)
         {
             InputManager.Instance.RumblePulse(_playerData.lowRumbleFrequency, _playerData.highRumbleFrequency, _playerData.rumbleDuration);

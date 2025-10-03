@@ -11,10 +11,10 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     [SerializeField] private ParticleSystem _entrada;
     [SerializeField] private ParticleSystem _salida;
 
+    private NodeType _requiredType = NodeType.Corrupted;
     // [SerializeField] private Renderer _renderer;
 
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
-
     public Vector3 TargetPos {  get; private set; }
 
     public Action<bool> OnPlayerStepped = delegate { };
@@ -51,29 +51,34 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
             succededInteraction = false;
             return;
         }
-        
+
         succededInteraction = true;
         _entrada.Stop();
     }
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player))
+        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType)
         {
-            OnPlayerStepped?.Invoke(true);
-            _entrada.Play();
-            TargetPlatform._entrada.Play();
-
+                OnPlayerStepped?.Invoke(true);
+                _entrada.Play();
+                TargetPlatform._salida.Play();
         }
     }
 
     private void OnTriggerExit(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerController player))
+        if (coll.TryGetComponent(out PlayerNodeHandler player))
         {
             OnPlayerStepped?.Invoke(false);
             _entrada.Stop();
-            TargetPlatform._entrada.Stop();
+            TargetPlatform._salida.Stop();
         }
+    }
+
+    private void OnTriggerStay(Collider coll)
+    {
+        if (coll.TryGetComponent(out PlayerNodeHandler player))
+            _salida.Stop();
     }
 }
