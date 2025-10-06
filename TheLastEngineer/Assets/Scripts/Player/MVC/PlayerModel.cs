@@ -48,10 +48,12 @@ public class PlayerModel
 
     private void MovePlayer(Vector3 moveDir)
     {
+        if (_isDashing) return;
+        //if (_isDashing) moveDir *= 0.01f;
+
         if (moveDir.sqrMagnitude > 0.0001f)
             RotatePlayer(moveDir);
 
-        if (_isDashing) moveDir *= 0.01f;
 
         Vector3 horizontal = GetHorizontalMovement(moveDir);
         Vector3 vertical = HandleVerticalMovement();

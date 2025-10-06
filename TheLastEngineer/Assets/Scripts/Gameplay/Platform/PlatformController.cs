@@ -158,13 +158,15 @@ public class PlatformController : MonoBehaviour
     {
         if (col.TryGetComponent(out IMovablePassenger passenger))
         {
-            _passenger = passenger;
-
-            if (_passenger is PlayerController)
+            if (_passenger is not PlayerController player || player.IsDead)
             {
-                _player = (PlayerController) _passenger;
-                _player.OnDied += CleanPlayerReferences;
+                CleanPlayerReferences();
+                return;
             }
+
+            _passenger = passenger;
+            _player = player;
+            _player.OnDied += CleanPlayerReferences;
         }
     }
 

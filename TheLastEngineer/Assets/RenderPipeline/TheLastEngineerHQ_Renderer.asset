@@ -1,5 +1,25 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8892589028869934220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d613f08f173d4dd895bb07b3230baa9, type: 3}
+  m_Name: FullScreenPassRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  injectionPoint: 600
+  fetchColorBuffer: 1
+  requirements: 0
+  passMaterial: {fileID: 2100000, guid: 4ba4af370873d4849b7e84f4025d4a42, type: 2}
+  passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1
 --- !u!114 &-6786851833439470812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55,10 +75,13 @@ MonoBehaviour:
   m_Name: Glitch
   m_EditorClassIdentifier: 
   m_Active: 1
-  passMaterial: {fileID: 2100000, guid: c130ec2a1893ed14993e2feaf2968680, type: 2}
   injectionPoint: 600
+  fetchColorBuffer: 1
   requirements: 4
+  passMaterial: {fileID: 2100000, guid: c130ec2a1893ed14993e2feaf2968680, type: 2}
   passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1
 --- !u!114 &-2150018184583197794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72,10 +95,13 @@ MonoBehaviour:
   m_Name: ShockWave
   m_EditorClassIdentifier: 
   m_Active: 0
-  passMaterial: {fileID: 2100000, guid: 294d9d745ac599242893c741f0b8d4b7, type: 2}
   injectionPoint: 450
+  fetchColorBuffer: 1
   requirements: 4
+  passMaterial: {fileID: 2100000, guid: 294d9d745ac599242893c741f0b8d4b7, type: 2}
   passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,7 +124,8 @@ MonoBehaviour:
   - {fileID: 4825620356065025281}
   - {fileID: 5067015972367755936}
   - {fileID: -6786851833439470812}
-  m_RendererFeatureMap: 9ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a1
+  - {fileID: -8892589028869934220}
+  m_RendererFeatureMap: 9ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a174f3aba8642d9784
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -117,6 +144,9 @@ MonoBehaviour:
     cameraMotionVector: {fileID: 4800000, guid: c56b7e0d4c7cb484e959caeeedae9bbf, type: 3}
     objectMotionVector: {fileID: 4800000, guid: 7b3ede40266cd49a395def176e1bc486, type: 3}
     dataDrivenLensFlare: {fileID: 4800000, guid: 6cda457ac28612740adb23da5d39ea92, type: 3}
+    terrainDetailLitPS: {fileID: 4800000, guid: f6783ab646d374f94b199774402a5144, type: 3}
+    terrainDetailGrassPS: {fileID: 4800000, guid: e507fdfead5ca47e8b9a768b51c291a1, type: 3}
+    terrainDetailGrassBillboardPS: {fileID: 4800000, guid: 29868e73b638e48ca99a19ea58c48d90, type: 3}
   m_AssetVersion: 2
   m_OpaqueLayerMask:
     serializedVersion: 2
@@ -150,10 +180,13 @@ MonoBehaviour:
   m_Name: Distortion
   m_EditorClassIdentifier: 
   m_Active: 1
-  passMaterial: {fileID: 2100000, guid: 2a07f83828bd3534e965673ebd4e8c47, type: 2}
   injectionPoint: 600
+  fetchColorBuffer: 1
   requirements: 4
+  passMaterial: {fileID: 2100000, guid: 2a07f83828bd3534e965673ebd4e8c47, type: 2}
   passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1
 --- !u!114 &4825620356065025281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,7 +223,10 @@ MonoBehaviour:
   m_Name: GlitchError
   m_EditorClassIdentifier: 
   m_Active: 1
-  passMaterial: {fileID: 2100000, guid: f5960303e1cb61d4dba776e2cc5f7d0f, type: 2}
   injectionPoint: 600
+  fetchColorBuffer: 1
   requirements: -12
+  passMaterial: {fileID: 2100000, guid: f5960303e1cb61d4dba776e2cc5f7d0f, type: 2}
   passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1

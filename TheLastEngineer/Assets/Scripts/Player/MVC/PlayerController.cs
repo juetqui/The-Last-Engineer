@@ -42,6 +42,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private bool _isDead = false, _canMove = true;
 
     private Vector3 _checkPointPos;
+
+    public bool IsDead { get { return _isDead; } }
     #endregion
 
     private void Awake()

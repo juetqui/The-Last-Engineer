@@ -51,15 +51,7 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isLoading == true)
             {
-                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
-                {
-                    _currentLoad = _currentLoad + Time.deltaTime / loadTime / timeModifier;
-                }
-                else
-                {
-                    _currentLoad = _currentLoad + Time.deltaTime / loadTime;
-
-                }
+                _currentLoad += Time.deltaTime / loadTime;
                 _myMaterial.SetFloat("_Step", _currentLoad);
                 OnLoading?.Invoke();
                 yield return null;
