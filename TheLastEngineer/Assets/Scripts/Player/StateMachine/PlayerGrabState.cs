@@ -52,8 +52,9 @@ public class PlayerGrabState : IPlayerState
 
         if (interactable is PlatformTeleport teleport)
         {
-            _player.SetPos(teleport.TargetPos);
+            _player.SetTeleport(teleport.TargetPos);
             _player.RemoveInteractable(interactable);
+            _stateMachine.TransitionToDissolving();
         }
         else if (interactable is Glitcheable glitcheable)
         {

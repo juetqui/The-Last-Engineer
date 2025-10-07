@@ -119,7 +119,7 @@ public class PlayerView
 
         walkPS.startColor = color;
         orbitPS.startColor = color;
-        _orbitPS.Play();
+        //_orbitPS.Play();
     }
 
     public void PlayNodePS(NodeType nodeType)

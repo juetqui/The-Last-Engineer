@@ -8,12 +8,12 @@ public class PlayerModel
     private Transform _transform = default;
     private Collider _collider = default;
 
-    private float _moveSpeed = default, _rotSpeed = default;
+    private float _moveSpeed = default, _rotSpeed = default, _teleportSpeed;
     private float _dashSpeed = default, _dashDuration = default, _dashCD = default;
     private float _coyoteTimeCounter = 0f, _coyoteTime = default;
 
     private float _gravity = -50f;
-    private bool _isDashing = false, _canDash = true;
+    private bool _isDashing = false, _canDash = true, _useGravity = true;
 
 
     private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
@@ -33,6 +33,7 @@ public class PlayerModel
         _collider = colider;
         _moveSpeed = playerData.moveSpeed;
         _rotSpeed = playerData.rotSpeed;
+        _teleportSpeed = playerData.teleportSpeed;
         _dashSpeed = playerData.dashSpeed;
         _dashDuration = playerData.dashDuration;
         _dashCD = playerData.dashCD;
@@ -62,7 +63,32 @@ public class PlayerModel
         _cc.Move(totalMovement);
         _platformDisplacement = Vector3.zero;
     }
-    
+
+    public bool Teleport(Vector3 teleportPos)
+    {
+        Vector3 toTarget = teleportPos - _transform.position;
+        float distance = Vector3.Distance(teleportPos, _transform.position);
+        float step = _teleportSpeed * Time.deltaTime;
+        float dynamicThreshold = Mathf.Max(0.1f, step * 1.2f);
+
+        if (step > distance) step = distance;
+
+        if (distance <= dynamicThreshold)
+        {
+            _transform.position = teleportPos;
+            return true;
+        }
+
+        //Vector3 moveDir = toTarget.normalized;
+        //_cc.Move(moveDir * _teleportSpeed * Time.deltaTime);
+
+        Vector3 moveDir = Vector3.Lerp(_transform.position, teleportPos, step / distance);
+        Vector3 displacement = moveDir - _transform.position;
+        _cc.Move(displacement);
+
+        return false;
+    }
+
     private Vector3 GetHorizontalMovement(Vector3 moveDir)
     {
         return moveDir.normalized * _moveSpeed * Time.deltaTime;
@@ -70,7 +96,7 @@ public class PlayerModel
 
     private Vector3 HandleVerticalMovement()
     {
-        if (!_isDashing)
+        if (!_isDashing && _useGravity)
         {
             if (_cc.isGrounded) _velocity.y = -1f;
             else _velocity.y += _gravity * Time.deltaTime;
@@ -89,7 +115,6 @@ public class PlayerModel
     {
         _platformDisplacement = displacementPerFrame;
     }
-
 
     public bool CanDashWithCoyoteTime()
     {
@@ -117,6 +142,11 @@ public class PlayerModel
     {
         Quaternion toRotation = Quaternion.LookRotation(rotDir.normalized, Vector3.up);
         _transform.rotation = Quaternion.Lerp(_transform.rotation, toRotation, _rotSpeed * Time.deltaTime);
+    }
+
+    public void SetGravity(bool setGravity)
+    {
+        _useGravity = setGravity;
     }
 
     public IEnumerator Dash(Vector3 dashDir)

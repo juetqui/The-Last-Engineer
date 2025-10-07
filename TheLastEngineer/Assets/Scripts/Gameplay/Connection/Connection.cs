@@ -89,7 +89,6 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     public void UnsetNode(NodeController node)
     {
-        print("unset");
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _renderer.material.SetColor(_emissiveColor, _emissionOff);
         _recievedNode = null;

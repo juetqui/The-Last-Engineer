@@ -1,12 +1,14 @@
-using System.Diagnostics;
-using UnityEngine;
-
 public class PlayerStateMachine
 {
     private IPlayerState _currentState, _lastState;
     
     private PlayerController _controller;
     private PlayerNodeHandler _nodeHandler;
+
+    private PlayerEmptyState _emptyState;
+    private PlayerGrabState _grabState;
+    private PlayerDissolvingState _dissolvingState;
+    private PlayerTeleportState _teleportState;
     
     public IPlayerState CurrentState => _currentState;
     public IPlayerState LastState => _lastState;
@@ -18,7 +20,13 @@ public class PlayerStateMachine
 
         _controller = controller;
         _nodeHandler = nodeHandler;
-        TransitionToState(new PlayerEmptyState(this));
+
+        _emptyState = new PlayerEmptyState(this);
+        _grabState = new PlayerGrabState(this);
+        _dissolvingState = new PlayerDissolvingState(this);
+        _teleportState = new PlayerTeleportState(this);
+
+        TransitionToState(_emptyState);
     }
 
     public void Tick()
@@ -28,7 +36,9 @@ public class PlayerStateMachine
 
     public void TransitionToState(IPlayerState newState)
     {
-        _lastState = _currentState;
+        if (_currentState != _dissolvingState && _currentState != _teleportState)
+            _lastState = _currentState;
+
         _currentState?.Exit();
         _currentState = newState;
         _currentState?.Enter(_controller, _nodeHandler);
@@ -36,13 +46,21 @@ public class PlayerStateMachine
 
     public void TransitionToEmptyState()
     {
-        TransitionToState(new PlayerEmptyState(this));
+        TransitionToState(_emptyState);
     }
 
     public void TransitionToGrabState(NodeController node)
     {
-        var grabState = new PlayerGrabState(this);
         _controller.PickUpNode(node);
-        TransitionToState(grabState);
+        TransitionToState(_grabState);
+    }
+
+    public void TransitionToDissolving()
+    {
+        TransitionToState(_dissolvingState);
+    }
+    public void TransitionToTeleport()
+    {
+        TransitionToState(_teleportState);
     }
 }

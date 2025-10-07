@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     [SerializeField] private Renderer _renderer;
     [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
-    //[SerializeField] private SolvingController _solvingController;
 
     public CharacterController CC { get; private set; }
     private Collider _collider = default;
@@ -25,6 +24,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action OnDied;
     public Action OnRespawned;
     public Action<Glitcheable> OnGlitcheableInArea;
+    public Action<float> OnDissolving;
+    public Action OnTeleported;
 
     // --- Internals
     private PlayerModel _model;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private bool _isDead = false, _canMove = true;
 
     private Vector3 _checkPointPos;
+    private Vector3 _teleportPos;
 
     public bool IsDead { get { return _isDead; } }
     #endregion
@@ -78,7 +80,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         View.OnStart();
 
         StateMachine = new PlayerStateMachine(this, _nodeHandler);
-        //_solvingController.OnDissolveCompleted += OnDissolveCompleted;
 
         HookInputs(true);
         
@@ -97,9 +98,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void OnDestroy()
     {
         HookInputs(false);
-        
-        //if (_solvingController != null)
-        //    _solvingController.OnDissolveCompleted -= OnDissolveCompleted;
     }
 
     #region INPUTS MANAGEMENT
@@ -185,10 +183,33 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void AddInteractable(IInteractable interactable) => _interactableHandler.Add(interactable);
     public void RemoveInteractable(IInteractable interactable) => _interactableHandler.Remove(interactable);
     public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
+    public void SetTeleport(Vector3 targetPos) => _teleportPos = targetPos;
     public void GetClosestGlitcheable()
     {
         Glitcheable nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
         OnGlitcheableInArea(nearest);
+    }
+    public void Dissolving(float timer) => OnDissolving?.Invoke(timer);
+    public void SetCollisions(bool setCollider)
+    {
+        _canMove = setCollider;
+        _model.SetGravity(setCollider);
+
+        if (setCollider)
+        {
+            _input.EnableInputs();
+            gameObject.layer = Mathf.RoundToInt(Mathf.Log(_playerData.defaultLayer.value, 2));
+        }
+        else
+        {
+            _input.DisableInputs();
+            gameObject.layer = Mathf.RoundToInt(Mathf.Log(_playerData.teleportLayer.value, 2));
+        }
+    }
+    public void Teleport()
+    {
+        if (_model.Teleport(_teleportPos))
+            OnTeleported?.Invoke();
     }
     #endregion
 
@@ -207,13 +228,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     }
     
     public void LaserNotRecived() { }
-    #endregion
-
-    #region DESINTEGRATION MANAGEMENT
-    //public void StartDesintegratePlayer() { _solvingController.StartDesintegrateShader(); }
-    //public void StopDesintegratePlayer() { _solvingController.StopDesintegrateShader(); }
-    //public void SetDesintegratePlayer(float a) { _solvingController.SetDesintegrateShader(a); }
-    private void OnDissolveCompleted() => StartCoroutine(RespawnPlayer(CauseOfDeath.Teleport));
     #endregion
 
     #region CheckPoint y Respawn

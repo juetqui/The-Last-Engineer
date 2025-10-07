@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_FOG
-  m_Shader: {fileID: -6465566751694194690, guid: 0ca29820c9d106f4b9fa860ac78fae60, type: 3}
+  m_Name: M_DissolvePlayer
+  m_Shader: {fileID: -6465566751694194690, guid: 8245f05c9a9d8654d8e985665614cda3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -23,6 +23,18 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Albedo:
+        m_Texture: {fileID: 2800000, guid: 43b8b8cd0b6bb4747b1ccc3b7fd57437, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -37,22 +49,22 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Depth: 10
-    - _HeightIntensity: 2
-    - _NoiseScale: 20
-    - _NoiseScale2: 12
-    - _OffsetX1: 0.0075
-    - _OffsetX2: -0.0125
-    - _OffsetY1: 0.0125
-    - _OffsetY2: -0.0075
+    - _DissolveAmount: 0
+    - _DissolveScale: 40
+    - _DissolveThreshold: 0
+    - _DissolveWidth: 0.005
+    - _MetallicFloat: 0
+    - _NormalStrength: 0
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Smoothnes: 0.5
     m_Colors:
-    - _BottomColor: {r: 0.58431375, g: 0.34509805, b: 0.46195495, a: 1}
-    - _Remap: {r: -0.6, g: 0.6, b: 0, a: 0}
-    - _TopColor: {r: 0.8980392, g: 0.4509804, b: 0.81978273, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 0}
+    - _BaseColor_1: {r: 0, g: 0, b: 0, a: 0}
+    - _DissolveColor: {r: 0.2330985, g: 0.2330985, b: 1.976675, a: 1}
+    - _ModelScale: {r: 0.15, g: 0.7, b: 0, a: 0}
   m_BuildTextureStacks: []
---- !u!114 &2651559081566355332
+--- !u!114 &3999384342276986248
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

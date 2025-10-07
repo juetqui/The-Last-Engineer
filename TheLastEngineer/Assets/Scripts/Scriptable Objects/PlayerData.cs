@@ -7,11 +7,14 @@ public class PlayerData : ScriptableObject
     public float moveSpeed = default;
     public float upgradedMoveSpeed = default;
     public float rotSpeed = default;
+    public float teleportSpeed = default;
     public float fovAngle = default;
     public float coyoteTime = default;
     public float maxWallDist = default;
     public LayerMask wallMask = default;
     public LayerMask glitchDetectionLayer = default;
+    public LayerMask defaultLayer = default;
+    public LayerMask teleportLayer = default;
 
     [Header("Dash")]
     public float dashSpeed = default;

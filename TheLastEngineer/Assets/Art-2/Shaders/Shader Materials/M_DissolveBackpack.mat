@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader_DissolvePlayer 1
+  m_Name: M_DissolveBackpack
   m_Shader: {fileID: -6465566751694194690, guid: 8245f05c9a9d8654d8e985665614cda3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -24,7 +24,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 43b8b8cd0b6bb4747b1ccc3b7fd57437, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicTexture:
@@ -49,10 +49,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DissolveAmount: 0.152
+    - _DissolveAmount: 0
     - _DissolveScale: 40
     - _DissolveThreshold: 0
-    - _DissolveWidth: 0.02
+    - _DissolveWidth: 0.005
     - _MetallicFloat: 0
     - _NormalStrength: 0
     - _QueueControl: 0
@@ -61,7 +61,8 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0, g: 0, b: 0, a: 0}
     - _BaseColor_1: {r: 0, g: 0, b: 0, a: 0}
-    - _DissolveColor: {r: 0.2330985, g: 0.2330985, b: 1.976675, a: 0}
+    - _DissolveColor: {r: 0.2330985, g: 0.2330985, b: 1.976675, a: 1}
+    - _ModelScale: {r: 0, g: 0.7, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &3999384342276986248
 MonoBehaviour:
