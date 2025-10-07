@@ -134,8 +134,9 @@ public class PlatformController : MonoBehaviour
 
     public bool ReachedTarget()
     {
-        return Motor.InTarget(CurrentTarget);
+        return Motor.InTarget(CurrentTarget, CurrentSpeed);
     }
+
     public bool CheckStop()
     {
         return myDictionary[CurrentTarget];
@@ -151,14 +152,15 @@ public class PlatformController : MonoBehaviour
         if (_player == null) return;
         
         _player.OnDied -= CleanPlayerReferences;
+        _player = null;
         _passenger = null;
     }
 
-    private void OnTriggerEnter(Collider col)
+    private void OnTriggerEnter(Collider coll)
     {
-        if (col.TryGetComponent(out IMovablePassenger passenger))
+        if (coll.TryGetComponent(out IMovablePassenger passenger))
         {
-            if (_passenger is not PlayerController player || player.IsDead)
+            if (passenger is not PlayerController player || player.IsDead)
             {
                 CleanPlayerReferences();
                 return;
@@ -170,9 +172,9 @@ public class PlatformController : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit(Collider col)
+    private void OnTriggerExit(Collider coll)
     {
-        if (col.TryGetComponent(out IMovablePassenger passenger) && _passenger == passenger)
+        if (coll.TryGetComponent(out IMovablePassenger passenger) && _passenger == passenger)
         {
             _passenger.OnPlatformMoving(Vector3.zero);
             _passenger = null;
