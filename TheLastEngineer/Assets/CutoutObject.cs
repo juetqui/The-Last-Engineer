@@ -32,40 +32,9 @@ public class CutoutObject : MonoBehaviour
             cutoutPos.y /= (Screen.width / Screen.height);
 
             _cutoutMat.SetVector("_CutoutPos", cutoutPos);
-            _cutoutMat.SetFloat("_CutoutSize", 0.1f);
-            _cutoutMat.SetFloat("_FalloffSize", 0.05f);
             _cutoutMat.SetFloat("_EnableCutout", 1f);
         }
         else
             _cutoutMat.SetFloat("_EnableCutout", 0f);
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (_target == null)
-            return;
-
-        // Si ya tenés la información de colisión
-        if (_hasObstacle)
-        {
-            // Línea hasta el punto de impacto (roja)
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, _hit.point);
-
-            // Punto de impacto
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawSphere(_hit.point, 0.05f);
-        }
-        else
-        {
-            // Si no hay colisión, dibujá toda la línea en verde
-            Gizmos.color = Color.green;
-            Gizmos.DrawLine(transform.position, _target.position);
-        }
-
-        // Opcional: dibujar esferas en el origen y destino
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawSphere(transform.position, 0.03f);
-        Gizmos.DrawSphere(_target.position, 0.03f);
     }
 }
