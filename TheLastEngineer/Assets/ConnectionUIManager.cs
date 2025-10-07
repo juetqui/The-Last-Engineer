@@ -13,10 +13,14 @@ public class ConnectionUIManager : MonoBehaviour
         _connectionParent = GetComponentInParent<Connection>();
         _animator = GetComponent<Animator>();
         _image = GetComponent<Image>();
-
-        _defaultColor = _connectionParent.RequiredType == NodeType.Default ? Color.cyan : Color.magenta;
-
         _connectionParent.OnAvailableToConnect += SetAnimation;
+        _connectionParent.OnInitialized += Setup;
+    }
+
+    private void Setup()
+    {
+        _defaultColor = _connectionParent.RequiredType == NodeType.Default ? Color.cyan : Color.magenta;
+        _image.color = _defaultColor;
     }
 
     private void SetAnimation(bool setAnim)

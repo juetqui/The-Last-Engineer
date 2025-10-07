@@ -98,17 +98,13 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType)
-        {
+        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType && !IsConnected)
             OnAvailableToConnect?.Invoke(true);
-        }
     }
 
     private void OnTriggerExit(Collider coll)
     {
         if (coll.TryGetComponent(out PlayerNodeHandler player))
-        {
             OnAvailableToConnect?.Invoke(false);
-        }
     }
 }
