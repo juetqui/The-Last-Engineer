@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Glitcheable : MonoBehaviour, IInteractable
 {
+    public GameObject[] Barandas;
     #region -----INTERFACE VARIABLES-----
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Transform Transform => transform;
