@@ -32,6 +32,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
 
     public Action OnInitialized;
     public Action<NodeType, bool> OnNodeConnected;
+    public Action<bool> OnAvailableToConnect;
 
     private void Start()
     {
@@ -93,5 +94,21 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         _renderer.material.SetColor(_emissiveColor, _emissionOff);
         _recievedNode = null;
         _particleNode.SetActive(true);
+    }
+
+    private void OnTriggerEnter(Collider coll)
+    {
+        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType)
+        {
+            OnAvailableToConnect?.Invoke(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider coll)
+    {
+        if (coll.TryGetComponent(out PlayerNodeHandler player))
+        {
+            OnAvailableToConnect?.Invoke(false);
+        }
     }
 }
