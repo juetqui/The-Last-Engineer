@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 public class PreassurePlate : MonoBehaviour
 {
@@ -9,9 +11,15 @@ public class PreassurePlate : MonoBehaviour
     public float castDistance = 2f;
     public Transform _boxCastOrigin;
     public LayerMask obstacleLayers;
+    public UnityEvent OnLoaded;
+    public UnityEvent OnUnloaded;
     [SerializeField] bool charging;
     [SerializeField] bool uncharging;
-    [SerializeField] float fillAmount=0;
+    [SerializeField] float addMultiplier;
+    [SerializeField] float reduceMultiplier;
+    [SerializeField] float fillAmount = 0;
+    [SerializeField] float totalFill = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,13 +29,21 @@ public class PreassurePlate : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (charging)
+        if (charging&& totalFill > fillAmount)
         {
-            fillAmount += Time.deltaTime;
+            fillAmount += Time.deltaTime* addMultiplier;
+            if (fillAmount>totalFill)
+            {
+                OnLoaded?.Invoke();
+            }
         }
-        if (uncharging)
+        else if (!charging&&fillAmount > 0)
         {
-            fillAmount -= Time.deltaTime;
+            fillAmount -= Time.deltaTime* reduceMultiplier;
+            if (fillAmount <0)
+            {
+                OnUnloaded?.Invoke();
+            }
         }
         RaycastHit[] hits = Physics.BoxCastAll(_boxCastOrigin.position, boxSize / 2, _boxCastOrigin.up, transform.rotation, castDistance, obstacleLayers);
         for (int i = 0; i < hits.Length; i++)
@@ -36,21 +52,26 @@ public class PreassurePlate : MonoBehaviour
             {
                 if(!charging)
                 StartCharging();
+                print("detecto");
                 return;
             }
         }
         if (charging)
         {
+            print("desdetecto");
+
             StartUnCharging();
         }
     }
     public void StartCharging()
     {
         material.color = Color.green;
+        charging = true;
     }
     public void StartUnCharging()
     {
         material.color = Color.red;
+        charging = false;
     }
     private void OnTriggerEnter(Collider other)
     {
