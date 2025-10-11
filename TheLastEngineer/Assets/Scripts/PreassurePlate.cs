@@ -15,10 +15,9 @@ public class PreassurePlate : MonoBehaviour
     public UnityEvent OnUnloaded;
     [SerializeField] bool charging;
     [SerializeField] bool uncharging;
-    [SerializeField] float addMultiplier;
-    [SerializeField] float reduceMultiplier;
+    [SerializeField] float timeToFill;
+    [SerializeField] float timeToUnfill;
     [SerializeField] float fillAmount = 0;
-    [SerializeField] float totalFill = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -29,17 +28,17 @@ public class PreassurePlate : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (charging&& totalFill > fillAmount)
+        if (charging&& 1 > fillAmount)
         {
-            fillAmount += Time.deltaTime* addMultiplier;
-            if (fillAmount>totalFill)
+            fillAmount += Time.deltaTime* 1/timeToFill;
+            if (fillAmount>=1)
             {
                 OnLoaded?.Invoke();
             }
         }
         else if (!charging&&fillAmount > 0)
         {
-            fillAmount -= Time.deltaTime* reduceMultiplier;
+            fillAmount -= Time.deltaTime* 1/ timeToUnfill;
             if (fillAmount <0)
             {
                 OnUnloaded?.Invoke();
@@ -88,11 +87,11 @@ public class PreassurePlate : MonoBehaviour
         Gizmos.color = Color.green;
 
         // Dibuja la caja inicial
-        Gizmos.DrawWireCube(Vector3.zero, boxSize);
+        Gizmos.DrawWireCube(_boxCastOrigin.localPosition, boxSize);
 
         // Dibuja la caja final (hasta donde llega el cast)
         Gizmos.color = new Color(0, 0, 0, 0.5f);
-        Gizmos.DrawWireCube(Vector3.forward * castDistance, boxSize);
+        Gizmos.DrawWireCube(_boxCastOrigin.localPosition+Vector3.up * castDistance, boxSize);
 
         // Dibuja una línea entre ambas cajas
         Gizmos.color = Color.yellow;
