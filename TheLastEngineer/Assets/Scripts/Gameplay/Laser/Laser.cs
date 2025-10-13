@@ -26,11 +26,13 @@ public class Laser : MonoBehaviour
         
         _audioSource = GetComponent<AudioSource>();
         _lineRenderer.positionCount = 2;
+        _lineRenderer.transform.position = Vector3.zero;
 
         Vector3 laserPos = GetFixedLaserPos();
-
         _lineRenderer.SetPosition(0, laserPos);
         _lineRenderer.SetPosition(1, laserPos);
+        _lineRenderer.endWidth = _raycastOffsetX*2;
+        _lineRenderer.startWidth = _raycastOffsetX*2;
     }
 
     private void Start()
@@ -78,8 +80,9 @@ public class Laser : MonoBehaviour
     {
         Vector3 laserOrigin = GetFixedLaserPos();
         Ray mainRay = new Ray(laserOrigin, transform.forward);
+        //Physics.SphereCast(mainRay, _raycastOffsetX);
         RaycastHit[] hits = Physics.RaycastAll(mainRay, _maxDist, _laserLayer);
-        
+        //RaycastHit[] hits = Physics.SphereCastAll(laserOrigin,- _raycastOffsetX, transform.forward, _maxDist, _laserLayer);
         if (hits.Length > 0)
         {
             var closestHit = hits.OrderBy(h => h.distance).First();
