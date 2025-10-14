@@ -80,9 +80,8 @@ public class Laser : MonoBehaviour
     {
         Vector3 laserOrigin = GetFixedLaserPos();
         Ray mainRay = new Ray(laserOrigin, transform.forward);
-        //Physics.SphereCast(mainRay, _raycastOffsetX);
         RaycastHit[] hits = Physics.RaycastAll(mainRay, _maxDist, _laserLayer);
-        //RaycastHit[] hits = Physics.SphereCastAll(laserOrigin,- _raycastOffsetX, transform.forward, _maxDist, _laserLayer);
+
         if (hits.Length > 0)
         {
             var closestHit = hits.OrderBy(h => h.distance).First();
@@ -149,7 +148,7 @@ public class Laser : MonoBehaviour
 
     private Vector3 GetFixedLaserPos()
     {
-        return new Vector3(transform.position.x, transform.position.y, transform.position.z) + transform.forward * _raycastOffsetZ;
+        return transform.position + transform.forward * _raycastOffsetZ;
     }
 
     public void LaserRecived()

@@ -266,6 +266,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     }
     #endregion
 
+    public void WalkSound () => View.WalkSound();
+
     #region TRIGGERS MANAGEMENT
     private void OnTriggerEnter(Collider coll)
     {

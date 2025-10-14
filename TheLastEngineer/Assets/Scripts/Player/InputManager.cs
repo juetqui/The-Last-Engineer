@@ -12,6 +12,7 @@ public class InputManager : MonoBehaviour
     
     #region PLAYER INPUTS
     [HideInInspector] public InputAction moveInput = default;
+    [HideInInspector] public InputAction rotateInput = default;
     [HideInInspector] public InputAction interactInput = default;
     [HideInInspector] public InputAction dashInput = default;
     [HideInInspector] public InputAction pauseInput = default;
@@ -46,6 +47,7 @@ public class InputManager : MonoBehaviour
         playerInputs.Player.Enable();
 
         moveInput = playerInputs.Player.Move;
+        rotateInput = playerInputs.Player.Rotate;
         dashInput = playerInputs.Player.Dash;
         interactInput = playerInputs.Player.Interact;
         pauseInput = playerInputs.Player.Pause;

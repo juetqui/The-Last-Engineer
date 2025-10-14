@@ -172,7 +172,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1142232106386274392}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6cbb27bb09bd9f04aa382ce02de80dff, type: 3}
   m_Name: 
@@ -407,14 +407,14 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 5000
+  far clip plane: 1500
   field of view: 60
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 10239
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -576,7 +576,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: cd8cde2edd19a1940b0c4e8864c93a46, type: 3}
+  m_audioClip: {fileID: 8300000, guid: e203c5f169e9f3446b0fe0e114d8ec50, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.125
   m_Pitch: 1
@@ -709,10 +709,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IsGlobal: 1
-  priority: 0
+  priority: 1
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: bb3a3f128a51cc346a2c7f9d4426a8e4, type: 2}
+  sharedProfile: {fileID: 11400000, guid: e869b2e21056cc242ace93f7fdb57f88, type: 2}
 --- !u!114 &1833994356153890528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -743,9 +743,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _target: {fileID: 0}
+  _cutoutMat: {fileID: 2100000, guid: 658264ee7c8218b48acf748a7f2e6a39, type: 2}
   _layerMask:
     serializedVersion: 2
     m_Bits: 64
+  _targetCutoutSize: 1
+  _timeModifier: 0.1
 --- !u!1 &2991757187918567609
 GameObject:
   m_ObjectHideFlags: 0
@@ -1634,6 +1637,7 @@ GameObject:
   - component: {fileID: 6746367112230885245}
   - component: {fileID: 3130783741150927945}
   - component: {fileID: 5604279558230666067}
+  - component: {fileID: 1521078648044814344}
   m_Layer: 0
   m_Name: CM Camera
   m_TagString: Untagged
@@ -1684,7 +1688,7 @@ MonoBehaviour:
     FieldOfView: 60
     OrthographicSize: 10
     NearClipPlane: 0.1
-    FarClipPlane: 5000
+    FarClipPlane: 1500
     Dutch: 0
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
@@ -1753,11 +1757,11 @@ MonoBehaviour:
   m_BindingMode: 4
   m_SplineCurvature: 0
   m_Orbits:
-  - m_Height: 33
+  - m_Height: 30
     m_Radius: 20
-  - m_Height: 33
+  - m_Height: 30
     m_Radius: 20
-  - m_Height: 33
+  - m_Height: 30
     m_Radius: 20
   m_LegacyHeadingBias: 3.4028235e+38
   m_Rigs:
@@ -1771,16 +1775,28 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7066685792927453148}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a2fba25a5cd15594e8f050a11e386c80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_ConfineMode: 1
-  m_BoundingVolume: {fileID: 5848450444954042055}
+  m_BoundingVolume: {fileID: 0}
   m_BoundingShape2D: {fileID: 0}
   m_ConfineScreenEdges: 1
   m_Damping: 0.25
+--- !u!114 &1521078648044814344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7066685792927453148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28a7e845d133e524d9c070ce060af1da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7200121273414972620
 GameObject:
   m_ObjectHideFlags: 0
