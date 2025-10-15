@@ -47,8 +47,10 @@ public class CutoutObject : MonoBehaviour
         }
         else
         {
-            _cutoutMat.SetFloat("_EnableCutout", 0f);
             UpdateCutoutSize(false);
+
+            if (_currentSize <= 0f)
+                _cutoutMat.SetFloat("_EnableCutout", 0f);
         }
     }
     private void UpdateCutoutSize(bool increment)
