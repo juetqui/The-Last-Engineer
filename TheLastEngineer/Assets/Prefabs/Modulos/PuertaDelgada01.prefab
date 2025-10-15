@@ -184,10 +184,15 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f93a384110f25e4d83c5bc6bb31f0ea, type: 2}
+  - {fileID: 2100000, guid: 841dc94f167f02145a126490562323cc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -205,13 +210,14 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!95 &4847841824640810668
 Animator:
-  serializedVersion: 5
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -225,6 +231,7 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -282,7 +289,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 21be76327d911b244b8b780d13f6f5bb, type: 3}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 21be76327d911b244b8b780d13f6f5bb, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.771
   m_Pitch: 2.56
@@ -467,7 +475,7 @@ PrefabInstance:
       value: PuertaIzq01 (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8544047501853832779, guid: d78390f16bb04024b9de08f24c5fb461, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f93a384110f25e4d83c5bc6bb31f0ea, type: 2}
     m_RemovedComponents: []
@@ -493,7 +501,7 @@ PrefabInstance:
       value: PuertaDer02
       objectReference: {fileID: 0}
     - target: {fileID: 3270142550893250875, guid: 435624bcc30e45747930c861d0101609, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f93a384110f25e4d83c5bc6bb31f0ea, type: 2}
     - target: {fileID: 7049702751144669647, guid: 435624bcc30e45747930c861d0101609, type: 3}
@@ -1037,7 +1045,7 @@ PrefabInstance:
       value: PuertaDer02 (1)
       objectReference: {fileID: 0}
     - target: {fileID: 3270142550893250875, guid: 435624bcc30e45747930c861d0101609, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f93a384110f25e4d83c5bc6bb31f0ea, type: 2}
     - target: {fileID: 7049702751144669647, guid: 435624bcc30e45747930c861d0101609, type: 3}
@@ -1249,7 +1257,7 @@ PrefabInstance:
       value: PuertaIzq01
       objectReference: {fileID: 0}
     - target: {fileID: 8544047501853832779, guid: d78390f16bb04024b9de08f24c5fb461, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f93a384110f25e4d83c5bc6bb31f0ea, type: 2}
     m_RemovedComponents: []
