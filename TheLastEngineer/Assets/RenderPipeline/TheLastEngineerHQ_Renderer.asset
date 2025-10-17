@@ -1,25 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8892589028869934220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
-  m_Name: FullScreenPassRendererFeature
-  m_EditorClassIdentifier: 
-  m_Active: 0
-  injectionPoint: 600
-  fetchColorBuffer: 1
-  requirements: 0
-  passMaterial: {fileID: 2100000, guid: 4ba4af370873d4849b7e84f4025d4a42, type: 2}
-  passIndex: 0
-  bindDepthStencilAttachment: 0
-  m_Version: 1
 --- !u!114 &-6786851833439470812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,6 +82,21 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &-1040465808298620843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d69a19d29ef66464ea0afc7cd84fd6c2, type: 3}
+  m_Name: VolumetricFogRendererFeature
+  m_EditorClassIdentifier: com.cqf.urpvolumetricfog.runtime::VolumetricFogRendererFeature
+  m_Active: 1
+  downsampleDepthShader: {fileID: 4800000, guid: cffeaeec0396a2c4dad475266cc8dfeb, type: 3}
+  volumetricFogShader: {fileID: 4800000, guid: 08f816187f9af0244a95556ee0cab83f, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,8 +128,8 @@ MonoBehaviour:
   - {fileID: 4825620356065025281}
   - {fileID: 5067015972367755936}
   - {fileID: -6786851833439470812}
-  - {fileID: -8892589028869934220}
-  m_RendererFeatureMap: 9ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a174f3aba8642d9784
+  - {fileID: -1040465808298620843}
+  m_RendererFeatureMap: 9ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a155c86b27dc858ff1
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

@@ -1,5 +1,72 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1196558709431957020
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a074ec59f6e910b4e8c49f57e56cf95a, type: 3}
+  m_Name: VolumetricFogVolumeComponent
+  m_EditorClassIdentifier: com.cqf.urpvolumetricfog.runtime::VolumetricFogVolumeComponent
+  active: 1
+  distance:
+    m_OverrideState: 1
+    m_Value: 64
+  baseHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  maximumHeight:
+    m_OverrideState: 1
+    m_Value: 15
+  enableGround:
+    m_OverrideState: 1
+    m_Value: 0
+  groundHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  density:
+    m_OverrideState: 0
+    m_Value: 0.2
+  attenuationDistance:
+    m_OverrideState: 0
+    m_Value: 128
+  enableAPVContribution:
+    m_OverrideState: 1
+    m_Value: 0
+  APVContributionWeight:
+    m_OverrideState: 0
+    m_Value: 1
+  enableMainLightContribution:
+    m_OverrideState: 1
+    m_Value: 1
+  anisotropy:
+    m_OverrideState: 0
+    m_Value: 0.4
+  scattering:
+    m_OverrideState: 0
+    m_Value: 0.15
+  tint:
+    m_OverrideState: 0
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
+  enableAdditionalLightsContribution:
+    m_OverrideState: 1
+    m_Value: 1
+  maxSteps:
+    m_OverrideState: 1
+    m_Value: 8
+  blurIterations:
+    m_OverrideState: 1
+    m_Value: 2
+  enabled:
+    m_OverrideState: 1
+    m_Value: 1
+  renderPassEvent:
+    m_OverrideState: 1
+    m_Value: 500
 --- !u!114 &-1169091180241870311
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -55,7 +122,7 @@ MonoBehaviour:
           time: 0
           value: 0
           inSlope: 0
-          outSlope: 0.7470085
+          outSlope: 1.4885328
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
@@ -63,8 +130,8 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 1
-          inSlope: 2.276042
-          outSlope: 0
+          inSlope: -0
+          outSlope: -0
           tangentMode: 0
           weightedMode: 0
           inWeight: 0
@@ -239,6 +306,7 @@ MonoBehaviour:
   - {fileID: -738285469809723183}
   - {fileID: 3356667083006108129}
   - {fileID: 8563785636815764917}
+  - {fileID: -1196558709431957020}
 --- !u!114 &461136383202084153
 MonoBehaviour:
   m_ObjectHideFlags: 3
