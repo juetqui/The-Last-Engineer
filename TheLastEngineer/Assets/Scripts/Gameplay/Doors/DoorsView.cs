@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+
 public class DoorsView : MonoBehaviour
 {
     [SerializeField] private bool _isBroken = false;
@@ -13,6 +15,8 @@ public class DoorsView : MonoBehaviour
     private Color _doorOpen = Color.green;
     [ColorUsageAttribute(true, true)]
     private Color _doorClosed = Color.red;
+
+    public Action<bool> OnOpen;
 
     public void Initialize()
     {
@@ -33,6 +37,7 @@ public class DoorsView : MonoBehaviour
     public void OpenDoor(bool isRunning)
     {
         _animator.SetBool("DoorActivated", isRunning);
+        OnOpen?.Invoke(isRunning);
 
         if (isRunning)
         {

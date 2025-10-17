@@ -3,12 +3,23 @@ using UnityEngine;
 
 public class DoorController : MonoBehaviour
 {
+    [SerializeField] NodeType tipo = NodeType.Default;
     [SerializeField] private List<Connection> _connections = new List<Connection>();
 
     private DoorsView _door;
     private int _activeCount = 0;
     private bool _isOpen = false, _shouldOpen;
-    [SerializeField] NodeType tipo = NodeType.Default;
+
+    private void OnEnable()
+    {
+        Subscribe(true);
+    }
+
+    private void OnDisable()
+    {
+        Subscribe(false);
+    }
+
     private void Awake()
     {
         _door = GetComponent<DoorsView>();
@@ -16,6 +27,7 @@ public class DoorController : MonoBehaviour
         RecountActiveConnections();
         EvaluateAndApply();
     }
+
     private void EvaluateAndApply()
     {
         _shouldOpen = (_activeCount == _connections.Count && _connections.Count > 0);
@@ -24,6 +36,7 @@ public class DoorController : MonoBehaviour
         _isOpen = _shouldOpen;
         _door.OpenDoor(_isOpen);
     }
+
     private void RecountActiveConnections()
     {
         _activeCount = 0;
@@ -54,13 +67,5 @@ public class DoorController : MonoBehaviour
             else
                 c.OnNodeConnected -= OnConnectionStateChanged;
         }
-    }
-    private void OnEnable() 
-    {
-        Subscribe(true);
-    }
-    private void OnDisable()
-    {
-        Subscribe(false);
     }
 }
