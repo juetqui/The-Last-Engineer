@@ -55,7 +55,7 @@ public class LevelSelector : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            PlayerController.Instance.SetCheckPointPos(_checkpoints[1].position);
+            PlayerController.Instance.SetCheckPointPos(_checkpoints[8].position);
             StartCoroutine(PlayerController.Instance.RespawnPlayer(CauseOfDeath.Teleport));
         }
     }
