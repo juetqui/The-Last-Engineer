@@ -103,6 +103,10 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("Nivel 1 - Entregable");
     }
+    public void StartTutorial2()
+    {
+        SceneManager.LoadScene("NIVEL gabi");
+    }
 
     public void Quit()
     {
