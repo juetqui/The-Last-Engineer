@@ -24,6 +24,10 @@ public class DoorController : MonoBehaviour
     {
         _door = GetComponent<DoorsView>();
         _door.Initialize();
+    }
+
+    private void Start()
+    {
         RecountActiveConnections();
         EvaluateAndApply();
     }
@@ -31,6 +35,7 @@ public class DoorController : MonoBehaviour
     private void EvaluateAndApply()
     {
         _shouldOpen = (_activeCount == _connections.Count && _connections.Count > 0);
+        
         if (_shouldOpen == _isOpen) return;
 
         _isOpen = _shouldOpen;
@@ -40,6 +45,7 @@ public class DoorController : MonoBehaviour
     private void RecountActiveConnections()
     {
         _activeCount = 0;
+        
         foreach (var c in _connections)
         {
             if (c != null && c.IsConnected) _activeCount++;
@@ -48,8 +54,9 @@ public class DoorController : MonoBehaviour
 
     private void OnConnectionStateChanged(NodeType type, bool connected)
     {
-        if(type == tipo) _activeCount += connected ? 1 : -1;
-        //_activeCount += connected ? 1 : -1;
+        if (type == tipo)
+            _activeCount += connected ? 1 : -1;
+
         _activeCount = Mathf.Clamp(_activeCount, 0, _connections.Count);
         EvaluateAndApply();
     }

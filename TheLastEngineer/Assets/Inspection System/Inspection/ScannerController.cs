@@ -1,0 +1,52 @@
+using UnityEngine;
+
+public class ScannerController : MonoBehaviour
+{
+    [SerializeField] private float _targetScale = 6f;
+    [SerializeField] private float _targetTime = 1f;
+
+    private CorruptionGenerator _corruptionGenerator = default;
+
+    private float _timer = 0f;
+    private bool _scan = false;
+
+    void Start()
+    {
+        InspectorController.Instance.OnTargetEnabled += ListenToTarget;
+    }
+
+    void Update()
+    {
+        if (_scan) StartScanning();
+    }
+
+    private void ListenToTarget(UIInspectionable inspectionable)
+    {
+        _corruptionGenerator = inspectionable.CorruptionGenerator;
+        _corruptionGenerator.OnObjectCleaned += SetScan;
+    }
+
+    private void SetScan(CorruptionGenerator corruptionGenerator)
+    {
+        if (corruptionGenerator != _corruptionGenerator) return;
+
+        _scan = true;
+        _corruptionGenerator.OnObjectCleaned -= SetScan;
+        _corruptionGenerator = null;
+    }
+
+    private void StartScanning()
+    {
+        _timer += Time.deltaTime;
+        
+        Vector3 newScale = Vector3.one * (_targetScale * _timer);
+
+        transform.localScale = newScale;
+
+        if (_timer >= _targetTime)
+        {
+            _scan = false;
+            transform.localScale = Vector3.one;
+        }
+    }
+}

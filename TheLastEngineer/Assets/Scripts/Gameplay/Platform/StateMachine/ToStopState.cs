@@ -8,30 +8,30 @@ public class ToStopState : IPlatformState
         _pc = pc;
         _fsm = fsm;
     }
+
     public void Enter()
     {
         _pc.isStopped = false;
-    }
-
-    public void Exit()
-    {
-
+        _pc.DecelerateToTarget(_pc.CurrentTarget);
     }
 
     public void Tick(float d)
     {
         if (_pc.ReachedTarget())
         {
-                _pc.StopPassenger();
-                _fsm.ToInactive();
-                _pc.Route.Advance();
-                _pc.isStopped = true;
-
+            _pc.StopImmediate();
+            _pc.StopPassenger();
+            _fsm.ToInactive();
+            _pc.Route.Advance();
+            _pc.isStopped = true;
             return;
-
-
         }
 
         _pc.MoveStep();
+    }
+
+    public void Exit()
+    {
+
     }
 }

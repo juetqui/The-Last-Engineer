@@ -80,7 +80,9 @@ public class InspectionSystem : MonoBehaviour
         _lastMousePosition = currentMousePosition;
     }
 
-    private void ResetRot(InputAction.CallbackContext context)
+    public void ResetRot() => ResetCDValues();
+
+    private void ResetRot(InputAction.CallbackContext context = default)
     {
         ResetCDValues();
     }
