@@ -1,6 +1,3 @@
-using UnityEngine;
-using UnityEngine.Windows;
-
 public class PlayerTeleportState : IPlayerState
 {
     private PlayerStateMachine _fsm = default;
@@ -15,6 +12,7 @@ public class PlayerTeleportState : IPlayerState
     {
         _player = player;
         _player.OnTeleported += _fsm.TransitionToDissolving;
+        _player.StartTeleport();
     }
 
     public void Tick()

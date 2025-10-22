@@ -7,7 +7,7 @@ public class PlayerView
     private Material[] _originalMats = default, _corruptionMats = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
     private ParticleSystem _defaultPS = default, _corruptedPS = default;
-    //private SolvingController _solvingController;
+    private ParticleSystem _teleportPS = default;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip = default, _fallClip = default;
@@ -16,9 +16,9 @@ public class PlayerView
 
     public Action OnDashViewPlayed = delegate { };
 
-    public PlayerView(Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS)
+    public PlayerView(Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS, ParticleSystem teleportPS)
     {
-        if (renderer == null || playerData == null)//|| solvingController == null
+        if (renderer == null || playerData == null)
             throw new System.ArgumentNullException("Core dependencies cannot be null");
 
         _renderer = renderer;
@@ -34,9 +34,9 @@ public class PlayerView
         _putDownClip = playerData.putDownClip;
         _deathClip = playerData.deathClip;
         _fallClip = playerData.fallClip;
-        //_solvingController = solvingController;
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
+        _teleportPS = teleportPS;
     }
 
     public void OnStart()
@@ -51,7 +51,6 @@ public class PlayerView
         for (int i = 0; i < _corruptionMats.Length; i++)
             _corruptionMats[i] = corruptionMat;
     }
-
 
     public void Walk(Vector3 moveVector)
     {
@@ -71,7 +70,6 @@ public class PlayerView
     {
         OnDashViewPlayed?.Invoke();
         _walkPS.Stop();
-        //SetParticlesLT(0.7f, 1f);
         PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
     
@@ -89,7 +87,6 @@ public class PlayerView
     public void RespawnPlayer()
     {
         _animator.speed = 1;
-        //_solvingController.RespawnPlayer();
     }
 
     public void DashChargedSound()
@@ -126,6 +123,11 @@ public class PlayerView
     {
         if (nodeType == NodeType.Corrupted) _corruptedPS.Play();
         else _defaultPS.Play();
+    }
+
+    public void TeleportPS()
+    {
+        _teleportPS.Play();
     }
 
     public void StopPS()

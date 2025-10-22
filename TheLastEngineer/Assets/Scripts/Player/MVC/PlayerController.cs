@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     [Header("Data & MVC")]
     [SerializeField] private PlayerData _playerData;
     [SerializeField] private Renderer _renderer;
-    [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS;
+    [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS, _teleportPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
 
     public CharacterController CC { get; private set; }
@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private Vector3 _teleportPos;
 
     public bool IsDead { get { return _isDead; } }
+    public Vector3 TeleportPos {  get { return _teleportPos; } }
     #endregion
 
     private void Awake()
@@ -69,7 +70,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _interactableHandler = new InteractableHandler();
 
         _model = new PlayerModel(CC, transform, _playerData, _collider);
-        View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS);
+        View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
 
         _checkPointPos = transform.position;
     }
@@ -206,11 +207,16 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             gameObject.layer = Mathf.RoundToInt(Mathf.Log(_playerData.teleportLayer.value, 2));
         }
     }
+    public void StartTeleport()
+    {
+        _model.StartTeleport(_teleportPos, 0.25f);
+    }
     public void Teleport()
     {
-        if (_model.Teleport(_teleportPos))
+        if (_model.Teleport())
             OnTeleported?.Invoke();
     }
+    public void PlayTeleportPS() => View.TeleportPS();
     #endregion
 
     #region PLATFORM TP MANAGEMENT

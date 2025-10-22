@@ -27,6 +27,8 @@ public class PlayerDissolvingState : IPlayerState
         }
         else
             _timer = 1f;
+
+        _player.PlayTeleportPS();
     }
 
     public void Tick()

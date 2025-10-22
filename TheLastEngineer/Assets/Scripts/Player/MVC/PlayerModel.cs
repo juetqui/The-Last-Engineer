@@ -15,6 +15,14 @@ public class PlayerModel
     private float _gravity = -50f;
     private bool _isDashing = false, _canDash = true, _useGravity = true;
 
+    //----- Teleport Variables -----//
+    #region
+    private float _teleportTimer = 0f;
+    private float _teleportDuration = 0.25f;
+    private Vector3 _teleportStartPos;
+    private Vector3 _teleportTargetPos;
+    private bool _isTeleporting = false;
+    #endregion
 
     private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
 
@@ -64,27 +72,33 @@ public class PlayerModel
         _platformDisplacement = Vector3.zero;
     }
 
-    public bool Teleport(Vector3 teleportPos)
+    public void StartTeleport(Vector3 teleportPos, float duration)
     {
-        Vector3 toTarget = teleportPos - _transform.position;
-        float distance = Vector3.Distance(teleportPos, _transform.position);
-        float step = _teleportSpeed * Time.deltaTime;
-        float dynamicThreshold = Mathf.Max(0.1f, step * 1.2f);
+        _teleportStartPos = _transform.position;
+        _teleportTargetPos = teleportPos;
+        _teleportDuration = duration;
+        _teleportTimer = 0f;
+        _isTeleporting = true;
+    }
 
-        if (step > distance) step = distance;
+    public bool Teleport()
+    {
+        if (!_isTeleporting)
+            return true;
 
-        if (distance <= dynamicThreshold)
+        _teleportTimer += Time.deltaTime;
+        float t = Mathf.Clamp01(_teleportTimer / _teleportDuration);
+
+        Vector3 newPos = Vector3.Lerp(_teleportStartPos, _teleportTargetPos, t);
+        Vector3 displacement = newPos - _transform.position;
+
+        _cc.Move(displacement);
+
+        if (t >= 1f)
         {
-            _transform.position = teleportPos;
+            _isTeleporting = false;
             return true;
         }
-
-        //Vector3 moveDir = toTarget.normalized;
-        //_cc.Move(moveDir * _teleportSpeed * Time.deltaTime);
-
-        Vector3 moveDir = Vector3.Lerp(_transform.position, teleportPos, step / distance);
-        Vector3 displacement = moveDir - _transform.position;
-        _cc.Move(displacement);
 
         return false;
     }
@@ -126,7 +140,6 @@ public class PlayerModel
         bool wasEnabled = _cc.enabled;
         _cc.enabled = false;
         _transform.position = newPos;
-        //_transform.position = new Vector3(newPos.x, _transform.position.y, newPos.z);
         _cc.enabled = wasEnabled;
     }
 
