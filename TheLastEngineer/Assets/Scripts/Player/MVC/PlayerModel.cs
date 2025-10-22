@@ -77,30 +77,23 @@ public class PlayerModel
         _teleportStartPos = _transform.position;
         _teleportTargetPos = teleportPos;
         _teleportDuration = duration;
-        _teleportTimer = 0f;
+
+        LeanTween.cancel(_transform.gameObject);
+
         _isTeleporting = true;
+
+        LeanTween.move(_transform.gameObject, teleportPos, _teleportDuration)
+            .setEase(LeanTweenType.easeInOutQuad)
+            .setOnComplete(() =>
+            {
+                _isTeleporting = false;
+                _cc.enabled = true;
+            });
     }
 
     public bool Teleport()
     {
-        if (!_isTeleporting)
-            return true;
-
-        _teleportTimer += Time.deltaTime;
-        float t = Mathf.Clamp01(_teleportTimer / _teleportDuration);
-
-        Vector3 newPos = Vector3.Lerp(_teleportStartPos, _teleportTargetPos, t);
-        Vector3 displacement = newPos - _transform.position;
-
-        _cc.Move(displacement);
-
-        if (t >= 1f)
-        {
-            _isTeleporting = false;
-            return true;
-        }
-
-        return false;
+        return !_isTeleporting;
     }
 
     private Vector3 GetHorizontalMovement(Vector3 moveDir)
