@@ -61,10 +61,16 @@ public class Corruption : MonoBehaviour
     {
         if (hitted != this) return;
 
-        _generator.RemoveCorruption(this);
+        _generator.RemoveCorruption();
         _audioSource.Stop();
         _psHitting.Stop();
         _psRemoved.Play();
+    }
+
+    public void SetPos((int index, Vector3 position, Quaternion rotation) posData)
+    {
+        transform.localPosition = posData.position;
+        transform.localRotation = posData.rotation;
     }
 
     public void TurnOnOff(bool turnOnOff)

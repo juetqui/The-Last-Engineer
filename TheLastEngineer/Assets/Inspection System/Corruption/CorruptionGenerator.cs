@@ -10,10 +10,9 @@ public class CorruptionGenerator : MonoBehaviour
     [SerializeField] private int _maxInstances = 10;
     [SerializeField] private float _offsetAboveSurface = 0.1f;
 
-    private List<Corruption> _corruptionList = default;
+    private List<(int index, Vector3 position, Quaternion rotation)> _generatedCorruption = new List<(int index, Vector3 position, Quaternion rotation)>();
     private Corruption _currentActive = default;
     private Mesh _mesh = default;
-    private ParticleSystem _ps = default;
 
     private float _maxParticles = 2000f;
     private float[] _triangleAreas = default;
@@ -32,14 +31,15 @@ public class CorruptionGenerator : MonoBehaviour
     void Start()
     {
         _mesh = GetComponent<MeshFilter>().mesh;
-        _ps = GetComponentInChildren<ParticleSystem>();
+        _currentActive = GetComponentInChildren<Corruption>();
+        _currentActive.SetUpGenerator(this);
+
         SetUpObjectCorruption();
-        SetParticlesAmount();
     }
 
     private void SetUpObjectCorruption()
     {
-        _corruptionList = new List<Corruption>();
+        _generatedCorruption.Clear();
         CalculateTriangleAreas(_mesh);
 
         _totalInstances = UnityEngine.Random.Range(_minInstances, _maxInstances);
@@ -48,16 +48,8 @@ public class CorruptionGenerator : MonoBehaviour
         {
             (Vector3 point, Vector3 normal) = GetRandomPointOnMesh(_mesh);
             Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
-            GameObject currentInstance = Instantiate(_prefabToSpawn, point, rotation, transform);
-            Corruption corruptionCleaner = currentInstance.GetComponent<Corruption>();
-            corruptionCleaner.SetUpGenerator(this);
 
-            _corruptionList.Add(corruptionCleaner);
-        }
-
-        foreach (var item in _corruptionList)
-        {
-            item.TurnOnOff(false);
+            _generatedCorruption.Add((i, point, rotation));
         }
 
         SetUpNextCorruption();
@@ -67,7 +59,8 @@ public class CorruptionGenerator : MonoBehaviour
     {
         Vector3[] vertices = targetMesh.vertices;
         int[] triangles = targetMesh.triangles;
-        
+        Vector3 meshCenter = targetMesh.bounds.center;
+
         _triangleAreas = new float[triangles.Length / 3];
         _totalArea = 0f;
 
@@ -76,6 +69,12 @@ public class CorruptionGenerator : MonoBehaviour
             Vector3 a = vertices[triangles[i * 3]];
             Vector3 b = vertices[triangles[i * 3 + 1]];
             Vector3 c = vertices[triangles[i * 3 + 2]];
+
+            if (!IsTriangleFacingOut(a, b, c, meshCenter))
+            {
+                _triangleAreas[i] = 0f;
+                continue;
+            }
 
             float area = Vector3.Cross(b - a, c - a).magnitude / 2f;
             _triangleAreas[i] = area;
@@ -115,47 +114,63 @@ public class CorruptionGenerator : MonoBehaviour
             r1 = 1f - r1;
             r2 = 1f - r2;
         }
-        
-        Vector3 point = a + r1 * (b - a) + r2 * (c - a);
-        Vector3 normal = Vector3.Normalize(Vector3.Cross(b - a, c - a));
-        Vector3 worldPoint = transform.TransformPoint(point);
-        Vector3 worldNormal = transform.TransformDirection(normal);
-        worldPoint += worldNormal * _offsetAboveSurface;
 
-        return (worldPoint, worldNormal);
+        Vector3 localPoint = a + r1 * (b - a) + r2 * (c - a);
+        Vector3 localNormal = Vector3.Normalize(Vector3.Cross(b - a, c - a));
+
+        localPoint += localNormal * _offsetAboveSurface;
+        return (localPoint, localNormal);
+    }
+
+    private bool IsTriangleFacingOut(Vector3 a, Vector3 b, Vector3 c, Vector3 meshCenter)
+    {
+        Vector3 normal = Vector3.Cross(b - a, c - a).normalized;
+        Vector3 toCenter = (meshCenter - (a + b + c) / 3f).normalized;
+
+        return Vector3.Dot(normal, toCenter) < 0f;
     }
 
     private void SetUpNextCorruption()
     {
-        if (_currentActive != null)
-            _currentActive.TurnOnOff(false);
-
-        if (_index >= _corruptionList.Count())
+        if (_index >= _generatedCorruption.Count())
         {
             OnObjectCleaned?.Invoke(this);
             _currentActive = null;
             return;
         }
 
-        _currentActive = _corruptionList[_index];
-        _currentActive.TurnOnOff(true);
+        _currentActive.SetPos(_generatedCorruption[_index]);
     }
 
-    public void RemoveCorruption(Corruption corruptionCleaner)
+    public void RemoveCorruption()
     {
-        if (_currentActive != corruptionCleaner) return;
-
         _index++;
         _cleanedInstances++;
         OnUpdatedInstances?.Invoke();
         SetUpNextCorruption();
-        SetParticlesAmount();
     }
 
-    private void SetParticlesAmount()
+    private void OnDrawGizmos()
     {
-        float amount = _maxParticles * (1f - ((float)_index / _corruptionList.Count()));
-        var psShape = _ps.emission;
-        psShape.rateOverTime = amount;
+        if (_generatedCorruption == null || _generatedCorruption.Count == 0)
+            return;
+
+        Gizmos.color = Color.yellow;
+
+        foreach (var (index, position, rotation) in _generatedCorruption)
+        {
+            Gizmos.DrawSphere(position, 0.02f);
+
+            Vector3 normalDir = rotation * Vector3.up;
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(position, position + normalDir * 0.1f);
+
+#if UNITY_EDITOR
+            UnityEditor.Handles.color = Color.white;
+            UnityEditor.Handles.Label(position + Vector3.up * 0.05f, index.ToString());
+#endif
+
+            Gizmos.color = Color.yellow;
+        }
     }
 }
