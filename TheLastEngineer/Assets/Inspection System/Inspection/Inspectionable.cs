@@ -14,6 +14,8 @@ public class Inspectionable : MonoBehaviour, IInteractable
     [SerializeField] private ParticlesFeedbackManager _positiveFM = default;
     [SerializeField] private ParticlesFeedbackManager _negativeFM = default;
 
+    public CorruptionGenerator CorruptionGenerator { get; private set; }
+
     public event Action OnFinished;
     public event Action OnCleaned;
 
@@ -21,7 +23,7 @@ public class Inspectionable : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        _collider = GetComponent<Collider>();
+        CorruptionGenerator = GetComponent<CorruptionGenerator>();
     }
 
     public bool CanInteract(PlayerNodeHandler playerNodeHandler)

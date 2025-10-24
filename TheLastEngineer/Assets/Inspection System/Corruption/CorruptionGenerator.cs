@@ -5,13 +5,11 @@ using UnityEngine;
 
 public class CorruptionGenerator : MonoBehaviour
 {
-    [SerializeField] private GameObject _prefabToSpawn;
     [SerializeField] private int _minInstances = 5;
     [SerializeField] private int _maxInstances = 10;
     [SerializeField] private float _offsetAboveSurface = 0.1f;
 
     private List<(int index, Vector3 position, Quaternion rotation)> _generatedCorruption = new List<(int index, Vector3 position, Quaternion rotation)>();
-    private Corruption _currentActive = default;
     private Mesh _mesh = default;
 
     private float _maxParticles = 2000f;
@@ -31,9 +29,6 @@ public class CorruptionGenerator : MonoBehaviour
     void Start()
     {
         _mesh = GetComponent<MeshFilter>().mesh;
-        _currentActive = GetComponentInChildren<Corruption>();
-        _currentActive.SetUpGenerator(this);
-
         SetUpObjectCorruption();
     }
 
@@ -130,16 +125,28 @@ public class CorruptionGenerator : MonoBehaviour
         return Vector3.Dot(normal, toCenter) < 0f;
     }
 
+    public void RefreshCorruptionVisual(Corruption corruption)
+    {
+        if (corruption == null) return;
+
+        if (_index < _generatedCorruption.Count)
+        {
+            corruption.SetPos(_generatedCorruption[_index]);
+            corruption.TurnOnOff(true);
+        }
+        else
+        {
+            corruption.TurnOnOff(false);
+        }
+    }
+
     private void SetUpNextCorruption()
     {
         if (_index >= _generatedCorruption.Count())
         {
             OnObjectCleaned?.Invoke(this);
-            _currentActive = null;
             return;
         }
-
-        _currentActive.SetPos(_generatedCorruption[_index]);
     }
 
     public void RemoveCorruption()

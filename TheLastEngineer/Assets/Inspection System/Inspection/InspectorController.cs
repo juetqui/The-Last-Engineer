@@ -8,6 +8,8 @@ public class InspectorController : MonoBehaviour
     public static InspectorController Instance;
 
     private List<UIInspectionable> _inspectionables = default;
+    private CorruptionGenerator _currentGenerator = default;
+    private UIInspectionable _currentUIInspectionable = default;
 
     public Action<UIInspectionable> OnTargetEnabled = delegate { };
     
@@ -44,13 +46,37 @@ public class InspectorController : MonoBehaviour
         foreach (var item in _inspectionables)
         {
             item.gameObject.SetActive(false);
+        }
 
-            if (enableTarget != null && enableTarget.Type == item.Type)
+        if (enableTarget == null) return;
+
+        foreach (var item in _inspectionables)
+        {
+            if (enableTarget.Type == item.Type)
             {
                 item.gameObject.SetActive(true);
-                item.CorruptionGenerator.OnObjectCleaned += enableTarget.CorruptionCleaned;
+                item.SetUpGenerator(enableTarget.CorruptionGenerator);
+
+                if (_currentGenerator != null)
+                    _currentGenerator.OnUpdatedInstances -= HandleGeneratorUpdated;
+
+                _currentGenerator = enableTarget.CorruptionGenerator;
+                _currentUIInspectionable = item;
+
+                _currentGenerator.OnUpdatedInstances += HandleGeneratorUpdated;
+                _currentGenerator.OnObjectCleaned += enableTarget.CorruptionCleaned;
+
                 OnTargetEnabled?.Invoke(item);
+                break;
             }
         }
+    }
+
+    private void HandleGeneratorUpdated()
+    {
+        if (_currentUIInspectionable == null || _currentGenerator == null)
+            return;
+
+        _currentGenerator.RefreshCorruptionVisual(_currentUIInspectionable.UICorruption);
     }
 }

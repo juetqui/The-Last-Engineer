@@ -22,11 +22,20 @@ public class Corruption : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
     }
 
-    void Start()
+    public void EnableCorruptionEvents(bool enable)
     {
-        CorruptionRemover.Instance.OnCorruptionHit += Hitted;
-        CorruptionRemover.Instance.OnHittingCorruption += Hitting;
-        CorruptionRemover.Instance.OnCorruptionRemoved += Removed;
+        if (enable)
+        {
+            CorruptionRemover.Instance.OnCorruptionHit += Hitted;
+            CorruptionRemover.Instance.OnHittingCorruption += Hitting;
+            CorruptionRemover.Instance.OnCorruptionRemoved += Removed;
+        }
+        else
+        {
+            CorruptionRemover.Instance.OnCorruptionHit -= Hitted;
+            CorruptionRemover.Instance.OnHittingCorruption -= Hitting;
+            CorruptionRemover.Instance.OnCorruptionRemoved -= Removed;
+        }
     }
 
     public void SetUpGenerator(CorruptionGenerator generator)
