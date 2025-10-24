@@ -8,7 +8,7 @@ public class PlayerDissolvingState : IPlayerState
     private bool _isDissolving = false;
 
     private float _timer = 0f;
-    private float _timerSpeed = 0.7f;
+    private float _dissolveDuration = 0.25f;
 
     public PlayerDissolvingState(PlayerStateMachine fsm)
     {
@@ -50,7 +50,7 @@ public class PlayerDissolvingState : IPlayerState
 
     private void Dissolve()
     {
-        _timer += Time.deltaTime * _timerSpeed;
+        _timer += Time.deltaTime / _dissolveDuration;
         _player.Dissolving(_timer);
 
         if (_timer >= 1f)
@@ -59,7 +59,7 @@ public class PlayerDissolvingState : IPlayerState
 
     private void Revert()
     {
-        _timer -= Time.deltaTime * _timerSpeed;
+        _timer -= Time.deltaTime / _dissolveDuration;
         _player.Dissolving(_timer);
 
         if (_timer <= 0f)

@@ -10,6 +10,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
     [SerializeField] private PlatformTeleport _targetPlatform;
     [SerializeField] private ParticleSystem _entrada;
     [SerializeField] private ParticleSystem _salida;
+    [SerializeField] private float _heightThershold = 0.5f;
 
     private NodeType _requiredType = NodeType.Corrupted;
     // [SerializeField] private Renderer _renderer;
@@ -21,7 +22,8 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        TargetPos = _targetPlatform.transform.position;
+        Vector3 targetPos = new Vector3(0, _heightThershold, 0) + _targetPlatform.transform.position;
+        TargetPos = targetPos;
         PlayerOn(false);
         OnPlayerStepped += PlayerOn;
         //_targetPlatform.OnPlayerStepped += PlayerOn;
