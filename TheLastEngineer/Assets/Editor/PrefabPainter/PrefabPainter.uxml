@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UXML xmlns="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+  <VisualElement class="root">
+    <VisualElement class="toolbar">
+      <Button name="newPaletteBtn" text="New Palette" />
+      <ObjectField name="paletteField" label="Palette" allow-scene-objects="false" />
+    </VisualElement>
+
+    <VisualElement class="content">
+      <ListView name="prefabList" class="left" />
+      <VisualElement class="right">
+        <Label text="Preview" class="section" />
+        <VisualElement name="previewArea" class="preview" />
+        <Label text="Settings" class="section" />
+        <EnumField name="snapEnum" label="Snap Mode" value="Grid" />
+        <Slider name="gridSlider" label="Grid Size" lowValue="0.25" highValue="8" value="1" />
+        <FloatField name="yOffsetField" label="Y Offset" value="0" />
+        <Toggle name="alignToggle" label="Align To Surface" value="false" />
+        <Toggle name="randomYawToggle" label="Random Yaw" value="false" />
+        <Toggle name="livePreviewToggle" label="Live Preview" value="true" />
+        <Button name="clearLastBtn" text="Clear Last Anchor" />
+      </VisualElement>
+    </VisualElement>
+  </VisualElement>
+</UXML>
