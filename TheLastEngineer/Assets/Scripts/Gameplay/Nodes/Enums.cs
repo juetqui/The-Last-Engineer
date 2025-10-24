@@ -10,6 +10,12 @@ public enum NodeType
     Default,
     Corrupted
 }
+public enum StopType
+{
+    None,
+    TimeStop,
+    CorruptedStop
+}
 
 public enum InteractablePriority
 {
