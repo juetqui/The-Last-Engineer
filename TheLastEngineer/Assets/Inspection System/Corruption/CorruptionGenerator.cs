@@ -12,7 +12,6 @@ public class CorruptionGenerator : MonoBehaviour
     private List<(int index, Vector3 position, Quaternion rotation)> _generatedCorruption = new List<(int index, Vector3 position, Quaternion rotation)>();
     private Mesh _mesh = default;
 
-    private float _maxParticles = 2000f;
     private float[] _triangleAreas = default;
     private float _totalArea = default;
 
@@ -155,29 +154,5 @@ public class CorruptionGenerator : MonoBehaviour
         _cleanedInstances++;
         OnUpdatedInstances?.Invoke();
         SetUpNextCorruption();
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (_generatedCorruption == null || _generatedCorruption.Count == 0)
-            return;
-
-        Gizmos.color = Color.yellow;
-
-        foreach (var (index, position, rotation) in _generatedCorruption)
-        {
-            Gizmos.DrawSphere(position, 0.02f);
-
-            Vector3 normalDir = rotation * Vector3.up;
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(position, position + normalDir * 0.1f);
-
-#if UNITY_EDITOR
-            UnityEditor.Handles.color = Color.white;
-            UnityEditor.Handles.Label(position + Vector3.up * 0.05f, index.ToString());
-#endif
-
-            Gizmos.color = Color.yellow;
-        }
     }
 }

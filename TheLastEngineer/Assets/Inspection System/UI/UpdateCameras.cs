@@ -1,4 +1,6 @@
 using Cinemachine;
+using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UpdateCameras : MonoBehaviour
@@ -7,24 +9,43 @@ public class UpdateCameras : MonoBehaviour
     [SerializeField] private CinemachineFreeLook _mainCam;
     [SerializeField] private CinemachineFreeLook _targetLockCam;
 
-    private Inspectionable _inspectionable = default;
+    private Camera _mainCamera = default;
+    private bool _isBlending = false;
 
     void Start()
     {
+        _mainCamera = _CMBrain.GetComponent<Camera>();
+
         PlayerController.Instance.OnInteractableSelected += TargetSelected;
+        ScannerController.Instance.OnScanFinished += CorruptionCleaned;
+    }
+
+    private void Update()
+    {
+        if (_isBlending)
+        {
+            if (!_CMBrain.IsBlending)
+            {
+                _CMBrain.m_CameraActivatedEvent.RemoveListener(EnableOcclusionCulling);
+                _mainCamera.useOcclusionCulling = true;
+                _isBlending = false;
+            }
+        }
     }
 
     private void OnDestroy()
     {
         PlayerController.Instance.OnInteractableSelected -= TargetSelected;
+        ScannerController.Instance.OnScanFinished -= CorruptionCleaned;
     }
+
+    private void CorruptionCleaned() => TargetSelected(null);
 
     private void TargetSelected(IInteractable target)
     {
         if (target == null || target is not Inspectionable)
         {
-            if (_inspectionable != null)
-                _inspectionable.OnFinished -= CorruptionCleaned;
+            _CMBrain.m_CameraActivatedEvent.AddListener(EnableOcclusionCulling);
 
             _targetLockCam.Follow = null;
             _targetLockCam.LookAt = null;
@@ -35,14 +56,7 @@ public class UpdateCameras : MonoBehaviour
             return;
         }
 
-        Inspectionable incomingInspectionable = (Inspectionable)target;
-
-        if (incomingInspectionable != _inspectionable)
-        {
-            _inspectionable = incomingInspectionable;
-            _inspectionable.OnFinished += CorruptionCleaned;
-        }
-
+        _mainCamera.useOcclusionCulling = false;
 
         _targetLockCam.Follow = target.Transform;
         _targetLockCam.LookAt = target.Transform;
@@ -51,9 +65,10 @@ public class UpdateCameras : MonoBehaviour
         _targetLockCam.Priority = 1;
     }
 
-    private void CorruptionCleaned()
+    private void EnableOcclusionCulling(ICinemachineCamera activeCam, ICinemachineCamera previousCam)
     {
-        _inspectionable.OnFinished -= CorruptionCleaned;
-        TargetSelected(null);
+        if (!ReferenceEquals(activeCam, _mainCam)) return;
+
+        _isBlending = true;
     }
 }

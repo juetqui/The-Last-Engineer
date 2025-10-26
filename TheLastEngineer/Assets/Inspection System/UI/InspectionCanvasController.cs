@@ -7,7 +7,6 @@ public class InspectionCanvasController : MonoBehaviour
     [SerializeField] private CinemachineFreeLook _inspectionCamera;
 
     private Canvas _canvas = default;
-    private Inspectionable _inspectionable = default;
 
     private bool _isBlending = false;
 
@@ -15,12 +14,12 @@ public class InspectionCanvasController : MonoBehaviour
     {
         _canvas = GetComponent<Canvas>();
         _CMBrain.m_CameraActivatedEvent.AddListener(EnableCanvas);
+        PlayerController.Instance.OnInteractableSelected += CheckInteractable;
+        ScannerController.Instance.OnScanFinished += DisableCanvas;
         
-        _canvas.enabled = true;
+        _canvas.enabled = false;
         ResetCanvas();
 
-        TargetSelected(null);
-        PlayerController.Instance.OnInteractableSelected += TargetSelected;
     }
 
     private void LateUpdate()
@@ -38,35 +37,21 @@ public class InspectionCanvasController : MonoBehaviour
 
     private void OnDestroy()
     {
-        PlayerController.Instance.OnInteractableSelected -= TargetSelected;
         _CMBrain.m_CameraActivatedEvent.RemoveListener(EnableCanvas);
+        ScannerController.Instance.OnScanFinished -= DisableCanvas;
     }
 
-    private void TargetSelected(IInteractable target)
+    private void CheckInteractable(IInteractable interactable)
     {
-        if (target == null || target is not Inspectionable)
-        {
-            if (_inspectionable != null)
-                _inspectionable.OnFinished -= ClearReferences;
+        if (interactable != null) return;
 
-            _canvas.enabled = false;
-            ResetCanvas();
-            return;
-        }
-
-        Inspectionable incomingInspectionable = (Inspectionable)target;
-
-        if (incomingInspectionable != _inspectionable)
-        {
-            _inspectionable = incomingInspectionable;
-            _inspectionable.OnFinished += ClearReferences;
-        }
+        DisableCanvas();
     }
 
-    private void ClearReferences()
+    private void DisableCanvas()
     {
-        _inspectionable.OnFinished -= ClearReferences;
-        TargetSelected(null);
+        _canvas.enabled = false;
+        ResetCanvas();
     }
 
     private void EnableCanvas(ICinemachineCamera activeCam, ICinemachineCamera previousCam)

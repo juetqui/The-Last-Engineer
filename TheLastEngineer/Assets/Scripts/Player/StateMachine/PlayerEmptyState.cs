@@ -37,7 +37,10 @@ public class PlayerEmptyState : IPlayerState
             _holding = true;
             _holdTimer = 0f;
         }
-        else TryDoInteraction(interactable);
+        else
+        {
+            TryDoInteraction(_target);
+        }
     }
 
     private void TryDoInteraction(IInteractable interactable)
@@ -59,6 +62,11 @@ public class PlayerEmptyState : IPlayerState
             _player.SetPos(teleport.TargetPos);
             _player.RemoveInteractable(interactable);
             InputManager.Instance?.RumblePulse(0.25f, 1f, 0.25f);
+        }
+
+        if (interactable is Inspectionable inspectionable)
+        {
+            inspectionable.OnFinished += RemoveInteractable;
         }
     }
 
@@ -91,5 +99,13 @@ public class PlayerEmptyState : IPlayerState
         _playerNodeHandler = null;
         _target = null;
         _holding = false;
+    }
+
+    private void RemoveInteractable()
+    {
+        if (_target is Inspectionable inspectionable)
+            inspectionable.OnFinished -= RemoveInteractable;
+
+        _player.RemoveInteractable(_target);
     }
 }

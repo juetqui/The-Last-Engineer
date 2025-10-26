@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class ScannerController : MonoBehaviour
 {
+    public static ScannerController Instance = null;
+
     [SerializeField] private float _targetScale = 6f;
     [SerializeField] private float _targetTime = 1f;
 
@@ -9,6 +12,19 @@ public class ScannerController : MonoBehaviour
 
     private float _timer = 0f;
     private bool _scan = false;
+
+    public Action OnScanFinished = delegate { };
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(Instance.gameObject);
+            Instance = null;
+        }
+
+        Instance = this;
+    }
 
     void Start()
     {
@@ -47,6 +63,7 @@ public class ScannerController : MonoBehaviour
         {
             _scan = false;
             transform.localScale = Vector3.one;
+            OnScanFinished?.Invoke();
         }
     }
 }

@@ -17,7 +17,6 @@ public class PlayerModel
 
     //----- Teleport Variables -----//
     #region
-    private float _teleportTimer = 0f;
     private float _teleportDuration = 0.25f;
     private Vector3 _teleportStartPos;
     private Vector3 _teleportTargetPos;

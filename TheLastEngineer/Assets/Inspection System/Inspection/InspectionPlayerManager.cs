@@ -12,13 +12,17 @@ public class InspectionPlayerManager : MonoBehaviour
         _camera = GetComponent<Camera>();
         _camera.enabled = false;
         PlayerController.Instance.OnInteractableSelected += OnTargetSelected;
+        ScannerController.Instance.OnScanFinished += HandleFinishedInspection;
         InspectionSystem.Instance.enabled = false;
     }
 
     private void OnDestroy()
     {
         PlayerController.Instance.OnInteractableSelected -= OnTargetSelected;
+        ScannerController.Instance.OnScanFinished -= HandleFinishedInspection;
     }
+
+    private void HandleFinishedInspection() => StopInspection();
 
     private void OnTargetSelected(IInteractable target)
     {
@@ -36,9 +40,8 @@ public class InspectionPlayerManager : MonoBehaviour
         InspectionSystem.Instance.enabled = true;
         PlayerController.Instance.SetCanMove(false);
         InputManager.Instance.UpdateActionMap(ActionMaps.UI);
+        
         _currentInteractable = interactable;
-
-        _currentInteractable.OnFinished += HandleFinishedInteraction;
         _currentInteractable.Interact(PlayerNodeHandler.Instance, out bool succeded);
 
         _isInspecting = true;
@@ -55,7 +58,6 @@ public class InspectionPlayerManager : MonoBehaviour
     {
         _camera.enabled = false;
         InspectionSystem.Instance.enabled = false;
-        _currentInteractable.OnFinished -= HandleFinishedInteraction;
 
         InputManager.Instance.UpdateActionMap(ActionMaps.Player);
         PlayerController.Instance.SetCanMove(true);

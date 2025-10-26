@@ -6,6 +6,8 @@ public class PlayerGrabState : IPlayerState
     private PlayerController _player;
     private PlayerNodeHandler _playerNodeHandler;
 
+    private IInteractable _target = null;
+
     public PlayerGrabState(PlayerStateMachine stateMachine)
     {
         _stateMachine = stateMachine;
@@ -18,6 +20,7 @@ public class PlayerGrabState : IPlayerState
 
         _player = player;
         _playerNodeHandler = playerNodeHandler;
+        _target = null;
     }
 
     public void Tick()
@@ -34,6 +37,15 @@ public class PlayerGrabState : IPlayerState
 
     public void HandleInteraction(IInteractable interactable)
     {
+        if (interactable is Inspectionable inspectionable)
+        {
+            Debug.Log("Interacting with Inspectionable");
+            _target = interactable;
+            inspectionable.OnFinished += RemoveInteractable;
+
+            return;
+        }
+
         if (_player.CheckForWalls()) return;
 
         if (interactable == null || !interactable.CanInteract(_playerNodeHandler))
@@ -73,5 +85,14 @@ public class PlayerGrabState : IPlayerState
     {
         _player.DropNode();
         _stateMachine.TransitionToEmptyState();
+    }
+
+    private void RemoveInteractable()
+    {
+        if (_target is Inspectionable inspectionable)
+            inspectionable.OnFinished -= RemoveInteractable;
+
+        _player.RemoveInteractable(_target);
+        Debug.Log("Inspection Finished");
     }
 }

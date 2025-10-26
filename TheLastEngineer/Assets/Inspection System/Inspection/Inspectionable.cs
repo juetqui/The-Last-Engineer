@@ -44,11 +44,12 @@ public class Inspectionable : MonoBehaviour, IInteractable
     public void CorruptionCleaned(CorruptionGenerator generator)
     {
         generator.OnObjectCleaned -= CorruptionCleaned;
-        _collider.enabled = false;
         _negativeFM.StopParticles();
         _positiveFM.StartParticles();
         OnFinished?.Invoke();
         OnCleaned?.Invoke();
+
+        _collider.enabled = false;
     }
 }
 
