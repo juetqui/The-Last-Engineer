@@ -46,9 +46,17 @@ public class ScannerController : MonoBehaviour
     {
         if (corruptionGenerator != _corruptionGenerator) return;
 
-        _scan = true;
+        InspectionSystem.Instance.OnResetRot += SetUpScanning;
+        GamepadCursor.Instance.CenterCursor();
+        InspectionSystem.Instance.ResetRot();
+
         _corruptionGenerator.OnObjectCleaned -= SetScan;
         _corruptionGenerator = null;
+    }
+
+    private void SetUpScanning()
+    {
+        _scan = true;
     }
 
     private void StartScanning()
@@ -61,6 +69,8 @@ public class ScannerController : MonoBehaviour
 
         if (_timer >= _targetTime)
         {
+            InspectionSystem.Instance.OnResetRot -= SetUpScanning;
+
             _scan = false;
             transform.localScale = Vector3.one;
             OnScanFinished?.Invoke();

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,8 +9,8 @@ public class InspectionSystem : MonoBehaviour
     [SerializeField] private Transform _inspectedObject;
     [SerializeField] private float _rotSpeed = 100f;
     [SerializeField] private float _gamepadRotSpeed = 300f;
-    [SerializeField] private float _resetRotThreshhold = 1f;
-    [SerializeField] private float _resetRotSpeed = 0.05f;
+    [SerializeField] private float _resetRotThreshold = 1f;
+    [SerializeField] private float _resetRotSpeed = 0.5f;
 
     private Vector3 _lastMousePosition = Vector3.zero;
     private Quaternion _initialObjectRot = Quaternion.identity;
@@ -18,6 +19,8 @@ public class InspectionSystem : MonoBehaviour
     private bool _canRotate = true;
     private bool _isRotatingWithMouse = false;
     private bool _isResettingPos = false;
+
+    public Action OnResetRot = delegate { };
 
     private void Awake()
     {
@@ -109,9 +112,9 @@ public class InspectionSystem : MonoBehaviour
 
     private void ResetCDValues()
     {
+        _timer = 0f;
         _isResettingPos = true;
         _canRotate = false;
-        _timer = 0f;
     }
 
     private void ResetPos()
@@ -119,8 +122,9 @@ public class InspectionSystem : MonoBehaviour
         _timer += Time.unscaledDeltaTime * _resetRotSpeed;
         _inspectedObject.rotation = Quaternion.Lerp(_inspectedObject.rotation, _initialObjectRot, _timer);
 
-        if (Quaternion.Angle(_inspectedObject.rotation, _initialObjectRot) <= _resetRotThreshhold)
+        if (Quaternion.Angle(_inspectedObject.rotation, _initialObjectRot) <= _resetRotThreshold)
         {
+            OnResetRot?.Invoke();
             _inspectedObject.rotation = _initialObjectRot;
             _isResettingPos = false;
             _canRotate = true;
