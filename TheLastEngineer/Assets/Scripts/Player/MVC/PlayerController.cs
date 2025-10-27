@@ -155,7 +155,12 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         StateMachine.CurrentState?.Cancel();
     }
 
-    private void OnCancelSelect() => OnInteractableSelected?.Invoke(null);
+    private void OnCancelSelect()
+    {
+        if (!InspectionSystem.Instance.CanRotate) return;
+
+        OnInteractableSelected?.Invoke(null);
+    }
 
     private Vector3 GetMovement3D()
     {
@@ -272,7 +277,12 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     }
     #endregion
 
-    public void WalkSound () => View.WalkSound();
+    public void WalkSound()
+    {
+        if (!CC.isGrounded) return;
+
+        View.WalkSound();
+    }
 
     #region TRIGGERS MANAGEMENT
     private void OnTriggerEnter(Collider coll)

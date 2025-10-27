@@ -6,11 +6,15 @@ public class InspectionSystem : MonoBehaviour
 {
     public static InspectionSystem Instance;
 
+    [Header("Rotation Values")]
     [SerializeField] private Transform _inspectedObject;
     [SerializeField] private float _rotSpeed = 100f;
     [SerializeField] private float _gamepadRotSpeed = 300f;
+
+    [Header("Rotation Reset Values")]
     [SerializeField] private float _resetRotThreshold = 1f;
-    [SerializeField] private float _resetRotSpeed = 0.5f;
+    [SerializeField] private float _resetRotDuration = 1f;
+    [SerializeField] private LeanTweenType _resetEasing = LeanTweenType.easeInOutSine;
 
     private Vector3 _lastMousePosition = Vector3.zero;
     private Quaternion _initialObjectRot = Quaternion.identity;
@@ -18,7 +22,9 @@ public class InspectionSystem : MonoBehaviour
     private float _timer = 0f;
     private bool _canRotate = true;
     private bool _isRotatingWithMouse = false;
-    private bool _isResettingPos = false;
+    private LTDescr _currentTween;
+
+    public bool CanRotate { get { return _canRotate; } }
 
     public Action OnResetRot = delegate { };
 
@@ -47,8 +53,6 @@ public class InspectionSystem : MonoBehaviour
     {
         if (_canRotate && GamepadCursor.Instance.IsUsingGamepad())
             RotateObjectForGamepad();
-
-        if (_isResettingPos) ResetPos();
     }
 
     private void RightClickStarted(InputAction.CallbackContext context)
@@ -83,11 +87,11 @@ public class InspectionSystem : MonoBehaviour
         _lastMousePosition = currentMousePosition;
     }
 
-    public void ResetRot() => ResetCDValues();
+    public void ResetRot() => ResetPos();
 
     private void ResetRot(InputAction.CallbackContext context = default)
     {
-        ResetCDValues();
+        ResetPos();
     }
 
     private void RotateObjectForGamepad()
@@ -110,25 +114,24 @@ public class InspectionSystem : MonoBehaviour
         _timer = 0f;
     }
 
-    private void ResetCDValues()
-    {
-        _timer = 0f;
-        _isResettingPos = true;
-        _canRotate = false;
-    }
-
     private void ResetPos()
     {
-        _timer += Time.unscaledDeltaTime * _resetRotSpeed;
-        _inspectedObject.rotation = Quaternion.Lerp(_inspectedObject.rotation, _initialObjectRot, _timer);
+        if (_currentTween != null)
+            LeanTween.cancel(_inspectedObject.gameObject);
 
-        if (Quaternion.Angle(_inspectedObject.rotation, _initialObjectRot) <= _resetRotThreshold)
+        _canRotate = false;
+
+        _currentTween = LeanTween.rotate(
+            _inspectedObject.gameObject,
+            _initialObjectRot.eulerAngles,
+            _resetRotDuration
+        )
+        .setEase(_resetEasing)
+        .setOnComplete(() =>
         {
-            OnResetRot?.Invoke();
             _inspectedObject.rotation = _initialObjectRot;
-            _isResettingPos = false;
             _canRotate = true;
-            _timer = 0f;
-        }
+            OnResetRot?.Invoke();
+        });
     }
 }
