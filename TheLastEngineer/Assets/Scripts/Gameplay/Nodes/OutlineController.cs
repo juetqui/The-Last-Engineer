@@ -13,9 +13,9 @@ public class OutlineController : MonoBehaviour
         _outline = GetComponent<Outline>();   
         _nodeController = GetComponentInParent<NodeController>();
         _nodeController.OnUpdatedNodeType += ChangeOutline;
+        _nodeController.OnEnableOutline += EnableOutline;
     }
-
-    void ChangeOutline(NodeType node)
+    private void ChangeOutline(NodeType node)
     {
         if (node == NodeType.Corrupted)
         {
@@ -25,5 +25,10 @@ public class OutlineController : MonoBehaviour
         {
             _outline.OutlineColor = _emissionDefault;
         }
+    }
+
+    private void EnableOutline(bool enable)
+    {
+        _outline.enabled = enable;
     }
 }

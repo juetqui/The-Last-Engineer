@@ -39,6 +39,7 @@ public class NodeController : MonoBehaviour, IInteractable
     private Vector3 _resetPos = Vector3.zero;
     private bool _isChildren = false;
 
+    public Action<bool> OnEnableOutline = delegate { };
 
     protected void Awake()
     {
@@ -94,6 +95,7 @@ public class NodeController : MonoBehaviour, IInteractable
             _playerNodeHandler.OnGlitchChange += InteractWithGlitcheable;
             _nodeView.EnableColl(false);
             _nodeView.EnableOutline(false);
+            OnEnableOutline?.Invoke(false);
         }
         else
         {
@@ -105,6 +107,7 @@ public class NodeController : MonoBehaviour, IInteractable
             
             _nodeView.EnableColl(true);
             _nodeView.EnableOutline(true);
+            OnEnableOutline?.Invoke(true);
         }
 
         if (!parentIsPlayer && newParent != null)
@@ -131,16 +134,6 @@ public class NodeController : MonoBehaviour, IInteractable
         if (glitcheable == null) return;
         
         UpdateNodeType();
-
-        //bool succceededInteraction = false;
-        //glitcheable.Interact();
-
-        //if (glitcheable.Interrupt(_nodeType))
-        //{
-        //    UpdateNodeType();
-        //    return true;
-        //}
-        //else return false;
     }
 
     private void UpdateNodeType()

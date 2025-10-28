@@ -1,7 +1,14 @@
+using TMPro;
 using UnityEngine;
 
 public class BackPackColorChange : MonoBehaviour
 {
+    [ColorUsageAttribute(true, true)]
+    [SerializeField] private Color _defultColor;
+    
+    [ColorUsageAttribute(true, true)]
+    [SerializeField] private Color _glitchedColor;
+
     private Renderer _renderer = default;
     private Color _targetColor = default;
 
@@ -26,9 +33,9 @@ public class BackPackColorChange : MonoBehaviour
         if (!hasNode || nodeType == NodeType.None)
             _targetColor = Color.black;
         else if (nodeType == NodeType.Default)
-            _targetColor = Color.cyan;
+            _targetColor = _defultColor;
         else
-            _targetColor = Color.magenta;
+            _targetColor = _glitchedColor;
 
         _changeColor = true;
     }
