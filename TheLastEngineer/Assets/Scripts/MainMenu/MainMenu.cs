@@ -105,7 +105,12 @@ public class MainMenu : MonoBehaviour
     }
     public void StartTutorial2()
     {
-        SceneManager.LoadScene("NIVEL gabi");
+        SceneManager.LoadScene("Zona Plataformas");
+    }
+
+    public void StartTutorial3()
+    {
+        SceneManager.LoadScene("NIVEL HUB");
     }
 
     public void Quit()
