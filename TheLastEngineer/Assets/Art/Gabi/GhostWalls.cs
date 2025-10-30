@@ -20,16 +20,16 @@ public class GhostWalls : MonoBehaviour
     }
     private void Update()
     {
-        if (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
+        if (PlayerNodeHandler.Instance.CurrentType != NodeType.Corrupted)
         {
             material.SetFloat("_Alpha", 0f);
-            playerHasCorruption=true;
+            playerHasCorruption=false;
             GetComponent<Collider>().enabled = false;
         }
         else if(!IsDisolving)
         {
             material.SetFloat("_Alpha", 1f);
-            playerHasCorruption = false;
+            playerHasCorruption = true;
             GetComponent<Collider>().enabled = true;
 
         }
