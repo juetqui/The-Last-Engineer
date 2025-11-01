@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class CutoutObject : MonoBehaviour
@@ -14,20 +13,47 @@ public class CutoutObject : MonoBehaviour
     private bool _hasObstacle = false, _lastCheck = false;
     private float _currentSize = 0f;
 
+    private const float CheckInterval = 0.05f;
+
+    private float _nextCheckTime;
+    private float _aspectRatio;
+
+    private Vector3 _hitPoint;
+    private Vector3 _desiredCutoutPos;
+    private bool _desiredEnabled;
+
+    private Vector3 _lastCutoutPos;
+    private float _lastCutoutSize;
+    private bool _cutoutEnabled;
+
     private void Awake()
     {
         _mainCamera = GetComponent<Camera>();
+        _aspectRatio = (float)Screen.width / Screen.height;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        CheckCutout();
+        if (Time.time >= _nextCheckTime)
+        {
+            _nextCheckTime = Time.time + CheckInterval;
+            SampleObstacle();
+        }
+
+        bool sizeChanged = UpdateCutoutSizeTowardsTarget();
+
+        bool positionChanged = _desiredEnabled && (_desiredCutoutPos != _lastCutoutPos);
+        bool enabledChanged = (_desiredEnabled != _cutoutEnabled);
+        bool anyChange = enabledChanged || positionChanged || sizeChanged;
+
+        if (anyChange)
+        {
+            ApplyCutout(_desiredCutoutPos, _currentSize, _desiredEnabled);
+        }
     }
 
-    private void CheckCutout()
+    private void SampleObstacle()
     {
-        Vector3 offset = _target.position - transform.position;
-
         _hasObstacle = Physics.Linecast(transform.position, _target.position, out _hit, _layerMask);
 
         if (_hasObstacle != _lastCheck)
@@ -38,30 +64,60 @@ public class CutoutObject : MonoBehaviour
 
         if (_hasObstacle)
         {
-            Vector3 cutoutPos = _mainCamera.WorldToViewportPoint(_hit.point);
-            cutoutPos.y /= (Screen.width / Screen.height);
+            _hitPoint = _hit.point;
 
-            _cutoutMat.SetVector("_CutoutPos", cutoutPos);
-            _cutoutMat.SetFloat("_EnableCutout", 1f);
-            UpdateCutoutSize(true);
+            Vector3 vp = _mainCamera.WorldToViewportPoint(_hitPoint);
+            vp.y /= _aspectRatio;
+
+            _desiredCutoutPos = vp;
+            _desiredEnabled = true;
         }
         else
         {
-            UpdateCutoutSize(false);
-
-            if (_currentSize <= 0f)
-                _cutoutMat.SetFloat("_EnableCutout", 0f);
+            _desiredCutoutPos = _lastCutoutPos;
+            _desiredEnabled = (_currentSize > 0f);
         }
     }
-    private void UpdateCutoutSize(bool increment)
+
+    private bool UpdateCutoutSizeTowardsTarget()
     {
+        float target = _hasObstacle ? _targetCutoutSize : 0f;
+        float before = _currentSize;
+
         float delta = Time.deltaTime * _timeModifier;
-
-        if (increment)
-            _currentSize = Mathf.Min(_currentSize + delta, _targetCutoutSize);
+        if (_hasObstacle)
+            _currentSize = Mathf.Min(_currentSize + delta, target);
         else
-            _currentSize = Mathf.Max(_currentSize - delta, 0f);
+            _currentSize = Mathf.Max(_currentSize - delta, target);
 
-        _cutoutMat.SetFloat("_CutoutSize", _currentSize);
+        if (!_hasObstacle && _currentSize <= 0f)
+            _desiredEnabled = false;
+
+        return !Mathf.Approximately(before, _currentSize);
     }
+
+    private void ApplyCutout(Vector3 pos, float size, bool enabled)
+    {
+        if (enabled != _cutoutEnabled)
+        {
+            _cutoutEnabled = enabled;
+            _cutoutMat.SetFloat("_EnableCutout", enabled ? 1f : 0f);
+        }
+
+        if (!enabled)
+            return;
+
+        if (pos != _lastCutoutPos)
+        {
+            _cutoutMat.SetVector("_CutoutPos", pos);
+            _lastCutoutPos = pos;
+        }
+
+        if (!Mathf.Approximately(size, _lastCutoutSize))
+        {
+            _cutoutMat.SetFloat("_CutoutSize", size);
+            _lastCutoutSize = size;
+        }
+    }
+
 }
