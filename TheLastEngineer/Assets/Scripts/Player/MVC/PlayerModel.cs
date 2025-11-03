@@ -47,21 +47,33 @@ public class PlayerModel
         _coyoteTime = playerData.coyoteTime;
     }
 
-    public void OnUpdate(Vector3 moveDir, float moveSpeed)
+    public void OnUpdate(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight, float moveSpeed)
     {
         _moveSpeed = moveSpeed;
-        MovePlayer(moveDir);
+        MovePlayer(moveDir, cameraForward, cameraRight);
         UpdateCoyoteTimer();
     }
 
-    private void MovePlayer(Vector3 moveDir)
+    private void MovePlayer(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight)
     {
         if (_isDashing) return;
         //if (_isDashing) moveDir *= 0.01f;
 
-        if (moveDir.sqrMagnitude > 0.0001f)
-            RotatePlayer(moveDir);
+        if (moveDir.magnitude > 0.0001f)
+        {
+            cameraForward.y = 0f;
+            cameraForward.Normalize();
 
+            cameraRight.y = 0f;
+            cameraRight.Normalize();
+
+            moveDir = (cameraForward * moveDir.z + cameraRight * moveDir.x).normalized;
+
+            RotatePlayer(moveDir);
+        }
+
+        //if (moveDir.sqrMagnitude > 0.0001f)
+        //    RotatePlayer(moveDir);
 
         Vector3 horizontal = GetHorizontalMovement(moveDir);
         Vector3 vertical = HandleVerticalMovement();

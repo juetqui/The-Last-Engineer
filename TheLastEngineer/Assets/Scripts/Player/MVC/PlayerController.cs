@@ -8,11 +8,13 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     #region Variables
     public static PlayerController Instance = null;
 
+
     [Header("Data & MVC")]
     [SerializeField] private PlayerData _playerData;
     [SerializeField] private Renderer _renderer;
     [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS, _teleportPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
+    [SerializeField] private Camera _mainCam;
 
     public CharacterController CC { get; private set; }
     private Collider _collider = default;
@@ -91,7 +93,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void Update()
     {
         var mv3 = GetMovement3D();
-        _model.OnUpdate(mv3, _currentSpeed);
+        _model.OnUpdate(mv3, _mainCam.transform.forward, _mainCam.transform.right, _currentSpeed);
         View.Walk(mv3);
         StateMachine.Tick();
     }
