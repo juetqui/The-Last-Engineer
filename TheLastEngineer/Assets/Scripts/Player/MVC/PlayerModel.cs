@@ -171,6 +171,8 @@ public class PlayerModel
         if (dashDir == Vector3.zero)
             dashDir = _transform.forward;
 
+        RotatePlayer(dashDir);
+
         float dashTimer = Time.time;
         _isDashing = true;
         _canDash = false;
