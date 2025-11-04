@@ -3,13 +3,17 @@ using UnityEngine;
 public class AudioListenerHolder : MonoBehaviour
 {
     private Quaternion _startRot = default;
-    private void Awake()
+    private Vector3 _startPos = new Vector3 (0, 1, 0);
+    
+    private void Start()
     {
-        _startRot = transform.localRotation;
+        _startRot = Quaternion.identity;
+        transform.SetParent(PlayerController.Instance.transform);
+        transform.localPosition = _startPos;
     }
+
     void Update()
     {
-        transform.position = PlayerController.Instance.transform.position;
         transform.rotation = _startRot;
     }
 }
