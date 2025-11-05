@@ -10,7 +10,9 @@ public class CameraMovementController : MonoBehaviour
 
     [Header("Offset Limits")]
     [SerializeField] private float _XLimit = 5f;
+    [SerializeField] private float _NegativeXLimit = -5f;
     [SerializeField] private float _YLimit = 15f;
+    [SerializeField] private float _NegativeYLimit = -15f;
 
     private CinemachineFreeLook _freeLookCamera;
     private CinemachineComposer _composer;
@@ -73,8 +75,8 @@ public class CameraMovementController : MonoBehaviour
         _currentOffset.x += _inputOffset.x * _sensitivity * Time.deltaTime;
         _currentOffset.y += _inputOffset.y * _sensitivity * Time.deltaTime;
 
-        _currentOffset.x = Mathf.Clamp(_currentOffset.x, -_XLimit, _XLimit);
-        _currentOffset.y = Mathf.Clamp(_currentOffset.y, -_YLimit, _YLimit);
+        _currentOffset.x = Mathf.Clamp(_currentOffset.x, _NegativeXLimit, _XLimit);
+        _currentOffset.y = Mathf.Clamp(_currentOffset.y, _NegativeYLimit, _YLimit);
 
         _composer.m_TrackedObjectOffset = _currentOffset;
     }
