@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9121050468221444649}
   - component: {fileID: 5030829516465307820}
   - component: {fileID: 3739855289011646573}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Tapa_Cristal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,8 @@ GameObject:
   - component: {fileID: 2830850855312791498}
   - component: {fileID: 2793121160697366333}
   - component: {fileID: 5424418330330595550}
-  m_Layer: 0
+  - component: {fileID: 3174929269531915488}
+  m_Layer: 6
   m_Name: cable_principal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,6 +179,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3174929269531915488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4419159049917988309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f58f44fdb566d349bd86f1dd0b211b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TubeLight
 --- !u!1 &4460169988995373699
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +200,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5331655533810559627}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Asset_Piso_CableConnection_T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +236,8 @@ GameObject:
   - component: {fileID: 6113683568341532517}
   - component: {fileID: 4029375832124301888}
   - component: {fileID: 1282143467784260475}
-  m_Layer: 0
+  - component: {fileID: 7809267332712747831}
+  m_Layer: 6
   m_Name: Estructura
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -301,3 +315,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7809267332712747831
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8341385264686623582}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 6, y: 1.3612002, z: 6}
+  m_Center: {x: -3, y: -0.626219, z: -3}

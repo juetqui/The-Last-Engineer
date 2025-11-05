@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6655838597733306078}
   - component: {fileID: 8309834010009918531}
   - component: {fileID: 1956254219396510685}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Tapa_Cristal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,8 @@ GameObject:
   - component: {fileID: 5634996993044491916}
   - component: {fileID: 8672353627446315149}
   - component: {fileID: 4673823762154175659}
-  m_Layer: 0
+  - component: {fileID: 3971515387610060821}
+  m_Layer: 6
   m_Name: cable_principal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -178,6 +179,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3971515387610060821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7741261582247734893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f58f44fdb566d349bd86f1dd0b211b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TubeLight
 --- !u!1 &8545276496817836941
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,7 +202,8 @@ GameObject:
   - component: {fileID: 5919928539996503727}
   - component: {fileID: 1998055759276045281}
   - component: {fileID: 1235333237396097221}
-  m_Layer: 0
+  - component: {fileID: 7819109537445821147}
+  m_Layer: 6
   m_Name: Estructura
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -267,6 +281,27 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7819109537445821147
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8545276496817836941}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 6, y: 1.3016685, z: 6}
+  m_Center: {x: -3, y: -0.59645313, z: -3}
 --- !u!1 &8905638927178864796
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +311,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6039276553534235200}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Asset_Piso_CableConnection_Izq
   m_TagString: Untagged
   m_Icon: {fileID: 0}
