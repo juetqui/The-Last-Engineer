@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class LightFlicker : MonoBehaviour
 {
-    [SerializeField] private float _minFirstTimer = 0.125f;
-    [SerializeField] private float _maxFirstTimer = 1f;
-    [SerializeField] private float _minSecTimer = 0.125f;
-    [SerializeField] private float _maxSecTimer = 0.25f;
+    [SerializeField] private float _minOnTimer = 0.125f;
+    [SerializeField] private float _maxOnTimer = 1f;
+    [SerializeField] private float _minOffTimer = 0.125f;
+    [SerializeField] private float _maxOffTimer = 0.25f;
 
     private Light _light = default;
 
@@ -18,8 +18,8 @@ public class LightFlicker : MonoBehaviour
 
     private IEnumerator FlickLight()
     {
-        float firstTimer = Random.Range(_minFirstTimer, _maxFirstTimer);
-        float secTimer = Random.Range(_minSecTimer, _maxSecTimer);
+        float firstTimer = Random.Range(_minOnTimer, _maxOnTimer);
+        float secTimer = Random.Range(_minOffTimer, _maxOffTimer);
         
         _light.enabled = true;
         yield return new WaitForSeconds(firstTimer);
