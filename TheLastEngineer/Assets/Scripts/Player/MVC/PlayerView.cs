@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerView
 {
@@ -121,8 +122,18 @@ public class PlayerView
 
     public void PlayNodePS(NodeType nodeType)
     {
-        if (nodeType == NodeType.Corrupted) _corruptedPS.Play();
-        else _defaultPS.Play();
+        _renderer.materials[1].SetFloat("_HasNode", 1);
+
+        if (nodeType == NodeType.Corrupted)
+        {
+            _renderer.materials[1].SetFloat("_IsGlitched", 1);
+            _corruptedPS.Play();
+        }
+        else
+        {
+            _renderer.materials[1].SetFloat("_IsGlitched", 0);
+            _defaultPS.Play();
+        }
     }
 
     public void TeleportPS()
@@ -150,7 +161,13 @@ public class PlayerView
         if (grab)
             PlayAudioWithRandomPitch(_fxSource, _liftClip);
         else
+        {
             PlayAudioWithRandomPitch(_fxSource, _putDownClip);
+
+            // SACAR ESTO DE ACA
+            _renderer.materials[1].SetFloat("_HasNode", 0);
+            _renderer.materials[1].SetFloat("_IsGlitched", 0);
+        }
 
         if (outlineColor != Color.black)
             PlayPS(outlineColor);

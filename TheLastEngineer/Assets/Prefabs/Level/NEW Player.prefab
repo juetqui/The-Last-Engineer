@@ -5259,6 +5259,7 @@ MonoBehaviour:
   _teleportPS: {fileID: 4976660462276035408}
   _walkSource: {fileID: 7616545465957714184}
   _fxSource: {fileID: 6748335142693940850}
+  _mainCam: {fileID: 0}
 --- !u!114 &3156403094411963407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5371,6 +5372,15 @@ MonoBehaviour:
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
+  resetCamInput:
+    m_Name: 
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 8a10e64b-49f1-46d3-9992-1b8eb28f91e2
     m_Processors: 
     m_Interactions: 
     m_SingletonActionBindings: []
@@ -21050,6 +21060,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 6fae8ad4ab8f4c041a19b09767f69a92, type: 2}
+  - {fileID: 2100000, guid: 040bb5a6b3ec97140bfb51e3be82371c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -31695,10 +31706,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376cd792c6750d545998ba99c3cb7fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minFirstTimer: 3
-  _maxFirstTimer: 5
-  _minSecTimer: 0.125
-  _maxSecTimer: 0.25
+  _minOnTimer: 0.125
+  _maxOnTimer: 1
+  _minOffTimer: 0.125
+  _maxOffTimer: 0.25
 --- !u!114 &8691022655479355915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31711,10 +31722,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376cd792c6750d545998ba99c3cb7fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minFirstTimer: 3
-  _maxFirstTimer: 5
-  _minSecTimer: 0.125
-  _maxSecTimer: 0.25
+  _minOnTimer: 0.125
+  _maxOnTimer: 1
+  _minOffTimer: 0.125
+  _maxOffTimer: 0.25
 --- !u!114 &5029485282236628373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31727,10 +31738,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376cd792c6750d545998ba99c3cb7fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minFirstTimer: 3
-  _maxFirstTimer: 5
-  _minSecTimer: 0.125
-  _maxSecTimer: 0.25
+  _minOnTimer: 0.125
+  _maxOnTimer: 1
+  _minOffTimer: 0.125
+  _maxOffTimer: 0.25
 --- !u!1 &9047472345889650924
 GameObject:
   m_ObjectHideFlags: 0
@@ -32163,6 +32174,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f98cf8fca6424774794b4d2602e17b26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _defultColor: {r: 0, g: 0, b: 0, a: 0}
+  _glitchedColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &336967876538944131
 MonoBehaviour:
   m_ObjectHideFlags: 0
