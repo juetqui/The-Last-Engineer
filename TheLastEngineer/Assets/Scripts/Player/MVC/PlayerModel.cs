@@ -72,9 +72,6 @@ public class PlayerModel
             RotatePlayer(moveDir);
         }
 
-        //if (moveDir.sqrMagnitude > 0.0001f)
-        //    RotatePlayer(moveDir);
-
         Vector3 horizontal = GetHorizontalMovement(moveDir);
         Vector3 vertical = HandleVerticalMovement();
         Vector3 totalMovement = horizontal + vertical + _platformDisplacement;
