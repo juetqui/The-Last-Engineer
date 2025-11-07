@@ -101,7 +101,7 @@ public class MainMenu : MonoBehaviour
 
     public void StartLevel()
     {
-        SceneManager.LoadScene("Nivel 1 - Entregable");
+        SceneManager.LoadScene("NIVEL TUTO 1 juli");
     }
     public void StartTutorial2()
     {
@@ -111,6 +111,11 @@ public class MainMenu : MonoBehaviour
     public void StartTutorial3()
     {
         SceneManager.LoadScene("NIVEL HUB");
+    }
+
+    public void PlatOld()
+    {
+        SceneManager.LoadScene("Zona Plataformas old");
     }
 
     public void Quit()

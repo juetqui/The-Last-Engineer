@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class DoorsView : MonoBehaviour
 {
@@ -28,12 +27,8 @@ public class DoorsView : MonoBehaviour
         _animator = GetComponent<Animator>();
         _openDoor = GetComponent<AudioSource>();
         _particulas = GetComponentInChildren<ParticleSystem>();
+        
         if (_isBroken) _animator.SetBool("IsBroken", true);
-
-    }
-
-    private void Start()
-    {
     }
     
     public void OpenDoor(bool isRunning)
