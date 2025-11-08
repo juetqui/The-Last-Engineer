@@ -32,7 +32,6 @@ public class CameraMovementController : MonoBehaviour
     {
         InputManager.Instance.rotateInput.performed += OnLook;
         InputManager.Instance.rotateInput.canceled += OnReset;
-        InputManager.Instance.resetCamInput.performed += OnReset;
 
         OnReset();
     }
