@@ -27,6 +27,12 @@ public class PauseGameController : MonoBehaviour
         SetTimescale(_isPaused);
     }
 
+    public void RestartLevel()
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+        GoToScene(currentScene);
+    }
+
     public void GoToScene(string scene)
     {
         SetTimescale(false);
