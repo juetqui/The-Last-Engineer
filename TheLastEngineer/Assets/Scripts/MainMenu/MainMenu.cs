@@ -1,125 +1,78 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public Transform currentPos;
-    public Transform startPos;
-    public Transform menuPos;
-    public Transform optionsPos;
-    public Transform playPos;
-    public Transform creditsPos;
-    public Transform startGamePos;
+    [Header("Tween Transition")]
+    [SerializeField] private LeanTweenType _tweentype = LeanTweenType.easeInOutSine;
+    [SerializeField] private float _duration = 1f;
 
-    [SerializeField] private Transform initialPos;
-    public float speedFactor = 0.1f;
-    public Image blackScreen;
-    public float fadeOutDuration = 2f;
-    public float movementDelay = 1f;
+    [Header("Fade Transition")]
+    [SerializeField] private Image _blackScreen;
+    [SerializeField] private float fadeOutDuration = 2f;
 
-    private void Awake()
-    {
-        transform.position = initialPos.position;
-        currentPos = initialPos; speedFactor = 1f;
-    }
+
+    [SerializeField] private Transform _startPos = default;
+
+    private string _targetLevel = "";
 
     void Start()
     {
-        Move_To_Start();
-
-        //if (blackScreen != null)
-        //{
-        //    blackScreen.gameObject.SetActive(true);
-        //    blackScreen.color = new Color(0, 0, 0, 0);
-        //}
+        MoveToPos(_startPos);
+        StartCoroutine(FadeTo(0f));
     }
 
-    void Update()
+    public void MoveToPos(Transform newPos)
     {
-        transform.localPosition = Vector3.Lerp(transform.localPosition, currentPos.position, speedFactor);
-        transform.localRotation = Quaternion.Slerp(transform.localRotation, currentPos.rotation, speedFactor);
+        LeanTween.move(gameObject, newPos.position, _duration).setEase(_tweentype);
+        LeanTween.rotate(gameObject, newPos.rotation.eulerAngles, _duration).setEase(_tweentype);
     }
 
-    public void Move_To_Start()
+    public void MoveToPosAndFade(Transform newPos)
     {
-        currentPos = startPos;
+        LeanTween.rotate(gameObject, newPos.rotation.eulerAngles, _duration)
+            .setEase(_tweentype);
+
+        LeanTween.move(gameObject, newPos.position, _duration)
+            .setEase(_tweentype)
+            .setOnComplete(() => StartCoroutine(FadeTo(1f, true)));
     }
-
-    public void Move_To_Menu()
+    
+    public void SetTargetLevel(string targetLevel)
     {
-        speedFactor = 0.1f;
-        currentPos = menuPos;
-    }
-
-    public void Move_To_Options()
-    {
-        currentPos = optionsPos;
-    }
-
-    public void Move_To_Credits()
-    {
-        currentPos = creditsPos;
-    }
-
-    public void Move_To_Play()
-    {
-        currentPos = playPos;
-    }
-
-    public void Move_To_StartGame()
-    {
-        speedFactor = 0.01f;
-        currentPos = startGamePos;
-        blackScreen.gameObject.SetActive(true);
-
-        StartCoroutine(FadeOutAndLoadLevel());
-    }
-
-    private IEnumerator FadeOutAndLoadLevel()
-    {
-        yield return new WaitForSeconds(movementDelay);
-
-        float timer = 0f;
-
-        while (timer < fadeOutDuration)
-        {
-            timer += Time.deltaTime;
-            float alpha = timer / fadeOutDuration;
-            blackScreen.color = new Color(0, 0, 0, alpha);
-            yield return null;
-        }
-
-        blackScreen.color = new Color(0, 0, 0, 1);
-
-        yield return null;
-
-        StartLevel();
-    }
-
-    public void StartLevel()
-    {
-        SceneManager.LoadScene("NIVEL TUTO 1 juli");
-    }
-    public void StartTutorial2()
-    {
-        SceneManager.LoadScene("Zona Plataformas");
-    }
-
-    public void StartTutorial3()
-    {
-        SceneManager.LoadScene("NIVEL HUB");
-    }
-
-    public void PlatOld()
-    {
-        SceneManager.LoadScene("Zona Plataformas old");
+        _targetLevel = targetLevel;
     }
 
     public void Quit()
     {
         Application.Quit();
+    }
+
+    private IEnumerator FadeTo(float targetValue, bool loadLevel = false)
+    {
+        _blackScreen.gameObject.SetActive(true);
+
+        float startAlpha = _blackScreen.color.a;
+        float timer = 0f;
+
+        while (timer < fadeOutDuration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / fadeOutDuration;
+            float newAlpha = Mathf.Lerp(startAlpha, targetValue, t);
+
+            _blackScreen.color = new Color(0, 0, 0, newAlpha);
+            yield return null;
+        }
+
+        _blackScreen.color = new Color(0, 0, 0, targetValue);
+
+        if (loadLevel && Mathf.Approximately(targetValue, 1f))
+            SceneManager.LoadScene(_targetLevel);
+        else
+            _blackScreen.gameObject.SetActive(false);
+
     }
 }

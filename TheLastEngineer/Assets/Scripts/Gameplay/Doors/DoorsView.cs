@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DoorsView : MonoBehaviour
 {
+    [SerializeField] private bool _isOpen = false;
     [SerializeField] private bool _isBroken = false;
     private Animator _animator = default;
     private ParticleSystem _particulas = default;
@@ -17,6 +18,16 @@ public class DoorsView : MonoBehaviour
     private Color _doorClosed = Color.red;
 
     public Action<bool> OnOpen;
+
+    private void Start()
+    {
+        if (_isOpen)
+        {
+            _animator = GetComponent<Animator>();
+            _openDoor = GetComponent<AudioSource>();
+            OpenDoor(true);
+        }
+    }
 
     public void Initialize()
     {
