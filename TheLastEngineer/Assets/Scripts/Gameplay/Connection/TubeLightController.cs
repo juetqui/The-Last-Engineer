@@ -36,11 +36,11 @@ public class TubeLightController : MonoBehaviour
 
     public void StartSequence(bool fill)
     {
-        if (_tubes == null || _tubes.Count == 0)
-        {
-            Debug.LogWarning($"{nameof(TubeLightController)}: Lista de tubos vacía.", this);
-            return;
-        }
+        //if (_tubes == null || _tubes.Count == 0)
+        //{
+        //    Debug.LogWarning($"{nameof(TubeLightController)}: Lista de tubos vacía.", this);
+        //    return;
+        //}
 
         // Cancelar corrida previa y protegernos de eventos rezagados
         _runId++;
