@@ -48,5 +48,8 @@ public class PauseGameController : MonoBehaviour
     {
         Time.timeScale = isPaused ? 0.0f : 1.0f;
         _canvas.enabled = isPaused;
+
+        if (isPaused) InputManager.Instance.UpdateActionMap(ActionMaps.PauseUI);
+        else InputManager.Instance.UpdateToLastActionMap();
     }
 }

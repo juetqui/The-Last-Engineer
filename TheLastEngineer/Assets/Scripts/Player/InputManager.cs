@@ -29,6 +29,8 @@ public class InputManager : MonoBehaviour
 
     private Gamepad _gamepad = default;
 
+    private ActionMaps _lastActionMap = default;
+
     public Action OnInputsEnabled = delegate { };
     public Action OnInputsDisabled = delegate { };
 
@@ -41,6 +43,7 @@ public class InputManager : MonoBehaviour
 
         playerInputs = new PlayerInputs();
         playerInput = GetComponent<PlayerInput>();
+        _lastActionMap = ActionMaps.Player;
     }
 
     public void OnEnable()
@@ -73,20 +76,36 @@ public class InputManager : MonoBehaviour
     {
         OnInputsEnabled?.Invoke();
     }
+
+    public void UpdateToLastActionMap()
+    {
+        UpdateActionMap(_lastActionMap);
+    }
     
     public void UpdateActionMap(ActionMaps newActionMap)
     {
+        if (newActionMap != ActionMaps.PauseUI)
+            _lastActionMap = newActionMap;
+
         playerInput.SwitchCurrentActionMap(newActionMap.ToString());
 
         if (newActionMap == ActionMaps.Player)
         {
             playerInputs.UI.Disable();
+            playerInputs.PauseUI.Disable();
             playerInputs.Player.Enable();
+        }
+        else if (newActionMap == ActionMaps.UI)
+        {
+            playerInputs.Player.Disable();
+            playerInputs.PauseUI.Disable();
+            playerInputs.UI.Enable();
         }
         else
         {
             playerInputs.Player.Disable();
-            playerInputs.UI.Enable();
+            playerInputs.UI.Disable();
+            playerInputs.PauseUI.Enable();
         }
     }
 
@@ -144,5 +163,6 @@ public class InputManager : MonoBehaviour
 public enum ActionMaps
 {
     Player,
-    UI
+    UI,
+    PauseUI
 }

@@ -3,26 +3,33 @@ using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
-    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private GameObject _laserRendererPrefab;
     [SerializeField] private ParticleSystem _beamLaser;
     [SerializeField] private ParticleSystem _hitLaser;
     [SerializeField] private float _maxDist = 20f;
     [SerializeField] private float _raycastOffsetX = 2f;
     [SerializeField] private float _raycastOffsetZ = 1f;
     [SerializeField] private bool _startsInitialized = false;
-    private bool _isInitialized;
     [SerializeField] private LayerMask _laserLayer;
 
+    [SerializeField] private bool _debug = false;
+
+    private LineRenderer _lineRenderer = null;
+    private Glitcheable _glitcheable = null;
+    private AudioSource _audioSource = default;
+    private ILaserReceptor _ownReceptor = null;
     private ILaserReceptor _lastHit = null;
     private RaycastHit _rayHit;
     private Ray _ray, _leftRay, _rightRay;
-    private Glitcheable _glitcheable = null;
-
-    private AudioSource _audioSource = default;
+    private bool _isInitialized;
 
     private void Awake()
     {
+        GameObject instancedLineRenderer = Instantiate(_laserRendererPrefab, null);
+
+        _lineRenderer = instancedLineRenderer.GetComponent<LineRenderer>();
         _glitcheable = GetComponentInParent<Glitcheable>();
+        _ownReceptor = GetComponentInParent<ILaserReceptor>();
         
         _audioSource = GetComponent<AudioSource>();
         _lineRenderer.positionCount = 2;
@@ -80,30 +87,40 @@ public class Laser : MonoBehaviour
     {
         Vector3 laserOrigin = GetFixedLaserPos();
         Ray mainRay = new Ray(laserOrigin, transform.forward);
-        RaycastHit[] hits = Physics.RaycastAll(mainRay, _maxDist, _laserLayer);
 
-        if (hits.Length > 0)
+        RaycastHit hit;
+        bool hasHit = Physics.Raycast(mainRay, out hit, _maxDist, _laserLayer);
+
+        if (!hasHit)
         {
-            var closestHit = hits.OrderBy(h => h.distance).First();
-            ProcessHit(laserOrigin, closestHit);
-        }
-        else
-        {
+            ClearLastHit();
             SetLaserEnd(laserOrigin, laserOrigin + transform.forward * _maxDist);
             StopLaserEffect();
+            return;
         }
+
+        ProcessHit(laserOrigin, hit);
     }
 
     private void ProcessHit(Vector3 origin, RaycastHit hit)
     {
         SetLaserEnd(origin, hit.point);
-
         PlayLaserEffect(hit.point, hit.normal);
 
         if (hit.collider.TryGetComponent(out ILaserReceptor receptor))
         {
-            NotifyReceptor(receptor);
-            receptor.LaserRecived();
+            if (receptor != _ownReceptor)
+            {
+                if (_lastHit != receptor)
+                {
+                    if (_lastHit != null)
+                        _lastHit.LaserNotRecived();
+
+                    _lastHit = receptor;
+                }
+
+                receptor.LaserRecived();
+            }
         }
         else
         {
