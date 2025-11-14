@@ -9,11 +9,6 @@ public class DetectPlayerToOpen : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
     }
 
-    private void Update()
-    {
-        Debug.Log(_animator.GetBool("IsPlayerNear"));
-    }
-
     private void OnTriggerEnter(Collider coll)
     {
         if (coll.TryGetComponent(out PlayerController player))
