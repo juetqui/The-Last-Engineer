@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 public class GoToMenu : MonoBehaviour
 {
     [SerializeField] private DoorsView _door;
+    [SerializeField] private string _scene = "MainMenu";
 
     private Collider _coll;
 
@@ -20,6 +21,6 @@ public class GoToMenu : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out PlayerController player))
-            SceneManager.LoadScene("MainMenu");
+            SceneManager.LoadScene(_scene);
     }
 }
