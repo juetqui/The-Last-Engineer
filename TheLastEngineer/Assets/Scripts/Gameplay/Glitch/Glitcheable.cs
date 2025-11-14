@@ -15,6 +15,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
     [HideInInspector] public Renderer _renderer;
     [SerializeField] public ParticleSystem _ps;
     [SerializeField] public List<Transform> _newPosList;
+    [SerializeField] public List<GameObject> _objectHolograms;
     [HideInInspector] public AudioSource _audioSource;
 
     [Header("Visual")]
@@ -42,6 +43,15 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        if (_newPosList.Count > 0)
+        {
+            for(int i=0; i < _newPosList.Count; i++)
+            {
+          
+                _objectHolograms.Add( _newPosList[i].gameObject);
+                
+            }
+        }
         if (_coll == null)
             _coll = GetComponent<Collider>();
         
@@ -77,7 +87,16 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         _sm.Tick(Time.deltaTime);
     }
-
+    public void HologramSwitch()
+    {
+        if (_objectHolograms.Count > 0)
+        {
+            for(int i=0; i < _objectHolograms.Count; i++)
+            {
+                _objectHolograms[i].SetActive(!_objectHolograms[i].activeSelf);
+            }
+        }
+    }
     public void BeginCycle()
     {
         _sm.Change(_dis.ResetAndReturn());

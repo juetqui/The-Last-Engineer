@@ -25,7 +25,7 @@ public class GlitchMovingState : IState
         _duration = t ? t.MoveDuration : 0.5f;
         _startPos = g.transform.position; _startRot = g.transform.rotation;
         _targetPos = g.CurrentTargetPos; _targetRot = g.CurrentTargetRot;
-
+        g.HologramSwitch();
         g.SetBoolCorrupted(0f);
         g.SetParticles(false, 1f);
         g.SetColliders(false);
