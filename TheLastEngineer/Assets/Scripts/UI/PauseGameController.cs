@@ -15,7 +15,7 @@ public class PauseGameController : MonoBehaviour
         _canvas = GetComponent<Canvas>();
         _canvas.enabled = false;
 
-        EventSystem.current.firstSelectedGameObject = _resumeBtn;
+        EventSystem.current.firstSelectedGameObject = null;
         InputManager.Instance.pauseInput.started += PauseGame;
     }
 
