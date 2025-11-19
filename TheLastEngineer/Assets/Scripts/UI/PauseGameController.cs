@@ -1,9 +1,12 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class PauseGameController : MonoBehaviour
 {
+    [SerializeField] private GameObject _resumeBtn;
+
     private Canvas _canvas = default;
     private bool _isPaused = false;
 
@@ -12,6 +15,7 @@ public class PauseGameController : MonoBehaviour
         _canvas = GetComponent<Canvas>();
         _canvas.enabled = false;
 
+        EventSystem.current.firstSelectedGameObject = _resumeBtn;
         InputManager.Instance.pauseInput.started += PauseGame;
     }
 
@@ -49,7 +53,15 @@ public class PauseGameController : MonoBehaviour
         Time.timeScale = isPaused ? 0.0f : 1.0f;
         _canvas.enabled = isPaused;
 
-        if (isPaused) InputManager.Instance.UpdateActionMap(ActionMaps.PauseUI);
-        else InputManager.Instance.UpdateToLastActionMap();
+        if (isPaused)
+        {
+            EventSystem.current.firstSelectedGameObject = _resumeBtn;
+            InputManager.Instance.UpdateActionMap(ActionMaps.PauseUI);
+        }
+        else
+        {
+            EventSystem.current.firstSelectedGameObject = null;
+            InputManager.Instance.UpdateToLastActionMap();
+        }
     }
 }
