@@ -4,6 +4,8 @@ using System.Collections;
 
 public class FollowController : MonoBehaviour
 {
+    [SerializeField] private Transform _lookAtObject;
+
     private CinemachineFreeLook _camera = default;
     private PlayerController _player = default;
 
@@ -14,6 +16,8 @@ public class FollowController : MonoBehaviour
 
         _player.OnDied += StopFollowing;
         _player.OnRespawned += StartFollowing;
+
+        StartFollowing();
     }
 
     private void StopFollowing()
@@ -24,8 +28,8 @@ public class FollowController : MonoBehaviour
 
     private void StartFollowing()
     {
-        _camera.Follow = _player.transform;
-        _camera.LookAt = _player.transform;
+        _camera.Follow = _lookAtObject;
+        _camera.LookAt = _lookAtObject;
     }
 
     private IEnumerator StopLooking()
