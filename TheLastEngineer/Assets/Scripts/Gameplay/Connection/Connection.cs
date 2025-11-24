@@ -13,17 +13,16 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     [SerializeField] private Transform _nodePos;
     [SerializeField] private NodeType _requiredType = NodeType.Default;
     [SerializeField] private GameObject _particleNode;
+    
     [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _emissionDefault;
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _emissionCorrupted;
+    [SerializeField] private Color _emissionOff;
+    
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionCorrect;
+    
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionIncorrect;
 
-    private string _emissiveColor = "_EmissiveColor";
-    private Color _emissionOff;
     private Renderer _renderer = default;
 
     public NodeType RequiredType {  get { return _requiredType; } }
@@ -38,8 +37,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     {
         _particleNode.SetActive(true);
         _renderer = GetComponent<Renderer>();
-        _emissionOff = _requiredType == NodeType.Corrupted ? _emissionCorrupted : _emissionDefault;
-        _renderer.material.SetColor(_emissiveColor, _emissionOff);
+        _renderer.material.SetColor("_EmissiveColor", _emissionOff);
 
         OnInitialized?.Invoke();
 
@@ -78,12 +76,12 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         if (_recievedNode.NodeType == _requiredType)
         {
             OnNodeConnected?.Invoke(node.NodeType, true);
-            _renderer.material.SetColor(_emissiveColor, _emissionCorrect);
+            _renderer.material.SetColor("_EmissiveColor", _emissionCorrect);
             _particleNode.SetActive(false);
         }
         else
         {
-            _renderer.material.SetColor(_emissiveColor, _emissionIncorrect);
+            _renderer.material.SetColor("_EmissiveColor", _emissionIncorrect);
         }
 
     }
@@ -91,7 +89,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     public void UnsetNode(NodeController node)
     {
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
-        _renderer.material.SetColor(_emissiveColor, _emissionOff);
+        _renderer.material.SetColor("_EmissiveColor", _emissionOff);
         _recievedNode = null;
         _particleNode.SetActive(true);
     }
