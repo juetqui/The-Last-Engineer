@@ -68,19 +68,26 @@ public class GamepadCursor : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_virtualMouse != null && _virtualMouse.added)
+        if (_playerInput != null && _playerInput.user.valid && _virtualMouse != null && _virtualMouse.added)
         {
             _playerInput.user.UnpairDevice(_virtualMouse);
+        }
+
+        if (_virtualMouse != null && _virtualMouse.added)
+        {
             InputSystem.RemoveDevice(_virtualMouse);
         }
 
         InputSystem.onAfterUpdate -= UpdateMotion;
-        _playerInput.onControlsChanged -= OnControlsChanged;
+        
+        if (_playerInput != null)
+            _playerInput.onControlsChanged -= OnControlsChanged;
     }
 
     private void UpdateMotion()
     {
         if (_virtualMouse == null || Gamepad.current == null) return;
+        if (_canvas == null || _canvasTransform == null || _cursorTransform == null) return;
 
         UpdatePosition();
         UpdateState();
@@ -120,11 +127,29 @@ public class GamepadCursor : MonoBehaviour
 
     private void AnchorCursor(Vector2 targetPos)
     {
+        if (_canvas == null || _canvasTransform == null || _cursorTransform == null)
+            return;
+
+        if (_canvas == null) return;
+
         Vector2 anchoredPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasTransform, targetPos, _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _mainCamera, out anchoredPos);
+        var cam = _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _mainCamera;
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _canvasTransform, targetPos, cam, out anchoredPos))
+            return;
 
         _cursorTransform.anchoredPosition = anchoredPos;
     }
+
+    // IN CASE THAT THE CURRENT AnchorCursor METHOD IS GIVING PROBLEMS, COMMENT IT AND UNCOMMENT THE ONE BELOW
+    //private void AnchorCursor(Vector2 targetPos)
+    //{
+    //    Vector2 anchoredPos;
+    //    RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasTransform, targetPos, _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _mainCamera, out anchoredPos);
+
+    //    _cursorTransform.anchoredPosition = anchoredPos;
+    //}
 
     private void OnControlsChanged(PlayerInput input)
     {

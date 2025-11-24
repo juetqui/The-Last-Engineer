@@ -22,10 +22,29 @@ public class PostProcessController : MonoBehaviour
     private float _speed = 60f;
     private bool animated = false;
 
+    // THIS SECTION IS USED TO RESTORE THE DEFAULT VALUES OF THE MODIFIED MATERIALS
+    #region ORIGINAL VALUES
+    private float _origPassiveVignette = default;
+    private float _origCorruptionVignette = default;
+    private float _origShockwaveDistance = default;
+
+    private Color _origPassiveColor = Color.black;
+    private Color _origCorruptionColor = Color.black;
+    #endregion
+
     private NodeType _requiredNode = NodeType.Corrupted;
 
     void Start()
     {
+        #region SET ORIGINAL VALUES
+        _origPassiveVignette = _passiveMat.GetFloat("_VignetteAmount");
+        _origCorruptionVignette = _corruptionMat.GetFloat("_VignetteAmount");
+        _origShockwaveDistance = _shockWaveMat.GetFloat("_WaveDistanceFromCenter");
+
+        _origPassiveColor = _passiveMat.color;
+        _origCorruptionColor = _corruptionMat.color;
+        #endregion
+
         _passiveMat.SetFloat("_VignetteAmount", 30f);
         _corruptionMat.SetFloat("_VignetteAmount", 30f);
 
@@ -35,6 +54,33 @@ public class PostProcessController : MonoBehaviour
         _shockWave = _rendererData.rendererFeatures.Where(rf => rf is FullScreenPassRendererFeature).FirstOrDefault();
         _shockWave.SetActive(false);
     }
+
+    private void OnDestroy()
+    {
+        if (_passiveMat != null)
+        {
+            _passiveMat.SetFloat("_VignetteAmount", _origPassiveVignette);
+            _passiveMat.color = _origPassiveColor;
+        }
+
+        if (_corruptionMat != null)
+        {
+            _corruptionMat.SetFloat("_VignetteAmount", _origCorruptionVignette);
+            _corruptionMat.color = _origCorruptionColor;
+        }
+
+        if (_shockWaveMat != null)
+        {
+            _shockWaveMat.SetFloat("_WaveDistanceFromCenter", _origShockwaveDistance);
+        }
+
+        if (PlayerNodeHandler.Instance == null) return;
+
+        PlayerNodeHandler.Instance.OnNodeGrabbed -= ActivatePassive;
+        PlayerNodeHandler.Instance.OnAbsorbCorruption -= ActivateCorruption;
+        PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
+    }
+
 
     private void ActivatePassive(bool hasNode, NodeType nodeType)
     {

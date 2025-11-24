@@ -26,10 +26,23 @@ public class CutoutObject : MonoBehaviour
     private float _lastCutoutSize;
     private bool _cutoutEnabled;
 
+    //THIS VARIABLES ARE USED TO SET THE MATERIAL TO IT'S ORIGINAL VALUES WHEN DESTROYED
+    #region ORIGINAL VALUES
+    private float _origEnableCutout;
+    private Vector4 _origCutoutPos;
+    private float _origCutoutSize;
+    #endregion
+
     private void Awake()
     {
         _mainCamera = GetComponent<Camera>();
         _aspectRatio = (float)Screen.width / Screen.height;
+
+        #region SET ORIGINAL VALUES
+        _origEnableCutout = _cutoutMat.GetFloat("_EnableCutout");
+        _origCutoutPos = _cutoutMat.GetVector("_CutoutPos");
+        _origCutoutSize = _cutoutMat.GetFloat("_CutoutSize");
+        #endregion
     }
 
     private void LateUpdate()
@@ -50,6 +63,16 @@ public class CutoutObject : MonoBehaviour
         {
             ApplyCutout(_desiredCutoutPos, _currentSize, _desiredEnabled);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (_cutoutMat == null)
+            return;
+
+        _cutoutMat.SetFloat("_EnableCutout", _origEnableCutout);
+        _cutoutMat.SetVector("_CutoutPos", _origCutoutPos);
+        _cutoutMat.SetFloat("_CutoutSize", _origCutoutSize);
     }
 
     private void SampleObstacle()
