@@ -21,8 +21,8 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     public float _currentLoad = 0;
     bool _isCurrentlyLoading;
     bool _isCurrentlyUnloading;
-    public float _timeToUnfill = 0;
-    public float timeModifier;
+    //public float _timeToUnfill = 0;
+    //public float timeModifier;
     public bool _canBeUnfilled= false;
 
     [SerializeField] private List<ParticleSystem> _hitPS = new List<ParticleSystem>();
@@ -63,7 +63,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     {
         OnHit?.Invoke();
         
-        if (!_isCompleted && !_isCurrentlyLoading)
+        if (_isCurrentlyUnloading||(!_isCompleted && !_isCurrentlyLoading))
         {
             _isCurrentlyUnloading = false;
             _isCurrentlyLoading = true;
@@ -85,8 +85,10 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         }
         if (!_isCompleted||_canBeUnfilled)
         {
+            print("a");
             OnEndHit?.Invoke();
-            if ((!_isCompleted && !_isCurrentlyUnloading) )
+            //if ((!_isCompleted && !_isCurrentlyUnloading))
+            if (!_isCurrentlyUnloading) 
             {
                 _isCurrentlyLoading = false;
                 _isCurrentlyUnloading = true;
@@ -97,7 +99,10 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
 
     private IEnumerator LoadRoutine(float loadTime)
     {
+        print("b");
+
         _audioSource.Stop();
+        if(!_isCompleted)
         _audioSource.Play();
         foreach (var ps in _hitPS)
         {
