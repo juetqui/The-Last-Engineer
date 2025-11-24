@@ -85,7 +85,6 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         }
         if (!_isCompleted||_canBeUnfilled)
         {
-            print("a");
             OnEndHit?.Invoke();
             //if ((!_isCompleted && !_isCurrentlyUnloading))
             if (!_isCurrentlyUnloading) 
@@ -99,8 +98,6 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
 
     private IEnumerator LoadRoutine(float loadTime)
     {
-        print("b");
-
         _audioSource.Stop();
         if(!_isCompleted)
         _audioSource.Play();
