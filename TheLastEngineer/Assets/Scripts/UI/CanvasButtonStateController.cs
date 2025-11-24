@@ -4,16 +4,20 @@ using UnityEngine.UI;
 
 public class CanvasButtonStateController : MonoBehaviour
 {
+    [SerializeField] private bool _startsEnabled = true;
+
     private Canvas _canvas = default;
 
     public Dictionary<Selectable, bool> OriginalTBNValues { get; private set; }
 
-    void Start()
+    void Awake()
     {
         _canvas = GetComponent<Canvas>();
         OriginalTBNValues = new Dictionary<Selectable, bool>();
         GetOriginalButtonValues();
-        EnableButtons();
+
+        if (_startsEnabled) EnableButtons();
+        else DisableButtons();
     }
 
     public void DisableButtons()
