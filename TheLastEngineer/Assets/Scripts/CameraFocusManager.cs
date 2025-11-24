@@ -8,7 +8,7 @@ public class CameraFocusManager : MonoBehaviour
     [SerializeField] private Transform _lookAtPoint;
     [SerializeField] private float _verticalOffset = 10f;
     [SerializeField] private float _transitionTime = 1.2f;
-    [SerializeField] private LeanTweenType _easeType = LeanTweenType.easeInOutQuad;
+    [SerializeField] private LeanTweenType _easeType = LeanTweenType.easeInOutSine;
 
     private Transform _cameraTarget;
     private bool _isInZone = false;
