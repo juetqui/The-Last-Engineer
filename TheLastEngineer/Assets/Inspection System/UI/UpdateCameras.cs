@@ -35,8 +35,11 @@ public class UpdateCameras : MonoBehaviour
 
     private void OnDestroy()
     {
-        PlayerController.Instance.OnInteractableSelected -= TargetSelected;
-        ScannerController.Instance.OnScanFinished -= CorruptionCleaned;
+        if (this.isActiveAndEnabled)
+        {
+            PlayerController.Instance.OnInteractableSelected -= TargetSelected;
+            ScannerController.Instance.OnScanFinished -= CorruptionCleaned;
+        }
     }
 
     private void CorruptionCleaned() => TargetSelected(null);
