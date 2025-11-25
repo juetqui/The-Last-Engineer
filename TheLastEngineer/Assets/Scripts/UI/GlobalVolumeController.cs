@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -11,13 +10,20 @@ public class GlobalVolumeController : MonoBehaviour
     [SerializeField] private float _maxLDIntensity = 0.1f;
     [SerializeField] private float _minPitch = 0.8f;
     [SerializeField] private float _maxPitch = 1f;
+
     private NodeType _requiredNode = NodeType.Corrupted;
     private Volume _volume = null;
+
+    private ChromaticAberration _chromatic;
+    private LensDistortion _lens;
 
     private void Awake()
     {
         _volume = GetComponent<Volume>();
         _source.pitch = 1f;
+
+        _volume.profile.TryGet(out _chromatic);
+        _volume.profile.TryGet(out _lens);
     }
 
     void Start()
@@ -29,66 +35,72 @@ public class GlobalVolumeController : MonoBehaviour
     {
         StopAllCoroutines();
 
-        bool hasChromaticAberration = _volume.profile.TryGet(out ChromaticAberration chromaticAberration);
-        bool hasLensDistortion = _volume.profile.TryGet(out LensDistortion lensDistortion);
+        bool enable = hasNode && nodeType == _requiredNode;
 
-        if (!hasNode || nodeType != _requiredNode)
+        if (_chromatic != null)
         {
-            if (hasChromaticAberration)
-                StartCoroutine(RemoveEffect(chromaticAberration, 0.15f));
+            if (enable)
+                StartCoroutine(AddChromatic(_chromatic, _maxCAIntensity, 0.25f));
+            else
+                StartCoroutine(RemoveChromatic(_chromatic, 0.15f));
+        }
 
-            if (hasLensDistortion)
-                StartCoroutine(RemoveEffect(lensDistortion, 0.125f));
+        if (_lens != null)
+        {
+            if (enable)
+                StartCoroutine(AddLens(_lens, _maxLDIntensity, 0.25f));
+            else
+                StartCoroutine(RemoveLens(_lens, 0.125f));
+        }
 
+        if (enable)
+            StartCoroutine(ReducePitch());
+        else
             StartCoroutine(IncrementPitch());
-            return;
-        }
-
-        if (hasChromaticAberration)
-            StartCoroutine(AddEffect(chromaticAberration, _maxCAIntensity, 0.25f));
-
-        if (hasLensDistortion)
-            StartCoroutine(AddEffect(lensDistortion, _maxLDIntensity, 0.25f));
-
-        StartCoroutine(ReducePitch());
     }
 
-    private IEnumerator AddEffect<T>(T effect, float targetIntensity, float speed = 0.25f) where T : VolumeComponent
+    private IEnumerator AddChromatic(ChromaticAberration ca, float target, float speed)
     {
-        if (effect == null) yield break;
-
-        var intensityProperty = effect.GetType().GetField("intensity", BindingFlags.Public | BindingFlags.Instance);
-        
-        if (intensityProperty == null || intensityProperty.FieldType != typeof(ClampedFloatParameter)) yield break;
-
-        var intensity = (ClampedFloatParameter)intensityProperty.GetValue(effect);
-        
-        while (intensity.value < targetIntensity)
+        while (ca.intensity.value < target)
         {
-            intensity.value += Time.deltaTime * speed;
+            ca.intensity.value += Time.deltaTime * speed;
             yield return null;
         }
-        
-        intensity.value = targetIntensity;
+
+        ca.intensity.value = target;
     }
 
-    private IEnumerator RemoveEffect<T>(T effect, float speed = 0.125f)
+    private IEnumerator RemoveChromatic(ChromaticAberration ca, float speed)
     {
-        if (effect == null) yield break;
-
-        var intensityProperty = effect.GetType().GetField("intensity", BindingFlags.Public | BindingFlags.Instance);
-        
-        if (intensityProperty == null || intensityProperty.FieldType != typeof(ClampedFloatParameter)) yield break;
-
-        var intensity = (ClampedFloatParameter)intensityProperty.GetValue(effect);
-        
-        while (intensity.value > 0)
+        while (ca.intensity.value > 0f)
         {
-            intensity.value -= Time.deltaTime * speed;
+            ca.intensity.value -= Time.deltaTime * speed;
             yield return null;
         }
-        
-        intensity.value = 0f;
+
+        ca.intensity.value = 0f;
+    }
+
+    private IEnumerator AddLens(LensDistortion ld, float target, float speed)
+    {
+        while (ld.intensity.value < target)
+        {
+            ld.intensity.value += Time.deltaTime * speed;
+            yield return null;
+        }
+
+        ld.intensity.value = target;
+    }
+
+    private IEnumerator RemoveLens(LensDistortion ld, float speed)
+    {
+        while (ld.intensity.value > 0f)
+        {
+            ld.intensity.value -= Time.deltaTime * speed;
+            yield return null;
+        }
+
+        ld.intensity.value = 0f;
     }
 
     private IEnumerator ReducePitch()
