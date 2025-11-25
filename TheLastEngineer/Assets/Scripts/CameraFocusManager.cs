@@ -5,24 +5,28 @@ public class CameraFocusManager : MonoBehaviour
 {
     [SerializeField] private CinemachineFreeLook _camera;
     [SerializeField] private Transform _newTarget;
-    [SerializeField] private Transform _lookAtPoint;
     [SerializeField] private float _verticalOffset = 10f;
     [SerializeField] private float _transitionTime = 1.2f;
     [SerializeField] private LeanTweenType _easeType = LeanTweenType.easeInOutSine;
 
-    private Transform _cameraTarget;
+    private Transform _cameraTarget = default;
+    private Transform _lookAtPoint = default;
+    private LTDescr _currentTween = null;
     private bool _isInZone = false;
     private float _blendValue = 0f;
-    private LTDescr _currentTween;
 
     void Awake()
     {
+        _lookAtPoint = new GameObject(gameObject.name + "'s Look At Point").transform;
+
         _cameraTarget = _camera.LookAt;
         _lookAtPoint.position = _cameraTarget.position;
     }
 
     void Update()
     {
+        if (!_isInZone) return;
+
         Vector3 midPoint = (_cameraTarget.position + _newTarget.position) * 0.5f;
         midPoint -= Vector3.up * _verticalOffset;
         _lookAtPoint.position = Vector3.Lerp(_cameraTarget.position, midPoint, _blendValue);

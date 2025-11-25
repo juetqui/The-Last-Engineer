@@ -4,17 +4,28 @@ using UnityEngine;
 
 public class ParedFillConnection : MonoBehaviour
 {
-    private Renderer _renderer = default;
-
-    public void IsCorrupted(int boleano)
-    {
-        _renderer = GetComponent<Renderer>();
-        _renderer.material.SetFloat("_IsCorrupted", boleano);
-    }
-
     [SerializeField] private float duration = 1.2f;
 
-    private CancellationTokenSource cancelSource;
+    private Connection _connection = default;
+    private CancellationTokenSource _cancelSource = default;
+    private Renderer _renderer = default;
+
+    private void Awake()
+    {
+        _renderer = GetComponent<Renderer>();
+        _connection = GetComponentInParent<Connection>();
+        _connection.OnNodeConnected += CheckConnectedNode;
+
+        int isCorrupted = _connection.RequiredType == NodeType.Corrupted ? 1 : 0;
+
+        _renderer.material.SetFloat("_IsCorrupted", isCorrupted);
+    }
+
+    private void CheckConnectedNode(NodeType nodeType, bool isConnected)
+    {
+        if (isConnected) Fill();
+        else Empty();
+    }
 
     public void Fill()
     {
@@ -28,11 +39,10 @@ public class ParedFillConnection : MonoBehaviour
 
     private void StartFill(float target)
     {
-        // Cancelar animación anterior
-        cancelSource?.Cancel();
-        cancelSource = new CancellationTokenSource();
+        _cancelSource?.Cancel();
+        _cancelSource = new CancellationTokenSource();
 
-        _ = AnimateFill(target, cancelSource.Token);
+        _ = AnimateFill(target, _cancelSource.Token);
     }
 
     private async Task AnimateFill(float target, CancellationToken token)

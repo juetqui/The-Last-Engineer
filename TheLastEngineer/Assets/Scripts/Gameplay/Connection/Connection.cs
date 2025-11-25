@@ -13,7 +13,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     [SerializeField] private Transform _nodePos;
     [SerializeField] private NodeType _requiredType = NodeType.Default;
     [SerializeField] private GameObject _particleNode;
-    [SerializeField] private ParedFillConnection _paredConnection;
+    
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionOff;
     
@@ -72,20 +72,10 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f, false, _nodePos.rotation);
         _recievedNode = node;
 
-        if (_recievedNode.NodeType == NodeType.Corrupted)
-        {
-            _paredConnection.IsCorrupted(1);
-        }
-        else
-        {
-            _paredConnection.IsCorrupted(0);
-        }
-
         if (_recievedNode.NodeType == _requiredType)
         {
                 OnNodeConnected?.Invoke(node.NodeType, true);
             _renderer.material.SetColor("_EmissiveColor", _emissionCorrect);
-            _paredConnection.Fill();
             _particleNode.SetActive(false);
         }
         else
@@ -100,7 +90,6 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
         _renderer.material.SetColor("_EmissiveColor", _emissionOff);
         _recievedNode = null;
-        _paredConnection.Empty();
         _particleNode.SetActive(true);
     }
 

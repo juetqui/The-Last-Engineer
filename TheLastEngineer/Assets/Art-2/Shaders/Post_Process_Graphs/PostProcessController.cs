@@ -9,18 +9,23 @@ public class PostProcessController : MonoBehaviour
     [SerializeField] private Material _passiveMat;
     [SerializeField] private Material _corruptionMat;
     [SerializeField] private Material _shockWaveMat;
+    
     [ColorUsage(true, true)]
     [SerializeField] private Color _colorNeg = new Color(191f, 7f, 7f);
+    
     [ColorUsage(true, true)]
     [SerializeField] private Color _colorOriginal = new Color(191f, 28f, 164f);
 
     private ScriptableRendererFeature _shockWave = default;
-    private float duracion = 1f;
-    private Coroutine _currentEffect = null;
+
     private float _vignetteAmount = 9f;
     private float _refNegVignetteAmount = 7f;
     private float _speed = 60f;
+    private float duracion = 1f;
+    
     private bool animated = false;
+    
+    private Coroutine _currentEffect = null;
 
     // THIS SECTION IS USED TO RESTORE THE DEFAULT VALUES OF THE MODIFIED MATERIALS
     #region ORIGINAL VALUES
@@ -28,7 +33,6 @@ public class PostProcessController : MonoBehaviour
     private float _origCorruptionVignette = default;
     private float _origShockwaveDistance = default;
 
-    private Color _origPassiveColor = Color.black;
     private Color _origCorruptionColor = Color.black;
     #endregion
 
@@ -40,8 +44,6 @@ public class PostProcessController : MonoBehaviour
         _origPassiveVignette = _passiveMat.GetFloat("_VignetteAmount");
         _origCorruptionVignette = _corruptionMat.GetFloat("_VignetteAmount");
         _origShockwaveDistance = _shockWaveMat.GetFloat("_WaveDistanceFromCenter");
-
-        _origPassiveColor = _passiveMat.color;
         _origCorruptionColor = _corruptionMat.color;
         #endregion
 
@@ -51,17 +53,14 @@ public class PostProcessController : MonoBehaviour
         PlayerNodeHandler.Instance.OnNodeGrabbed += ActivatePassive;
         PlayerNodeHandler.Instance.OnAbsorbCorruption += ActivateCorruption;
 
-        _shockWave = _rendererData.rendererFeatures.Where(rf => rf is FullScreenPassRendererFeature).FirstOrDefault();
+        _shockWave = _rendererData.rendererFeatures.FirstOrDefault(rf => rf is FullScreenPassRendererFeature);
         _shockWave.SetActive(false);
     }
 
     private void OnDestroy()
     {
         if (_passiveMat != null)
-        {
             _passiveMat.SetFloat("_VignetteAmount", _origPassiveVignette);
-            _passiveMat.color = _origPassiveColor;
-        }
 
         if (_corruptionMat != null)
         {
@@ -81,133 +80,88 @@ public class PostProcessController : MonoBehaviour
         PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
     }
 
-
-    private void ActivatePassive(bool hasNode, NodeType nodeType)
+    private void ActivatePassive(bool hasNode, NodeType type)
     {
-        if (!hasNode || nodeType != _requiredNode)
+        if (!hasNode || type != _requiredNode)
         {
-            StartCoroutine(DeactivatePP(_passiveMat));
+            DeactivatePP(_passiveMat);
             PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
             return;
         }
 
-        StartCoroutine(ActivatePP(_passiveMat));
-        StartCoroutine(ActivateShockWave());
+        ActivatePP(_passiveMat);
+        ActivateShockWave();
         PlayerNodeHandler.Instance.OnGlitchChange += RefNegVignette;
     }
 
     private void ActivateCorruption(bool hasEffect)
     {
-        if (_currentEffect != null)
-            StopCoroutine(_currentEffect);
-
         if (!hasEffect)
         {
-            _currentEffect = StartCoroutine(DeactivatePP(_corruptionMat));
+            DeactivatePP(_corruptionMat);
             return;
         }
 
-        _currentEffect = StartCoroutine(ActivatePP(_corruptionMat));
+        ActivatePP(_corruptionMat);
     }
 
-    private IEnumerator ActivateShockWave()
+    private void ActivateShockWave()
     {
         _shockWave.SetActive(true);
-        float effectAmount = -0.1f;
-        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
 
-        while (_shockWaveMat.GetFloat("_WaveDistanceFromCenter") < 1f)
-        {
-            effectAmount += Time.deltaTime * 2f;
-
-            _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
-            yield return null;
-        }
-        
-        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", 1f);
-        _shockWave.SetActive(false);
+        TweenFloat(_shockWaveMat, "_WaveDistanceFromCenter", -0.1f, 1f, 0.5f)
+            .setOnComplete(() => _shockWave.SetActive(false));
     }
 
-    private IEnumerator DeactivateShockWave()
+    private void DeactivateShockWave()
     {
         _shockWave.SetActive(true);
-        float effectAmount = 1f;
-        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
 
-        while (_shockWaveMat.GetFloat("_WaveDistanceFromCenter") > -0.1f)
-        {
-            effectAmount -= Time.deltaTime * 2f;
-
-            _shockWaveMat.SetFloat("_WaveDistanceFromCenter", effectAmount);
-            yield return null;
-        }
-        
-        _shockWaveMat.SetFloat("_WaveDistanceFromCenter", -0.1f);
-        _shockWave.SetActive(false);
+        TweenFloat(_shockWaveMat, "_WaveDistanceFromCenter", 1f, -0.1f, 0.5f)
+            .setOnComplete(() => _shockWave.SetActive(false));
     }
 
-    private IEnumerator ActivatePP(Material material)
+    private void ActivatePP(Material mat)
     {
-        float currentAmount = material.GetFloat("_VignetteAmount");
-        while (currentAmount > _vignetteAmount)
-        {
-            currentAmount -= Time.deltaTime * _speed;
-            material.SetFloat("_VignetteAmount", currentAmount);
-
-            yield return null;
-        }
-
-        material.SetFloat("_VignetteAmount", _vignetteAmount);
+        float start = mat.GetFloat("_VignetteAmount");
+        TweenFloat(mat, "_VignetteAmount", start, _vignetteAmount, 0.4f);
     }
 
-    private void RefNegVignette(Glitcheable gltich)
+    private void DeactivatePP(Material mat)
+    {
+        float start = mat.GetFloat("_VignetteAmount");
+        TweenFloat(mat, "_VignetteAmount", start, _speed / 2f, 0.4f);
+    }
+
+    private void RefNegVignette(Glitcheable glt)
     {
         if (animated) return;
-        
-        StartCoroutine(LerpColorRefNeg(_passiveMat));
-    }
-
-    private IEnumerator LerpColorRefNeg(Material material)
-    {
         animated = true;
 
-        float currentAmount = material.GetFloat("_VignetteAmount");
-        while (currentAmount > _refNegVignetteAmount)
-        {
-            _passiveMat.color = Color.Lerp(_colorOriginal, _colorNeg, duracion);
-            currentAmount -= Time.deltaTime * 10f;
-            material.SetFloat("_VignetteAmount", currentAmount);
+        float current = _passiveMat.GetFloat("_VignetteAmount");
 
-            yield return null;
-        }
-
-        while (currentAmount < _vignetteAmount)
-        {
-            _passiveMat.color = Color.Lerp(_colorNeg, _colorOriginal, duracion);
-            currentAmount += Time.deltaTime * 15f;
-            material.SetFloat("_VignetteAmount", currentAmount);
-
-            yield return null;
-        }
-        material.SetFloat("_VignetteAmount", _vignetteAmount);
-        
-        yield return new WaitForSeconds(1f);
-        animated = false;
+        TweenColor(_passiveMat, "_Color", _colorOriginal, _colorNeg, 0.4f);
+        TweenFloat(_passiveMat, "_VignetteAmount", current, _refNegVignetteAmount, 0.4f)
+            .setOnComplete(() =>
+            {
+                TweenColor(_passiveMat, "_Color", _colorNeg, _colorOriginal, 0.4f);
+                TweenFloat(_passiveMat, "_VignetteAmount", _refNegVignetteAmount, _vignetteAmount, 0.4f)
+                    .setOnComplete(() => animated = false);
+            });
     }
 
-    private IEnumerator DeactivatePP(Material material)
+    private LTDescr TweenFloat(Material mat, string prop, float from, float to, float dur)
     {
-        float speed = (_speed / 2f);
-        float currentAmount = material.GetFloat("_VignetteAmount");
+        mat.SetFloat(prop, from);
+        return LeanTween.value(gameObject, from, to, dur)
+            .setOnUpdate(v => mat.SetFloat(prop, v));
+    }
 
-        while (currentAmount < speed)
-        {
-            currentAmount += Time.deltaTime * speed;
-            material.SetFloat("_VignetteAmount", currentAmount);
+    private LTDescr TweenColor(Material mat, string prop, Color from, Color to, float dur)
+    {
+        mat.SetColor(prop, from);
 
-            yield return null;
-        }
-
-        material.SetFloat("_VignetteAmount", speed);
+        return LeanTween.value(gameObject, 0f, 1f, dur)
+            .setOnUpdate(t => mat.SetColor(prop, Color.Lerp(from, to, t)));
     }
 }

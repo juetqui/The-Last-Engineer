@@ -158,7 +158,6 @@ MonoBehaviour:
   _nodePos: {fileID: 4334285154860852007}
   _requiredType: 1
   _particleNode: {fileID: 2598662775292928984}
-  _paredConnection: {fileID: 4909628616095903017}
   _emissionOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   _emissionCorrect: {r: 0.07075471, g: 1, b: 0.07597906, a: 1}
   _emissionIncorrect: {r: 4, g: 0.05660367, b: 0.05660367, a: 1}
@@ -187,7 +186,7 @@ GameObject:
   - component: {fileID: 8676254068285188073}
   - component: {fileID: 1349310258555870901}
   - component: {fileID: 4947827517473444858}
-  - component: {fileID: 5456887676964428634}
+  - component: {fileID: 6213702433390099816}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -220,9 +219,9 @@ Light:
   m_Enabled: 1
   serializedVersion: 11
   m_Type: 2
-  m_Color: {r: 0.6, g: 0.7647059, b: 0.75686276, a: 1}
-  m_Intensity: 4
-  m_Range: 4.9
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 10
+  m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -304,7 +303,7 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &5456887676964428634
+--- !u!114 &6213702433390099816
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -313,13 +312,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 3382407700807647050}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 376cd792c6750d545998ba99c3cb7fbb, type: 3}
+  m_Script: {fileID: 11500000, guid: 9753aadfb8088244ca14cf7599907d10, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  _minOnTimer: 0.125
-  _maxOnTimer: 1
-  _minOffTimer: 0.125
-  _maxOffTimer: 0.25
+  m_EditorClassIdentifier: '::'
+  _tweenType: 16
+  _lightDefault: {r: 0.34509805, g: 0.8431373, b: 0.9058824, a: 1}
+  _lightCorrupted: {r: 0.7372549, g: 0.0627451, b: 0.7490196, a: 1}
+  _lightOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
 --- !u!1 &4117342671872351749
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,7 +527,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e58ab5d3b463f74a81fe6e52ebfeb22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParedFillConnection
-  tubeMat: {fileID: 2100000, guid: 738b508b3d4fc604cbcadac085c091f6, type: 2}
   duration: 1.2
 --- !u!1 &5845743357459041662
 GameObject:
