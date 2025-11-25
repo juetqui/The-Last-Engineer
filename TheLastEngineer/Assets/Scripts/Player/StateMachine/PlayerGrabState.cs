@@ -25,7 +25,7 @@ public class PlayerGrabState : IPlayerState
 
     public void Tick()
     {
-        _player.GetClosestGlitcheable();
+        //_player.GetClosestGlitcheable();
     }
 
     public void Cancel() { }

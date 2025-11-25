@@ -23,7 +23,7 @@ public class CameraFocusManager : MonoBehaviour
         _lookAtPoint.position = _cameraTarget.position;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (!_isInZone) return;
 

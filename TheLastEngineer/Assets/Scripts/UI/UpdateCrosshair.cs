@@ -25,7 +25,7 @@ public class UpdateCrosshair : MonoBehaviour
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", glitcheable != null);
 
-        if (glitcheable == null)
+        if (glitcheable == null || PlayerNodeHandler.Instance.CurrentType == NodeType.None)
         {
             ResetPos();
             return;
@@ -56,14 +56,6 @@ public class UpdateCrosshair : MonoBehaviour
         _circleImage.enabled = !compatible;
         _circleImage.rectTransform.position = screenPosition;
     }
-
-    //private void TryPlayInvalidAnim(Glitcheable glitcheable, InteractionOutcome interactionResult)
-    //{
-    //    if (glitcheable == null) return;
-        
-    //    if (interactionResult.Result == InteractResult.Invalid)
-    //        _myAnim.SetTrigger("InvalidAction");
-    //}
 
     public void SetUpdateAnim()
     {

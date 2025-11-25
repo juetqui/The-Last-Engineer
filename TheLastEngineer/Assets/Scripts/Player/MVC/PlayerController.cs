@@ -96,6 +96,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _model.OnUpdate(mv3, _mainCam.transform.forward, _mainCam.transform.right, _currentSpeed);
         View.Walk(mv3);
         StateMachine.Tick();
+
+        GetClosestGlitcheable();
     }
 
     private void OnDestroy()
