@@ -1,18 +1,31 @@
-using System.Linq;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
+    [Header("View References")]
     [SerializeField] private GameObject _laserRendererPrefab;
     [SerializeField] private ParticleSystem _beamLaser;
     [SerializeField] private ParticleSystem _hitLaser;
-    [SerializeField] private float _maxDist = 20f;
+
+    [Header("Distance Parameters")]
+    [SerializeField] private int _maxDist = 100;
     [SerializeField] private float _raycastOffsetX = 2f;
     [SerializeField] private float _raycastOffsetZ = 1f;
+
+    [Header("Initialization Parameter")]
     [SerializeField] private bool _startsInitialized = false;
+
+    [Header("Turn On/Off Parameters")]
+    [SerializeField] private LeanTweenType _easeType = LeanTweenType.easeInSine;
+    [SerializeField] private float _easeTime = 0.5f;
+
+    [Header("Raycast Filter Parameter")]
     [SerializeField] private LayerMask _laserLayer;
 
+    [Header("Debug Parameter")]
     [SerializeField] private bool _debug = false;
+
+    private LTDescr _currentTween = null;
 
     private LineRenderer _lineRenderer = null;
     private Glitcheable _glitcheable = null;
@@ -21,7 +34,8 @@ public class Laser : MonoBehaviour
     private ILaserReceptor _lastHit = null;
     private RaycastHit _rayHit;
     private Ray _ray, _leftRay, _rightRay;
-    private bool _isInitialized;
+    private float _currentDist = 0f, _lastTargetDist = 0f;
+    private bool _isInitialized, _wasHit = false;
 
     private void Awake()
     {
@@ -46,7 +60,7 @@ public class Laser : MonoBehaviour
     {
         if (_startsInitialized)
         {
-            _isInitialized = true;
+            LaserRecived();
             _beamLaser.Play();
             CastLaser();
             _audioSource.Play();
@@ -71,16 +85,30 @@ public class Laser : MonoBehaviour
 
         if (_glitcheable == null)
         {
+            SetLaserLength(_maxDist);
             CastLaser();
             CorruptionCheck();
         }
         else if (_glitcheable._sm.Current is IGlitchInterruptible)
         {
+            if (_glitcheable._sm.Current is GlitchReintegratingState)
+            {
+                SetLaserLength(_maxDist);
+            }
+            else if (_glitcheable._sm.Current is GlitchDisintegratingState)
+            {
+                SetLaserLength(0);
+            }
+
             _lineRenderer.enabled = true;
             CastLaser();
             CorruptionCheck();
         }
-        else _lineRenderer.enabled = false;
+        else
+        {
+            SetLaserLength(0);
+            _lineRenderer.enabled = false;
+        }
     }
 
     private void CastLaser()
@@ -89,12 +117,12 @@ public class Laser : MonoBehaviour
         Ray mainRay = new Ray(laserOrigin, transform.forward);
 
         RaycastHit hit;
-        bool hasHit = Physics.Raycast(mainRay, out hit, _maxDist, _laserLayer);
+        bool hasHit = Physics.Raycast(mainRay, out hit, _currentDist, _laserLayer);
 
         if (!hasHit)
         {
             ClearLastHit();
-            SetLaserEnd(laserOrigin, laserOrigin + transform.forward * _maxDist);
+            SetLaserEnd(laserOrigin, laserOrigin + transform.forward * _currentDist);
             StopLaserEffect();
             return;
         }
@@ -107,20 +135,17 @@ public class Laser : MonoBehaviour
         SetLaserEnd(origin, hit.point);
         PlayLaserEffect(hit.point, hit.normal);
 
-        if (hit.collider.TryGetComponent(out ILaserReceptor receptor))
+        if (hit.collider.TryGetComponent(out ILaserReceptor receptor) && receptor != _ownReceptor)
         {
-            if (receptor != _ownReceptor)
+            if (_lastHit != receptor)
             {
-                if (_lastHit != receptor)
-                {
-                    if (_lastHit != null)
-                        _lastHit.LaserNotRecived();
+                if (_lastHit != null)
+                    _lastHit.LaserNotRecived();
 
-                    _lastHit = receptor;
-                }
-
-                receptor.LaserRecived();
+                _lastHit = receptor;
             }
+
+            receptor.LaserRecived();
         }
         else
         {
@@ -170,17 +195,26 @@ public class Laser : MonoBehaviour
 
     public void LaserRecived()
     {
+        if (_startsInitialized && _wasHit) return;
+
         _isInitialized = true;
+
+        if (_wasHit) return;
+
+        _wasHit = true;
+        SetLaserLength(_maxDist);
     }
 
     public void LaserNotRecived()
     {
-        Vector3 laserPos = GetFixedLaserPos();
+        SetLaserLength(0);
 
-        if (!_startsInitialized) _isInitialized = false;
+        if (!_startsInitialized)
+        {
+            _isInitialized = false;
+            _wasHit = false;
+        }
 
-        _lineRenderer.SetPosition(0, laserPos);
-        _lineRenderer.SetPosition(1, laserPos);
         StopLaserEffect();
     }
 
@@ -192,6 +226,45 @@ public class Laser : MonoBehaviour
     protected virtual bool CollitionCheck(RaycastHit hit)
     {
         return false;
+    }
+
+    private void SetLaserLength(int targetLength)
+    {
+        float correctedTarget = GetValidLaserDistance(targetLength);
+
+        if (Mathf.Approximately(_lastTargetDist, correctedTarget))
+            return;
+
+        _lastTargetDist = correctedTarget;
+
+        if (_debug)
+            Debug.Log("<color=yellow>SetLaserLength corrected target = " + correctedTarget + "</color>");
+
+        LeanTween.value(gameObject, _currentDist, correctedTarget, _easeTime)
+            .setEase(_easeType)
+            .setOnUpdate(v => UpdateCurrentDist(correctedTarget, v));
+    }
+
+    private float GetValidLaserDistance(float maxDistance)
+    {
+        Vector3 origin = GetFixedLaserPos();
+        Ray ray = new Ray(origin, transform.forward);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, _laserLayer))
+        {
+            return hit.distance;
+        }
+
+        return maxDistance;
+    }
+
+    private void UpdateCurrentDist(float targetDist, float value)
+    {
+        _currentDist = value;
+        
+        Vector3 origin = GetFixedLaserPos();
+        _lineRenderer.SetPosition(0, origin);
+        _lineRenderer.SetPosition(1, origin + transform.forward * _currentDist);
     }
 
     private void OnDrawGizmosSelected()
