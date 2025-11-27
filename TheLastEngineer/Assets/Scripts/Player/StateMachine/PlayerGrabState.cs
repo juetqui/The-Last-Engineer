@@ -39,7 +39,6 @@ public class PlayerGrabState : IPlayerState
     {
         if (interactable is Inspectionable inspectionable)
         {
-            Debug.Log("Interacting with Inspectionable");
             _target = interactable;
             inspectionable.OnFinished += RemoveInteractable;
 

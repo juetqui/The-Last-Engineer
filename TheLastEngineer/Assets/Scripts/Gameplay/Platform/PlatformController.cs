@@ -18,16 +18,16 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private float _waitCD = 1f;
     [SerializeField] private LeanTweenType _accelEase = LeanTweenType.easeOutSine;
     [SerializeField] private LeanTweenType _decelEase = LeanTweenType.easeInSine;
-    [SerializeField] private NodeType _requiredNode = NodeType.Corrupted;
     [SerializeField] private Connection _connection = default;
     [SerializeField] private StationsStops[] _positions2;
-    
+
     private bool[] _stationList;
     private Transform[] _positions;
     public Dictionary<Vector3, bool> myDictionary;
     private IMovablePassenger _passenger;
     private IPlatformState _state;
     private PlatformStateMachine _fsm;
+    private NodeType _requiredType = NodeType.Default;
     private Coroutine _changingColor = null;
     private PlayerController _player = default;
     private LTDescr _tween = default;
@@ -68,6 +68,7 @@ public class PlatformController : MonoBehaviour
     private void Initialize()
     {
         _connection.OnNodeConnected += OnConnectionChanged;
+        _requiredType = _connection.RequiredType;
         _fsm = new PlatformStateMachine(this, _connection.StartsConnected);
         SetPositiveFeedback(_connection.StartsConnected);
     }
@@ -98,7 +99,8 @@ public class PlatformController : MonoBehaviour
     /* -------------------- Eventos externos -------------------- */
     private void OnConnectionChanged(NodeType type, bool active)
     {
-        bool canMove = (type == _requiredNode) && active;
+        bool canMove = (type == _requiredType) && active;
+        
         SetPositiveFeedback(canMove);
 
         if (canMove) 
