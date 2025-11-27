@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using static UnityEngine.Rendering.DebugUI;
 
 public class LaserReceptor : MonoBehaviour, ILaserReceptor
 {
@@ -25,12 +28,18 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     //public float timeModifier;
     public bool _canBeUnfilled= false;
 
+    private CancellationTokenSource _cancelSource = default;
+    private Renderer _renderer = default;
+    [SerializeField] private float duration = 1.2f;
+
     [SerializeField] private List<ParticleSystem> _hitPS = new List<ParticleSystem>();
 
     private AudioSource _audioSource = default;
 
     private void Awake()
     {
+        _renderer = GetComponent<Renderer>();
+        _renderer.material.SetFloat("_GlowStep", 0f);
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider>();
         _hitPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
@@ -96,6 +105,45 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         }
     }
 
+    public void Fill()
+    {
+        StartFill(1f);
+    }
+
+    public void Empty()
+    {
+        StartFill(0f);
+    }
+
+    private void StartFill(float target)
+    {
+        _cancelSource?.Cancel();
+        _cancelSource = new CancellationTokenSource();
+
+        _ = AnimateFill(target, _cancelSource.Token);
+    }
+
+    private async Task AnimateFill(float target, CancellationToken token)
+    {
+        float startValue = _renderer.material.GetFloat("_GlowStep");
+        float time = 0f;
+
+        while (time < duration)
+        {
+            if (token.IsCancellationRequested) return;
+
+            time += Time.deltaTime;
+            float t = time / duration;
+
+            float value = Mathf.Lerp(startValue, target, t);
+            _renderer.material.SetFloat("_GlowStep", value);
+
+            await Task.Yield();
+        }
+
+        _renderer.material.SetFloat("_GlowStep", target);
+    }
+
     private IEnumerator LoadRoutine(float loadTime)
     {
         _audioSource.Stop();
@@ -109,6 +157,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         {
             if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
             {
+                Fill();
                 _currentLoad = _currentLoad + Time.deltaTime / loadTime;
                 yield return null;
             }
@@ -127,6 +176,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         {
             if (_isCurrentlyLoading == false && _isCurrentlyUnloading == true)
             {
+                Empty();
                 _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
                 yield return null;
             }
