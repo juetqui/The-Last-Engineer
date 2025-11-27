@@ -24,6 +24,7 @@ public class Laser : MonoBehaviour
 
     [Header("Debug Parameter")]
     [SerializeField] private bool _debug = false;
+    [SerializeField] private GameObject _debugObject;
 
     private LTDescr _currentTween = null;
 
@@ -232,17 +233,12 @@ public class Laser : MonoBehaviour
     {
         float correctedTarget = GetValidLaserDistance(targetLength);
 
-        if (Mathf.Approximately(_lastTargetDist, correctedTarget))
-            return;
-
         _lastTargetDist = correctedTarget;
-
-        if (_debug)
-            Debug.Log("<color=yellow>SetLaserLength corrected target = " + correctedTarget + "</color>");
 
         LeanTween.value(gameObject, _currentDist, correctedTarget, _easeTime)
             .setEase(_easeType)
-            .setOnUpdate(v => UpdateCurrentDist(correctedTarget, v));
+            .setOnUpdate(v => UpdateCurrentDist(v))
+            .setOnComplete(c => _currentDist = correctedTarget);
     }
 
     private float GetValidLaserDistance(float maxDistance)
@@ -258,7 +254,7 @@ public class Laser : MonoBehaviour
         return maxDistance;
     }
 
-    private void UpdateCurrentDist(float targetDist, float value)
+    private void UpdateCurrentDist(float value)
     {
         _currentDist = value;
         
