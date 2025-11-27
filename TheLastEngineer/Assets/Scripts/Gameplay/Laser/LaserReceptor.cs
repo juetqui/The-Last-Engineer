@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static UnityEngine.Rendering.DebugUI;
+using DG.Tweening;
 
 public class LaserReceptor : MonoBehaviour, ILaserReceptor
 {
@@ -31,8 +32,11 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
     private CancellationTokenSource _cancelSource = default;
     private Renderer _renderer = default;
     [SerializeField] private float duration = 1.2f;
+    [SerializeField] private ParticleSystem _completeFillPartcle;
+    [SerializeField] private List<ParticleSystem> _FinishFillParticle;
 
     [SerializeField] private List<ParticleSystem> _hitPS = new List<ParticleSystem>();
+
 
     private AudioSource _audioSource = default;
 
@@ -87,6 +91,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
 
     public void LaserNotRecived()
     {
+        _completeFillPartcle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         _audioSource.Stop();
         foreach (var ps in _hitPS)
         {
@@ -166,6 +171,12 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
                 yield break;
             }
         }
+
+        foreach (var ps in _FinishFillParticle)
+        {
+            ps.Play();
+        }
+        _completeFillPartcle.Play();
         _currentLoad = 1;
         ChargeCompleted();
     }
