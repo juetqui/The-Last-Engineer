@@ -216,7 +216,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void GetClosestGlitcheable()
     {
         Glitcheable nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
-        OnGlitcheableInArea(nearest);
+        OnGlitcheableInArea?.Invoke(nearest);
     }
     public void Dissolving(float timer) => OnDissolving?.Invoke(timer);
     public void SetCollisions(bool setCollider)
