@@ -30,16 +30,16 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     public Renderer _feedbackRenderer;
 
-    public GlitchStateMachine _sm;
-    public GlitchIdleState _idle;
-    public GlitchDisintegratingState _dis;
-    public GlitchMovingState _mov;
-    public GlitchReintegratingState _rei;
+    public GlitchStateMachine FSM;
+    public GlitchIdleState IdleState;
+    public GlitchDisintegratingState DisState;
+    public GlitchMovingState MovState;
+    public GlitchReintegratingState ReiState;
 
     public Vector3 CurrentTargetPos => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].position : transform.position;
     public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].rotation : transform.rotation;
 
-    public bool IsCorrupted { get { return _sm.Current != _idle; } }
+    public bool IsCorrupted { get { return FSM.Current != IdleState; } }
 
     private void Awake()
     {
@@ -68,24 +68,24 @@ public class Glitcheable : MonoBehaviour, IInteractable
         SetParticles(false, 1f);
         SetColliders(true);
 
-        _sm = new GlitchStateMachine();
+        FSM = new GlitchStateMachine();
 
-        _idle = new GlitchIdleState(this);
-        _dis = new GlitchDisintegratingState(this);
-        _mov = new GlitchMovingState(this);
-        _rei = new GlitchReintegratingState(this);
+        IdleState = new GlitchIdleState(this);
+        DisState = new GlitchDisintegratingState(this);
+        MovState = new GlitchMovingState(this);
+        ReiState = new GlitchReintegratingState(this);
 
-        _idle.SetNext(_dis);
-        _dis.SetNext(_mov, _idle);
-        _mov.SetNext(_rei);
-        _rei.SetNext(_dis, _idle);
+        IdleState.SetNext(DisState);
+        DisState.SetNext(MovState, IdleState);
+        MovState.SetNext(ReiState);
+        ReiState.SetNext(DisState, IdleState);
 
-        _sm.Change(_startInIdle ? _idle : _dis);
+        FSM.Change(_startInIdle ? IdleState : DisState);
     }
 
     private void Update()
     {
-        _sm.Tick(Time.deltaTime);
+        FSM.Tick(Time.deltaTime);
     }
     public void HologramSwitch()
     {
@@ -99,7 +99,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
     }
     public void BeginCycle()
     {
-        _sm.Change(_dis.ResetAndReturn());
+        FSM.Change(DisState.ResetAndReturn());
     }
 
     private bool CheckStateChange(NodeType nodeType)
@@ -107,15 +107,15 @@ public class Glitcheable : MonoBehaviour, IInteractable
         if (nodeType == NodeType.None)
             return false;
 
-        bool toIdleCase = _sm.Current != _idle && nodeType == NodeType.Default;
-        bool toGlitchedCase = _sm.Current == _idle && nodeType == NodeType.Corrupted;
+        bool toIdleCase = FSM.Current != IdleState && nodeType == NodeType.Default;
+        bool toGlitchedCase = FSM.Current == IdleState && nodeType == NodeType.Corrupted;
 
         return toIdleCase || toGlitchedCase;
     }
 
     public bool CanInteract(PlayerNodeHandler player)
     {
-        if (!CheckStateChange(player.CurrentType) || _sm.Current is not IGlitchInterruptible ii) return false;
+        if (!CheckStateChange(player.CurrentType) || FSM.Current is not IGlitchInterruptible ii) return false;
 
         return true;
     }
@@ -126,7 +126,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
         
         if (succeededInteraction)
         {
-            IGlitchInterruptible ii = (IGlitchInterruptible) _sm.Current;
+            IGlitchInterruptible ii = (IGlitchInterruptible) FSM.Current;
             ii.Interrupt();
         }
     }

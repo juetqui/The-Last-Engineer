@@ -47,7 +47,7 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
         if (raw >= 1f)
         {
             g.SetParticles(false, 1f);
-            g._sm?.Change(_nextNormal);
+            g.FSM?.Change(_nextNormal);
         }
     }
 
@@ -68,6 +68,6 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
 
     public void Interrupt()
     {
-        g._sm?.Change(_nextInterrupt);
+        g.FSM?.Change(_nextInterrupt);
     }
 }

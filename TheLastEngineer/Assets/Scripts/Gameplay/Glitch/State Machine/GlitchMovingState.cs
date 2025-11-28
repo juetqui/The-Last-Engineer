@@ -47,7 +47,7 @@ public class GlitchMovingState : IState
             g.transform.position = _targetPos;
             g.transform.rotation = _targetRot;
             g.AdvanceToNextNode();
-            g._sm?.Change(_next);
+            g.FSM?.Change(_next);
         }
     }
 

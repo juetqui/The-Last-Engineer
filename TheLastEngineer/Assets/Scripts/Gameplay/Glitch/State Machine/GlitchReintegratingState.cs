@@ -54,7 +54,7 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         {
             g.SetParticles(false, 1f);
             g.SetBoolCorrupted(0f);
-            g._sm?.Change(_next);
+            g.FSM?.Change(_next);
         }
     }
 
@@ -62,6 +62,6 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
 
     public void Interrupt()
     {
-        g._sm?.Change(_nextInterrupt);
+        g.FSM?.Change(_nextInterrupt);
     }
 }

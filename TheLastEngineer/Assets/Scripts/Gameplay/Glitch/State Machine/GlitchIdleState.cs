@@ -37,6 +37,6 @@ public class GlitchIdleState : IState, IGlitchInterruptible
     }
     public void Interrupt()
     {
-        g._sm.Change(_next);
+        g.FSM.Change(_next);
     }
 }
