@@ -26,7 +26,7 @@ public class Laser : MonoBehaviour
     [SerializeField] private bool _debug = false;
     [SerializeField] private GameObject _debugObject;
 
-    private LTDescr _currentTween = null;
+    //private LTDescr _currentTween = null;
 
     private LineRenderer _lineRenderer = null;
     private Glitcheable _glitcheable = null;
@@ -37,6 +37,11 @@ public class Laser : MonoBehaviour
     private Ray _ray, _leftRay, _rightRay;
     private float _currentDist = 0f, _lastTargetDist = 0f;
     private bool _isInitialized, _wasHit = false;
+
+    private float _targetDist = 0f;
+    private float _transitionTimer = 0f;
+    private float _startDist = 0f;
+    private bool _isTransitioning = false;
 
     private void Awake()
     {
@@ -86,17 +91,25 @@ public class Laser : MonoBehaviour
 
         if (_glitcheable == null)
         {
-            SetLaserLength(_maxDist);
-            CastLaser();
-            CorruptionCheck();
+            if (_isInitialized)
+            {
+                SetLaserLength(_maxDist);
+                CastLaser();
+                CorruptionCheck();
+            }
+            else
+            {
+                SetLaserLength(0);
+                _lineRenderer.enabled = false;
+            }
         }
-        else if (_glitcheable._sm.Current is IGlitchInterruptible)
+        else if (_glitcheable.FSM.Current is IGlitchInterruptible)
         {
-            if (_glitcheable._sm.Current is GlitchReintegratingState)
+            if (_glitcheable.FSM.Current is GlitchReintegratingState)
             {
                 SetLaserLength(_maxDist);
             }
-            else if (_glitcheable._sm.Current is GlitchDisintegratingState)
+            else if (_glitcheable.FSM.Current is GlitchDisintegratingState)
             {
                 SetLaserLength(0);
             }
@@ -110,6 +123,8 @@ public class Laser : MonoBehaviour
             SetLaserLength(0);
             _lineRenderer.enabled = false;
         }
+
+        UpdateDistanceSmooth();
     }
 
     private void CastLaser()
@@ -209,13 +224,8 @@ public class Laser : MonoBehaviour
     public void LaserNotRecived()
     {
         SetLaserLength(0);
-
-        if (!_startsInitialized)
-        {
-            _isInitialized = false;
-            _wasHit = false;
-        }
-
+        _isInitialized = false;
+        _wasHit = false;
         StopLaserEffect();
     }
 
@@ -233,12 +243,28 @@ public class Laser : MonoBehaviour
     {
         float correctedTarget = GetValidLaserDistance(targetLength);
 
-        _lastTargetDist = correctedTarget;
+        _startDist = _currentDist;
+        _targetDist = correctedTarget;
+        _transitionTimer = 0f;
+        _isTransitioning = true;
+    }
 
-        LeanTween.value(gameObject, _currentDist, correctedTarget, _easeTime)
-            .setEase(_easeType)
-            .setOnUpdate(v => UpdateCurrentDist(v))
-            .setOnComplete(c => _currentDist = correctedTarget);
+    private void UpdateDistanceSmooth()
+    {
+        if (!_isTransitioning) return;
+
+        _transitionTimer += Time.deltaTime;
+
+        float t = Mathf.Clamp01(_transitionTimer / _easeTime);
+
+        _currentDist = Mathf.Lerp(_startDist, _targetDist, t);
+
+        Vector3 origin = GetFixedLaserPos();
+        _lineRenderer.SetPosition(0, origin);
+        _lineRenderer.SetPosition(1, origin + transform.forward * _currentDist);
+
+        if (t >= 1f)
+            _isTransitioning = false;
     }
 
     private float GetValidLaserDistance(float maxDistance)

@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class LaserActivator : MonoBehaviour, ILaserReceptor
 {
-    private List<Laser> _lasers = default;
+    private List<LaserController> _lasers = default;
 
     private void Awake()
     {
-        _lasers = GetComponentsInChildren<Laser>().ToList();
+        _lasers = GetComponentsInChildren<LaserController>().ToList();
     }
 
     public void LaserRecived()
