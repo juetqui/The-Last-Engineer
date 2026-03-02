@@ -13,7 +13,7 @@ public class GoToMenu : MonoBehaviour
         _coll = GetComponent<Collider>();
         _door.OnOpen += EnableCollider;
 
-        EnableCollider(false);
+        //EnableCollider(false);
     }
 
     private void EnableCollider(bool isOpen) => _coll.enabled = isOpen;
