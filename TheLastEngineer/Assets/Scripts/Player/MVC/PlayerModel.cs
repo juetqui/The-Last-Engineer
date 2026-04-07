@@ -23,7 +23,7 @@ public class PlayerModel
     private bool _isTeleporting = false;
     #endregion
 
-    private Vector3 _velocity = default, _platformDisplacement = Vector3.zero;
+    private Vector3 _velocity = default, _platformDisplacement = Vector3.zero, _cameraForward = Vector3.zero;
 
     public bool IsDashing { get { return _isDashing; } }
     public bool CanDash { get { return _canDash; } }
@@ -50,7 +50,8 @@ public class PlayerModel
     public void OnUpdate(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight, float moveSpeed)
     {
         _moveSpeed = moveSpeed;
-        MovePlayer(moveDir, cameraForward, cameraRight);
+        _cameraForward = cameraForward;
+        MovePlayer(moveDir, _cameraForward, cameraRight);
         UpdateCoyoteTimer();
     }
 
@@ -166,7 +167,7 @@ public class PlayerModel
     public IEnumerator Dash(Vector3 dashDir)
     {
         if (dashDir == Vector3.zero)
-            dashDir = _transform.forward;
+            dashDir = _cameraForward;
 
         RotatePlayer(dashDir);
 
