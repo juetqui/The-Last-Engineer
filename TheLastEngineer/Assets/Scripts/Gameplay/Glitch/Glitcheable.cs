@@ -45,11 +45,9 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         if (_newPosList.Count > 0)
         {
-            for(int i=0; i < _newPosList.Count; i++)
+            foreach (var newPos in _newPosList)
             {
-          
-                _objectHolograms.Add( _newPosList[i].gameObject);
-                
+                _objectHolograms.Add( newPos.gameObject);
             }
         }
         if (_coll == null)

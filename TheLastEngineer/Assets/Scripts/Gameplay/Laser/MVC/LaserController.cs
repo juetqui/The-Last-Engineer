@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class LaserController : MonoBehaviour
@@ -11,12 +12,17 @@ public class LaserController : MonoBehaviour
     [SerializeField] private bool _debug = false;
     [SerializeField] private Color _gizmosColor = Color.red;
 
-    private LaserModel _model = default;
-    private LaserView _view = default;
+    private LaserModel _model;
+    private LaserView _view;
 
     private bool _isInitialized = false;
-    private ILaserReceptor _ownReceptor = default;
-    private Glitcheable _glitcheable = default;
+    private bool _isIdle = false;
+    private bool _isTransitioning = false;
+    private bool _isToggling = false;
+    private bool _idleSetupDone = false;
+
+    private ILaserReceptor _ownReceptor;
+    private Glitcheable _glitcheable;
 
     private void Awake()
     {
@@ -31,6 +37,15 @@ public class LaserController : MonoBehaviour
     private void Start()
     {
         _isInitialized = _startsInitialized;
+
+        if (_glitcheable != null)
+            _glitcheable.FSM.OnStateChanged += UpdateGlitchedBehaviour;
+    }
+
+    private void OnDestroy()
+    {
+        if (_glitcheable != null)
+            _glitcheable.FSM.OnStateChanged -= UpdateGlitchedBehaviour;
     }
 
     private void Update()
@@ -43,62 +58,93 @@ public class LaserController : MonoBehaviour
 
     private void CheckGlitchedBehaviour()
     {
-        if (_glitcheable.FSM.Current is GlitchReintegratingState || _glitcheable.FSM.Current is GlitchIdleState)
-        {
-            _view.EnableBeam(true);
-            CheckCommonBehaviour();
-        }
-        else if (_glitcheable.FSM.Current is GlitchDisintegratingState || _glitcheable.FSM.Current is GlitchMovingState)
-        {
-            _model.SetLaserLength(0f);
-            _model.ClearReceptor();
-            _model.UpdateRaycastDistance();
-
-            Vector3 origin = GetLaserOrigin();
-            Vector3 dir = transform.forward;
-            Vector3 end = origin + dir * _model.CurrentDist;
-
-            _view.SetLaserPositions(origin, end);
-
-            if (_model.CurrentDist <= 0.01f)
-            {
-                _view.EnableBeam(false);
-                _view.StopHitEffect();
-                _view.StopAudio();
-            }
-        }
+        if (_isIdle) IdleBehaviour();
+        else if (_isTransitioning) TransitioningBehaviour();
     }
+
+    private void UpdateGlitchedBehaviour(IState newState)
+    {
+        (_isIdle, _isTransitioning) = newState switch
+        {
+            GlitchReintegratingState or GlitchIdleState => (true, false),
+            GlitchDisintegratingState or GlitchMovingState => (false, true),
+            _ => (false, false)
+        };
+
+        _isToggling = false;
+        _idleSetupDone = false;
+    }
+
+    private void IdleBehaviour()
+    {
+        _view.EnableBeam(true);
+
+        if (!_idleSetupDone)
+        {
+            var origin = GetLaserOrigin();
+            var dir = transform.forward;
+            var didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, _layer, QueryTriggerInteraction.Ignore);
+            _model.SetLaserLength(didHit ? hit.distance : _maxDist);
+            _isToggling = true;
+            _idleSetupDone = true;
+        }
+
+        CheckCommonBehaviour();
+    }
+
+    private void TransitioningBehaviour()
+    {
+        if (!_isToggling)
+        {
+            _isToggling = true;
+            _model.SetLaserLength(0f);
+        }
+
+        _model.ClearReceptor();
+        _model.UpdateRaycastDistance();
+
+        var origin = GetLaserOrigin();
+        var dir = transform.forward;
+        var end = origin + dir * _model.CurrentDist;
+
+        _view.SetLaserPositions(origin, end);
+
+        if (_model.IsTransitioning) return;
+
+        _isToggling = false;
+        _view.EnableBeam(false);
+        _view.StopHitEffect();
+        _view.StopAudio();
+    }
+    
 
     private void CheckCommonBehaviour()
     {
-        Vector3 origin = GetLaserOrigin();
-        Vector3 dir = transform.forward;
+        var origin = GetLaserOrigin();
+        var dir = transform.forward;
 
-        RaycastHit hit;
+        var didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, _layer, QueryTriggerInteraction.Ignore);
 
-        bool didHit = Physics.Raycast(origin, dir, out hit, _model.TargetDist, _layer, QueryTriggerInteraction.Ignore);
-
-        if (_debug)
+        if (_isToggling && _model.IsTransitioning)
         {
-            Debug.Log(didHit ? $"Hit: {hit.collider.name}" : "No Hit");
+            _model.ClearReceptor();
+            _model.UpdateRaycastDistance();
+            _view.SetLaserPositions(origin, origin + dir * _model.CurrentDist);
+            _view.StopHitEffect();
+            return;
         }
 
-        if (_isInitialized)
-            _model.SetLaserLength(didHit ? hit.distance : _maxDist);
-        else
-            _model.SetLaserLength(0f);
+        _isToggling = false;
+        _model.SetInstant(_isInitialized ? (didHit ? hit.distance : _maxDist) : 0f);
 
-        if (didHit)
-            _model.ProcessReceptor(hit, _ownReceptor);
-        else
-            _model.ClearReceptor();
+        if (didHit) _model.ProcessReceptor(hit, _ownReceptor);
+        else _model.ClearReceptor();
 
         _model.UpdateRaycastDistance();
 
-        Vector3 start = origin;
-        Vector3 end = origin + dir * _model.CurrentDist;
+        var end = origin + dir * _model.CurrentDist;
         
-        _view.SetLaserPositions(start, end);
+        _view.SetLaserPositions(origin, end);
 
         if (didHit)
             _view.ShowHitEffect(hit.point, hit.normal);
@@ -111,6 +157,8 @@ public class LaserController : MonoBehaviour
         if (_startsInitialized) return;
 
         _isInitialized = true;
+        _isToggling = true;
+        _model.SetLaserLength(_maxDist);
     }
 
     public void LaserNotRecived()
@@ -118,6 +166,8 @@ public class LaserController : MonoBehaviour
         if (_startsInitialized) return;
 
         _isInitialized = false;
+        _isToggling = true;
+        _model.SetLaserLength(0f);
     }
 
     private Vector3 GetLaserOrigin()
@@ -129,11 +179,11 @@ public class LaserController : MonoBehaviour
     {
         Gizmos.color = _gizmosColor;
         
-        float maxDist = _model != null ? _model.CurrentDist : _maxDist;   
+        var maxDist = _model?.CurrentDist ?? _maxDist;
 
-        Vector3 origin = transform.position + transform.forward * _offsetZ;
-        Vector3 dir = transform.forward;
-        Vector3 end = origin + dir * maxDist;
+        var origin = transform.position + transform.forward * _offsetZ;
+        var dir = transform.forward;
+        var end = origin + dir * maxDist;
 
         Gizmos.DrawLine(origin, end);
         Gizmos.DrawSphere(origin, 0.05f);

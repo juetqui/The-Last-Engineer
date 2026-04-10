@@ -11,6 +11,8 @@ public class LaserModel
     private float _transitionTimer = 0f;
     private float _easeTime = 0f;
     
+    public bool IsTransitioning => _isTransitioning;
+
     private bool _isTransitioning = false;
     private bool _debug = false;
 
@@ -32,12 +34,10 @@ public class LaserModel
             return;
         }
 
-        if (_lastHit != receptor)
-        {
-            _lastHit?.LaserNotRecived();
-            _lastHit = receptor;
-        }
+        if (receptor == _lastHit) return;
 
+        _lastHit?.LaserNotRecived();
+        _lastHit = receptor;
         _lastHit.LaserRecived();
     }
 
@@ -55,13 +55,21 @@ public class LaserModel
         _isTransitioning = true;
     }
 
+    public void SetInstant(float length)
+    {
+        CurrentDist = length;
+        TargetDist = length;
+        _transitionTimer = 0f;
+        _isTransitioning = false;
+    }
+
     public float UpdateRaycastDistance()
     {
         if (!_isTransitioning)
             return CurrentDist;
 
         _transitionTimer += Time.deltaTime;
-        float t = _transitionTimer / _easeTime;
+        var t = _transitionTimer / _easeTime;
 
         CurrentDist = Mathf.Lerp(_startDist, TargetDist, t);
 

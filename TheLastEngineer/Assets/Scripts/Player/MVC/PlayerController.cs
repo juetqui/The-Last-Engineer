@@ -137,19 +137,26 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
                 _playerData.highRumbleFrequency,
                 _playerData.rumbleDuration);
 
-            Vector3 dashInput = GetMovement3D();
+            var dashInput = GetMovement3D();
+            var dashDir = Vector3.zero;
+
             if (dashInput == Vector3.zero)
+            {
                 dashInput = transform.forward;
+                // dashDir = _mainCam.transform.forward;
+            }
+            else
+            {
+                var camForward = _mainCam.transform.forward;
+                var camRight = _mainCam.transform.right;
 
-            Vector3 camForward = _mainCam.transform.forward;
-            Vector3 camRight = _mainCam.transform.right;
+                camForward.y = 0f;
+                camRight.y = 0f;
+                camForward.Normalize();
+                camRight.Normalize();
 
-            camForward.y = 0f;
-            camRight.y = 0f;
-            camForward.Normalize();
-            camRight.Normalize();
-
-            Vector3 dashDir = (camForward * dashInput.z + camRight * dashInput.x).normalized;
+                dashDir = (camForward * dashInput.z + camRight * dashInput.x).normalized;
+            }
 
             StartCoroutine(_model.Dash(dashDir));
 
