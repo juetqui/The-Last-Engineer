@@ -81,9 +81,8 @@ public class LaserController : MonoBehaviour
 
         if (!_idleSetupDone)
         {
-            var origin = GetLaserOrigin();
-            var dir = transform.forward;
-            var didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, _layer, QueryTriggerInteraction.Ignore);
+            var hit = CheckRaycast(out var origin, out var dir, out var didHit);
+            
             _model.SetLaserLength(didHit ? hit.distance : _maxDist);
             _isToggling = true;
             _idleSetupDone = true;
@@ -116,14 +115,19 @@ public class LaserController : MonoBehaviour
         _view.StopHitEffect();
         _view.StopAudio();
     }
-    
+
+    private RaycastHit CheckRaycast(out Vector3 origin, out Vector3 dir, out bool didHit)
+    {
+        origin = GetLaserOrigin();
+        dir = transform.forward;
+
+        didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, _layer, QueryTriggerInteraction.Ignore);
+        return hit;
+    }
 
     private void CheckCommonBehaviour()
     {
-        var origin = GetLaserOrigin();
-        var dir = transform.forward;
-
-        var didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, _layer, QueryTriggerInteraction.Ignore);
+        var hit = CheckRaycast(out var origin, out var dir, out var didHit);
 
         if (_isToggling && _model.IsTransitioning)
         {
@@ -137,6 +141,8 @@ public class LaserController : MonoBehaviour
         _isToggling = false;
         _model.SetInstant(_isInitialized ? (didHit ? hit.distance : _maxDist) : 0f);
 
+        if (!_isInitialized) return;
+        
         if (didHit) _model.ProcessReceptor(hit, _ownReceptor);
         else _model.ClearReceptor();
 
@@ -158,7 +164,10 @@ public class LaserController : MonoBehaviour
 
         _isInitialized = true;
         _isToggling = true;
-        _model.SetLaserLength(_maxDist);
+
+        var hit = CheckRaycast(out var origin, out var dir, out var didHit);
+
+        _model.SetLaserLength(didHit ? hit.distance : _maxDist);
     }
 
     public void LaserNotRecived()
