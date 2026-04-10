@@ -32,14 +32,11 @@ public class LaserController : MonoBehaviour
         _view.Init(1);
         _ownReceptor = GetComponentInParent<ILaserReceptor>();
         _glitcheable = GetComponentInParent<Glitcheable>();
-    }
-
-    private void Start()
-    {
-        _isInitialized = _startsInitialized;
-
+        
         if (_glitcheable != null)
             _glitcheable.FSM.OnStateChanged += UpdateGlitchedBehaviour;
+        
+        _isInitialized = _startsInitialized;
     }
 
     private void OnDestroy()
@@ -77,6 +74,24 @@ public class LaserController : MonoBehaviour
 
     private void IdleBehaviour()
     {
+        if (!_isInitialized)
+        {
+            if (!_isToggling) return;
+
+            _model.UpdateRaycastDistance();
+            var origin = GetLaserOrigin();
+            var dir = transform.forward;
+            _view.SetLaserPositions(origin, origin + dir * _model.CurrentDist);
+
+            if (_model.IsTransitioning) return;
+
+            _isToggling = false;
+            _view.EnableBeam(false);
+            _view.StopHitEffect();
+            _view.StopAudio();
+            return;
+        }
+
         _view.EnableBeam(true);
 
         if (!_idleSetupDone)
@@ -93,6 +108,8 @@ public class LaserController : MonoBehaviour
 
     private void TransitioningBehaviour()
     {
+        if (!_isInitialized) return;
+        
         if (!_isToggling)
         {
             _isToggling = true;
@@ -158,7 +175,7 @@ public class LaserController : MonoBehaviour
             _view.StopHitEffect();
     }
 
-    public void LaserRecived()
+    public void LaserReceived()
     {
         if (_startsInitialized) return;
 
@@ -170,12 +187,13 @@ public class LaserController : MonoBehaviour
         _model.SetLaserLength(didHit ? hit.distance : _maxDist);
     }
 
-    public void LaserNotRecived()
+    public void LaserNotReceived()
     {
         if (_startsInitialized) return;
 
         _isInitialized = false;
         _isToggling = true;
+        _idleSetupDone = false;
         _model.SetLaserLength(0f);
     }
 

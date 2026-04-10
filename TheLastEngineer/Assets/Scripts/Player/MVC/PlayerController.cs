@@ -260,7 +260,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     #endregion
 
     #region LASER MANAGEMENT
-    public void LaserRecived()
+    public void LaserReceived()
     {
         if (_isDead) return;
         View.SetAnimatorSpeed(0f);
@@ -268,7 +268,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         StartCoroutine(RespawnPlayer(CauseOfDeath.Laser));
     }
     
-    public void LaserNotRecived() { }
+    public void LaserNotReceived() { }
     #endregion
 
     #region CheckPoint y Respawn

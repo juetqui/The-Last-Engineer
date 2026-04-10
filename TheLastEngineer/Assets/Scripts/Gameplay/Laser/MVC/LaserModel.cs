@@ -36,14 +36,14 @@ public class LaserModel
 
         if (receptor == _lastHit) return;
 
-        _lastHit?.LaserNotRecived();
+        _lastHit?.LaserNotReceived();
         _lastHit = receptor;
-        _lastHit.LaserRecived();
+        _lastHit.LaserReceived();
     }
 
     public void ClearReceptor()
     {
-        _lastHit?.LaserNotRecived();
+        _lastHit?.LaserNotReceived();
         _lastHit = null;
     }
 

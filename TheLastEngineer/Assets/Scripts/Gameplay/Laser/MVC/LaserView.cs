@@ -32,11 +32,13 @@ public class LaserView : MonoBehaviour
     {
         _hitLaser.transform.position = pos;
         _hitLaser.transform.rotation = Quaternion.LookRotation(normal);
+        _hitLaser.gameObject.SetActive(true);
         if (!_hitLaser.isPlaying) _hitLaser.Play();
     }
 
     public void StopHitEffect()
     {
+        _hitLaser.gameObject.SetActive(false);
         if (_hitLaser.isPlaying) _hitLaser.Stop();
     }
 

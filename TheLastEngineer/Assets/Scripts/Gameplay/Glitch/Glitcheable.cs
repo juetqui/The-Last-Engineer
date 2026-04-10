@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-1)]
 public class Glitcheable : MonoBehaviour, IInteractable
 {
     public GameObject[] Barandas;
+    
     #region -----INTERFACE VARIABLES-----
     public InteractablePriority Priority => InteractablePriority.Highest;
     public Transform Transform => transform;
@@ -77,7 +80,10 @@ public class Glitcheable : MonoBehaviour, IInteractable
         DisState.SetNext(MovState, IdleState);
         MovState.SetNext(ReiState);
         ReiState.SetNext(DisState, IdleState);
+    }
 
+    private void Start()
+    {
         FSM.Change(_startInIdle ? IdleState : DisState);
     }
 

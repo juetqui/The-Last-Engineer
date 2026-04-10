@@ -1,6 +1,6 @@
 public interface ILaserReceptor
 {
-    public void LaserRecived();
-    public void LaserNotRecived();
+    public void LaserReceived();
+    public void LaserNotReceived();
 
 }

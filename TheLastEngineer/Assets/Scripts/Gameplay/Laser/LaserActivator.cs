@@ -11,19 +11,19 @@ public class LaserActivator : MonoBehaviour, ILaserReceptor
         _lasers = GetComponentsInChildren<LaserController>().ToList();
     }
 
-    public void LaserRecived()
+    public void LaserReceived()
     {
         foreach (var laser in _lasers)
         {
-            laser.LaserRecived();
+            laser.LaserReceived();
         }
     }
 
-    public void LaserNotRecived()
+    public void LaserNotReceived()
     {
         foreach (var laser in _lasers)
         {
-            laser.LaserNotRecived();
+            laser.LaserNotReceived();
         }
     }
 }

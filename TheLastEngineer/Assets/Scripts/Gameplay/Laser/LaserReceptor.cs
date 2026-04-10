@@ -72,7 +72,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         OnDepleated?.Invoke();
     }
 
-    public void LaserRecived()
+    public void LaserReceived()
     {
         OnHit?.Invoke();
         
@@ -89,7 +89,7 @@ public class LaserReceptor : MonoBehaviour, ILaserReceptor
         _collider.enabled = false;
     }
 
-    public void LaserNotRecived()
+    public void LaserNotReceived()
     {
         _completeFillPartcle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         _audioSource.Stop();

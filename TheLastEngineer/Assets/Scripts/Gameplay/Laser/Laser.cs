@@ -66,7 +66,7 @@ public class Laser : MonoBehaviour
     {
         if (_startsInitialized)
         {
-            LaserRecived();
+            LaserReceived();
             _beamLaser.Play();
             CastLaser();
             _audioSource.Play();
@@ -79,7 +79,7 @@ public class Laser : MonoBehaviour
         {
             if (_lastHit != null)
             {
-                _lastHit.LaserNotRecived();
+                _lastHit.LaserNotReceived();
                 _lastHit = null;
             }
             _audioSource.Stop();
@@ -156,12 +156,12 @@ public class Laser : MonoBehaviour
             if (_lastHit != receptor)
             {
                 if (_lastHit != null)
-                    _lastHit.LaserNotRecived();
+                    _lastHit.LaserNotReceived();
 
                 _lastHit = receptor;
             }
 
-            receptor.LaserRecived();
+            receptor.LaserReceived();
         }
         else
         {
@@ -191,7 +191,7 @@ public class Laser : MonoBehaviour
     private void NotifyReceptor(ILaserReceptor receptor)
     {
         if (_lastHit != null && _lastHit != receptor)
-            _lastHit.LaserNotRecived();
+            _lastHit.LaserNotReceived();
 
         _lastHit = receptor;
     }
@@ -200,7 +200,7 @@ public class Laser : MonoBehaviour
     {
         if (_lastHit == null) return;
 
-        _lastHit.LaserNotRecived();
+        _lastHit.LaserNotReceived();
         _lastHit = null;
     }
 
@@ -209,7 +209,7 @@ public class Laser : MonoBehaviour
         return transform.position + transform.forward * _raycastOffsetZ;
     }
 
-    public void LaserRecived()
+    public void LaserReceived()
     {
         if (_startsInitialized && _wasHit) return;
 
@@ -221,7 +221,7 @@ public class Laser : MonoBehaviour
         SetLaserLength(_maxDist);
     }
 
-    public void LaserNotRecived()
+    public void LaserNotReceived()
     {
         SetLaserLength(0);
         _isInitialized = false;
