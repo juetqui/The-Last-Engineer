@@ -1,6 +1,4 @@
 using Cinemachine;
-using System.Net;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class UpdateCameras : MonoBehaviour
@@ -22,24 +20,20 @@ public class UpdateCameras : MonoBehaviour
 
     private void Update()
     {
-        if (_isBlending)
-        {
-            if (!_CMBrain.IsBlending)
-            {
-                _CMBrain.m_CameraActivatedEvent.RemoveListener(EnableOcclusionCulling);
-                _mainCamera.useOcclusionCulling = true;
-                _isBlending = false;
-            }
-        }
+        if (!_isBlending) return;
+        if (_CMBrain.IsBlending) return;
+
+        _CMBrain.m_CameraActivatedEvent.RemoveListener(EnableOcclusionCulling);
+        _mainCamera.useOcclusionCulling = true;
+        _isBlending = false;
     }
 
     private void OnDestroy()
     {
-        if (this.isActiveAndEnabled)
-        {
-            PlayerController.Instance.OnInteractableSelected -= TargetSelected;
-            ScannerController.Instance.OnScanFinished -= CorruptionCleaned;
-        }
+        if (!this.isActiveAndEnabled) return;
+
+        PlayerController.Instance.OnInteractableSelected -= TargetSelected;
+        ScannerController.Instance.OnScanFinished -= CorruptionCleaned;
     }
 
     private void CorruptionCleaned() => TargetSelected(null);

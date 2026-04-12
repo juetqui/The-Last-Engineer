@@ -15,8 +15,7 @@ public class PlayerModel
     private float _gravity = -50f;
     private bool _isDashing = false, _canDash = true, _useGravity = true;
 
-    //----- Teleport Variables -----//
-    #region
+    #region Teleport Variables
     private float _teleportDuration = 0.25f;
     private Vector3 _teleportStartPos;
     private Vector3 _teleportTargetPos;

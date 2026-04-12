@@ -9,8 +9,7 @@ public class CameraMovementController : MonoBehaviour
     [SerializeField] private LeanTweenType _easeType;
 
     [Header("Offset Limits")]
-    [SerializeField] private float _XLimit = 5f;
-    [SerializeField] private float _NegativeXLimit = -5f;
+    [SerializeField] private float _horizontalLimit = 5f;
     [SerializeField] private float _YLimit = 15f;
     [SerializeField] private float _NegativeYLimit = -15f;
 
@@ -71,10 +70,22 @@ public class CameraMovementController : MonoBehaviour
 
     private void SetOffset()
     {
-        _currentOffset.x += _inputOffset.x * _sensitivity * Time.deltaTime;
+        var yaw = _freeLookCamera.m_XAxis.Value * Mathf.Deg2Rad;
+        var horizontalDelta = _inputOffset.x * _sensitivity * Time.deltaTime;
+
+        _currentOffset.x += horizontalDelta * Mathf.Cos(yaw);
+        _currentOffset.z -= horizontalDelta * Mathf.Sin(yaw);
         _currentOffset.y += _inputOffset.y * _sensitivity * Time.deltaTime;
 
-        _currentOffset.x = Mathf.Clamp(_currentOffset.x, _NegativeXLimit, _XLimit);
+        // Clamp horizontal magnitude (circular limit in XZ plane)
+        Vector2 horizontal = new Vector2(_currentOffset.x, _currentOffset.z);
+        if (horizontal.magnitude > _horizontalLimit)
+        {
+            horizontal = horizontal.normalized * _horizontalLimit;
+            _currentOffset.x = horizontal.x;
+            _currentOffset.z = horizontal.y;
+        }
+
         _currentOffset.y = Mathf.Clamp(_currentOffset.y, _NegativeYLimit, _YLimit);
 
         _composer.m_TrackedObjectOffset = _currentOffset;

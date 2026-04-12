@@ -17,6 +17,8 @@ public class InputManager : MonoBehaviour
     [HideInInspector] public InputAction dashInput = default;
     [HideInInspector] public InputAction pauseInput = default;
     [HideInInspector] public InputAction resetCamInput = default;
+    [HideInInspector] public InputAction cameraRight = default;
+    [HideInInspector] public InputAction cameraLeft = default;
     #endregion
 
     #region UI INPUTS
@@ -56,6 +58,8 @@ public class InputManager : MonoBehaviour
         interactInput = playerInputs.Player.Interact;
         pauseInput = playerInputs.Player.Pause;
         resetCamInput = playerInputs.Player.ResetCam;
+        cameraRight = playerInputs.Player.CameraRight;
+        cameraLeft = playerInputs.Player.CameraLeft;
 
         rotate = playerInputs.UI.Rotate;
         click = playerInputs.UI.Click;

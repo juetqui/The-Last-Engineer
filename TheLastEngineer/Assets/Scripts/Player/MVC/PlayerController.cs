@@ -320,9 +320,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (coll.TryGetComponent(out IInteractable interactable))
             _interactableHandler.Add(interactable);
         else if (coll.CompareTag("Void") && !_isDead)
-        {
             StartCoroutine(RespawnPlayer(CauseOfDeath.Fall));
-        }
     }
 
     private void OnTriggerExit(Collider coll)
