@@ -5,8 +5,6 @@ using UnityEngine.InputSystem;
 
 public class FollowController : MonoBehaviour
 {
-    public static FollowController Instance;
-    
     [SerializeField] private Transform lookAtObject;
 
     private CinemachineFreeLook _camera;
@@ -14,12 +12,7 @@ public class FollowController : MonoBehaviour
     
     private bool _canRotate = true;
 
-    private void Awake()
-    {
-        if (Instance == null) Instance = this;
-    }
-
-    void Start()
+    private void Start()
     {
         _camera = GetComponent<CinemachineFreeLook>();
         _player = PlayerController.Instance;
@@ -61,23 +54,26 @@ public class FollowController : MonoBehaviour
         OrientateCamera(_camera.m_XAxis.Value + 90f);
     }
 
-    public void OrientateCamera(float angle, float easeTime = 0.75f, LeanTweenType easeType = LeanTweenType.easeInOutSine)
+    private void OrientateCamera(float angle, float easeTime = 0.75f, LeanTweenType easeType = LeanTweenType.easeInOutSine)
     {
         if (!_canRotate) return;
-        
+
         LeanTween.value(gameObject, UpdateCameraOrientation, _camera.m_XAxis.Value, angle, easeTime)
+            .setOnStart(() => _canRotate = false)
+            .setEase(easeType);
+        
+        LeanTween.value(lookAtObject.gameObject, UpdateObjectOrientation, lookAtObject.eulerAngles.y, angle, easeTime)
             .setEase(easeType)
             .setOnComplete(() => _canRotate = true);
     }
 
+    private void UpdateObjectOrientation(float angle)
+    {
+        lookAtObject.localRotation = Quaternion.Euler(0f, angle, 0f);
+    }
+    
     private void UpdateCameraOrientation(float angle)
     {
-        _canRotate = false;
         _camera.m_XAxis.Value = angle;
     }
-
-    // private float WrapAngle(float angle)
-    // {
-    //     return Mathf.Repeat(angle + 180f, 360f) - 180f;
-    // }
 }
