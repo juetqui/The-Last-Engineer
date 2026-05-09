@@ -9,9 +9,11 @@ public class PlayerStateMachine
     private PlayerGrabState _grabState;
     private PlayerDissolvingState _dissolvingState;
     private PlayerTeleportState _teleportState;
+    private PlayerCinematicState _cinematicState;
     
     public IPlayerState CurrentState => _currentState;
     public IPlayerState LastState => _lastState;
+    public PlayerCinematicState CinematicState => _cinematicState;
 
     public PlayerStateMachine(PlayerController controller, PlayerNodeHandler nodeHandler)
     {
@@ -25,6 +27,7 @@ public class PlayerStateMachine
         _grabState = new PlayerGrabState(this);
         _dissolvingState = new PlayerDissolvingState(this);
         _teleportState = new PlayerTeleportState(this);
+        _cinematicState = new PlayerCinematicState(this);
 
         TransitionToState(_emptyState);
     }
@@ -36,7 +39,7 @@ public class PlayerStateMachine
 
     public void TransitionToState(IPlayerState newState)
     {
-        if (_currentState != _dissolvingState && _currentState != _teleportState)
+        if (_currentState != _dissolvingState && _currentState != _teleportState && _currentState != _cinematicState)
             _lastState = _currentState;
 
         _currentState?.Exit();
@@ -62,5 +65,18 @@ public class PlayerStateMachine
     public void TransitionToTeleport()
     {
         TransitionToState(_teleportState);
+    }
+
+    public void TransitionToCinematicState()
+    {
+        TransitionToState(_cinematicState);
+    }
+
+    public void TransitionFromCinematicState()
+    {
+        if (_lastState != null && _lastState != _cinematicState)
+            TransitionToState(_lastState);
+        else
+            TransitionToEmptyState();
     }
 }

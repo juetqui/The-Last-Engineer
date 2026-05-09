@@ -29,6 +29,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action<float> OnDissolving;
     public Action OnTeleported;
 
+    // Cinematic Events
+    public Action<Transform, LayerMask, bool> OnCinematicSetupRequested; // parent, cinematicLayer, storeCCState
+    public Action<LayerMask, bool> OnCinematicRestoreRequested; // defaultLayer, ccWasEnabled
+
     // --- Internals
     private PlayerModel _model;
     public PlayerView View { get; private set; }
@@ -53,13 +57,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private void Awake()
     {
-        if (Instance != null)
-        {
-            Instance = null;
-            Destroy(Instance.gameObject);
-        }
-
-        Instance = this;
+        if (Instance == null) Instance = this;
         
         CC = GetComponent<CharacterController>();
         _collider = GetComponent<Collider>();
@@ -88,13 +86,25 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         
         OnDied += _input.DisableInputs;
         OnRespawned += _input.EnableInputs;
+
+        // Subscribe to cinematic events
+        OnCinematicSetupRequested += HandleCinematicSetup;
+        OnCinematicRestoreRequested += HandleCinematicRestore;
+
+        // Subscribe to CinematicManager events for state transitions
+        if (CinematicManager.Instance != null)
+        {
+            CinematicManager.Instance.OnRequestEnterCinematicState += HandleEnterCinematicState;
+            CinematicManager.Instance.OnRequestExitCinematicState += HandleExitCinematicState;
+        }
     }
 
     private void Update()
     {
         var mv3 = GetMovement3D();
-        _model.OnUpdate(mv3, _mainCam.transform.forward, _mainCam.transform.right, _currentSpeed);
-        View.Walk(mv3);
+        var actualMovement = _model.OnUpdate(mv3, _mainCam.transform.forward, _mainCam.transform.right, _currentSpeed);
+
+        View.Walk(actualMovement);
         StateMachine.Tick();
 
         GetClosestGlitcheable();
@@ -103,6 +113,17 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void OnDestroy()
     {
         HookInputs(false);
+        
+        // Unsubscribe from cinematic events
+        OnCinematicSetupRequested -= HandleCinematicSetup;
+        OnCinematicRestoreRequested -= HandleCinematicRestore;
+
+        // Unsubscribe from CinematicManager events
+        if (CinematicManager.Instance != null)
+        {
+            CinematicManager.Instance.OnRequestEnterCinematicState -= HandleEnterCinematicState;
+            CinematicManager.Instance.OnRequestExitCinematicState -= HandleExitCinematicState;
+        }
     }
 
     #region INPUTS MANAGEMENT
@@ -226,6 +247,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         OnGlitcheableInArea?.Invoke(nearest);
     }
     public void Dissolving(float timer) => OnDissolving?.Invoke(timer);
+    public void SetCinematicMovement(Vector3 direction) => _model.SetCinematicMovement(direction);
+    public void ClearCinematicMovement() => _model.ClearCinematicMovement();
+    public bool IsInCinematicMode() => _model.IsInCinematicMode();
     public void SetCollisions(bool setCollider)
     {
         _canMove = setCollider;
@@ -252,6 +276,38 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             OnTeleported?.Invoke();
     }
     public void PlayTeleportPS() => View.TeleportPS();
+    #endregion
+
+    #region CINEMATIC MANAGEMENT
+    private void HandleCinematicSetup(Transform parentObject, LayerMask cinematicLayer, bool storeCCState)
+    {
+        if (parentObject != null)
+            transform.SetParent(parentObject);
+
+        if (storeCCState) CC.enabled = false;
+
+        var cinematicLayerIndex = Mathf.RoundToInt(Mathf.Log(cinematicLayer.value, 2));
+        gameObject.layer = cinematicLayerIndex;
+    }
+
+    private void HandleCinematicRestore(LayerMask defaultLayer, bool ccWasEnabled)
+    {
+        transform.SetParent(null);
+        CC.enabled = ccWasEnabled;
+
+        var defaultLayerIndex = Mathf.RoundToInt(Mathf.Log(defaultLayer.value, 2));
+        gameObject.layer = defaultLayerIndex;
+    }
+
+    private void HandleEnterCinematicState()
+    {
+        StateMachine.TransitionToCinematicState();
+    }
+
+    private void HandleExitCinematicState()
+    {
+        StateMachine.TransitionFromCinematicState();
+    }
     #endregion
 
     #region PLATFORM TP MANAGEMENT

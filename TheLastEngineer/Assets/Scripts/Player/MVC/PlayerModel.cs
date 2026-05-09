@@ -15,6 +15,9 @@ public class PlayerModel
     private float _gravity = -50f;
     private bool _isDashing = false, _canDash = true, _useGravity = true;
 
+    private Vector3 _cinematicMovementDirection = Vector3.zero;
+    private bool _isInCinematicMode = false;
+
     #region Teleport Variables
     private float _teleportDuration = 0.25f;
     private Vector3 _teleportStartPos;
@@ -46,18 +49,26 @@ public class PlayerModel
         _coyoteTime = playerData.coyoteTime;
     }
 
-    public void OnUpdate(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight, float moveSpeed)
+    public Vector3 OnUpdate(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight, float moveSpeed)
     {
         _moveSpeed = moveSpeed;
         _cameraForward = cameraForward;
-        MovePlayer(moveDir, _cameraForward, cameraRight);
+        
+        var actualMovement = MovePlayer(moveDir, _cameraForward, cameraRight);
+        
         UpdateCoyoteTimer();
+        
+        return actualMovement;
     }
 
-    private void MovePlayer(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight)
+    private Vector3 MovePlayer(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight)
     {
-        if (_isDashing) return;
-        //if (_isDashing) moveDir *= 0.01f;
+        if (_isDashing) return Vector3.zero;
+
+        if (_isInCinematicMode)
+            moveDir = _cinematicMovementDirection;
+
+        var actualDirection = Vector3.zero;
 
         if (moveDir.magnitude > 0.0001f)
         {
@@ -67,17 +78,24 @@ public class PlayerModel
             cameraRight.y = 0f;
             cameraRight.Normalize();
 
-            moveDir = (cameraForward * moveDir.z + cameraRight * moveDir.x).normalized;
+            // Only apply camera-relative movement if NOT in cinematic mode
+            if (!_isInCinematicMode)
+            {
+                moveDir = (cameraForward * moveDir.z + cameraRight * moveDir.x).normalized;
+            }
 
             RotatePlayer(moveDir);
+            actualDirection = moveDir;
         }
 
-        Vector3 horizontal = GetHorizontalMovement(moveDir);
-        Vector3 vertical = HandleVerticalMovement();
-        Vector3 totalMovement = horizontal + vertical + _platformDisplacement;
+        var horizontal = GetHorizontalMovement(moveDir);
+        var vertical = HandleVerticalMovement();
+        var totalMovement = horizontal + vertical + _platformDisplacement;
 
         _cc.Move(totalMovement);
         _platformDisplacement = Vector3.zero;
+    
+        return actualDirection; // Return the actual movement direction for animation
     }
 
     public void StartTeleport(Vector3 teleportPos, float duration)
@@ -161,6 +179,23 @@ public class PlayerModel
     public void SetGravity(bool setGravity)
     {
         _useGravity = setGravity;
+    }
+
+    public void SetCinematicMovement(Vector3 direction)
+    {
+        _cinematicMovementDirection = direction;
+        _isInCinematicMode = true;
+    }
+
+    public void ClearCinematicMovement()
+    {
+        _cinematicMovementDirection = Vector3.zero;
+        _isInCinematicMode = false;
+    }
+
+    public bool IsInCinematicMode()
+    {
+        return _isInCinematicMode;
     }
 
     public IEnumerator Dash(Vector3 dashDir)
