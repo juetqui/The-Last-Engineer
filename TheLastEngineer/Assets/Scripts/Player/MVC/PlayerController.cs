@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 
 public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 {

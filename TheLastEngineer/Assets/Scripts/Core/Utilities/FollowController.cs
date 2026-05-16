@@ -1,5 +1,5 @@
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 using System.Collections;
 using UnityEngine.InputSystem;
 
@@ -7,14 +7,16 @@ public class FollowController : MonoBehaviour
 {
     [SerializeField] private Transform lookAtObject;
 
-    private CinemachineFreeLook _camera;
+    private CinemachineCamera _camera;
+    private CinemachineOrbitalFollow _orbitalFollow;
     private PlayerController _player;
     
     private bool _canRotate = true;
 
     private void Start()
     {
-        _camera = GetComponent<CinemachineFreeLook>();
+        _camera = GetComponent<CinemachineCamera>();
+        _orbitalFollow = GetComponent<CinemachineOrbitalFollow>();
         _player = PlayerController.Instance;
 
         _player.OnDied += StopFollowing;
@@ -46,19 +48,19 @@ public class FollowController : MonoBehaviour
 
     private void RotateRight(InputAction.CallbackContext context)
     {
-        OrientateCamera(_camera.m_XAxis.Value - 90f);
+        OrientateCamera(_orbitalFollow.HorizontalAxis.Value - 90f);
     }
     
     private void RotateLeft(InputAction.CallbackContext context)
     {
-        OrientateCamera(_camera.m_XAxis.Value + 90f);
+        OrientateCamera(_orbitalFollow.HorizontalAxis.Value + 90f);
     }
 
     private void OrientateCamera(float angle, float easeTime = 0.75f, LeanTweenType easeType = LeanTweenType.easeInOutSine)
     {
         if (!_canRotate) return;
 
-        LeanTween.value(gameObject, UpdateCameraOrientation, _camera.m_XAxis.Value, angle, easeTime)
+        LeanTween.value(gameObject, UpdateCameraOrientation, _orbitalFollow.HorizontalAxis.Value, angle, easeTime)
             .setOnStart(() => _canRotate = false)
             .setEase(easeType);
         
@@ -74,6 +76,6 @@ public class FollowController : MonoBehaviour
     
     private void UpdateCameraOrientation(float angle)
     {
-        _camera.m_XAxis.Value = angle;
+        _orbitalFollow.HorizontalAxis.Value = angle;
     }
 }

@@ -1,11 +1,11 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class UpdateCameras : MonoBehaviour
 {
     [SerializeField] private CinemachineBrain _CMBrain;
-    [SerializeField] private CinemachineFreeLook _mainCam;
-    [SerializeField] private CinemachineFreeLook _targetLockCam;
+    [SerializeField] private CinemachineCamera _mainCam;
+    [SerializeField] private CinemachineCamera _targetLockCam;
 
     private Camera _mainCamera = default;
     private bool _isBlending = false;
@@ -23,7 +23,7 @@ public class UpdateCameras : MonoBehaviour
         if (!_isBlending) return;
         if (_CMBrain.IsBlending) return;
 
-        _CMBrain.m_CameraActivatedEvent.RemoveListener(EnableOcclusionCulling);
+        CinemachineCore.CameraActivatedEvent.RemoveListener(EnableOcclusionCulling);
         _mainCamera.useOcclusionCulling = true;
         _isBlending = false;
     }
@@ -42,7 +42,7 @@ public class UpdateCameras : MonoBehaviour
     {
         if (target == null || target is not Inspectionable)
         {
-            _CMBrain.m_CameraActivatedEvent.AddListener(EnableOcclusionCulling);
+            CinemachineCore.CameraActivatedEvent.AddListener(EnableOcclusionCulling);
 
             _targetLockCam.Follow = null;
             _targetLockCam.LookAt = null;
@@ -62,9 +62,9 @@ public class UpdateCameras : MonoBehaviour
         _targetLockCam.Priority = 1;
     }
 
-    private void EnableOcclusionCulling(ICinemachineCamera activeCam, ICinemachineCamera previousCam)
+    private void EnableOcclusionCulling(ICinemachineCamera.ActivationEventParams evt)
     {
-        if (!ReferenceEquals(activeCam, _mainCam)) return;
+        if (!ReferenceEquals(evt.IncomingCamera, _mainCam)) return;
 
         _isBlending = true;
     }

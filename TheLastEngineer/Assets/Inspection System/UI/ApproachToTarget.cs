@@ -1,17 +1,17 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class ApproachToTarget : MonoBehaviour
 {
     [SerializeField] private float _timeModifier = 0.00125f;
 
-    private CinemachineFreeLook _camera;
+    private CinemachineOrbitalFollow _orbitalFollow;
     private float _originalRadius = 0f;
 
     void Start()
     {
-        _camera = GetComponent<CinemachineFreeLook>();
-        _originalRadius = _camera.m_Orbits[0].m_Radius;
+        _orbitalFollow = GetComponent<CinemachineOrbitalFollow>();
+        _originalRadius = _orbitalFollow.Orbits.Top.Radius;
 
         CorruptionRemover.Instance.OnCorruptionHit += GetBackToPlace;
         CorruptionRemover.Instance.OnHittingCorruption += GetCloseToTarget;
@@ -21,11 +21,15 @@ public class ApproachToTarget : MonoBehaviour
     private void GetCloseToTarget(float timer)
     {
         timer *= _timeModifier;
-        _camera.m_Orbits[0].m_Radius -= timer;
+        var orbits = _orbitalFollow.Orbits;
+        orbits.Top.Radius -= timer;
+        _orbitalFollow.Orbits = orbits;
     }
 
     private void GetBackToPlace(Corruption c)
     {
-        _camera.m_Orbits[0].m_Radius = _originalRadius;
+        var orbits = _orbitalFollow.Orbits;
+        orbits.Top.Radius = _originalRadius;
+        _orbitalFollow.Orbits = orbits;
     }
 }

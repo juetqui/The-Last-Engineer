@@ -1,43 +1,37 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class InspectionCanvasController : MonoBehaviour
 {
     [SerializeField] private CinemachineBrain _CMBrain;
-    [SerializeField] private CinemachineFreeLook _inspectionCamera;
+    [SerializeField] private CinemachineCamera _inspectionCamera;
 
-    private Canvas _canvas = default;
-
+    private Canvas _canvas;
     private bool _isBlending = false;
 
-    void Start()
+    private void Start()
     {
         _canvas = GetComponent<Canvas>();
-        _CMBrain.m_CameraActivatedEvent.AddListener(EnableCanvas);
+        CinemachineCore.CameraActivatedEvent.AddListener(EnableCanvas);
         PlayerController.Instance.OnInteractableSelected += CheckInteractable;
         ScannerController.Instance.OnScanFinished += DisableCanvas;
         
         _canvas.enabled = false;
         ResetCanvas();
-
     }
 
     private void LateUpdate()
     {
-        if (_isBlending)
-        {
-            if (!_CMBrain.IsBlending)
-            {
-                _canvas.enabled = true;
-                GamepadCursor.Instance.CenterCursor();
-                _isBlending = false;
-            }
-        }
+        if (!_isBlending || _CMBrain.IsBlending) return;
+        
+        _canvas.enabled = true;
+        GamepadCursor.Instance.CenterCursor();
+        _isBlending = false;
     }
 
     private void OnDestroy()
     {
-        _CMBrain.m_CameraActivatedEvent.RemoveListener(EnableCanvas);
+        CinemachineCore.CameraActivatedEvent.RemoveListener(EnableCanvas);
         ScannerController.Instance.OnScanFinished -= DisableCanvas;
     }
 
@@ -54,9 +48,9 @@ public class InspectionCanvasController : MonoBehaviour
         ResetCanvas();
     }
 
-    private void EnableCanvas(ICinemachineCamera activeCam, ICinemachineCamera previousCam)
+    private void EnableCanvas(ICinemachineCamera.ActivationEventParams evt)
     {
-        if (!ReferenceEquals(activeCam, _inspectionCamera)) return;
+        if (!ReferenceEquals(evt.IncomingCamera, _inspectionCamera)) return;
 
         _isBlending = true;
     }

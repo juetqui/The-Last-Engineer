@@ -4017,6 +4017,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &205665209
 MeshFilter:
@@ -5478,14 +5479,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276398224}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 0.8537736, g: 0.9656335, b: 1, a: 1}
   m_Intensity: 0.3
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -8093,16 +8094,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b2d199b96b516448144ab30fb26aed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ApplyAfter: 2
-  m_ChannelMask: 1
-  m_Gain: 1
-  m_Use2DDistance: 0
-  m_UseCameraSpace: 1
-  m_ReactionSettings:
+  ApplyAfter: 2
+  ChannelMask: 1
+  Gain: 1
+  Use2DDistance: 0
+  UseCameraSpace: 1
+  SignalCombinationMode: 0
+  ReactionSettings:
     m_SecondaryNoise: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
-    m_AmplitudeGain: 4
-    m_FrequencyGain: 1
-    m_Duration: 1
+    AmplitudeGain: 4
+    FrequencyGain: 1
+    Duration: 1
     m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1001 &412025543
 PrefabInstance:
@@ -13700,6 +13702,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1843483096669739847, guid: f8dce1926fd9a3343956605913605f02, type: 3}
+    - {fileID: 3130783741150927945, guid: f8dce1926fd9a3343956605913605f02, type: 3}
+    - {fileID: 5988007095553339257, guid: f8dce1926fd9a3343956605913605f02, type: 3}
+    - {fileID: 6308128992367689382, guid: f8dce1926fd9a3343956605913605f02, type: 3}
+    - {fileID: 6471880010263562056, guid: f8dce1926fd9a3343956605913605f02, type: 3}
+    - {fileID: 2679122212752576620, guid: f8dce1926fd9a3343956605913605f02, type: 3}
+    - {fileID: 5604279558230666067, guid: f8dce1926fd9a3343956605913605f02, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -17247,6 +17255,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &952674671
 MeshFilter:
@@ -21515,6 +21524,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1193885779
 MeshFilter:
@@ -31657,6 +31667,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1764491667
 MeshFilter:

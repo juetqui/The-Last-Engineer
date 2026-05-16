@@ -1,9 +1,9 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class CameraFocusManager : MonoBehaviour
 {
-    [SerializeField] private CinemachineFreeLook _camera;
+    [SerializeField] private CinemachineCamera _camera;
     [SerializeField] private Transform _newTarget;
     [SerializeField] private float _verticalOffset = 10f;
     [SerializeField] private float _transitionTime = 1.2f;

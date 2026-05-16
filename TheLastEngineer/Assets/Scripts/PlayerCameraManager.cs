@@ -1,18 +1,20 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class PlayerCameraManager : MonoBehaviour
 {
-    [SerializeField] private CinemachineFreeLook _camera;
+    [SerializeField] private CinemachineCamera _camera;
     [SerializeField] private Collider _trigger;
     [SerializeField] private LeanTweenType _tweenType;
     [SerializeField] private float _duration;
 
+    private CinemachineOrbitalFollow _orbitalFollow;
     private float _startHeight = 0f, _targetHeight = 30f;
 
     private void Awake()
     {
-        _startHeight = _camera.m_Orbits[1].m_Height;
+        _orbitalFollow = _camera.GetComponent<CinemachineOrbitalFollow>();
+        _startHeight = _orbitalFollow.Orbits.Center.Height;
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -21,7 +23,12 @@ public class PlayerCameraManager : MonoBehaviour
         {
             LeanTween.value(gameObject, _startHeight, _targetHeight, _duration)
                 .setEase(_tweenType)
-                .setOnUpdate((float value) => _camera.m_Orbits[1].m_Height = value)
+                .setOnUpdate((float value) =>
+                {
+                    var orbits = _orbitalFollow.Orbits;
+                    orbits.Center.Height = value;
+                    _orbitalFollow.Orbits = orbits;
+                })
                 .setOnComplete(() => _trigger.enabled = false);
         }
     }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using Cinemachine;
+using Unity.Cinemachine;
 
 [System.Serializable]
 public class CinematicSequence
@@ -14,8 +14,8 @@ public class CinematicSequence
     public Transform[] waypointsAfterAnimation;
 
     [Header("Camera Settings")]
-    public CinemachineVirtualCamera cinematicCamera;
-    public CinemachineFreeLook gameplayCamera;
+    public CinemachineCamera cinematicCamera;
+    public CinemachineCamera gameplayCamera;
     public int cinematicCameraPriority = 20;
     public int gameplayCameraPriority = 10;
 

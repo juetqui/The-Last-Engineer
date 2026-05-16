@@ -1,4 +1,4 @@
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,8 +13,9 @@ public class CameraMovementController : MonoBehaviour
     [SerializeField] private float _YLimit = 15f;
     [SerializeField] private float _NegativeYLimit = -15f;
 
-    private CinemachineFreeLook _freeLookCamera;
-    private CinemachineComposer _composer;
+    private CinemachineCamera _freeLookCamera;
+    private CinemachineOrbitalFollow _orbitalFollow;
+    private CinemachineRotationComposer _composer;
 
     private Vector2 _inputOffset = Vector2.zero;
     private Vector3 _currentOffset = Vector3.zero;
@@ -23,8 +24,9 @@ public class CameraMovementController : MonoBehaviour
 
     private void Awake()
     {
-        _freeLookCamera = GetComponent<CinemachineFreeLook>();
-        _composer = _freeLookCamera.GetRig(1).GetCinemachineComponent<CinemachineComposer>();
+        _freeLookCamera = GetComponent<CinemachineCamera>();
+        _orbitalFollow = GetComponent<CinemachineOrbitalFollow>();
+        _composer = GetComponent<CinemachineRotationComposer>();
     }
 
     private void Start()
@@ -58,19 +60,19 @@ public class CameraMovementController : MonoBehaviour
             .setOnUpdate((Vector3 valor) =>
             {
                 _currentOffset = valor;
-                _composer.m_TrackedObjectOffset = _currentOffset;
+                _composer.TargetOffset = _currentOffset;
             })
             .setOnComplete(() =>
             {
                 _currentOffset = Vector3.zero;
-                _composer.m_TrackedObjectOffset = _currentOffset;
+                _composer.TargetOffset = _currentOffset;
                 _isResetting = false;
             });
     }
 
     private void SetOffset()
     {
-        var yaw = _freeLookCamera.m_XAxis.Value * Mathf.Deg2Rad;
+        var yaw = _orbitalFollow.HorizontalAxis.Value * Mathf.Deg2Rad;
         var horizontalDelta = _inputOffset.x * _sensitivity * Time.deltaTime;
 
         _currentOffset.x += horizontalDelta * Mathf.Cos(yaw);
@@ -88,6 +90,6 @@ public class CameraMovementController : MonoBehaviour
 
         _currentOffset.y = Mathf.Clamp(_currentOffset.y, _NegativeYLimit, _YLimit);
 
-        _composer.m_TrackedObjectOffset = _currentOffset;
+        _composer.TargetOffset = _currentOffset;
     }
 }
