@@ -59,11 +59,17 @@ public class Outline : MonoBehaviour {
   [SerializeField]
   private Mode outlineMode;
 
-  [SerializeField]
+  [SerializeField, ColorUsage(true, true)]
   private Color outlineColor = Color.white;
 
   [SerializeField, Range(0f, 10f)]
   private float outlineWidth = 2f;
+
+  [Header("Soft Glow")]
+
+  [SerializeField, Tooltip("Enabled: uses the multi-layer soft glow shader (OutlineFillSoft). "
+  + "Disabled: uses the original solid outline shader (OutlineFill).")]
+  private bool softOutline = false;
 
   [Header("Optional")]
 
@@ -91,11 +97,14 @@ public class Outline : MonoBehaviour {
     _renderer = GetComponent<Renderer>();
 
     // Instantiate outline materials
+    // softOutline: loads the multi-layer soft glow material instead of the solid one.
     outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
-    outlineFillMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
+    outlineFillMaterial = softOutline
+      ? Instantiate(Resources.Load<Material>(@"Materials/OutlineFillSoft"))
+      : Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
 
     outlineMaskMaterial.name = "OutlineMask (Instance)";
-    outlineFillMaterial.name = "OutlineFill (Instance)";
+    outlineFillMaterial.name = softOutline ? "OutlineFillSoft (Instance)" : "OutlineFill (Instance)";
 
     // Retrieve or generate smooth normals
     LoadSmoothNormals();
