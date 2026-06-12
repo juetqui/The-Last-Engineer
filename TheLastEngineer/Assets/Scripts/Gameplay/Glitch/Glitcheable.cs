@@ -17,7 +17,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public Collider _coll;
     [HideInInspector] public Renderer _renderer;
     [SerializeField] public ParticleSystem _ps;
-    [SerializeField] public List<Transform> _newPosList;
+    [SerializeField] public List<GlitchAnchorPoint> _newPosList;
     [SerializeField] public List<GameObject> _objectHolograms;
     [HideInInspector] public AudioSource _audioSource;
 
@@ -39,8 +39,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public GlitchMovingState MovState;
     public GlitchReintegratingState ReiState;
 
-    public Vector3 CurrentTargetPos => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].position : transform.position;
-    public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].rotation : transform.rotation;
+    public Vector3 CurrentTargetPos => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].transform.position : transform.position;
+    public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].transform.rotation : transform.rotation;
 
     public bool IsCorrupted { get { return FSM.Current != IdleState; } }
 
@@ -50,9 +50,9 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         if (_newPosList.Count > 0)
         {
-            foreach (var newPos in _newPosList)
+            foreach (var anchor in _newPosList)
             {
-                _objectHolograms.Add( newPos.gameObject);
+                _objectHolograms.Add(anchor.gameObject);
             }
         }
         if (_coll == null)

@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private Vector3 _checkPointPos;
     private Vector3 _teleportPos;
+    private Glitcheable _lastNearestGlitcheable;
 
     public bool IsDead { get { return _isDead; } }
     public Vector3 TeleportPos {  get { return _teleportPos; } }
@@ -112,6 +113,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private void OnDestroy()
     {
+        _lastNearestGlitcheable = null;
         HookInputs(false);
         
         // Unsubscribe from cinematic events
@@ -244,6 +246,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void GetClosestGlitcheable()
     {
         Glitcheable nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
+        if (nearest == _lastNearestGlitcheable) return;
+        _lastNearestGlitcheable = nearest;
         OnGlitcheableInArea?.Invoke(nearest);
     }
     public void Dissolving(float timer) => OnDissolving?.Invoke(timer);

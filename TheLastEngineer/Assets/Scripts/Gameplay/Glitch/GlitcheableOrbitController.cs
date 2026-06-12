@@ -14,6 +14,9 @@ public class GlitcheableOrbitController : MonoBehaviour
     
     [Header("PS Ease Type")]
     [SerializeField] private LeanTweenType scaleEaseType = LeanTweenType.easeOutQuad;
+    
+    [Header("Debug")]
+    [SerializeField] private bool debug = false;
 
     private bool _isPlayerInRange;
     private Glitcheable _glitcheable;
@@ -30,37 +33,51 @@ public class GlitcheableOrbitController : MonoBehaviour
         _particleBuffers = new ParticleSystem.Particle[_particleSystem.Length][];
         for (int i = 0; i < _particleSystem.Length; i++)
             _particleBuffers[i] = new ParticleSystem.Particle[_particleSystem[i].main.maxParticles];
-        
-        _glitcheable.OnPlayerInRange += SetUpParticles;
+
         _glitcheable.FSM.OnStateChanged += SetUpPSColor;
     }
-    
-    private void SetUpParticles(bool isPlayerInRange)
+
+    private void Start()
     {
-        _isPlayerInRange = isPlayerInRange;
-        OnPlayerInRange?.Invoke(isPlayerInRange);
+        PlayerController.Instance.OnGlitcheableInArea += SetUpParticles;
+    }
+
+    private void SetUpParticles(Glitcheable glitcheable)
+    {
+        var newIsInRange = _glitcheable == glitcheable && glitcheable != null;
+
+        if (newIsInRange == _isPlayerInRange) return;
+
+        _isPlayerInRange = newIsInRange;
+        OnPlayerInRange?.Invoke(_isPlayerInRange);
 
         foreach (var ps in _particleSystem)
         {
-            if (isPlayerInRange)
+            if (_isPlayerInRange)
             {
                 ps.gameObject.SetActive(true);
                 ps.Play();
             }
             else ps.Stop();
             
-            var targetScale = isPlayerInRange ? Vector3.one * upScale : Vector3.one * downScale;
+            var targetScale = _isPlayerInRange ? Vector3.one * upScale : Vector3.one * downScale;
 
             LeanTween.cancel(ps.gameObject);
             LeanTween.scale(ps.gameObject, targetScale, scaleTime).setEase(scaleEaseType).setOnComplete(() =>
             {
-                if (!isPlayerInRange) ps.gameObject.SetActive(false);
+                if (!_isPlayerInRange) ps.gameObject.SetActive(false);
             });
         }
     }
 
     private void SetUpPSColor(IState state)
     {
+        if (state == _glitcheable.DisState)
+        {
+            SetUpParticles(null);
+            return;
+        }
+
         var gradient = _glitcheable.IsCorrupted ? corruptedColor : idleColor;
 
         for (int i = 0; i < _particleSystem.Length; i++)

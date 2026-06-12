@@ -17,6 +17,9 @@ public class RouteManager
     public Vector3 CurrentPoint => IsValid ? _points[_index] : Vector3.zero;
     public bool AtStart() => _index == 0;
     public bool HasToWait(bool algo) =>/*( _points.Length > 1 && (_index == 0 || _index == _points.Length - 1))||*/algo;
+    public Vector3 InitialDirection => _points != null && _points.Length > 1
+        ? (_points[1] - _points[0]).normalized
+        : Vector3.zero;
 
     public void Advance()
     {
@@ -29,6 +32,7 @@ public class RouteManager
              {
                 _dir *= -1;
                 _index += _dir;
+                _pc.NotifyDirectionChanged();
              }   
             else
             {
@@ -38,13 +42,12 @@ public class RouteManager
         else
         {
             _index += _dir;
-
         }
-
     }
     
     public void ForceReverse()
     {
         _dir = -1;
+        _pc.NotifyDirectionChanged();
     }
 }

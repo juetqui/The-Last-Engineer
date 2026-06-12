@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class StationsStops
 
 public class PlatformController : MonoBehaviour
 {
-    [Header("Configuración")]
+    [Header("Configuraciï¿½n")]
     [SerializeField] private float _moveSpeed = 2f;
     [SerializeField] private float _accelTime = 1f;
     [SerializeField] private float _decelTime = 1f;
@@ -35,6 +36,8 @@ public class PlatformController : MonoBehaviour
     public bool isStopped;
     public bool isReversed;
     
+    public event Action<Vector3> OnDirectionChanged;
+
     public float CurrentSpeed { get; private set; }
     public float MoveSpeed => _moveSpeed;
     public float WaitCD => _waitCD;
@@ -46,6 +49,7 @@ public class PlatformController : MonoBehaviour
     public PlatformMotor Motor { get; private set; }
     public RouteManager Route { get; private set; }
     public Vector3 CurrentTarget => Route.CurrentPoint;
+    public Vector3 InitialDirection => Route.InitialDirection;
 
     private void Awake()
     {
@@ -192,6 +196,13 @@ public class PlatformController : MonoBehaviour
     {
         CancelSpeedTween();
         CurrentSpeed = 0f;
+    }
+
+    internal void NotifyDirectionChanged()
+    {
+        Vector3 toTarget = Route.CurrentPoint - transform.position;
+        if (toTarget.sqrMagnitude > 0.001f)
+            OnDirectionChanged?.Invoke(toTarget.normalized);
     }
     #endregion
 

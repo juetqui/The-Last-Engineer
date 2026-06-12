@@ -46,11 +46,7 @@ public class GlitcheableOrbitAnimator : MonoBehaviour
 
     private void SetUpAnimation(bool isPlayerInRange)
     {
-        if (debug) Debug.Log("SetUpAnimation: " + isPlayerInRange);
-
         var target = isPlayerInRange ? 1f : 0f;
-
-        if (debug) Debug.Log("Target: " + target);
 
         if (_fadeTween != null)
             LeanTween.cancel(_fadeTween.uniqueId);
@@ -60,21 +56,14 @@ public class GlitcheableOrbitAnimator : MonoBehaviour
                               .setOnUpdate(OnSpeedMultiplierUpdated);
     }
 
-    private void OnSpeedMultiplierUpdated(float value)
-    {
-        if (debug) Debug.Log("Update Value: " + value);
-        _speedMultiplier = value;
-    }
+    private void OnSpeedMultiplierUpdated(float value) => _speedMultiplier = value;
 
     private void OrbitObjectRotation()
     {
         var dt = Time.deltaTime * _speedMultiplier;
 
         if (primarySpeed != 0f)
-        {
             transform.Rotate(primaryAxis, primarySpeed * dt, Space.Self);
-            if (debug) Debug.Log("ROTANDO");
-        }
 
         if (secondarySpeed != 0f)
             transform.Rotate(secondaryAxis, secondarySpeed * dt, Space.Self);
