@@ -17,8 +17,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public Collider _coll;
     [HideInInspector] public Renderer _renderer;
     [SerializeField] public ParticleSystem _ps;
-    [SerializeField] public List<GlitchAnchorPoint> _newPosList;
-    [SerializeField] public List<GameObject> _objectHolograms;
+    [SerializeField] public List<Transform> _newPosList;
+    [SerializeField] public List<MeshRenderer> _objectHolograms;
     [HideInInspector] public AudioSource _audioSource;
 
     [Header("Visual")]
@@ -27,6 +27,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     [Header("Estados iniciales")]
     [SerializeField] public bool _startInIdle = false;
+    [SerializeField] private bool _isPlatform = false;
+    public bool IsPlatform => _isPlatform;
 
     [HideInInspector] public TimerController _timer;
     [HideInInspector] public int _index = 0;
@@ -39,8 +41,10 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public GlitchMovingState MovState;
     public GlitchReintegratingState ReiState;
 
-    public Vector3 CurrentTargetPos => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].transform.position : transform.position;
-    public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].transform.rotation : transform.rotation;
+    public Transform CurrentTarget => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index] : transform;
+    
+    public Vector3 CurrentTargetPos => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].position : transform.position;
+    public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].rotation : transform.rotation;
 
     public bool IsCorrupted { get { return FSM.Current != IdleState; } }
 
@@ -52,7 +56,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
         {
             foreach (var anchor in _newPosList)
             {
-                _objectHolograms.Add(anchor.gameObject);
+                var meshRenderer = anchor.gameObject.GetComponent<MeshRenderer>();
+                _objectHolograms.Add(meshRenderer);
             }
         }
         if (_coll == null)
@@ -86,6 +91,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        if (_startInIdle && _isPlatform) _index++; 
+        
         FSM.Change(_startInIdle ? IdleState : DisState);
     }
 
@@ -95,12 +102,11 @@ public class Glitcheable : MonoBehaviour, IInteractable
     }
     public void HologramSwitch()
     {
-        if (_objectHolograms.Count > 0)
+        if (_objectHolograms.Count <= 0) return;
+
+        for(int i=0; i < _objectHolograms.Count; i++)
         {
-            for(int i=0; i < _objectHolograms.Count; i++)
-            {
-                _objectHolograms[i].SetActive(!_objectHolograms[i].activeSelf);
-            }
+            _objectHolograms[i].enabled = !_objectHolograms[i].enabled;
         }
     }
     public void BeginCycle()

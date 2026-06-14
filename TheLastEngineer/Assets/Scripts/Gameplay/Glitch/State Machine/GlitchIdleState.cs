@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class GlitchIdleState : IState, IGlitchInterruptible
 {
     private readonly Glitcheable g;
@@ -24,6 +26,12 @@ public class GlitchIdleState : IState, IGlitchInterruptible
             g.Barandas[i].SetActive(false);
         }
         //desactivar pbarandas escaleras
+
+        if (g.IsPlatform)
+        {
+            g.transform.SetParent(g.CurrentTarget);
+            g.transform.localPosition = Vector3.zero;
+        }
     }
 
     public void Tick(float dt) { return; }

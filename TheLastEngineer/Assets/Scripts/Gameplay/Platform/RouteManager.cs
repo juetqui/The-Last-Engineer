@@ -10,16 +10,15 @@ public class RouteManager
     public RouteManager(Vector3[] points, PlatformController platformController)
     {
         _points = points;
-        _pc=platformController;
+        _pc = platformController;
     }
 
     public bool IsValid => _points != null && _points.Length > 0;
     public Vector3 CurrentPoint => IsValid ? _points[_index] : Vector3.zero;
     public bool AtStart() => _index == 0;
-    public bool HasToWait(bool algo) =>/*( _points.Length > 1 && (_index == 0 || _index == _points.Length - 1))||*/algo;
-    public Vector3 InitialDirection => _points != null && _points.Length > 1
-        ? (_points[1] - _points[0]).normalized
-        : Vector3.zero;
+    public bool HasToWait(bool algo) => algo;
+    public int TravelDir => _dir;
+
 
     public void Advance()
     {
@@ -28,26 +27,26 @@ public class RouteManager
         int last = _points.Length - 1;
 
         if ((_index + _dir > last || _index + _dir < 0))
+        {
             if (!_pc.isReversed)
-             {
+            {
                 _dir *= -1;
                 _index += _dir;
-                _pc.NotifyDirectionChanged();
-             }   
+            }
             else
             {
                 last = 0;
                 _index = 0;
             }
+        }
         else
         {
             _index += _dir;
         }
     }
-    
+
     public void ForceReverse()
     {
         _dir = -1;
-        _pc.NotifyDirectionChanged();
     }
 }

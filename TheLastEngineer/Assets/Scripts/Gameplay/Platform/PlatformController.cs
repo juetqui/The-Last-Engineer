@@ -13,7 +13,7 @@ public class StationsStops
 public class PlatformController : MonoBehaviour
 {
     [Header("Configuraci�n")]
-    [SerializeField] private float _moveSpeed = 2f;
+    [SerializeField] private float _moveTime = 2f;
     [SerializeField] private float _accelTime = 1f;
     [SerializeField] private float _decelTime = 1f;
     [SerializeField] private float _waitCD = 1f;
@@ -35,11 +35,10 @@ public class PlatformController : MonoBehaviour
 
     public bool isStopped;
     public bool isReversed;
-    
-    public event Action<Vector3> OnDirectionChanged;
 
     public float CurrentSpeed { get; private set; }
-    public float MoveSpeed => _moveSpeed;
+    public float SegmentSpeed { get; private set; }
+    public float MoveTime => _moveTime;
     public float WaitCD => _waitCD;
     public float DecelTime => _decelTime;
     public float AccelTime => _accelTime;
@@ -49,7 +48,6 @@ public class PlatformController : MonoBehaviour
     public PlatformMotor Motor { get; private set; }
     public RouteManager Route { get; private set; }
     public Vector3 CurrentTarget => Route.CurrentPoint;
-    public Vector3 InitialDirection => Route.InitialDirection;
 
     private void Awake()
     {
@@ -63,7 +61,7 @@ public class PlatformController : MonoBehaviour
         
         Route = new RouteManager(myDictionary.Keys.ToArray(),this);
         Motor = new PlatformMotor(transform, null);
-        CurrentSpeed = _moveSpeed;
+        CurrentSpeed = 0f;
 
         if (_connection != null)
             _connection.OnInitialized += Initialize;
@@ -125,12 +123,17 @@ public class PlatformController : MonoBehaviour
 
     /* -------------------- API interna usada por los estados -------------------- */
     #region
+    public void AdvanceRoute()
+    {
+        Route.Advance();
+    }
+
     public void AdvanceRouteAndWait()
     {
         if (Route.HasToWait(myDictionary[CurrentTarget]))
             _fsm.ToWaiting();
 
-        Route.Advance();
+        AdvanceRoute();
     }
 
     public void BeginWait()
@@ -166,11 +169,29 @@ public class PlatformController : MonoBehaviour
         _tween = null;
     }
 
+    public void RefreshSegmentSpeed()
+    {
+        float dist = Vector3.Distance(transform.position, Route.CurrentPoint);
+        SegmentSpeed = dist / Mathf.Max(0.01f, _moveTime);
+    }
+
     public void StartAccelerationToMax()
     {
         CancelSpeedTween();
         CurrentSpeed = 0f;
-        _tween = LeanTween.value(gameObject, 0f, _moveSpeed, _accelTime)
+        _tween = LeanTween.value(gameObject, 0f, SegmentSpeed, _accelTime)
+            .setEase(_accelEase)
+            .setOnUpdate(v => CurrentSpeed = v);
+    }
+
+    public void ContinueWithNewSegmentSpeed()
+    {
+        CancelSpeedTween();
+        float from = CurrentSpeed;
+        float to = SegmentSpeed;
+        if (Mathf.Approximately(from, to)) { CurrentSpeed = to; return; }
+        float t = _accelTime * Mathf.Abs(to - from) / Mathf.Max(0.001f, to);
+        _tween = LeanTween.value(gameObject, from, to, Mathf.Max(0.01f, t))
             .setEase(_accelEase)
             .setOnUpdate(v => CurrentSpeed = v);
     }
@@ -196,13 +217,6 @@ public class PlatformController : MonoBehaviour
     {
         CancelSpeedTween();
         CurrentSpeed = 0f;
-    }
-
-    internal void NotifyDirectionChanged()
-    {
-        Vector3 toTarget = Route.CurrentPoint - transform.position;
-        if (toTarget.sqrMagnitude > 0.001f)
-            OnDirectionChanged?.Invoke(toTarget.normalized);
     }
     #endregion
 
