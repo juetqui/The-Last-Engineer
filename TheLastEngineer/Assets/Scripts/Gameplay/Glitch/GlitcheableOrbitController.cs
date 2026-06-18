@@ -11,6 +11,13 @@ public class GlitcheableOrbitController : MonoBehaviour
     [SerializeField] private float scaleTime = 0.3f;
     [SerializeField] private float upScale = 1f;
     [SerializeField] private float downScale = 0.1f;
+
+    [Header("Bounce Animation")]
+    [SerializeField] private float interactionUpScale = 1.1f;
+    [SerializeField] private float interactionDownScale = 0.9f;
+    [SerializeField] private float bounceDuration = 0.45f;
+    [SerializeField] private float bounceDelay = 0f;
+    [SerializeField] private LeanTweenType bounceSettleEaseType = LeanTweenType.easeOutElastic;
     
     [Header("PS Ease Type")]
     [SerializeField] private LeanTweenType scaleEaseType = LeanTweenType.easeOutQuad;
@@ -35,6 +42,7 @@ public class GlitcheableOrbitController : MonoBehaviour
             _particleBuffers[i] = new ParticleSystem.Particle[_particleSystem[i].main.maxParticles];
 
         _glitcheable.FSM.OnStateChanged += SetUpPSColor;
+        _glitcheable.OnInteractionRejected += BouncePS;
     }
 
     private void Start()
@@ -104,6 +112,37 @@ public class GlitcheableOrbitController : MonoBehaviour
             }
 
             ps.SetParticles(buffer, count);
+        }
+    }
+
+    private void BouncePS()
+    {
+        foreach (var ps in _particleSystem)
+        {
+            var go = ps.gameObject;
+            var baseScale = _isPlayerInRange ? Vector3.one * upScale : Vector3.one * downScale;
+            var targetUp   = Vector3.one * interactionUpScale;
+            var targetDown = Vector3.one * interactionDownScale;
+
+            var phase1 = bounceDuration * 0.35f;
+            var phase2 = bounceDuration * 0.30f;
+            var phase3 = bounceDuration * 0.35f;
+
+            LeanTween.cancel(go);
+
+            LeanTween.scale(go, targetUp, phase1)
+                .setEase(LeanTweenType.easeOutQuad)
+                .setDelay(bounceDelay)
+                .setOnComplete(() =>
+                {
+                    LeanTween.scale(go, targetDown, phase2)
+                        .setEase(LeanTweenType.easeInOutQuad)
+                        .setOnComplete(() =>
+                        {
+                            LeanTween.scale(go, baseScale, phase3)
+                                .setEase(bounceSettleEaseType);
+                        });
+                });
         }
     }
 }

@@ -49,6 +49,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public bool IsCorrupted { get { return FSM.Current != IdleState; } }
 
     public Action<bool> OnPlayerInRange;
+    public Action OnInteractionRejected;
 
     private void Awake()
     {
@@ -127,11 +128,11 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     public bool CanInteract(PlayerNodeHandler player)
     {
-        return CheckStateChange(player.CurrentType) && FSM.Current is IGlitchInterruptible;
-        
-        if (!CheckStateChange(player.CurrentType) || FSM.Current is not IGlitchInterruptible ii) return false;
+        var canInteract = CheckStateChange(player.CurrentType) && FSM.Current is IGlitchInterruptible;
 
-        return true;
+        if (!canInteract) OnInteractionRejected?.Invoke();
+
+        return canInteract;
     }
 
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
@@ -140,7 +141,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
         
         if (succeededInteraction)
         {
-            IGlitchInterruptible ii = (IGlitchInterruptible) FSM.Current;
+            var ii = (IGlitchInterruptible) FSM.Current;
             ii.Interrupt();
         }
     }
