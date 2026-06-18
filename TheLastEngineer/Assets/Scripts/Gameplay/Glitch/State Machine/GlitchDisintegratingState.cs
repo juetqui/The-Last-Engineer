@@ -12,15 +12,18 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
     private float _elapsed;
     private float _duration;
     private bool _collidersOff;
+    private bool _isChangingState;
 
     public GlitchDisintegratingState(Glitcheable g) { this.g = g; }
 
     public void Enter()
     {
+        _isChangingState = false;
         t = g._timer;
         _elapsed = 0f; _collidersOff = false;
         _duration = t ? t.TransparencyDuration : 1f;
 
+        g.HologramSwitch(true);
         g.SetBoolCorrupted(1f);
         g.SetParticles(true, g._radialDonutPS);
         g.PlaySfx(g._sounds ? g._sounds.startSFX : null);
@@ -43,15 +46,16 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
             _collidersOff = true;
         }
 
+        if (raw < 1f || _isChangingState) return;
 
-        if (raw >= 1f)
-        {
-            g.SetParticles(false, 1f);
-            g.FSM?.Change(_nextNormal);
-        }
+        _isChangingState = true;
+        g.SetParticles(false, 1f);
+        g.FSM?.Change(_nextNormal);
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+    }
 
     public GlitchDisintegratingState ResetAndReturn()
     {

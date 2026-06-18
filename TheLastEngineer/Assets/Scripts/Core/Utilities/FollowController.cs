@@ -6,12 +6,19 @@ using UnityEngine.InputSystem;
 public class FollowController : MonoBehaviour
 {
     [SerializeField] private Transform lookAtObject;
+    [SerializeField] private float easeTime = 0.75f;
 
     private CinemachineCamera _camera;
     private CinemachineOrbitalFollow _orbitalFollow;
     private PlayerController _player;
-    
+
     private bool _canRotate = true;
+    private bool _isAnimating;
+    private float _elapsedTime;
+    private float _startCameraAngle;
+    private float _targetCameraAngle;
+    private float _startObjectAngle;
+    private float _targetObjectAngle;
 
     private void Start()
     {
@@ -56,17 +63,42 @@ public class FollowController : MonoBehaviour
         OrientateCamera(_orbitalFollow.HorizontalAxis.Value + 90f);
     }
 
-    private void OrientateCamera(float angle, float easeTime = 0.75f, LeanTweenType easeType = LeanTweenType.easeInOutSine)
+    private void OrientateCamera(float angle)
     {
         if (!_canRotate) return;
 
-        LeanTween.value(gameObject, UpdateCameraOrientation, _orbitalFollow.HorizontalAxis.Value, angle, easeTime)
-            .setOnStart(() => _canRotate = false)
-            .setEase(easeType);
-        
-        LeanTween.value(lookAtObject.gameObject, UpdateObjectOrientation, lookAtObject.eulerAngles.y, angle, easeTime)
-            .setEase(easeType)
-            .setOnComplete(() => _canRotate = true);
+        _startCameraAngle = _orbitalFollow.HorizontalAxis.Value;
+        _targetCameraAngle = angle;
+        _startObjectAngle = lookAtObject.eulerAngles.y;
+        _targetObjectAngle = angle;
+        _elapsedTime = 0f;
+        _canRotate = false;
+        _isAnimating = true;
+    }
+
+    private void Update()
+    {
+        if (!_isAnimating) return;
+
+        _elapsedTime += Time.deltaTime;
+
+        var t = Mathf.Clamp01(_elapsedTime / easeTime);
+        var easedT = EaseInOutSine(t);
+
+        UpdateCameraOrientation(Mathf.Lerp(_startCameraAngle, _targetCameraAngle, easedT));
+        UpdateObjectOrientation(Mathf.Lerp(_startObjectAngle, _targetObjectAngle, easedT));
+
+        if (t < 1f) return;
+
+        UpdateCameraOrientation(_targetCameraAngle);
+        UpdateObjectOrientation(_targetObjectAngle);
+        _isAnimating = false;
+        _canRotate = true;
+    }
+
+    private static float EaseInOutSine(float t)
+    {
+        return -(Mathf.Cos(Mathf.PI * t) - 1f) / 2f;
     }
 
     private void UpdateObjectOrientation(float angle)

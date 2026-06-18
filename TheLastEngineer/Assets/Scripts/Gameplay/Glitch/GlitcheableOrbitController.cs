@@ -3,10 +3,8 @@ using UnityEngine;
 
 public class GlitcheableOrbitController : MonoBehaviour
 {
-    [Header("PS State Color")]
-    [SerializeField] private Gradient corruptedColor;
-    [SerializeField] private Gradient idleColor;
-    
+    [SerializeField] private PSType psType = PSType.Idle;
+
     [Header("PS Scale")]
     [SerializeField] private float scaleTime = 0.3f;
     [SerializeField] private float upScale = 1f;
@@ -28,18 +26,19 @@ public class GlitcheableOrbitController : MonoBehaviour
     private bool _isPlayerInRange;
     private Glitcheable _glitcheable;
     private ParticleSystem[] _particleSystem;
-    private ParticleSystem.Particle[][] _particleBuffers;
     
     public Action<bool> OnPlayerInRange;
+    
+    private enum PSType
+    {
+        Idle,
+        Corrupted
+    }
     
     private void Awake()
     {
         _glitcheable = GetComponentInParent<Glitcheable>();
         _particleSystem = GetComponentsInChildren<ParticleSystem>(true);
-
-        _particleBuffers = new ParticleSystem.Particle[_particleSystem.Length][];
-        for (int i = 0; i < _particleSystem.Length; i++)
-            _particleBuffers[i] = new ParticleSystem.Particle[_particleSystem[i].main.maxParticles];
 
         _glitcheable.FSM.OnStateChanged += SetUpPSColor;
         _glitcheable.OnInteractionRejected += BouncePS;
@@ -55,6 +54,12 @@ public class GlitcheableOrbitController : MonoBehaviour
         var newIsInRange = _glitcheable == glitcheable && glitcheable != null;
 
         if (newIsInRange == _isPlayerInRange) return;
+
+        if (_glitcheable.IsCorrupted && psType != PSType.Corrupted
+        || !_glitcheable.IsCorrupted && psType != PSType.Idle)
+        {
+            return;
+        }
 
         _isPlayerInRange = newIsInRange;
         OnPlayerInRange?.Invoke(_isPlayerInRange);
@@ -80,38 +85,32 @@ public class GlitcheableOrbitController : MonoBehaviour
 
     private void SetUpPSColor(IState state)
     {
+        if (_glitcheable.IsCorrupted && psType == PSType.Corrupted
+        || !_glitcheable.IsCorrupted && psType == PSType.Idle)
+        {
+            if (debug) Debug.Log("Activated: " + psType);
+            foreach (var ps in _particleSystem)
+            {
+                ps.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            if (debug) Debug.Log("Deactivated: " + psType);
+            foreach (var ps in _particleSystem)
+            {
+                ps.gameObject.SetActive(false);
+            }
+        }
+
         if (state == _glitcheable.DisState)
         {
             SetUpParticles(null);
             return;
         }
-
-        var gradient = _glitcheable.IsCorrupted ? corruptedColor : idleColor;
-
-        for (int i = 0; i < _particleSystem.Length; i++)
+        else
         {
-            var ps = _particleSystem[i];
-            var buffer = _particleBuffers[i];
-
-            // Update colorOverLifetime — Unity re-evaluates this per-frame for all alive particles
-            var col = ps.colorOverLifetime;
-            col.enabled = true;
-            col.color = new ParticleSystem.MinMaxGradient(gradient);
-
-            // Ensure new particles start white so colorOverLifetime is the sole color driver
-            var main = ps.main;
-            main.startColor = new ParticleSystem.MinMaxGradient(gradient);
-
-            // Set startColor of each alive particle to the gradient color at its current normalized age
-            int count = ps.GetParticles(buffer);
-
-            for (int j = 0; j < count; j++)
-            {
-                float normalizedAge = 1f - buffer[j].remainingLifetime / buffer[j].startLifetime;
-                buffer[j].startColor = gradient.Evaluate(normalizedAge);
-            }
-
-            ps.SetParticles(buffer, count);
+            SetUpParticles(_glitcheable);
         }
     }
 

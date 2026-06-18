@@ -13,6 +13,8 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
     private float _duration;
     private float _startAlpha;
 
+    private bool _isChangingState;
+
     public GlitchReintegratingState(Glitcheable g) { this.g = g; }
     public void SetNext(IState next, IState nextInterrupt)
     {
@@ -28,11 +30,12 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
 
     public void Enter()
     {
+        _isChangingState = false;
         t = g._timer;
         _elapsed = 0f; _duration = t ? t.TransparencyDuration : 1f;
         _startAlpha = ReadCurrentAlpha();
 
-        g.HologramSwitch();
+        // g.HologramSwitch();
         g.SetBoolCorrupted(1f);
         g.SetParticles(true, 1f);
         g.PlaySfx(g._sounds ? g._sounds.endSFX : null);
@@ -49,13 +52,13 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         g.SetAlpha(alpha);
         g.SetFeedbackAlpha(1f - alpha);
 
+        if (raw < 1f || _isChangingState) return;
 
-        if (raw >= 1f)
-        {
-            g.SetParticles(false, 1f);
-            g.SetBoolCorrupted(0f);
-            g.FSM?.Change(_next);
-        }
+        _isChangingState = true;
+        g.HologramSwitch(false);
+        g.SetParticles(false, 1f);
+        g.SetBoolCorrupted(0f);
+        g.FSM?.Change(_next);
     }
 
     public void Exit() { }

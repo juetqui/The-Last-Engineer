@@ -20,27 +20,29 @@ public class GlitchIdleState : IState, IGlitchInterruptible
         g.SetBoolCorrupted(0f);
         g.SetParticles(false, 1f);
         g.SetColliders(true);
-        if(g.Barandas!=null)
-        for (int i = 0; i<g.Barandas.Length; i++)
-        {
-            g.Barandas[i].SetActive(false);
-        }
-        //desactivar pbarandas escaleras
 
-        if (g.IsPlatform)
+        if (g.handrails != null)
         {
-            g.transform.SetParent(g.CurrentTarget);
-            g.transform.localPosition = Vector3.zero;
+            foreach (var h in g.handrails)
+            {
+                h.SetActive(false);
+            }
         }
+
+        if (!g.IsPlatform) return;
+
+        g.transform.SetParent(g.CurrentTarget);
+        g.transform.localPosition = Vector3.zero;
     }
 
     public void Tick(float dt) { return; }
-    public void Exit() {
-        if (g.Barandas != null)
+    public void Exit()
+    {
+        if (g.handrails == null) return;
 
-            for (int i = 0; i < g.Barandas.Length; i++)
+        foreach (var h in g.handrails)
         {
-            g.Barandas[i].SetActive(true);
+            h.SetActive(false);
         }
     }
     public void Interrupt()

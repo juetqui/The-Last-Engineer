@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2519897804274896923}
   - component: {fileID: 703838415057395570}
   - component: {fileID: 6129906761736128585}
+  - component: {fileID: 1405403137508259073}
   m_Layer: 0
   m_Name: PS Ring SelectionGlitch (3)
   m_TagString: Untagged
@@ -4962,6 +4963,25 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &1405403137508259073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2392480081061731246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b913473246012f14cb76bfa621f1a99e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitcheableOrbitAnimator
+  primaryAxis: {x: 0, y: 1, z: 0}
+  primarySpeed: 60
+  secondaryAxis: {x: 1, y: 0, z: 0}
+  secondarySpeed: 0
+  fadeTime: 0.4
+  fadeEase: 30
+  debug: 0
 --- !u!1 &3102474880014512871
 GameObject:
   m_ObjectHideFlags: 0
@@ -4973,7 +4993,7 @@ GameObject:
   - component: {fileID: 418521219896953888}
   - component: {fileID: 3145875562406339301}
   m_Layer: 0
-  m_Name: Glitcheable Orbit PS
+  m_Name: Glitcheable Default Orbit PS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4992,9 +5012,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3831067715324032870}
   - {fileID: 2485817317308053262}
   - {fileID: 2519897804274896923}
-  - {fileID: 3831067715324032870}
   - {fileID: 2305142712600568383}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5010,67 +5030,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05264a89e2e1c6c4895838a9f616ef25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlitcheableOrbitController
-  corruptedColor:
-    serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 0.8679245, g: 0.08597365, b: 0.82723695, a: 1}
-    key2: {r: 0.7964716, g: 0.07889577, b: 0.7591337, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 19661
-    ctime1: 20316
-    ctime2: 45219
-    ctime3: 45875
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 4
-    m_NumAlphaKeys: 2
-  idleColor:
-    serializedVersion: 2
-    key0: {r: 1, g: 1, b: 1, a: 1}
-    key1: {r: 0.086274505, g: 0.84326404, b: 0.8666667, a: 1}
-    key2: {r: 0.08627451, g: 0.8431373, b: 0.86666673, a: 0}
-    key3: {r: 0, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 20817
-    ctime1: 21203
-    ctime2: 45219
-    ctime3: 45875
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 4
-    m_NumAlphaKeys: 2
-  transitionDuration: 0.2
+  psType: 0
+  scaleTime: 0.3
+  upScale: 1
+  downScale: 0.1
+  interactionUpScale: 1.1
+  interactionDownScale: 0.9
+  bounceDuration: 0.45
+  bounceDelay: 0
+  bounceSettleEaseType: 30
+  scaleEaseType: 30
+  debug: 0
 --- !u!1 &6385239532833733944
 GameObject:
   m_ObjectHideFlags: 0
@@ -5082,6 +5052,7 @@ GameObject:
   - component: {fileID: 2485817317308053262}
   - component: {fileID: 4712460108446407849}
   - component: {fileID: 7435096423081221729}
+  - component: {fileID: 8690326320258505378}
   m_Layer: 0
   m_Name: PS Ring SelectionGlitch (2)
   m_TagString: Untagged
@@ -10033,6 +10004,25 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &8690326320258505378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6385239532833733944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b913473246012f14cb76bfa621f1a99e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitcheableOrbitAnimator
+  primaryAxis: {x: 0, y: 1, z: 0}
+  primarySpeed: 60
+  secondaryAxis: {x: 1, y: 0, z: 0}
+  secondarySpeed: 0
+  fadeTime: 0.4
+  fadeEase: 30
+  debug: 0
 --- !u!1 &6509508166144001965
 GameObject:
   m_ObjectHideFlags: 0
@@ -10044,6 +10034,7 @@ GameObject:
   - component: {fileID: 2305142712600568383}
   - component: {fileID: 1496823730056826266}
   - component: {fileID: 8250404890613495075}
+  - component: {fileID: 3474681449607997873}
   m_Layer: 0
   m_Name: PS Ring SelectionGlitch (4)
   m_TagString: Untagged
@@ -14995,6 +14986,25 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &3474681449607997873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6509508166144001965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b913473246012f14cb76bfa621f1a99e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitcheableOrbitAnimator
+  primaryAxis: {x: 0, y: 1, z: 0}
+  primarySpeed: 60
+  secondaryAxis: {x: 1, y: 0, z: 0}
+  secondarySpeed: 0
+  fadeTime: 0.4
+  fadeEase: 30
+  debug: 0
 --- !u!1 &8227913821248668606
 GameObject:
   m_ObjectHideFlags: 0
@@ -15006,6 +15016,7 @@ GameObject:
   - component: {fileID: 3831067715324032870}
   - component: {fileID: 260405546539882121}
   - component: {fileID: 7185983438146127563}
+  - component: {fileID: 5899408304446586225}
   m_Layer: 0
   m_Name: PS Ring SelectionGlitch (1)
   m_TagString: Untagged
@@ -19957,3 +19968,22 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
+--- !u!114 &5899408304446586225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8227913821248668606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b913473246012f14cb76bfa621f1a99e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitcheableOrbitAnimator
+  primaryAxis: {x: 0, y: 1, z: 0}
+  primarySpeed: 60
+  secondaryAxis: {x: 1, y: 0, z: 0}
+  secondarySpeed: 0
+  fadeTime: 0.4
+  fadeEase: 30
+  debug: 0

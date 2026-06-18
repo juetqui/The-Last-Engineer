@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1)]
 public class Glitcheable : MonoBehaviour, IInteractable
 {
-    public GameObject[] Barandas;
+    public GameObject[] handrails;
     
     #region -----INTERFACE VARIABLES-----
     public InteractablePriority Priority => InteractablePriority.Highest;
@@ -28,6 +29,10 @@ public class Glitcheable : MonoBehaviour, IInteractable
     [Header("Estados iniciales")]
     [SerializeField] public bool _startInIdle = false;
     [SerializeField] private bool _isPlatform = false;
+    
+    [Header("Debug")]
+    [SerializeField] private bool debug = false;
+    
     public bool IsPlatform => _isPlatform;
 
     [HideInInspector] public TimerController _timer;
@@ -101,13 +106,17 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         FSM.Tick(Time.deltaTime);
     }
-    public void HologramSwitch()
+    public void HologramSwitch(bool enable)
     {
         if (_objectHolograms.Count <= 0) return;
 
-        for(int i=0; i < _objectHolograms.Count; i++)
+        var closest = _objectHolograms.OrderBy(x => Vector3.Distance(transform.position, x.transform.position)).First();
+        closest.enabled = enable;
+
+        if (debug)
         {
-            _objectHolograms[i].enabled = !_objectHolograms[i].enabled;
+            Debug.Log("Enable: " + enable);
+            Debug.Log(closest.gameObject.name);
         }
     }
     public void BeginCycle()
