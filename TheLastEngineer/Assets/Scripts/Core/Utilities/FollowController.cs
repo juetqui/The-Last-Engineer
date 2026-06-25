@@ -14,6 +14,8 @@ public class FollowController : MonoBehaviour
 
     private bool _canRotate = true;
     private bool _isAnimating;
+
+    public float CurrentYaw => _orbitalFollow.HorizontalAxis.Value;
     private float _elapsedTime;
     private float _startCameraAngle;
     private float _targetCameraAngle;
@@ -109,5 +111,14 @@ public class FollowController : MonoBehaviour
     private void UpdateCameraOrientation(float angle)
     {
         _orbitalFollow.HorizontalAxis.Value = angle;
+    }
+    
+    public void GetCameraBasis(out Vector3 forward, out Vector3 right)
+    {
+        var yaw = this.CurrentYaw;
+        var camYaw = Quaternion.Euler(0f, yaw, 0f);
+
+        forward = camYaw * Vector3.forward;
+        right = camYaw * Vector3.right;
     }
 }

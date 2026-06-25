@@ -14,7 +14,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     [SerializeField] private Renderer _renderer;
     [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS, _teleportPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
-    [SerializeField] private Camera _mainCam;
+    [SerializeField] private FollowController _followController;
+    
+    [Header("Debug")]
+    [SerializeField] private bool debug = false;
 
     public CharacterController CC { get; private set; }
     private Collider _collider = default;
@@ -103,7 +106,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private void Update()
     {
         var mv3 = GetMovement3D();
-        var actualMovement = _model.OnUpdate(mv3, _mainCam.transform.forward, _mainCam.transform.right, _currentSpeed);
+        _followController.GetCameraBasis(out var camForward, out var camRight);
+        var actualMovement = _model.OnUpdate(mv3, camForward, camRight, _currentSpeed);
 
         View.Walk(actualMovement);
         StateMachine.Tick();
@@ -166,18 +170,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             if (dashInput == Vector3.zero)
             {
                 dashInput = transform.forward;
-                // dashDir = _mainCam.transform.forward;
             }
             else
             {
-                var camForward = _mainCam.transform.forward;
-                var camRight = _mainCam.transform.right;
-
-                camForward.y = 0f;
-                camRight.y = 0f;
-                camForward.Normalize();
-                camRight.Normalize();
-
+                _followController.GetCameraBasis(out var camForward, out var camRight);
                 dashDir = (camForward * dashInput.z + camRight * dashInput.x).normalized;
             }
 
@@ -218,7 +214,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private Vector3 GetMovement3D()
     {
         if (_isDead || !_canMove) return Vector3.zero;
-        
+
         return new Vector3(_move.x, 0f, _move.y);
     }
 
