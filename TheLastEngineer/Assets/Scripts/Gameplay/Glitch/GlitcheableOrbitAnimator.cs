@@ -1,4 +1,5 @@
 using UnityEngine;
+using PrimeTween;
 
 public class GlitcheableOrbitAnimator : MonoBehaviour
 {
@@ -13,12 +14,12 @@ public class GlitcheableOrbitAnimator : MonoBehaviour
 
     [Header("Smooth Fade")]
     [SerializeField] private float fadeTime = 0.4f;
-    [SerializeField] private LeanTweenType fadeEase = LeanTweenType.easeOutQuad;
-    
+    [SerializeField] private Ease fadeEase = Ease.OutQuad;
+
     [SerializeField] private bool debug = false;
 
     private GlitcheableOrbitController _orbitController;
-    private LTDescr _fadeTween;
+    private Tween _fadeTween;
 
     private float _speedMultiplier;
 
@@ -33,8 +34,7 @@ public class GlitcheableOrbitAnimator : MonoBehaviour
         if (_orbitController != null)
             _orbitController.OnPlayerInRange -= SetUpAnimation;
 
-        if (_fadeTween != null)
-            LeanTween.cancel(_fadeTween.uniqueId);
+        _fadeTween.Stop();
     }
 
     private void Update()
@@ -48,12 +48,10 @@ public class GlitcheableOrbitAnimator : MonoBehaviour
     {
         var target = isPlayerInRange ? 1f : 0f;
 
-        if (_fadeTween != null)
-            LeanTween.cancel(_fadeTween.uniqueId);
+        _fadeTween.Stop();
 
-        _fadeTween = LeanTween.value(_orbitController.gameObject, _speedMultiplier, target, fadeTime)
-                              .setEase(fadeEase)
-                              .setOnUpdate(OnSpeedMultiplierUpdated);
+        _fadeTween = Tween.Custom(_orbitController.gameObject, _speedMultiplier, target, fadeTime,
+                                  (_, value) => OnSpeedMultiplierUpdated(value), fadeEase);
     }
 
     private void OnSpeedMultiplierUpdated(float value) => _speedMultiplier = value;

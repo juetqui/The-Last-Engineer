@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using PrimeTween;
 
 public class PostProcessController : MonoBehaviour
 {
@@ -21,11 +22,8 @@ public class PostProcessController : MonoBehaviour
     private float _vignetteAmount = 9f;
     private float _refNegVignetteAmount = 7f;
     private float _speed = 60f;
-    private float duracion = 1f;
     
     private bool animated = false;
-    
-    private Coroutine _currentEffect = null;
 
     // THIS SECTION IS USED TO RESTORE THE DEFAULT VALUES OF THE MODIFIED MATERIALS
     #region ORIGINAL VALUES
@@ -110,7 +108,7 @@ public class PostProcessController : MonoBehaviour
         _shockWave.SetActive(true);
 
         TweenFloat(_shockWaveMat, "_WaveDistanceFromCenter", -0.1f, 1f, 0.5f)
-            .setOnComplete(() => _shockWave.SetActive(false));
+            .OnComplete(() => _shockWave.SetActive(false));
     }
 
     private void DeactivateShockWave()
@@ -118,7 +116,7 @@ public class PostProcessController : MonoBehaviour
         _shockWave.SetActive(true);
 
         TweenFloat(_shockWaveMat, "_WaveDistanceFromCenter", 1f, -0.1f, 0.5f)
-            .setOnComplete(() => _shockWave.SetActive(false));
+            .OnComplete(() => _shockWave.SetActive(false));
     }
 
     private void ActivatePP(Material mat)
@@ -142,26 +140,26 @@ public class PostProcessController : MonoBehaviour
 
         TweenColor(_passiveMat, "_Color", _colorOriginal, _colorNeg, 0.4f);
         TweenFloat(_passiveMat, "_VignetteAmount", current, _refNegVignetteAmount, 0.4f)
-            .setOnComplete(() =>
+            .OnComplete(() =>
             {
                 TweenColor(_passiveMat, "_Color", _colorNeg, _colorOriginal, 0.4f);
                 TweenFloat(_passiveMat, "_VignetteAmount", _refNegVignetteAmount, _vignetteAmount, 0.4f)
-                    .setOnComplete(() => animated = false);
+                    .OnComplete(() => animated = false);
             });
     }
 
-    private LTDescr TweenFloat(Material mat, string prop, float from, float to, float dur)
+    private Tween TweenFloat(Material mat, string prop, float from, float to, float dur)
     {
         mat.SetFloat(prop, from);
-        return LeanTween.value(gameObject, from, to, dur)
-            .setOnUpdate(v => mat.SetFloat(prop, v));
+        return Tween.Custom(gameObject, from, to, dur,
+            (_, v) => mat.SetFloat(prop, v), Ease.Linear);
     }
 
-    private LTDescr TweenColor(Material mat, string prop, Color from, Color to, float dur)
+    private Tween TweenColor(Material mat, string prop, Color from, Color to, float dur)
     {
         mat.SetColor(prop, from);
 
-        return LeanTween.value(gameObject, 0f, 1f, dur)
-            .setOnUpdate(t => mat.SetColor(prop, Color.Lerp(from, to, t)));
+        return Tween.Custom(gameObject, 0f, 1f, dur,
+            (_, t) => mat.SetColor(prop, Color.Lerp(from, to, t)), Ease.Linear);
     }
 }

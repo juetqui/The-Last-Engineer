@@ -1,8 +1,9 @@
 using UnityEngine;
+using PrimeTween;
 
 public class ConnectionTypeView : MonoBehaviour
 {
-    [SerializeField] private LeanTweenType _tweenType = LeanTweenType.easeInOutSine;
+    [SerializeField] private Ease _tweenType = Ease.InOutSine;
 
     [ColorUsageAttribute(true, true)]
     [SerializeField] private Color _emissionDefault;
@@ -31,18 +32,16 @@ public class ConnectionTypeView : MonoBehaviour
     {
         Color currentColor = _renderer.material.GetColor("_EmissiveColor");
 
-        LeanTween.value(gameObject, UpdateColor, currentColor, _emissionOn, 0.6f)
-            .setEase(_tweenType)
-            .setOnComplete(turnOff);
+        Tween.Custom(gameObject, currentColor, _emissionOn, 0.6f, (_, c) => UpdateColor(c), _tweenType)
+            .OnComplete(turnOff);
     }
 
     private void turnOff()
     {
         Color currentColor = _renderer.material.GetColor("_EmissiveColor");
 
-        LeanTween.value(gameObject, UpdateColor, currentColor, _emissionOff, 0.6f)
-            .setEase(_tweenType)
-            .setOnComplete(TurnOn);
+        Tween.Custom(gameObject, currentColor, _emissionOff, 0.6f, (_, c) => UpdateColor(c), _tweenType)
+            .OnComplete(TurnOn);
     }
 
     private void UpdateColor(Color c)

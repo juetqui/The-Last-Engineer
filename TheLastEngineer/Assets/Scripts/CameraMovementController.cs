@@ -1,12 +1,13 @@
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PrimeTween;
 
 public class CameraMovementController : MonoBehaviour
 {
     [Header("Movement Sensitivity")]
     [SerializeField] private float _sensitivity = 2f;
-    [SerializeField] private LeanTweenType _easeType;
+    [SerializeField] private Ease _easeType;
 
     [Header("Offset Limits")]
     [SerializeField] private float _horizontalLimit = 5f;
@@ -55,14 +56,12 @@ public class CameraMovementController : MonoBehaviour
         _inputOffset = Vector2.zero;
         _isResetting = true;
 
-        LeanTween.value(gameObject, _currentOffset, Vector3.zero, 0.5f)
-            .setEase(_easeType)
-            .setOnUpdate((Vector3 valor) =>
+        Tween.Custom(gameObject, _currentOffset, Vector3.zero, 0.5f, (_, valor) =>
             {
                 _currentOffset = valor;
                 _composer.TargetOffset = _currentOffset;
-            })
-            .setOnComplete(() =>
+            }, _easeType)
+            .OnComplete(() =>
             {
                 _currentOffset = Vector3.zero;
                 _composer.TargetOffset = _currentOffset;

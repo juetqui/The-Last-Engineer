@@ -2,11 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using PrimeTween;
 
 public class MainMenu : MonoBehaviour
 {
     [Header("Tween Transition")]
-    [SerializeField] private LeanTweenType _tweentype = LeanTweenType.easeInOutSine;
+    [SerializeField] private Ease _tweentype = Ease.InOutSine;
     [SerializeField] private float _duration = 1f;
 
     [Header("Fade Transition")]
@@ -26,18 +27,16 @@ public class MainMenu : MonoBehaviour
 
     public void MoveToPos(Transform newPos)
     {
-        LeanTween.move(gameObject, newPos.position, _duration).setEase(_tweentype);
-        LeanTween.rotate(gameObject, newPos.rotation.eulerAngles, _duration).setEase(_tweentype);
+        Tween.Position(transform, newPos.position, _duration, _tweentype);
+        Tween.Rotation(transform, newPos.rotation, _duration, _tweentype);
     }
 
     public void MoveToPosAndFade(Transform newPos)
     {
-        LeanTween.rotate(gameObject, newPos.rotation.eulerAngles, _duration)
-            .setEase(_tweentype);
+        Tween.Rotation(transform, newPos.rotation, _duration, _tweentype);
 
-        LeanTween.move(gameObject, newPos.position, _duration)
-            .setEase(_tweentype)
-            .setOnComplete(() => StartCoroutine(FadeTo(1f, true)));
+        Tween.Position(transform, newPos.position, _duration, _tweentype)
+            .OnComplete(() => StartCoroutine(FadeTo(1f, true)));
     }
     
     public void SetTargetLevel(string targetLevel)

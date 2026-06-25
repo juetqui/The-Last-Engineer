@@ -1,4 +1,5 @@
 using UnityEngine;
+using PrimeTween;
 
 public class DoorLightListener : MonoBehaviour
 {
@@ -8,14 +9,13 @@ public class DoorLightListener : MonoBehaviour
     [SerializeField] private Color _openColor;
 
     [SerializeField] private float _lerpTime = 1f;
-    [SerializeField] private LeanTweenType _lerpType;
+    [SerializeField] private Ease _lerpType;
 
     private DoorsView _door = default;
     private Renderer _renderer = default;
 
     private Color _targetColor;
-
-    private bool _isLerping = false;
+    private Tween _tween;
 
     private void Awake()
     {
@@ -26,17 +26,15 @@ public class DoorLightListener : MonoBehaviour
 
     private void ChangeLights(bool enabled)
     {
-        Color startColor = _renderer.material.GetColor("_EmissiveColor");
-        Color endColor = enabled ? _openColor : _defaultColor;
+        var startColor = _renderer.material.GetColor("_EmissiveColor");
+        var endColor = enabled ? _openColor : _defaultColor;
 
-        LeanTween.cancel(gameObject);
+        _tween.Stop();
 
-        LeanTween.value(gameObject, 0f, 1f, _lerpTime)
-            .setEase(_lerpType)
-            .setOnUpdate((float t) =>
+        _tween = Tween.Custom(gameObject, 0f, 1f, _lerpTime, (_, t) =>
             {
-                Color lerped = Color.Lerp(startColor, endColor, t);
+                var lerped = Color.Lerp(startColor, endColor, t);
                 _renderer.material.SetColor("_EmissiveColor", lerped);
-            });
+            }, _lerpType);
     }
 }

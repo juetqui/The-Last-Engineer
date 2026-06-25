@@ -1,22 +1,13 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using PrimeTween;
 
 public class CameraShakeController : MonoBehaviour
 {
     [SerializeField] private CinematicSpaceshipController spaceshipController;
-    
-    [Header("Camera Shake Settings")]
-    [Range(0, 10)]
-    [SerializeField] private int strongShakeAmplitude = 3;
-    [Range(0, 10)]
-    [SerializeField] private int strongShakeFrequency = 8;
-    [Range(0, 10)]
-    [SerializeField] private int weakShakeAmplitude = 1;
-    [Range(0, 10)]
-    [SerializeField] private int weakShakeFrequency = 1;
 
     [Header("Camera Shake Transition Settings")]
-    [SerializeField] private LeanTweenType easeType = LeanTweenType.easeInOutSine;
+    [SerializeField] private Ease easeType = Ease.InOutSine;
     [SerializeField] private float tweenDuration = 0.5f;
 
     private CinemachineBasicMultiChannelPerlin _shake;
@@ -41,13 +32,11 @@ public class CameraShakeController : MonoBehaviour
         var amplitude = targetShakeIntensity.x;
         var frequency = targetShakeIntensity.y;
 
-        LeanTween.value(gameObject, currentAmplitude, amplitude, tweenDuration)
-            .setEase(easeType)
-            .setOnUpdate(value => _shake.AmplitudeGain = value);
+        Tween.Custom(gameObject, currentAmplitude, amplitude, tweenDuration,
+            (_, value) => _shake.AmplitudeGain = value, easeType);
 
-        LeanTween.value(gameObject, currentFrequency, frequency, tweenDuration)
-            .setEase(easeType)
-            .setOnUpdate(value => _shake.FrequencyGain = value);
+        Tween.Custom(gameObject, currentFrequency, frequency, tweenDuration,
+            (_, value) => _shake.FrequencyGain = value, easeType);
     }
 
     private static Vector2 CalculateShake(CameraShakeType  shakeType)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using PrimeTween;
 
 public class PlayerModel
 {
@@ -104,13 +105,12 @@ public class PlayerModel
         _teleportTargetPos = teleportPos;
         _teleportDuration = duration;
 
-        LeanTween.cancel(_transform.gameObject);
+        Tween.StopAll(onTarget: _transform);
 
         _isTeleporting = true;
 
-        LeanTween.move(_transform.gameObject, teleportPos, _teleportDuration)
-            .setEase(LeanTweenType.easeInOutQuad)
-            .setOnComplete(() =>
+        Tween.Position(_transform, teleportPos, _teleportDuration, Ease.InOutQuad)
+            .OnComplete(() =>
             {
                 _isTeleporting = false;
                 _cc.enabled = true;

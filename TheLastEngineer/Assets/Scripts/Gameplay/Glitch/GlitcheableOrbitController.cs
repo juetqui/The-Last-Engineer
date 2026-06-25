@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using PrimeTween;
 
 public class GlitcheableOrbitController : MonoBehaviour
 {
@@ -15,10 +16,10 @@ public class GlitcheableOrbitController : MonoBehaviour
     [SerializeField] private float interactionDownScale = 0.9f;
     [SerializeField] private float bounceDuration = 0.45f;
     [SerializeField] private float bounceDelay = 0f;
-    [SerializeField] private LeanTweenType bounceSettleEaseType = LeanTweenType.easeOutElastic;
-    
+    [SerializeField] private Ease bounceSettleEaseType = Ease.OutElastic;
+
     [Header("PS Ease Type")]
-    [SerializeField] private LeanTweenType scaleEaseType = LeanTweenType.easeOutQuad;
+    [SerializeField] private Ease scaleEaseType = Ease.OutQuad;
     
     [Header("Debug")]
     [SerializeField] private bool debug = false;
@@ -75,8 +76,8 @@ public class GlitcheableOrbitController : MonoBehaviour
             
             var targetScale = _isPlayerInRange ? Vector3.one * upScale : Vector3.one * downScale;
 
-            LeanTween.cancel(ps.gameObject);
-            LeanTween.scale(ps.gameObject, targetScale, scaleTime).setEase(scaleEaseType).setOnComplete(() =>
+            Tween.StopAll(onTarget: ps.transform);
+            Tween.Scale(ps.transform, targetScale, scaleTime, scaleEaseType).OnComplete(() =>
             {
                 if (!_isPlayerInRange) ps.gameObject.SetActive(false);
             });
@@ -127,19 +128,15 @@ public class GlitcheableOrbitController : MonoBehaviour
             var phase2 = bounceDuration * 0.30f;
             var phase3 = bounceDuration * 0.35f;
 
-            LeanTween.cancel(go);
+            Tween.StopAll(onTarget: go.transform);
 
-            LeanTween.scale(go, targetUp, phase1)
-                .setEase(LeanTweenType.easeOutQuad)
-                .setDelay(bounceDelay)
-                .setOnComplete(() =>
+            Tween.Scale(go.transform, targetUp, phase1, Ease.OutQuad, startDelay: bounceDelay)
+                .OnComplete(() =>
                 {
-                    LeanTween.scale(go, targetDown, phase2)
-                        .setEase(LeanTweenType.easeInOutQuad)
-                        .setOnComplete(() =>
+                    Tween.Scale(go.transform, targetDown, phase2, Ease.InOutQuad)
+                        .OnComplete(() =>
                         {
-                            LeanTween.scale(go, baseScale, phase3)
-                                .setEase(bounceSettleEaseType);
+                            Tween.Scale(go.transform, baseScale, phase3, bounceSettleEaseType);
                         });
                 });
         }

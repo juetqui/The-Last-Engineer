@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PrimeTween;
 
 public class InspectionSystem : MonoBehaviour
 {
@@ -12,17 +13,15 @@ public class InspectionSystem : MonoBehaviour
     [SerializeField] private float _gamepadRotSpeed = 300f;
 
     [Header("Rotation Reset Values")]
-    [SerializeField] private float _resetRotThreshold = 1f;
     [SerializeField] private float _resetRotDuration = 1f;
-    [SerializeField] private LeanTweenType _resetEasing = LeanTweenType.easeInOutSine;
+    [SerializeField] private Ease _resetEasing = Ease.InOutSine;
 
     private Vector3 _lastMousePosition = Vector3.zero;
     private Quaternion _initialObjectRot = Quaternion.identity;
 
-    private float _timer = 0f;
     private bool _canRotate = true;
     private bool _isRotatingWithMouse = false;
-    private LTDescr _currentTween;
+    private Tween _currentTween;
 
     public bool CanRotate { get { return _canRotate; } }
 
@@ -89,7 +88,7 @@ public class InspectionSystem : MonoBehaviour
 
     public void ResetRot() => ResetPos();
 
-    private void ResetRot(InputAction.CallbackContext context = default)
+    private void ResetRot(InputAction.CallbackContext context)
     {
         ResetPos();
     }
@@ -111,23 +110,21 @@ public class InspectionSystem : MonoBehaviour
     public void SetHoldValues(bool isHolding, bool canRotate)
     {
         _canRotate = canRotate;
-        _timer = 0f;
     }
 
     private void ResetPos()
     {
-        if (_currentTween != null)
-            LeanTween.cancel(_inspectedObject.gameObject);
+        _currentTween.Stop();
 
         _canRotate = false;
 
-        _currentTween = LeanTween.rotate(
-            _inspectedObject.gameObject,
-            _initialObjectRot.eulerAngles,
-            _resetRotDuration
+        _currentTween = Tween.Rotation(
+            _inspectedObject,
+            _initialObjectRot,
+            _resetRotDuration,
+            _resetEasing
         )
-        .setEase(_resetEasing)
-        .setOnComplete(() =>
+        .OnComplete(() =>
         {
             _inspectedObject.rotation = _initialObjectRot;
             _canRotate = true;

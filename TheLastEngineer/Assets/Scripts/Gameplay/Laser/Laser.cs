@@ -1,4 +1,5 @@
 using UnityEngine;
+using PrimeTween;
 
 public class Laser : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class Laser : MonoBehaviour
     [SerializeField] private bool _startsInitialized = false;
 
     [Header("Turn On/Off Parameters")]
-    [SerializeField] private LeanTweenType _easeType = LeanTweenType.easeInSine;
     [SerializeField] private float _easeTime = 0.5f;
 
     [Header("Raycast Filter Parameter")]
@@ -26,8 +26,6 @@ public class Laser : MonoBehaviour
     [SerializeField] private bool debug = false;
     [SerializeField] private GameObject debugObject;
 
-    //private LTDescr _currentTween = null;
-
     private LineRenderer _lineRenderer = null;
     private Glitcheable _glitcheable = null;
     private AudioSource _audioSource = default;
@@ -35,7 +33,7 @@ public class Laser : MonoBehaviour
     private ILaserReceptor _lastHit = null;
     private RaycastHit _rayHit;
     private Ray _ray, _leftRay, _rightRay;
-    private float _currentDist = 0f, _lastTargetDist = 0f;
+    private float _currentDist = 0f;
     private bool _isInitialized, _wasHit = false;
 
     private float _targetDist = 0f;

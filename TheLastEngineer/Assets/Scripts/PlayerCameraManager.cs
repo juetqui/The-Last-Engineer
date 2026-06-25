@@ -1,11 +1,12 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using PrimeTween;
 
 public class PlayerCameraManager : MonoBehaviour
 {
     [SerializeField] private CinemachineCamera _camera;
     [SerializeField] private Collider _trigger;
-    [SerializeField] private LeanTweenType _tweenType;
+    [SerializeField] private Ease _tweenType;
     [SerializeField] private float _duration;
 
     private CinemachineOrbitalFollow _orbitalFollow;
@@ -21,15 +22,13 @@ public class PlayerCameraManager : MonoBehaviour
     {
         if (coll.TryGetComponent(out PlayerController player))
         {
-            LeanTween.value(gameObject, _startHeight, _targetHeight, _duration)
-                .setEase(_tweenType)
-                .setOnUpdate((float value) =>
+            Tween.Custom(gameObject, _startHeight, _targetHeight, _duration, (_, value) =>
                 {
                     var orbits = _orbitalFollow.Orbits;
                     orbits.Center.Height = value;
                     _orbitalFollow.Orbits = orbits;
-                })
-                .setOnComplete(() => _trigger.enabled = false);
+                }, _tweenType)
+                .OnComplete(() => _trigger.enabled = false);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using PrimeTween;
 
 public class CameraFocusManager : MonoBehaviour
 {
@@ -7,11 +8,11 @@ public class CameraFocusManager : MonoBehaviour
     [SerializeField] private Transform _newTarget;
     [SerializeField] private float _verticalOffset = 10f;
     [SerializeField] private float _transitionTime = 1.2f;
-    [SerializeField] private LeanTweenType _easeType = LeanTweenType.easeInOutSine;
+    [SerializeField] private Ease _easeType = Ease.InOutSine;
 
-    private Transform _cameraTarget = default;
-    private Transform _lookAtPoint = default;
-    private LTDescr _currentTween = null;
+    private Transform _cameraTarget;
+    private Transform _lookAtPoint;
+    private Tween _currentTween;
     private bool _isInZone = false;
     private float _blendValue = 0f;
 
@@ -39,12 +40,10 @@ public class CameraFocusManager : MonoBehaviour
             _isInZone = true;
             _camera.LookAt = _lookAtPoint;
 
-            if (_currentTween != null)
-                LeanTween.cancel(gameObject);
+            _currentTween.Stop();
 
-            _currentTween = LeanTween.value(gameObject, _blendValue, 1f, _transitionTime)
-                .setEase(_easeType)
-                .setOnUpdate((float val) => _blendValue = val);
+            _currentTween = Tween.Custom(gameObject, _blendValue, 1f, _transitionTime,
+                (_, val) => _blendValue = val, _easeType);
         }
     }
 
@@ -54,13 +53,11 @@ public class CameraFocusManager : MonoBehaviour
         {
             _isInZone = false;
 
-            if (_currentTween != null)
-                LeanTween.cancel(gameObject);
+            _currentTween.Stop();
 
-            _currentTween = LeanTween.value(gameObject, _blendValue, 0f, _transitionTime)
-                .setEase(_easeType)
-                .setOnUpdate((float val) => _blendValue = val)
-                .setOnComplete(() => _camera.LookAt = _cameraTarget);
+            _currentTween = Tween.Custom(gameObject, _blendValue, 0f, _transitionTime,
+                (_, val) => _blendValue = val, _easeType)
+                .OnComplete(() => _camera.LookAt = _cameraTarget);
         }
     }
 }

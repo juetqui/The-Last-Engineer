@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using PrimeTween;
 
 [System.Serializable]
 public class StationsStops
@@ -16,8 +17,8 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private float _accelTime = 1f;
     [SerializeField] private float _decelTime = 1f;
     [SerializeField] private float _waitCD = 1f;
-    [SerializeField] private LeanTweenType _accelEase = LeanTweenType.easeOutSine;
-    [SerializeField] private LeanTweenType _decelEase = LeanTweenType.easeInSine;
+    [SerializeField] private Ease _accelEase = Ease.OutSine;
+    [SerializeField] private Ease _decelEase = Ease.InSine;
     [SerializeField] private Connection _connection = default;
     [SerializeField] private StationsStops[] _positions2;
 
@@ -30,7 +31,7 @@ public class PlatformController : MonoBehaviour
     private NodeType _requiredType = NodeType.Default;
     private Coroutine _changingColor = null;
     private PlayerController _player = default;
-    private LTDescr _tween = default;
+    private Tween _tween = default;
 
     public bool isStopped;
     public bool isReversed;
@@ -164,8 +165,7 @@ public class PlatformController : MonoBehaviour
 
     public void CancelSpeedTween()
     {
-        if (_tween != null) LeanTween.cancel(gameObject);
-        _tween = null;
+        _tween.Stop();
     }
 
     public void RefreshSegmentSpeed()
@@ -178,9 +178,8 @@ public class PlatformController : MonoBehaviour
     {
         CancelSpeedTween();
         CurrentSpeed = 0f;
-        _tween = LeanTween.value(gameObject, 0f, SegmentSpeed, _accelTime)
-            .setEase(_accelEase)
-            .setOnUpdate(v => CurrentSpeed = v);
+        _tween = Tween.Custom(gameObject, 0f, SegmentSpeed, _accelTime,
+            (_, v) => CurrentSpeed = v, _accelEase);
     }
 
     public void ContinueWithNewSegmentSpeed()
@@ -190,18 +189,16 @@ public class PlatformController : MonoBehaviour
         float to = SegmentSpeed;
         if (Mathf.Approximately(from, to)) { CurrentSpeed = to; return; }
         float t = _accelTime * Mathf.Abs(to - from) / Mathf.Max(0.001f, to);
-        _tween = LeanTween.value(gameObject, from, to, Mathf.Max(0.01f, t))
-            .setEase(_accelEase)
-            .setOnUpdate(v => CurrentSpeed = v);
+        _tween = Tween.Custom(gameObject, from, to, Mathf.Max(0.01f, t),
+            (_, v) => CurrentSpeed = v, _accelEase);
     }
 
     public void StartDeceleration(float duration)
     {
         CancelSpeedTween();
         float v0 = CurrentSpeed;
-        _tween = LeanTween.value(gameObject, v0, 0f, Mathf.Max(0.01f, duration))
-            .setEase(_decelEase)
-            .setOnUpdate(v => CurrentSpeed = v);
+        _tween = Tween.Custom(gameObject, v0, 0f, Mathf.Max(0.01f, duration),
+            (_, v) => CurrentSpeed = v, _decelEase);
     }
 
     public void DecelerateToTarget(Vector3 target)
