@@ -23,8 +23,8 @@ public class Laser : MonoBehaviour
     [SerializeField] private LayerMask _laserLayer;
 
     [Header("Debug Parameter")]
-    [SerializeField] private bool _debug = false;
-    [SerializeField] private GameObject _debugObject;
+    [SerializeField] private bool debug = false;
+    [SerializeField] private GameObject debugObject;
 
     //private LTDescr _currentTween = null;
 
@@ -45,7 +45,7 @@ public class Laser : MonoBehaviour
 
     private void Awake()
     {
-        GameObject instancedLineRenderer = Instantiate(_laserRendererPrefab, null);
+        var instancedLineRenderer = Instantiate(_laserRendererPrefab, null);
 
         _lineRenderer = instancedLineRenderer.GetComponent<LineRenderer>();
         _glitcheable = GetComponentInParent<Glitcheable>();
@@ -55,7 +55,8 @@ public class Laser : MonoBehaviour
         _lineRenderer.positionCount = 2;
         _lineRenderer.transform.position = Vector3.zero;
 
-        Vector3 laserPos = GetFixedLaserPos();
+        var laserPos = GetFixedLaserPos();
+
         _lineRenderer.SetPosition(0, laserPos);
         _lineRenderer.SetPosition(1, laserPos);
         _lineRenderer.endWidth = _raycastOffsetX*2;
@@ -64,13 +65,12 @@ public class Laser : MonoBehaviour
 
     private void Start()
     {
-        if (_startsInitialized)
-        {
-            LaserReceived();
-            _beamLaser.Play();
-            CastLaser();
-            _audioSource.Play();
-        }
+        if (!_startsInitialized) return;
+
+        LaserReceived();
+        _beamLaser.Play();
+        CastLaser();
+        _audioSource.Play();
     }
 
     private void Update()

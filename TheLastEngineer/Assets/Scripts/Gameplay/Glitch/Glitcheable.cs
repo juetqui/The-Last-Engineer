@@ -19,8 +19,9 @@ public class Glitcheable : MonoBehaviour, IInteractable
     [HideInInspector] public Renderer _renderer;
     [SerializeField] public ParticleSystem _ps;
     [SerializeField] public List<Transform> _newPosList;
-    [SerializeField] public List<MeshRenderer> _objectHolograms;
     [HideInInspector] public AudioSource _audioSource;
+
+    private List<MeshRenderer> _objectHolograms;
 
     [Header("Visual")]
     [SerializeField] public GlitchSounds _sounds;
@@ -60,6 +61,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         if (_newPosList.Count > 0)
         {
+            _objectHolograms = new List<MeshRenderer>();
+            
             foreach (var anchor in _newPosList)
             {
                 var meshRenderer = anchor.gameObject.GetComponent<MeshRenderer>();
@@ -112,13 +115,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
         var closest = _objectHolograms.OrderBy(x => Vector3.Distance(transform.position, x.transform.position)).First();
         closest.enabled = enable;
-
-        if (debug)
-        {
-            Debug.Log("Enable: " + enable);
-            Debug.Log(closest.gameObject.name);
-        }
     }
+
     public void BeginCycle()
     {
         FSM.Change(DisState.ResetAndReturn());
@@ -129,8 +127,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
         if (nodeType == NodeType.None)
             return false;
 
-        bool toIdleCase = FSM.Current != IdleState && nodeType == NodeType.Default;
-        bool toGlitchedCase = FSM.Current == IdleState && nodeType == NodeType.Corrupted;
+        var toIdleCase = FSM.Current != IdleState && nodeType == NodeType.Default;
+        var toGlitchedCase = FSM.Current == IdleState && nodeType == NodeType.Corrupted;
 
         return toIdleCase || toGlitchedCase;
     }
@@ -147,12 +145,11 @@ public class Glitcheable : MonoBehaviour, IInteractable
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
     {
         succeededInteraction = CanInteract(player);
-        
-        if (succeededInteraction)
-        {
-            var ii = (IGlitchInterruptible) FSM.Current;
-            ii.Interrupt();
-        }
+
+        if (!succeededInteraction) return;
+
+        var ii = (IGlitchInterruptible) FSM.Current;
+        ii.Interrupt();
     }
 
     public void SetAlpha(float a)

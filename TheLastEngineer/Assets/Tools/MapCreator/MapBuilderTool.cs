@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
+#if UNITYEDITOR
 public class MapBuilderTool : EditorWindow
 {
     // Referencias principales
@@ -749,3 +750,4 @@ public class MapBuilderTool : EditorWindow
         Debug.Log($"Prefab '{currentPrefab.name}' colocado en celda {cellPosition} con rotación {currentYRotation}°");
     }
 }
+#endif
