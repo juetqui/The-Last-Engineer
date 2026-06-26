@@ -31,8 +31,8 @@ public class FollowController : MonoBehaviour
         _player.OnDied += StopFollowing;
         _player.OnRespawned += StartFollowing;
         
-        InputManager.Instance.cameraRight.started += RotateRight;
-        InputManager.Instance.cameraLeft.started += RotateLeft;
+        // InputManager.Instance.cameraRight.started += RotateRight;
+        // InputManager.Instance.cameraLeft.started += RotateLeft;
 
         StartFollowing();
     }
