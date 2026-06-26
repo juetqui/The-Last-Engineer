@@ -194,6 +194,7 @@ public class LaserController : MonoBehaviour
         _isInitialized = false;
         _isToggling = true;
         _idleSetupDone = false;
+        _model.ClearReceptor();
         _model.SetLaserLength(0f);
     }
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ public class UpdateCrosshair : MonoBehaviour
     [SerializeField] Image _circleImage;
     
     private Animator _myAnim;
+    private Glitcheable _currentTarget;
    
     private void Awake()
     {
@@ -20,22 +22,28 @@ public class UpdateCrosshair : MonoBehaviour
         PlayerController.Instance.OnGlitcheableInArea += UpdatePos;
     }
 
+    private void Update()
+    {
+        if (_currentTarget == null) return;
+
+        var targetPosition = _currentTarget.transform.position;
+        var screenPosition = _camera.WorldToScreenPoint(targetPosition);
+
+        if (screenPosition.z > 0) CompareGlitchWithPlayerNode(_currentTarget, screenPosition);
+        else ResetPos();
+    }
+
     private void UpdatePos(Glitcheable glitcheable)
     {
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", glitcheable != null);
+        _currentTarget = glitcheable;
 
         if (glitcheable == null || PlayerNodeHandler.Instance.CurrentType == NodeType.None)
         {
             ResetPos();
             return;
         }
-
-        Vector3 targetPosition = glitcheable.transform.position;
-        Vector3 screenPosition = _camera.WorldToScreenPoint(targetPosition);
-
-        if (screenPosition.z > 0) CompareGlitchWithPlayerNode(glitcheable, screenPosition);
-        else ResetPos();
     }
     
     private void ResetPos()
