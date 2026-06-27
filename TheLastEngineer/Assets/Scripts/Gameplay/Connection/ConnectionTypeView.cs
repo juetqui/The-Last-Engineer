@@ -17,25 +17,49 @@ public class ConnectionTypeView : MonoBehaviour
     private Renderer _renderer = default;
     private Connection _connection = default;
     private Color _emissionOn = default;
+    public bool _keepOn;
 
     void Start()
     {
         _renderer = GetComponent<Renderer>();
         _connection = GetComponentInParent<Connection>();
+        _connection.OnNodeConnected += SetCorrectNode;
 
         _emissionOn = _connection.RequiredType == NodeType.Default ? _emissionDefault : _emissionCorrupted;
 
-        TurnOn();
+        if (!_connection.IsConnected)
+        {
+            TurnOn();
+
+        }
     }
 
     private void TurnOn()
     {
         Color currentColor = _renderer.material.GetColor("_EmissiveColor");
 
-        Tween.Custom(gameObject, currentColor, _emissionOn, 0.6f, (_, c) => UpdateColor(c), _tweenType)
-            .OnComplete(turnOff);
+        var tween = Tween.Custom(gameObject, currentColor, _emissionOn, 0.6f, (_, c) => UpdateColor(c), _tweenType);
+        if (!_keepOn)
+        {
+            tween.OnComplete(turnOff);
+        }
     }
 
+    public void SetCorrectNode(NodeType nodeType, bool a)
+    {
+        if (a)
+        {
+            _keepOn = true;
+
+        }
+        else
+        {
+            _keepOn = false;
+
+        }
+        TurnOn();
+
+    }
     private void turnOff()
     {
         Color currentColor = _renderer.material.GetColor("_EmissiveColor");

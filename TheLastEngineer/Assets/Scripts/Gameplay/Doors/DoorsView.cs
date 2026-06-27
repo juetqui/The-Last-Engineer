@@ -27,6 +27,13 @@ public class DoorsView : MonoBehaviour
             _openDoor = GetComponent<AudioSource>();
             OpenDoor(true);
         }
+        if (_isBroken)
+        {
+            _animator = GetComponent<Animator>();
+
+            _animator.SetBool("IsBroken", true);
+
+        }
     }
 
     public void Initialize()
