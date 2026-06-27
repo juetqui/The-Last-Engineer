@@ -40,14 +40,23 @@ public class GlitcheableOrbitController : MonoBehaviour
     {
         _glitcheable = GetComponentInParent<Glitcheable>();
         _particleSystem = GetComponentsInChildren<ParticleSystem>(true);
-
-        _glitcheable.FSM.OnStateChanged += SetUpPSColor;
-        _glitcheable.OnInteractionRejected += BouncePS;
     }
 
     private void Start()
     {
-        PlayerController.Instance.OnGlitcheableInArea += SetUpParticles;
+        _glitcheable.FSM.OnStateChanged += SetUpPSColor;
+        _glitcheable.OnInteractionRejected += BouncePS;
+        _glitcheable.OnPlayerInRange += SetUpPlayerInRange;
+    }
+
+    private void SetUpPlayerInRange(PlayerController player, bool entered)
+    {
+        if (entered) player.OnGlitcheableInArea += SetUpParticles;
+        else
+        {
+            player.OnGlitcheableInArea -= SetUpParticles;
+            SetUpParticles(null);
+        }
     }
 
     private void SetUpParticles(Glitcheable glitcheable)
@@ -89,30 +98,23 @@ public class GlitcheableOrbitController : MonoBehaviour
         if (_glitcheable.IsCorrupted && psType == PSType.Corrupted
         || !_glitcheable.IsCorrupted && psType == PSType.Idle)
         {
-            if (debug) Debug.Log("Activated: " + psType);
             foreach (var ps in _particleSystem)
             {
                 ps.gameObject.SetActive(true);
+                ps.Play();
             }
         }
         else
         {
-            if (debug) Debug.Log("Deactivated: " + psType);
             foreach (var ps in _particleSystem)
             {
                 ps.gameObject.SetActive(false);
+                ps.Stop();
             }
         }
 
         if (state == _glitcheable.DisState)
-        {
             SetUpParticles(null);
-            return;
-        }
-        else
-        {
-            SetUpParticles(_glitcheable);
-        }
     }
 
     private void BouncePS()

@@ -54,7 +54,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     public bool IsCorrupted { get { return FSM.Current != IdleState; } }
 
-    public Action<bool> OnPlayerInRange;
+    public Action<PlayerController, bool> OnPlayerInRange;
     public Action OnInteractionRejected;
 
     private void Awake()
@@ -196,13 +196,13 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<PlayerController>()  != null)
-            OnPlayerInRange?.Invoke(true);
+        if (other.TryGetComponent(out PlayerController player))
+            OnPlayerInRange?.Invoke(player, true);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<PlayerController>() != null)
-            OnPlayerInRange?.Invoke(false);
+        if (other.TryGetComponent(out PlayerController player))
+            OnPlayerInRange?.Invoke(player, false);
     }
 }

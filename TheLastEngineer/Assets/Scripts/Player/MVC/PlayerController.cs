@@ -241,8 +241,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void SetTeleport(Vector3 targetPos) => _teleportPos = targetPos;
     public void GetClosestGlitcheable()
     {
-        Glitcheable nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
+        var nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
+
         if (nearest == _lastNearestGlitcheable) return;
+
         _lastNearestGlitcheable = nearest;
         OnGlitcheableInArea?.Invoke(nearest);
     }
