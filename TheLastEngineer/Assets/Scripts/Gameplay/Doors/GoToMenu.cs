@@ -1,19 +1,23 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GoToMenu : MonoBehaviour
 {
-    [SerializeField] private DoorsView _door;
-    [SerializeField] private string _scene = "MainMenu";
+    [SerializeField] private DoorsView door;
+    [SerializeField] private string scene = "MainMenu";
 
     private Collider _coll;
 
     private void Awake()
     {
         _coll = GetComponent<Collider>();
-        _door.OnOpen += EnableCollider;
+        door.OnOpen += EnableCollider;
 
-        //EnableCollider(false);
+        EnableCollider(false);
+    }
+
+    private void OnDestroy()
+    {
+        door.OnOpen -= EnableCollider;
     }
 
     private void EnableCollider(bool isOpen) => _coll.enabled = isOpen;
@@ -21,6 +25,8 @@ public class GoToMenu : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out PlayerController player))
-            SceneManager.LoadScene(_scene);
+        {
+            LevelLoader.Instance.SetScene(scene);
+        }
     }
 }

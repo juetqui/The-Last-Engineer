@@ -90,6 +90,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         
         OnDied += _input.DisableInputs;
         OnRespawned += _input.EnableInputs;
+        LevelLoader.Instance.OnLoading += _input.DisableInputs;
 
         // Subscribe to cinematic events
         OnCinematicSetupRequested += HandleCinematicSetup;
