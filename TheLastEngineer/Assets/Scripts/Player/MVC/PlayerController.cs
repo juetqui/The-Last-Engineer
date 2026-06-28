@@ -145,6 +145,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnInteractStart += OnInteractPressed;
             _input.OnInteractCancel += OnInteractCanceled;
             _input.OnCancelSelect += OnCancelSelect;
+
+            if (debug) _input.OnDebug += OnDebug;
         }
         else
         {
@@ -153,6 +155,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _input.OnInteractStart -= OnInteractPressed;
             _input.OnInteractCancel -= OnInteractCanceled;
             _input.OnCancelSelect -= OnCancelSelect;
+
+            if (debug) _input.OnDebug -= OnDebug;
         }
     }
     private void OnMove(Vector2 mv) => _move = _isDead || !_canMove ? Vector2.zero : mv;
@@ -211,6 +215,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         OnInteractableSelected?.Invoke(null);
     }
+
+    private void OnDebug() => LevelLoader.Instance.PerformDebug();
 
     private Vector3 GetMovement3D()
     {

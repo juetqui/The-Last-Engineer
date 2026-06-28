@@ -19,6 +19,7 @@ public class InputManager : MonoBehaviour
     [HideInInspector] public InputAction resetCamInput = default;
     [HideInInspector] public InputAction cameraRight = default;
     [HideInInspector] public InputAction cameraLeft = default;
+    [HideInInspector] public InputAction debugInput = default;
     #endregion
 
     #region UI INPUTS
@@ -60,6 +61,7 @@ public class InputManager : MonoBehaviour
         resetCamInput = playerInputs.Player.ResetCam;
         cameraRight = playerInputs.Player.CameraRight;
         cameraLeft = playerInputs.Player.CameraLeft;
+        debugInput = playerInputs.Player.Debug;
 
         rotate = playerInputs.UI.Rotate;
         click = playerInputs.UI.Click;

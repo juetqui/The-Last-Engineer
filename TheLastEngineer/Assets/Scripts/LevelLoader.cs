@@ -11,6 +11,10 @@ public class LevelLoader : MonoBehaviour
     [SerializeField] private GameObject loadingCanvas;
     [SerializeField] private Image loadingBar;
     [SerializeField] private float loadingScale;
+    [SerializeField] private float loadingOffset;
+
+    [Header("Debug")]
+    [SerializeField] private string debugScene;
 
     private string _scene;
     private float _target;
@@ -20,9 +24,13 @@ public class LevelLoader : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
         else Destroy(gameObject);
-        
+
         loadingCanvas.SetActive(false);
     }
 
@@ -46,7 +54,7 @@ public class LevelLoader : MonoBehaviour
         do
         {
             await Task.Delay(100);
-            _target = asyncScene.progress;
+            _target = loadingOffset + asyncScene.progress;
         } while (asyncScene.progress < 0.9f);
         
         await Task.Delay(1000);
@@ -64,4 +72,6 @@ public class LevelLoader : MonoBehaviour
         ChangeLevel();
         OnLoading?.Invoke();
     }
+
+    public void PerformDebug() => SetScene(debugScene);
 }

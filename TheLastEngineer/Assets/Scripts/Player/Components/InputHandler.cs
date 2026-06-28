@@ -10,6 +10,7 @@ public class InputHandler : MonoBehaviour
     public event Action OnInteractCancel = delegate { };
     public event Action OnCorruptionChange = delegate { };
     public event Action OnCancelSelect = delegate { };
+    public event Action OnDebug = delegate { };
 
     private InputManager _inputManager = default;
 
@@ -27,6 +28,7 @@ public class InputHandler : MonoBehaviour
         _inputManager.interactInput.started += InteractStarted;
         _inputManager.interactInput.canceled += InteractCanceled;
         _inputManager.cancelInput.performed += CancelPerformed;
+        _inputManager.debugInput.performed += DebugPerformed;
     }
 
     public void DisableInputs()
@@ -37,6 +39,7 @@ public class InputHandler : MonoBehaviour
         _inputManager.interactInput.started -= InteractStarted;
         _inputManager.interactInput.canceled -= InteractCanceled;
         _inputManager.cancelInput.performed -= CancelPerformed;
+        _inputManager.debugInput.performed -= DebugPerformed;
     }
 
     private void OnDisable()
@@ -56,4 +59,5 @@ public class InputHandler : MonoBehaviour
     private void InteractStarted(InputAction.CallbackContext _) => OnInteractStart?.Invoke();
     private void InteractCanceled(InputAction.CallbackContext _) => OnInteractCancel?.Invoke();
     private void CancelPerformed(InputAction.CallbackContext _) => OnCancelSelect?.Invoke();
+    private void DebugPerformed(InputAction.CallbackContext _) => OnDebug?.Invoke();
 }
