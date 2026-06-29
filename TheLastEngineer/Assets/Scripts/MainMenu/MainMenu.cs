@@ -23,6 +23,7 @@ public class MainMenu : MonoBehaviour
     {
         MoveToPos(_startPos);
         StartCoroutine(FadeTo(0f));
+
     }
 
     public void MoveToPos(Transform newPos)
@@ -32,7 +33,12 @@ public class MainMenu : MonoBehaviour
     }
     public void ButtonEnabler(Button button)
     {
-        new WaitForSeconds(_duration*2);
+        StartCoroutine("ButtonEnablerRoutine", (button));
+    }
+    public IEnumerator ButtonEnablerRoutine(Button button)
+    {
+        yield return new WaitForSeconds(_duration*1.01f);
+
         if (button.interactable == true)
         {
             button.interactable = false;
@@ -40,6 +46,7 @@ public class MainMenu : MonoBehaviour
         else
         {
             button.interactable = true;
+
         }
     }
     public void MoveToPosAndFade(Transform newPos)

@@ -27,11 +27,7 @@ public class CanvasButtonStateController : MonoBehaviour
             item.Key.interactable = false;
         }
     }
-    public void EnableButtonsTimer(float timer)
-    {
-        DisableButtons();
-        Invoke("EnableButtons", timer);
-    }
+
 
     public void EnableButtons()
     {

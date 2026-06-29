@@ -27,8 +27,8 @@ public class CanvasController : MonoBehaviour
         if (_newCanvas == null)
             throw new Exception("There is no Canvas in the newTarget object sent through parameters");
 
-        _currentCanvas.DisableButtons();
-        _newCanvas.EnableButtons();
+        //_currentCanvas.DisableButtons();
+        //_newCanvas.EnableButtons();
 
         EventSystem.current.firstSelectedGameObject = newTarget;
         EventSystem.current.SetSelectedGameObject(newTarget);
