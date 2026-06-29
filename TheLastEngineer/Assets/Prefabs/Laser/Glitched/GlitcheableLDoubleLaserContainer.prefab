@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7654964781609409250}
   - component: {fileID: 5895170518142944161}
   - component: {fileID: 9142481423536516546}
-  m_Layer: 6
+  m_Layer: 18
   m_Name: Glitchable Feedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,7 @@ GameObject:
   - component: {fileID: 42632265470385335}
   - component: {fileID: 4022903798098403211}
   - component: {fileID: 1205643913796016324}
-  m_Layer: 0
+  m_Layer: 18
   m_Name: Laser Point (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -156,7 +156,7 @@ MonoBehaviour:
   _easeTime: 0.1
   _layer:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 262464
   _startsInitialized: 1
   _debug: 0
   _gizmosColor: {r: 1, g: 0, b: 0, a: 1}
@@ -290,7 +290,7 @@ GameObject:
   - component: {fileID: 9012416793114071167}
   - component: {fileID: 388869991194834864}
   - component: {fileID: 2256488664415551493}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: GlitcheableLDoubleLaserContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -468,6 +468,12 @@ MonoBehaviour:
   _index: 0
   _feedbackRenderer: {fileID: 5895170518142944161}
   feedbackMinMaxPS: {x: 0, y: 2000}
+  _defaultLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  _glitchedLayer:
+    serializedVersion: 2
+    m_Bits: 262144
 --- !u!114 &9012416793114071167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -604,7 +610,7 @@ GameObject:
   - component: {fileID: 6698587833686878032}
   - component: {fileID: 3762636474980757552}
   - component: {fileID: 8783546998683337045}
-  m_Layer: 0
+  m_Layer: 18
   m_Name: Laser Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -643,7 +649,7 @@ MonoBehaviour:
   _easeTime: 0.1
   _layer:
     serializedVersion: 2
-    m_Bits: 320
+    m_Bits: 262464
   _startsInitialized: 1
   _debug: 0
   _gizmosColor: {r: 1, g: 0, b: 0, a: 1}
@@ -770,7 +776,7 @@ GameObject:
   - component: {fileID: 5422705509207302325}
   - component: {fileID: 8873328242644916584}
   - component: {fileID: 1970230575642916845}
-  m_Layer: 6
+  m_Layer: 18
   m_Name: Particle System (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5607,7 +5613,7 @@ GameObject:
   - component: {fileID: 1149465729471232187}
   - component: {fileID: 4327605219906808061}
   - component: {fileID: 1129045288971126214}
-  m_Layer: 6
+  m_Layer: 18
   m_Name: Particle System (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10444,7 +10450,7 @@ GameObject:
   - component: {fileID: 6822390256199225125}
   - component: {fileID: 3393156980702218830}
   - component: {fileID: 7207567650615568725}
-  m_Layer: 0
+  m_Layer: 18
   m_Name: Cristales (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10534,7 +10540,7 @@ GameObject:
   - component: {fileID: 1087263042581559378}
   - component: {fileID: 5392403482262702180}
   - component: {fileID: 1376958845382252338}
-  m_Layer: 6
+  m_Layer: 18
   m_Name: Particle System (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15516,6 +15522,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LaserBeam
       objectReference: {fileID: 0}
+    - target: {fileID: 3598781072741633053, guid: d7d95a28f594c8c4fac7dbaa068c25a5, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15582,6 +15592,10 @@ PrefabInstance:
     - target: {fileID: 5968165276550321381, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
       propertyPath: m_Name
       value: LaserHit (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5968165276550321381, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
       propertyPath: InitialModule.startSize.scalar
@@ -15692,7 +15706,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5857082574178549785, guid: 9fdac549a87d3db498e0602dfbdc8028, type: 3}
       propertyPath: m_Layer
-      value: 6
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15728,6 +15742,10 @@ PrefabInstance:
     - target: {fileID: 8149460489347095763, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
       propertyPath: m_Name
       value: PS_ShapeGlitcheables
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149460489347095763, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 8414339696103262109, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
       propertyPath: m_LocalPosition.x
@@ -15843,6 +15861,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2392480081061731246, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: 2485817317308053262, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.01
@@ -15879,6 +15901,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Glitcheable Default Orbit PS
       objectReference: {fileID: 0}
+    - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.01
@@ -15894,6 +15920,18 @@ PrefabInstance:
     - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6385239532833733944, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6509508166144001965, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8227913821248668606, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15913,6 +15951,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6185482462152066171}
     m_Modifications:
+    - target: {fileID: 2083600441042187074, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495470902742522391, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: 2829166442014828918, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.01
@@ -15989,6 +16035,14 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.01
       objectReference: {fileID: 0}
+    - target: {fileID: 8063979054765715356, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8320788159297549805, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
+      objectReference: {fileID: 0}
     - target: {fileID: 8649683805202407926, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.01
@@ -16004,6 +16058,10 @@ PrefabInstance:
     - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_Name
       value: Glitcheable Glitched Orbit PS
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16066,6 +16124,10 @@ PrefabInstance:
     - target: {fileID: 5968165276550321381, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
       propertyPath: m_Name
       value: LaserHit
+      objectReference: {fileID: 0}
+    - target: {fileID: 5968165276550321381, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
       propertyPath: InitialModule.startSize.scalar
@@ -16245,6 +16307,10 @@ PrefabInstance:
     - target: {fileID: 3598781072741633053, guid: d7d95a28f594c8c4fac7dbaa068c25a5, type: 3}
       propertyPath: m_Name
       value: LaserBeam (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3598781072741633053, guid: d7d95a28f594c8c4fac7dbaa068c25a5, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

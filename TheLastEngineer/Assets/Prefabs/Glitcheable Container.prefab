@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6622573030770761945}
   - component: {fileID: 5569323615469767385}
   - component: {fileID: 4639057647756485585}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: Particle System (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4854,7 +4854,7 @@ GameObject:
   - component: {fileID: 2060325497639247304}
   - component: {fileID: 2217608446055450339}
   - component: {fileID: 4694357798645460333}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: Glitcheable Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5011,6 +5011,12 @@ MonoBehaviour:
   _index: 0
   _feedbackRenderer: {fileID: 7672798766777683271}
   feedbackMinMaxPS: {x: 0, y: 2000}
+  _defaultLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  _glitchedLayer:
+    serializedVersion: 2
+    m_Bits: 262144
 --- !u!114 &2060325497639247304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5146,7 +5152,7 @@ GameObject:
   - component: {fileID: 4911349713852570661}
   - component: {fileID: 2078661097148658113}
   - component: {fileID: 5063293732857129786}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: Particle System (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10198,7 +10204,7 @@ GameObject:
   - component: {fileID: 8301119984829714747}
   - component: {fileID: 7672798766777683271}
   - component: {fileID: 7526396118443110963}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: Glitchable Feedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10302,7 +10308,7 @@ GameObject:
   - component: {fileID: 3576800593818850351}
   - component: {fileID: 2924790856894543484}
   - component: {fileID: 9146551859587475715}
-  m_Layer: 8
+  m_Layer: 18
   m_Name: Particle System (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15214,7 +15220,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5857082574178549785, guid: 9fdac549a87d3db498e0602dfbdc8028, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15250,6 +15256,10 @@ PrefabInstance:
     - target: {fileID: 8149460489347095763, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
       propertyPath: m_Name
       value: PS_ShapeGlitcheables
+      objectReference: {fileID: 0}
+    - target: {fileID: 8149460489347095763, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 8414339696103262109, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
       propertyPath: m_LocalPosition.x
@@ -15309,30 +15319,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4045016863836570219}
     m_Modifications:
-    - target: {fileID: 260405546539882121, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 260405546539882121, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 260405546539882121, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.z
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 418521219896953888, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 418521219896953888, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 418521219896953888, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 418521219896953888, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -15373,125 +15359,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 418521219896953888, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 703838415057395570, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 703838415057395570, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 703838415057395570, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.z
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1496823730056826266, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1496823730056826266, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1496823730056826266, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.z
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2305142712600568383, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2305142712600568383, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2305142712600568383, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2305142712600568383, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2485817317308053262, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2485817317308053262, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2485817317308053262, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2485817317308053262, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2519897804274896923, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2519897804274896923, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2519897804274896923, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2519897804274896923, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
+    - target: {fileID: 2392480081061731246, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_Name
       value: Glitcheable Default Orbit PS
       objectReference: {fileID: 0}
-    - target: {fileID: 3145875562406339301, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: downScale
-      value: 0.01
+    - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
-    - target: {fileID: 3145875562406339301, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: scaleEaseType
-      value: 25
+    - target: {fileID: 6385239532833733944, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
-    - target: {fileID: 3145875562406339301, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: bounceSettleEaseType
-      value: 25
+    - target: {fileID: 6509508166144001965, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
-    - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4712460108446407849, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4712460108446407849, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.y
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4712460108446407849, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
-      propertyPath: ShapeModule.m_Scale.z
-      value: 2
+    - target: {fileID: 8227913821248668606, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15511,29 +15401,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4045016863836570219}
     m_Modifications:
-    - target: {fileID: 2829166442014828918, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
+    - target: {fileID: 2083600441042187074, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
-    - target: {fileID: 2829166442014828918, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 2829166442014828918, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443280430484661589, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443280430484661589, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3443280430484661589, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
+    - target: {fileID: 2495470902742522391, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 3443280430484661589, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_LocalPosition.x
@@ -15575,57 +15449,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4066863065245775652, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
+    - target: {fileID: 8063979054765715356, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
-    - target: {fileID: 4066863065245775652, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 4066863065245775652, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 5781209950630770604, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 5781209950630770604, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 5781209950630770604, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8079015349990960414, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: downScale
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8079015349990960414, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: scaleEaseType
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 8079015349990960414, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: bounceSettleEaseType
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 8649683805202407926, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8649683805202407926, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8649683805202407926, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.01
+    - target: {fileID: 8320788159297549805, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_Name
       value: Glitcheable Glitched Orbit PS
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

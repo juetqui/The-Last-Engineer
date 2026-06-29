@@ -41,6 +41,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     public Renderer _feedbackRenderer;
     [SerializeField] private Vector2 feedbackMinMaxPS = new Vector2(0, 200);
+    [SerializeField] private LayerMask _defaultLayer;
+    [SerializeField] private LayerMask _glitchedLayer;
     private ParticleSystem.EmissionModule _feedbackPS;
 
     public GlitchStateMachine FSM;
@@ -86,7 +88,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
         SetAlpha(1f);
         SetFeedbackAlpha(0f);
-        SetBoolCorrupted(0f);
+        // SetBoolCorrupted(0f);
         SetParticles(false, 1f);
         SetColliders(true);
 
@@ -166,13 +168,29 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         var clampedAlpha = Mathf.Clamp01(a);
 
-        // _feedbackRenderer.material.SetFloat("_Alpha", clampedAlpha);
         _feedbackPS.rateOverTime = Mathf.Lerp(feedbackMinMaxPS.x, feedbackMinMaxPS.y, clampedAlpha);
     }
 
     public void SetBoolCorrupted(float v)
     {
         _renderer.material.SetFloat("_IsCorrupted", v);
+
+        var targetLayer = _glitchedLayer;
+        if (FSM.Current != IdleState) targetLayer = _defaultLayer;
+
+        int mask = targetLayer.value;
+        if (mask == 0) { if (debug) Debug.LogWarning($"[Glitcheable] {name}: LayerMask vacía", this); return; }                                                                                                                                                                                                              
+        int layerIndex = Mathf.RoundToInt(Mathf.Log(mask, 2));
+        SetLayerRecursively(gameObject, layerIndex);
+
+        if (debug) Debug.Log($"[Glitcheable] {name} -> layer {layerIndex} (corrupted={v}, state={FSM.Current?.GetType().Name})", this);
+    }
+    
+    private static void SetLayerRecursively(GameObject go, int layer)
+    {
+        go.layer = layer;
+        foreach (Transform child in go.transform)
+            SetLayerRecursively(child.gameObject, layer);
     }
 
     public void SetParticles(bool on, float radial)
