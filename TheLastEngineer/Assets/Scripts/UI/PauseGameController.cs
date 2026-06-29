@@ -21,7 +21,8 @@ public class PauseGameController : MonoBehaviour
         // In this case the pause menu will never be enabled at the start,
         // so the bool will be set to false in the prefab to avoid calling the method again here.
         _canvasController = GetComponent<CanvasButtonStateController>();
-
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         EventSystem.current.firstSelectedGameObject = null;
         InputManager.Instance.pauseInput.started += PauseGame;
     }
@@ -30,12 +31,18 @@ public class PauseGameController : MonoBehaviour
     {
         _isPaused = !_isPaused;
         SetTimescale(_isPaused);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
     }
 
     public void ResumeGame()
     {
         _isPaused = false;
         SetTimescale(_isPaused);
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
     }
 
     public void RestartLevel()
