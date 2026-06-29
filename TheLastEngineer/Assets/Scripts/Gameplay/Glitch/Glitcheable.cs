@@ -40,6 +40,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
     [HideInInspector] public int _index = 0;
 
     public Renderer _feedbackRenderer;
+    private ParticleSystem.EmissionModule _feedbackPS;
 
     public GlitchStateMachine FSM;
     public GlitchIdleState IdleState;
@@ -74,6 +75,9 @@ public class Glitcheable : MonoBehaviour, IInteractable
         
         if (_renderer == null)
             _renderer = GetComponent<Renderer>();
+
+        if (_feedbackRenderer != null)
+            _feedbackPS = _feedbackRenderer.GetComponentInChildren<ParticleSystem>().emission;
         
         _audioSource = GetComponent<AudioSource>();
         _ps.Stop();
@@ -159,7 +163,10 @@ public class Glitcheable : MonoBehaviour, IInteractable
 
     public void SetFeedbackAlpha(float a)
     {
-        _feedbackRenderer.material.SetFloat("_Alpha", Mathf.Clamp01(a));
+        var clampedAlpha = Mathf.Clamp01(a);
+
+        _feedbackRenderer.material.SetFloat("_Alpha", clampedAlpha);
+        _feedbackPS.rateOverTime = Mathf.Lerp(0, 200, clampedAlpha);
     }
 
     public void SetBoolCorrupted(float v)
