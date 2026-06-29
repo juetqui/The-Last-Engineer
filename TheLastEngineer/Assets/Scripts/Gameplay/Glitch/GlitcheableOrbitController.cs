@@ -95,8 +95,9 @@ public class GlitcheableOrbitController : MonoBehaviour
 
     private void SetUpPSColor(IState state)
     {
-        if (_glitcheable.IsCorrupted && psType == PSType.Corrupted
-        || !_glitcheable.IsCorrupted && psType == PSType.Idle)
+        var condition = _glitcheable.IsCorrupted && psType == PSType.Corrupted || !_glitcheable.IsCorrupted && psType == PSType.Idle;
+
+        if (condition)
         {
             foreach (var ps in _particleSystem)
             {
@@ -108,8 +109,8 @@ public class GlitcheableOrbitController : MonoBehaviour
         {
             foreach (var ps in _particleSystem)
             {
-                ps.gameObject.SetActive(false);
                 ps.Stop();
+                ps.gameObject.SetActive(false);
             }
         }
 
