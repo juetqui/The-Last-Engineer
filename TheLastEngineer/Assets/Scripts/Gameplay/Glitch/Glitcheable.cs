@@ -40,6 +40,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
     [HideInInspector] public int _index = 0;
 
     public Renderer _feedbackRenderer;
+    [SerializeField] private Vector2 feedbackMinMaxPS = new Vector2(0, 200);
     private ParticleSystem.EmissionModule _feedbackPS;
 
     public GlitchStateMachine FSM;
@@ -165,8 +166,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
     {
         var clampedAlpha = Mathf.Clamp01(a);
 
-        _feedbackRenderer.material.SetFloat("_Alpha", clampedAlpha);
-        _feedbackPS.rateOverTime = Mathf.Lerp(0, 200, clampedAlpha);
+        // _feedbackRenderer.material.SetFloat("_Alpha", clampedAlpha);
+        _feedbackPS.rateOverTime = Mathf.Lerp(feedbackMinMaxPS.x, feedbackMinMaxPS.y, clampedAlpha);
     }
 
     public void SetBoolCorrupted(float v)
