@@ -30,7 +30,18 @@ public class MainMenu : MonoBehaviour
         Tween.Position(transform, newPos.position, _duration, _tweentype);
         Tween.Rotation(transform, newPos.rotation, _duration, _tweentype);
     }
-
+    public void ButtonEnabler(Button button)
+    {
+        new WaitForSeconds(_duration*2);
+        if (button.interactable == true)
+        {
+            button.interactable = false;
+        }
+        else
+        {
+            button.interactable = true;
+        }
+    }
     public void MoveToPosAndFade(Transform newPos)
     {
         Tween.Rotation(transform, newPos.rotation, _duration, _tweentype);
