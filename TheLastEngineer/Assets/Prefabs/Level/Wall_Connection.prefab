@@ -99,6 +99,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &3084647553427187021
 BoxCollider:
@@ -157,10 +158,10 @@ MonoBehaviour:
   _recievedNode: {fileID: 0}
   _nodePos: {fileID: 4334285154860852007}
   _requiredType: 1
-  _particleNode: {fileID: 2598662775292928984}
   _emissionOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   _emissionCorrect: {r: 0.07075471, g: 1, b: 0.07597906, a: 1}
   _emissionIncorrect: {r: 4, g: 0.05660367, b: 0.05660367, a: 1}
+  connectDelay: 2
 --- !u!114 &4735625068119971840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,14 +218,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3382407700807647050}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 10
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -319,6 +320,7 @@ MonoBehaviour:
   _lightDefault: {r: 0.34509805, g: 0.8431373, b: 0.9058824, a: 1}
   _lightCorrupted: {r: 0.7372549, g: 0.0627451, b: 0.7490196, a: 1}
   _lightOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  _keepOn: 0
 --- !u!1 &4117342671872351749
 GameObject:
   m_ObjectHideFlags: 0
@@ -408,6 +410,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8768464024608347805
 MonoBehaviour:
@@ -425,6 +428,7 @@ MonoBehaviour:
   _emissionDefault: {r: 0, g: 0.9098039, b: 2.9960785, a: 1}
   _emissionCorrupted: {r: 2.5411766, g: 0.5019608, b: 5.992157, a: 1}
   _emissionOff: {r: 0.14150941, g: 0.14150941, b: 0.14150941, a: 1}
+  _keepOn: 0
 --- !u!1 &5829207433386441487
 GameObject:
   m_ObjectHideFlags: 0
@@ -514,6 +518,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4909628616095903017
 MonoBehaviour:
@@ -1258,10 +1263,5 @@ PrefabInstance:
 --- !u!4 &2222598715604863783 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5183477578661844890, guid: d997d29ebc528c046a12aae606610bb1, type: 3}
-  m_PrefabInstance: {fileID: 6428651680225123517}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2598662775292928984 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9018289625152946021, guid: d997d29ebc528c046a12aae606610bb1, type: 3}
   m_PrefabInstance: {fileID: 6428651680225123517}
   m_PrefabAsset: {fileID: 0}

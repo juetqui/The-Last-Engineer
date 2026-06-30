@@ -98,6 +98,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &4111767658034296274
 BoxCollider:
@@ -156,10 +157,10 @@ MonoBehaviour:
   _recievedNode: {fileID: 0}
   _nodePos: {fileID: 6705675220169433962}
   _requiredType: 1
-  _particleNode: {fileID: 7088048994769883020}
   _emissionOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   _emissionCorrect: {r: 0.07075471, g: 1, b: 0.07597906, a: 1}
   _emissionIncorrect: {r: 4, g: 0.05660367, b: 0.05660367, a: 1}
+  connectDelay: 2
 --- !u!114 &8319484417427940898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,14 +262,14 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4837425491044234399}
   m_Enabled: 1
-  serializedVersion: 11
+  serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.6, g: 0.7647059, b: 0.75686276, a: 1}
   m_Intensity: 4
   m_Range: 4.9
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize: 10
+  m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
@@ -1030,11 +1031,6 @@ PrefabInstance:
 --- !u!4 &6383220006293956467 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5183477578661844890, guid: d997d29ebc528c046a12aae606610bb1, type: 3}
-  m_PrefabInstance: {fileID: 2268311882681430249}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &7088048994769883020 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9018289625152946021, guid: d997d29ebc528c046a12aae606610bb1, type: 3}
   m_PrefabInstance: {fileID: 2268311882681430249}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3457871269937405771
