@@ -34,9 +34,9 @@ public class ConnectionLightView : MonoBehaviour
         var tween=Tween.Custom(gameObject, currentColor, _lightOn, 0.6f, (_, c) => UpdateColor(c), _tweenType);
         if (!_keepOn)
         {
-            tween.OnComplete(turnOff);
+            tween.OnComplete(turnOff, warnIfTargetDestroyed: false);
         }
-       
+
     }
     public void SetCorrectNode(NodeType nodeType, bool a)
     {
@@ -59,11 +59,16 @@ public class ConnectionLightView : MonoBehaviour
         Color currentColor = _light.color;
 
         Tween.Custom(gameObject, currentColor, _lightOff, 0.6f, (_, c) => UpdateColor(c), _tweenType)
-            .OnComplete(TurnOn);
+            .OnComplete(TurnOn, warnIfTargetDestroyed: false);
     }
 
     private void UpdateColor(Color c)
     {
         _light.color = c;
+    }
+
+    private void OnDestroy()
+    {
+        Tween.StopAll(onTarget: gameObject);
     }
 }

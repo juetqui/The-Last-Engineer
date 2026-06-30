@@ -69,6 +69,11 @@ public class CameraMovementController : MonoBehaviour
             });
     }
 
+    private void OnDestroy()
+    {
+        Tween.StopAll(onTarget: gameObject);
+    }
+
     private void SetOffset()
     {
         var yaw = _orbitalFollow.HorizontalAxis.Value * Mathf.Deg2Rad;

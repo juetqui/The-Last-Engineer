@@ -99,6 +99,11 @@ public class PlayerModel
         return actualDirection; // Return the actual movement direction for animation
     }
 
+    public void StopTweens()
+    {
+        Tween.StopAll(onTarget: _transform);
+    }
+
     public void StartTeleport(Vector3 teleportPos, float duration)
     {
         _teleportStartPos = _transform.position;

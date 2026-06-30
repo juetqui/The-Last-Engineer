@@ -67,6 +67,11 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
+    private void OnDestroy()
+    {
+        Tween.StopAll(onTarget: transform);
+    }
+
     private IEnumerator FadeTo(float targetValue, bool loadLevel = false)
     {
         _blackScreen.gameObject.SetActive(true);

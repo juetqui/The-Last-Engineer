@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class AudioListenerHolder : MonoBehaviour
 {
+    [SerializeField] private Transform _cameraTarget;
+    
     private Quaternion _startRot = default;
     private Vector3 _startPos = new Vector3 (0, 1, 0);
     
@@ -14,6 +16,6 @@ public class AudioListenerHolder : MonoBehaviour
 
     void Update()
     {
-        transform.rotation = _startRot;
+        transform.forward = _cameraTarget.forward;
     }
 }

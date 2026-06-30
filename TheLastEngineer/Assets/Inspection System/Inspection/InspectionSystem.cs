@@ -43,6 +43,8 @@ public class InspectionSystem : MonoBehaviour
 
     private void OnDestroy()
     {
+        _currentTween.Stop();
+
         InputManager.Instance.resetRot.started -= ResetRot;
         InputManager.Instance.rightClick.started -= RightClickStarted;
         InputManager.Instance.rightClick.canceled -= RightClickCanceled;

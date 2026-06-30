@@ -20,6 +20,8 @@ public class CameraShakeController : MonoBehaviour
 
     private void OnDestroy()
     {
+        Tween.StopAll(onTarget: gameObject);
+
         spaceshipController.OnStartAnimation -= SetRumble;
     }
 

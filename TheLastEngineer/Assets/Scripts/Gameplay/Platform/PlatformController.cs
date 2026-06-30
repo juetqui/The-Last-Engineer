@@ -77,6 +77,8 @@ public class PlatformController : MonoBehaviour
 
     private void OnDestroy()
     {
+        _tween.Stop();
+
         if (_connection != null)
             _connection.OnNodeConnected -= OnConnectionChanged;
     }

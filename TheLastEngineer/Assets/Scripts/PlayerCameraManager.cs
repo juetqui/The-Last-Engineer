@@ -31,4 +31,9 @@ public class PlayerCameraManager : MonoBehaviour
                 .OnComplete(() => _trigger.enabled = false);
         }
     }
+
+    private void OnDestroy()
+    {
+        Tween.StopAll(onTarget: gameObject);
+    }
 }

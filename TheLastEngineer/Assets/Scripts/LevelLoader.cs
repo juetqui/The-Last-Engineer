@@ -61,6 +61,7 @@ public class LevelLoader : MonoBehaviour
 
         asyncScene.allowSceneActivation = true;
         loadingCanvas.SetActive(false);
+        _canUpdateLoadingBar = false;
     }
 
     public void SetScene(string scene)

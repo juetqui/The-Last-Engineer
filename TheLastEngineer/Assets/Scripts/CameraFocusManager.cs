@@ -14,6 +14,7 @@ public class CameraFocusManager : MonoBehaviour
     private Transform _lookAtPoint;
     private Tween _currentTween;
     private bool _isInZone = false;
+    private bool _isTransitioning = false;
     private float _blendValue = 0f;
 
     void Awake()
@@ -26,7 +27,7 @@ public class CameraFocusManager : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!_isInZone) return;
+        if (!_isInZone && !_isTransitioning) return;
 
         Vector3 midPoint = (_cameraTarget.position + _newTarget.position) * 0.5f;
         midPoint -= Vector3.up * _verticalOffset;
@@ -38,6 +39,7 @@ public class CameraFocusManager : MonoBehaviour
         if (coll.TryGetComponent(out PlayerController player))
         {
             _isInZone = true;
+            _isTransitioning = false;
             _camera.LookAt = _lookAtPoint;
 
             _currentTween.Stop();
@@ -52,12 +54,22 @@ public class CameraFocusManager : MonoBehaviour
         if (coll.TryGetComponent(out PlayerController player))
         {
             _isInZone = false;
+            _isTransitioning = true;
 
             _currentTween.Stop();
 
             _currentTween = Tween.Custom(gameObject, _blendValue, 0f, _transitionTime,
                 (_, val) => _blendValue = val, _easeType)
-                .OnComplete(() => _camera.LookAt = _cameraTarget);
+                .OnComplete(() =>
+                {
+                    _camera.LookAt = _cameraTarget;
+                    _isTransitioning = false;
+                });
         }
+    }
+
+    private void OnDestroy()
+    {
+        _currentTween.Stop();
     }
 }

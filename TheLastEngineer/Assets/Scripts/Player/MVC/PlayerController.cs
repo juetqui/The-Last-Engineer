@@ -120,6 +120,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private void OnDestroy()
     {
+        _model?.StopTweens();
+
         _lastNearestGlitcheable = null;
         HookInputs(false);
         

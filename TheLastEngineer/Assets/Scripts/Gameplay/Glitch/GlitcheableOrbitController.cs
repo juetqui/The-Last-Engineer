@@ -118,6 +118,17 @@ public class GlitcheableOrbitController : MonoBehaviour
             SetUpParticles(null);
     }
 
+    private void OnDestroy()
+    {
+        if (_particleSystem == null) return;
+
+        foreach (var ps in _particleSystem)
+        {
+            if (ps != null)
+                Tween.StopAll(onTarget: ps.transform);
+        }
+    }
+
     private void BouncePS()
     {
         foreach (var ps in _particleSystem)

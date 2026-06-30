@@ -37,4 +37,9 @@ public class DoorLightListener : MonoBehaviour
                 _renderer.material.SetColor("_EmissiveColor", lerped);
             }, _lerpType);
     }
+
+    private void OnDestroy()
+    {
+        _tween.Stop();
+    }
 }

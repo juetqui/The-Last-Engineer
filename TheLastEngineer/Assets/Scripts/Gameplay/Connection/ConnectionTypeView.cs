@@ -41,7 +41,7 @@ public class ConnectionTypeView : MonoBehaviour
         var tween = Tween.Custom(gameObject, currentColor, _emissionOn, 0.6f, (_, c) => UpdateColor(c), _tweenType);
         if (!_keepOn)
         {
-            tween.OnComplete(turnOff);
+            tween.OnComplete(turnOff, warnIfTargetDestroyed: false);
         }
     }
 
@@ -65,11 +65,16 @@ public class ConnectionTypeView : MonoBehaviour
         Color currentColor = _renderer.material.GetColor("_EmissiveColor");
 
         Tween.Custom(gameObject, currentColor, _emissionOff, 0.6f, (_, c) => UpdateColor(c), _tweenType)
-            .OnComplete(TurnOn);
+            .OnComplete(TurnOn, warnIfTargetDestroyed: false);
     }
 
     private void UpdateColor(Color c)
     {
         _renderer.material.SetColor("_EmissiveColor", c);
+    }
+
+    private void OnDestroy()
+    {
+        Tween.StopAll(onTarget: gameObject);
     }
 }

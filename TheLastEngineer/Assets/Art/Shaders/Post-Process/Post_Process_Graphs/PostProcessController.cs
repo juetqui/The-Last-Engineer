@@ -57,6 +57,8 @@ public class PostProcessController : MonoBehaviour
 
     private void OnDestroy()
     {
+        Tween.StopAll(onTarget: gameObject);
+
         if (_passiveMat != null)
             _passiveMat.SetFloat("_VignetteAmount", _origPassiveVignette);
 
