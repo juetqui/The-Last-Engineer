@@ -66,7 +66,7 @@ public class InputDeviceDetector : ScriptableObject
 
         DetectCurrentDevice();
         
-        Debug.Log("InputDeviceDetector initialized");
+        // Debug.Log("InputDeviceDetector initialized");
     }
 
     public void Dispose()
@@ -86,7 +86,7 @@ public class InputDeviceDetector : ScriptableObject
         // de Play en el editor (el SO y sus delegados sobreviven al stop de Play).
         OnDeviceChanged = null;
 
-        Debug.Log("InputDeviceDetector disposed");
+        // Debug.Log("InputDeviceDetector disposed");
     }
 
     private void OnKeyboardMouseInput(InputAction.CallbackContext context)
@@ -133,7 +133,7 @@ public class InputDeviceDetector : ScriptableObject
         if (change is InputDeviceChange.Added or InputDeviceChange.Removed or 
             InputDeviceChange.Reconnected or InputDeviceChange.Disconnected)
         {
-            Debug.Log($"Device {change}: {device.displayName}");
+            // Debug.Log($"Device {change}: {device.displayName}");
             DetectCurrentDevice();
         }
     }
@@ -189,7 +189,7 @@ public class InputDeviceDetector : ScriptableObject
         if (_currentDevice == newDevice) return;
         
         _currentDevice = newDevice;
-        Debug.Log($"{GetColor()}🎮 Input device changed to: {_currentDevice}</color>");
+        // Debug.Log($"{GetColor()}🎮 Input device changed to: {_currentDevice}</color>");
         OnDeviceChanged?.Invoke(_currentDevice);
     }
 

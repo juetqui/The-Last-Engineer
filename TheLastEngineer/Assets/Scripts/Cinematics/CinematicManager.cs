@@ -18,6 +18,9 @@ public class CinematicSequence
     public CinemachineCamera gameplayCamera;
     public int cinematicCameraPriority = 20;
     public int gameplayCameraPriority = 10;
+    
+    [Header("Cinematic Settings")]
+    public string cameraAnimTrigger;
 
     [Header("Player Data Reference")]
     public PlayerData playerData;
@@ -193,7 +196,7 @@ public class CinematicManager : MonoBehaviour
         {
             if (isCinematic)
             {
-                _currentSequence.cinematicCamera.GetComponent<Animator>().SetTrigger("isCinematic");
+                _currentSequence.cinematicCamera.GetComponent<Animator>().SetTrigger(_currentSequence.cameraAnimTrigger);
                 
                 _currentSequence.cinematicCamera.Priority = _currentSequence.cinematicCameraPriority;
                 _currentSequence.gameplayCamera.Priority = _currentSequence.gameplayCameraPriority;
