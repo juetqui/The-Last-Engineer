@@ -7,6 +7,9 @@ public class InputManager : MonoBehaviour
 {
     public static InputManager Instance = default;
 
+    [SerializeField] private InputDeviceDetector _deviceDetector = default;
+    public InputDeviceDetector DeviceDetector => _deviceDetector;
+
     [HideInInspector] public PlayerInput playerInput = default;
     [HideInInspector] public PlayerInputs playerInputs = default;
     
@@ -47,6 +50,15 @@ public class InputManager : MonoBehaviour
         playerInputs = new PlayerInputs();
         playerInput = GetComponent<PlayerInput>();
         _lastActionMap = ActionMaps.Player;
+
+        if (_deviceDetector != null)
+            _deviceDetector.Initialize();
+    }
+
+    private void OnDestroy()
+    {
+        if (_deviceDetector != null)
+            _deviceDetector.Dispose();
     }
 
     public void OnEnable()
