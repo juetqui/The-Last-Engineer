@@ -6,6 +6,9 @@ public class UpdateCrosshair : MonoBehaviour
 {
     [SerializeField] Camera _camera;
     [SerializeField] Image _circleImage;
+
+    [SerializeField] private Color defaultColor;
+    [SerializeField] private Color glitchColor;
     
     private Animator _myAnim;
     private Glitcheable _currentTarget;
@@ -57,12 +60,13 @@ public class UpdateCrosshair : MonoBehaviour
 
     private void CompareGlitchWithPlayerNode(Glitcheable glitcheable, Vector3 screenPosition)
     {
-        bool compatible =
+        var compatible =
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Default && !glitcheable.IsCorrupted);
 
         _circleImage.enabled = !compatible;
         _circleImage.rectTransform.position = screenPosition;
+        _circleImage.color = glitcheable.IsCorrupted ? glitchColor : defaultColor;
     }
 
     public void SetUpdateAnim()
