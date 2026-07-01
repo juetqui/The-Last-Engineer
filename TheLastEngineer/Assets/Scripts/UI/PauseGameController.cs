@@ -54,7 +54,7 @@ public class PauseGameController : MonoBehaviour
     public void GoToScene(string scene)
     {
         SetTimescale(false);
-        SceneManager.LoadScene(scene);
+        LevelLoader.Instance.SetScene(scene);
     }
 
     public void GoToDesktop()
