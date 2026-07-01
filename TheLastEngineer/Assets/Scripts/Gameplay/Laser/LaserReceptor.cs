@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static UnityEngine.Rendering.DebugUI;
-using DG.Tweening;
 
 public class LaserReceptor : MonoBehaviour, ILaserReceptor
 {

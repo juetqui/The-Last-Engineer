@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class GlitchMovingState : IState
@@ -79,7 +78,7 @@ public class GlitchMovingState : IState
         }
 
         float raw = Mathf.Clamp01(_elapsed / _duration);
-        float e   = DOVirtual.EasedValue(0f, 1f, raw, Ease.InOutQuad);
+        float e   = EaseUtil.InOutQuad(raw);
 
         ApplyPose(Vector3.Lerp(_startPos, _targetPos, e),
                   Quaternion.Lerp(_startRot, _targetRot, e));

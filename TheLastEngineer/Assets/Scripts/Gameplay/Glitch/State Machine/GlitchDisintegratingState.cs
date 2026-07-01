@@ -1,4 +1,3 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class GlitchDisintegratingState : IState, IGlitchInterruptible
@@ -34,7 +33,7 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
         _elapsed += dt;
         
         float raw = Mathf.Clamp01(_elapsed / _duration);
-        float e = DOVirtual.EasedValue(0f, 1f, raw, Ease.InOutQuad);
+        float e = EaseUtil.InOutQuad(raw);
         float alpha = Mathf.Lerp(1f, 0f, e);
 
         g.SetAlpha(alpha);
