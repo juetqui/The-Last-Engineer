@@ -40,18 +40,21 @@ public class InputDeviceDetector : ScriptableObject
             type: InputActionType.PassThrough
         );
         
-        // Detectar CUALQUIER tecla o mouse
+        // Detectar CUALQUIER tecla, botón o movimiento del mouse
         _anyKeyAction.AddBinding("<Keyboard>/<Button>");
         _anyKeyAction.AddBinding("<Mouse>/<Button>");
+        _anyKeyAction.AddBinding("<Mouse>/delta");
 
         _anyGamepadAction = new InputAction(
             name: "AnyGamepad",
             type: InputActionType.PassThrough
         );
         
-        // Detectar CUALQUIER botón o stick del gamepad
+        // Detectar CUALQUIER botón, dpad o stick del gamepad
         _anyGamepadAction.AddBinding("<Gamepad>/<Button>");
         _anyGamepadAction.AddBinding("<Gamepad>/dpad");
+        _anyGamepadAction.AddBinding("<Gamepad>/leftStick");
+        _anyGamepadAction.AddBinding("<Gamepad>/rightStick");
 
         // Callbacks cuando se detecta input
         _anyKeyAction.performed += ctx => OnKeyboardMouseInput(ctx);
@@ -91,11 +94,26 @@ public class InputDeviceDetector : ScriptableObject
 
     private void OnKeyboardMouseInput(InputAction.CallbackContext context)
     {
+        // Movimiento del mouse: exigir un desplazamiento mínimo (en pixeles) para
+        // evitar que un micro-jitter del sensor cambie el dispositivo mientras se
+        // está usando el gamepad. Las teclas/botones (magnitud 0-1) no se filtran.
+        if (context.control.name == "delta")
+        {
+            const float MouseMoveThreshold = 2f;
+            if (context.control.EvaluateMagnitude() < MouseMoveThreshold) return;
+        }
+
         SetDevice(DeviceType.KeyboardMouse);
     }
 
     private void OnGamepadInput(InputAction.CallbackContext context)
     {
+        // Ignorar drift del stick en reposo y micro-actuaciones: solo contar como
+        // "uso del gamepad" un movimiento/press intencional. EvaluateMagnitude()
+        // devuelve una magnitud normalizada tanto para sticks (Vector2) como botones.
+        const float ActuationThreshold = 0.5f;
+        if (context.control.EvaluateMagnitude() < ActuationThreshold) return;
+
         // Detectar qué tipo de gamepad generó el input usando el nombre del tipo
         var device = context.control.device;
         string deviceTypeName = device.GetType().Name;
