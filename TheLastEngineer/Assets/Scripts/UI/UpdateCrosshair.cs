@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using PrimeTween;
 
 public class UpdateCrosshair : MonoBehaviour
 {
@@ -9,7 +10,14 @@ public class UpdateCrosshair : MonoBehaviour
 
     [SerializeField] private Color defaultColor;
     [SerializeField] private Color glitchColor;
-    
+
+    [Header("Crosshair Scale")]
+    [SerializeField] private float targetMin = 0.01f;
+    [SerializeField] private float targetMax = 1f;
+    [SerializeField] private float easeTime = 0.5f;
+    [SerializeField] private float easeDelay = 0.25f;
+    [SerializeField] private Ease easeType = Ease.OutBack;
+
     private Animator _myAnim;
     private Glitcheable _currentTarget;
    
@@ -51,7 +59,7 @@ public class UpdateCrosshair : MonoBehaviour
     
     private void ResetPos()
     {
-        _circleImage.enabled = false;
+        SetCircleEnabled(false);
         _circleImage.rectTransform.position = Vector3.zero;
         
         _myAnim.SetBool("IsActivated", false);
@@ -64,9 +72,27 @@ public class UpdateCrosshair : MonoBehaviour
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Default && !glitcheable.IsCorrupted);
 
-        _circleImage.enabled = !compatible;
+        SetCircleEnabled(!compatible);
         _circleImage.rectTransform.position = screenPosition;
         _circleImage.color = glitcheable.IsCorrupted ? glitchColor : defaultColor;
+    }
+
+    private void SetCircleEnabled(bool value)
+    {
+        if (_circleImage.enabled == value) return;
+
+        Tween.StopAll(onTarget: _circleImage.rectTransform);
+
+        if (value)
+        {
+            _circleImage.enabled = true;
+            Tween.Scale(_circleImage.rectTransform, targetMax, easeTime, easeType, 1, CycleMode.Restart, easeDelay);
+        }
+        else
+        {
+            Tween.Scale(_circleImage.rectTransform, targetMin, easeTime, easeType, 1, CycleMode.Restart, easeDelay)
+                .OnComplete(() => _circleImage.enabled = false);
+        }
     }
 
     public void SetUpdateAnim()

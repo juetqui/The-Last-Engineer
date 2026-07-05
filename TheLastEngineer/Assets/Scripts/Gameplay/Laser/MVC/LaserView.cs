@@ -45,7 +45,7 @@ public class LaserView : MonoBehaviour
     public void EnableBeam(bool enable)
     {
         _line.enabled = enable;
-        if (enable && !_beamLaser.isPlaying) _beamLaser.Play();
+        if (enable && !_beamLaser.isPlaying)_beamLaser.Play();
         if (!enable && _beamLaser.isPlaying) _beamLaser.Stop();
     }
 

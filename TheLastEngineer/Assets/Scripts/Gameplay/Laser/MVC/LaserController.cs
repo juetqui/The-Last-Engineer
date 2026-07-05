@@ -37,6 +37,11 @@ public class LaserController : MonoBehaviour
             _glitcheable.FSM.OnStateChanged += UpdateGlitchedBehaviour;
         
         _isInitialized = _startsInitialized;
+
+        if (_startsInitialized)
+        {
+            
+        }
     }
 
     private void OnDestroy()
@@ -173,6 +178,8 @@ public class LaserController : MonoBehaviour
             _view.ShowHitEffect(hit.point, hit.normal);
         else
             _view.StopHitEffect();
+        
+        _view.PlayAudio();
     }
 
     public void LaserReceived()

@@ -15,6 +15,8 @@ public class PlaySound : MonoBehaviour
     {
         if (other.TryGetComponent(out PlayerController player))
         {
+            if (_audioSource.isPlaying) return;
+
             var randomPitch = Random.Range(pitchVariation.x, pitchVariation.y);
 
             _audioSource.pitch = randomPitch;
