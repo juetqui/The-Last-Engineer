@@ -45,8 +45,8 @@ public class PlayerGrabState : IPlayerState
             return;
         }
 
-        if (_player.CheckForWalls()) return;
-
+        // Sin CheckForWalls: el gate de pared ahora es la línea de visión por objetivo, que ya
+        // filtró este interactuable en InteractableHandler.GetInteractable.
         if (interactable == null || !interactable.CanInteract(_playerNodeHandler))
         {
             HandleFailedInteraction();

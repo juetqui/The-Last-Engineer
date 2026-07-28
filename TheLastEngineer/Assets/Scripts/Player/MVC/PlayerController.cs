@@ -73,11 +73,14 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _nodeHandler = GetComponent<PlayerNodeHandler>();
         _impulse = GetComponent<CinemachineImpulseSource>();
 
-        _obstruction = new LineOfSightChecker(_playerData.wallMask);
-        _interactableHandler = new InteractableHandler(_obstruction);
+        _obstruction = new LineOfSightChecker(_playerData.wallMask, _playerData.losHeightOffset, _playerData.losEndMargin);
+        _interactableHandler = new InteractableHandler();
 
+        // El detector es el dueño del LOS: lo recalcula por frame y publica el resultado en el
+        // handler, que solo cachea el flag.
         if (_interactionDetector != null)
-            _interactionDetector.Initialize(_interactableHandler, this, _playerData.interactionRadius);
+            _interactionDetector.Initialize(_interactableHandler, this, _obstruction,
+                _playerData.interactionRadius, _playerData.losCheckInterval, _playerData.losDebounceTime);
 
         _model = new PlayerModel(CC, transform, _playerData, _collider);
         View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
@@ -265,6 +268,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     // Re-anuncia un interactuable que se movió o reactivó su collider dentro del radio.
     public void RescanInteractable(IInteractable interactable, Collider coll)
         => _interactionDetector?.Rescan(interactable, coll);
+
+    // Estado de línea de visión cacheado por el detector. Lo consultan los estados del jugador
+    // para cortar una interacción en curso si aparece una pared en el medio.
+    public bool HasLineOfSight(IInteractable interactable)
+        => _interactableHandler == null || _interactableHandler.HasLineOfSight(interactable);
     public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
     public void SetTeleport(Vector3 targetPos) => _teleportPos = targetPos;
     public void GetClosestGlitcheable()
@@ -414,8 +422,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     #region DEBUG GIZMOS
     // Dibuja una línea desde el jugador hasta cada interactuable registrado en la lista.
-    // Verde = línea de visión despejada; rojo = bloqueada. Usa el MISMO IObstructionChecker que
-    // el gate de selección, así el gizmo no puede mentir respecto de lo que pasa en runtime.
+    // Verde = línea de visión despejada; rojo = bloqueada. Lee el flag CACHEADO que publica el
+    // detector, no un raycast propio: así el gizmo muestra el mismo estado (debounce incluido)
+    // que decide la selección, y no puede mentir respecto de lo que pasa en runtime.
     private void OnDrawGizmos()
     {
         if (!debug || _interactableHandler == null || _obstruction == null) return;
@@ -429,7 +438,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
             Vector3 target = interactable.Transform.position + offset;
 
-            Gizmos.color = _obstruction.IsObstructed(transform.position, interactable.Transform) ? Color.red : Color.green;
+            Gizmos.color = _interactableHandler.HasLineOfSight(interactable) ? Color.green : Color.red;
             Gizmos.DrawLine(origin, target);
             Gizmos.DrawWireSphere(target, 0.15f);
         }

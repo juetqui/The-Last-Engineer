@@ -28,7 +28,10 @@ public class PlayerEmptyState : IPlayerState
 
     public void HandleInteraction(IInteractable interactable)
     {
-        if (interactable == null || _player.CheckForWalls()) return;
+        // Sin CheckForWalls: ese raycast miraba hacia transform.forward sin importar dónde estaba
+        // el objetivo. El gate de pared ahora es la línea de visión por objetivo, que ya filtró
+        // este interactuable en InteractableHandler.GetInteractable.
+        if (interactable == null) return;
 
         _target = interactable;
         
@@ -73,6 +76,14 @@ public class PlayerEmptyState : IPlayerState
     public void Tick()
     {
         if (!_holding || _target == null) return;
+
+        // Si aparece una pared en el medio del hold, se corta como si el jugador soltara el botón:
+        // el LOS se recalcula por frame, así que la interacción nunca se completa a través de ella.
+        if (!_player.HasLineOfSight(_target))
+        {
+            Cancel();
+            return;
+        }
 
         _holdTimer += Time.deltaTime;
         

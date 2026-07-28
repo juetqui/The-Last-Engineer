@@ -10,4 +10,11 @@ using UnityEngine;
 public interface IObstructionChecker
 {
     bool IsObstructed(Vector3 from, Transform target);
+
+    /// <summary>
+    /// Igual que el anterior pero apuntando a un punto concreto del objetivo (típicamente el
+    /// centro de su collider) en lugar de a su pivote. El pivote de la mayoría de los
+    /// interactuables está al ras del piso y no representa dónde está el objeto realmente.
+    /// </summary>
+    bool IsObstructed(Vector3 from, Transform target, Vector3 aimPoint);
 }
