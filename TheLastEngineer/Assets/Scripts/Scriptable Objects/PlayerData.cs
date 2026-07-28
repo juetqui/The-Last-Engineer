@@ -11,6 +11,7 @@ public class PlayerData : ScriptableObject
     public float fovAngle = default;
     public float coyoteTime = default;
     public float maxWallDist = default;
+    public float interactionRadius = 2.5f;
     public LayerMask wallMask = default;
     public LayerMask glitchDetectionLayer = default;
     public LayerMask defaultLayer = default;

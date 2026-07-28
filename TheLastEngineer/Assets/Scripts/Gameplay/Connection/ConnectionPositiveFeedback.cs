@@ -3,15 +3,15 @@ using UnityEngine;
 
 public class ConnectionPositiveFeedback : MonoBehaviour
 {
-    private List<ParticleSystem> _positivePS = new List<ParticleSystem>();
-    private Connection _connection;
+    [SerializeField] private Connection _connection;
     [SerializeField] private Color _defaultColor;
     [SerializeField] private Color _corruptedColor;
+
+    private List<ParticleSystem> _positivePS = new List<ParticleSystem>();
 
     private void Awake()
     {
         _positivePS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
-        _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += playPS;
     }
 

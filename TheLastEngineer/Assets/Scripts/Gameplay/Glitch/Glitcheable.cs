@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1)]
-public class Glitcheable : MonoBehaviour, IInteractable
+public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 {
     public GameObject[] handrails;
     
@@ -73,6 +73,7 @@ public class Glitcheable : MonoBehaviour, IInteractable
                 _objectHolograms.Add(meshRenderer);
             }
         }
+
         if (_coll == null)
             _coll = GetComponent<Collider>();
         
@@ -140,20 +141,21 @@ public class Glitcheable : MonoBehaviour, IInteractable
         return toIdleCase || toGlitchedCase;
     }
 
+    // Sin efectos colaterales: InteractableHandler.GetInteractable evalúa CanInteract sobre TODOS
+    // los interactuables registrados en cada pulsación, así que el feedback de rechazo tiene que
+    // dispararse solo desde Interact (el objeto que el jugador realmente eligió).
     public bool CanInteract(PlayerNodeHandler player)
-    {
-        var canInteract = CheckStateChange(player.CurrentType) && FSM.Current is IGlitchInterruptible;
-
-        if (!canInteract) OnInteractionRejected?.Invoke();
-
-        return canInteract;
-    }
+        => CheckStateChange(player.CurrentType) && FSM.Current is IGlitchInterruptible;
 
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
     {
         succeededInteraction = CanInteract(player);
 
-        if (!succeededInteraction) return;
+        if (!succeededInteraction)
+        {
+            OnInteractionRejected?.Invoke();
+            return;
+        }
 
         var ii = (IGlitchInterruptible) FSM.Current;
         ii.Interrupt();
@@ -220,15 +222,8 @@ public class Glitcheable : MonoBehaviour, IInteractable
         _index = (_index + 1) % _newPosList.Count;
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void OnPlayerProximity(bool inRange, PlayerController player)
     {
-        if (other.TryGetComponent(out PlayerController player))
-            OnPlayerInRange?.Invoke(player, true);
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.TryGetComponent(out PlayerController player))
-            OnPlayerInRange?.Invoke(player, false);
+        OnPlayerInRange?.Invoke(player, inRange);
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlatformTeleport : MonoBehaviour, IInteractable
+public class PlatformTeleport : MonoBehaviour, IInteractable, IProximityListener
 {
     public InteractablePriority Priority => InteractablePriority.MaxPriority;
     public Transform Transform => transform;
@@ -58,29 +58,26 @@ public class PlatformTeleport : MonoBehaviour, IInteractable
         _entrada.Stop();
     }
 
-    private void OnTriggerEnter(Collider coll)
+    public void OnPlayerProximity(bool inRange, PlayerController player)
     {
-        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType)
+        if (inRange)
         {
+            if (player.NodeHandler.CurrentType == _requiredType)
+            {
                 OnPlayerStepped?.Invoke(true);
                 _entrada.Play();
                 TargetPlatform._salida.Play();
-        }
-    }
+            }
 
-    private void OnTriggerExit(Collider coll)
-    {
-        if (coll.TryGetComponent(out PlayerNodeHandler player))
+            // Antes lo hacía OnTriggerStay: mientras el jugador está sobre la plataforma,
+            // su propio PS de salida permanece apagado.
+            _salida.Stop();
+        }
+        else
         {
             OnPlayerStepped?.Invoke(false);
             _entrada.Stop();
             TargetPlatform._salida.Stop();
         }
-    }
-
-    private void OnTriggerStay(Collider coll)
-    {
-        if (coll.TryGetComponent(out PlayerNodeHandler player))
-            _salida.Stop();
     }
 }

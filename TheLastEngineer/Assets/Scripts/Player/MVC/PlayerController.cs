@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     [SerializeField] private ParticleSystem _walkPS, _orbitPS, _defaultPS, _corruptedPS, _teleportPS;
     [SerializeField] private AudioSource _walkSource, _fxSource;
     [SerializeField] private FollowController _followController;
+    [SerializeField] private PlayerInteractionDetector _interactionDetector;
     
     [Header("Debug")]
     [SerializeField] private bool debug = false;
@@ -42,10 +43,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public PlayerStateMachine StateMachine { get; private set; }
     
     private InputHandler _input;
-    private GlitcheableDetector _glitcheableDetector;
     private PlayerNodeHandler _nodeHandler;
     private CinemachineImpulseSource _impulse;
     private InteractableHandler _interactableHandler;
+    private LineOfSightChecker _obstruction;
 
     private Vector2 _move = Vector2.zero;
     private float _currentSpeed;
@@ -57,6 +58,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public bool IsDead { get { return _isDead; } }
     public Vector3 TeleportPos {  get { return _teleportPos; } }
+    public PlayerNodeHandler NodeHandler => _nodeHandler;
     #endregion
 
     private void Awake()
@@ -68,10 +70,14 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _animator = GetComponent<Animator>();
         
         _input = GetComponent<InputHandler>();
-        _glitcheableDetector = new GlitcheableDetector(10f, _playerData.glitchDetectionLayer);
         _nodeHandler = GetComponent<PlayerNodeHandler>();
         _impulse = GetComponent<CinemachineImpulseSource>();
-        _interactableHandler = new InteractableHandler();
+
+        _obstruction = new LineOfSightChecker(_playerData.wallMask);
+        _interactableHandler = new InteractableHandler(_obstruction);
+
+        if (_interactionDetector != null)
+            _interactionDetector.Initialize(_interactableHandler, this, _playerData.interactionRadius);
 
         _model = new PlayerModel(CC, transform, _playerData, _collider);
         View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
@@ -247,7 +253,18 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void DropNode() => _nodeHandler.Release(true);
     public float GetHoldInteractionTime() => _playerData.holdInteractionTime;
     public void AddInteractable(IInteractable interactable) => _interactableHandler.Add(interactable);
-    public void RemoveInteractable(IInteractable interactable) => _interactableHandler.Remove(interactable);
+
+    // Delega en el detector: es el único que puede sacar el interactuable de la lista Y del set
+    // de colliders solapados a la vez. Sacarlo solo del handler lo deja imposible de re-registrar.
+    public void RemoveInteractable(IInteractable interactable)
+    {
+        if (_interactionDetector != null) _interactionDetector.Forget(interactable);
+        else _interactableHandler.Remove(interactable);
+    }
+
+    // Re-anuncia un interactuable que se movió o reactivó su collider dentro del radio.
+    public void RescanInteractable(IInteractable interactable, Collider coll)
+        => _interactionDetector?.Rescan(interactable, coll);
     public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
     public void SetTeleport(Vector3 targetPos) => _teleportPos = targetPos;
     public void GetClosestGlitcheable()
@@ -351,6 +368,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _isDead = true;
         OnDied?.Invoke();
         _interactableHandler.Clear();
+        // Sin esto el set de solapados queda con entradas fantasma y cualquier interactuable que
+        // siga dentro del radio al reaparecer no vuelve a entrar a la lista nunca.
+        if (_interactionDetector != null) _interactionDetector.ResetTracking();
 
         if (cause == CauseOfDeath.Laser)
             View.DeathSound();
@@ -386,16 +406,33 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     #region TRIGGERS MANAGEMENT
     private void OnTriggerEnter(Collider coll)
     {
-        if (coll.TryGetComponent(out IInteractable interactable))
-            _interactableHandler.Add(interactable);
-        else if (coll.CompareTag("Void") && !_isDead)
+        // El registro de interactuables lo maneja PlayerInteractionDetector (trigger fijo del jugador).
+        if (coll.CompareTag("Void") && !_isDead)
             StartCoroutine(RespawnPlayer(CauseOfDeath.Fall));
     }
+    #endregion
 
-    private void OnTriggerExit(Collider coll)
+    #region DEBUG GIZMOS
+    // Dibuja una línea desde el jugador hasta cada interactuable registrado en la lista.
+    // Verde = línea de visión despejada; rojo = bloqueada. Usa el MISMO IObstructionChecker que
+    // el gate de selección, así el gizmo no puede mentir respecto de lo que pasa en runtime.
+    private void OnDrawGizmos()
     {
-        if (coll.TryGetComponent(out IInteractable interactable))
-            _interactableHandler.Remove(interactable);
+        if (!debug || _interactableHandler == null || _obstruction == null) return;
+
+        Vector3 offset = Vector3.up * _obstruction.HeightOffset;
+        Vector3 origin = transform.position + offset;
+
+        foreach (var interactable in _interactableHandler.Interactables)
+        {
+            if (interactable == null) continue;
+
+            Vector3 target = interactable.Transform.position + offset;
+
+            Gizmos.color = _obstruction.IsObstructed(transform.position, interactable.Transform) ? Color.red : Color.green;
+            Gizmos.DrawLine(origin, target);
+            Gizmos.DrawWireSphere(target, 0.15f);
+        }
     }
     #endregion
 }

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Connection : MonoBehaviour, IInteractable, IConnectable
+public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximityListener
 {
     #region -----INTERFACE VARIABLES-----
     public InteractablePriority Priority => InteractablePriority.Medium;
@@ -41,7 +41,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
     private void Start()
     {
         //_particleNode.SetActive(true);
-        _renderer = GetComponent<Renderer>();
+        _renderer = GetComponentInParent<Renderer>();
         _renderer.material.SetColor("_EmissiveColor", _emissionOff);
         OnInitialized?.Invoke();
 
@@ -120,15 +120,16 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable
         //_particleNode.SetActive(true);
     }
 
-    private void OnTriggerEnter(Collider coll)
+    public void OnPlayerProximity(bool inRange, PlayerController player)
     {
-        if (coll.TryGetComponent(out PlayerNodeHandler player) && player.CurrentType == _requiredType && !IsConnected)
-            OnAvailableToConnect?.Invoke(true);
-    }
-
-    private void OnTriggerExit(Collider coll)
-    {
-        if (coll.TryGetComponent(out PlayerNodeHandler player))
+        if (inRange)
+        {
+            if (player.NodeHandler.CurrentType == _requiredType && !IsConnected)
+                OnAvailableToConnect?.Invoke(true);
+        }
+        else
+        {
             OnAvailableToConnect?.Invoke(false);
+        }
     }
 }

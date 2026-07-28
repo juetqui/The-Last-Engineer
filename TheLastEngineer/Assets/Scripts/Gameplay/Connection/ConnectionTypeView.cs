@@ -3,6 +3,7 @@ using PrimeTween;
 
 public class ConnectionTypeView : MonoBehaviour
 {
+    [SerializeField] private Connection _connection;
     [SerializeField] private Ease _tweenType = Ease.InOutSine;
 
     [ColorUsageAttribute(true, true)]
@@ -15,14 +16,12 @@ public class ConnectionTypeView : MonoBehaviour
     [SerializeField] private Color _emissionOff;
 
     private Renderer _renderer = default;
-    private Connection _connection = default;
     private Color _emissionOn = default;
     public bool _keepOn;
 
     void Start()
     {
         _renderer = GetComponent<Renderer>();
-        _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += SetCorrectNode;
 
         _emissionOn = _connection.RequiredType == NodeType.Default ? _emissionDefault : _emissionCorrupted;

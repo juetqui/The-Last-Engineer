@@ -203,6 +203,7 @@ public class LaserController : MonoBehaviour
         _idleSetupDone = false;
         _model.ClearReceptor();
         _model.SetLaserLength(0f);
+        _view.StopAudio();
     }
 
     private Vector3 GetLaserOrigin()

@@ -1,5 +1,94 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &436496198614800949
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1592907430173523846}
+  - component: {fileID: 6308341155757523374}
+  - component: {fileID: 7399522104628882926}
+  - component: {fileID: 7591631190372742042}
+  m_Layer: 0
+  m_Name: Connection
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1592907430173523846
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436496198614800949}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.5, y: 0.5, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 4334285154860852007}
+  m_Father: {fileID: 1750193380023825211}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &6308341155757523374
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436496198614800949}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 0.5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7399522104628882926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436496198614800949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8f7e72f036de01469f20c79a1e49909, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TubeLightController
+  _autoReverseOnComplete: 1
+  _tubes: []
+--- !u!114 &7591631190372742042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436496198614800949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a05b33e82272fad468dcaf23f9564e04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _recievedNode: {fileID: 0}
+  _nodePos: {fileID: 4334285154860852007}
+  _requiredType: 1
+  _emissionOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  _emissionCorrect: {r: 0.07075471, g: 1, b: 0.07597906, a: 1}
+  _emissionIncorrect: {r: 4, g: 0.05660367, b: 0.05660367, a: 1}
+  connectDelay: 2
 --- !u!1 &2595225480019416360
 GameObject:
   m_ObjectHideFlags: 0
@@ -12,10 +101,7 @@ GameObject:
   - component: {fileID: 3760866874267380484}
   - component: {fileID: 6872397026299092692}
   - component: {fileID: 3084647553427187021}
-  - component: {fileID: 7923774426586722575}
-  - component: {fileID: 3882261973168733966}
-  - component: {fileID: 4735625068119971840}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall_Connection
   m_TagString: Connection
   m_Icon: {fileID: 0}
@@ -35,7 +121,7 @@ Transform:
   m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 4334285154860852007}
+  - {fileID: 1592907430173523846}
   - {fileID: 1560736033011310171}
   - {fileID: 3237607625301222437}
   - {fileID: 2222598715604863783}
@@ -120,62 +206,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.0000012, y: 1, z: 0.60628414}
-  m_Center: {x: -0.5000006, y: 0.5, z: -0.19686157}
---- !u!65 &7923774426586722575
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2595225480019416360}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3309641, y: 0.91652954, z: 1.5397482}
-  m_Center: {x: -0.511913, y: 0.63453114, z: 0.4469202}
---- !u!114 &3882261973168733966
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2595225480019416360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a05b33e82272fad468dcaf23f9564e04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _recievedNode: {fileID: 0}
-  _nodePos: {fileID: 4334285154860852007}
-  _requiredType: 1
-  _emissionOff: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  _emissionCorrect: {r: 0.07075471, g: 1, b: 0.07597906, a: 1}
-  _emissionIncorrect: {r: 4, g: 0.05660367, b: 0.05660367, a: 1}
-  connectDelay: 2
---- !u!114 &4735625068119971840
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2595225480019416360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8f7e72f036de01469f20c79a1e49909, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TubeLightController
-  _autoReverseOnComplete: 1
-  _tubes: []
+  m_Size: {x: 1.0000012, y: 1, z: 0.5}
+  m_Center: {x: -0.5000006, y: 0.5, z: -0.25}
 --- !u!1 &3382407700807647050
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,6 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9753aadfb8088244ca14cf7599907d10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _connection: {fileID: 7591631190372742042}
   _tweenType: 16
   _lightDefault: {r: 0.34509805, g: 0.8431373, b: 0.9058824, a: 1}
   _lightCorrupted: {r: 0.7372549, g: 0.0627451, b: 0.7490196, a: 1}
@@ -333,7 +366,7 @@ GameObject:
   - component: {fileID: 2618992845097769189}
   - component: {fileID: 1864759517374181160}
   - component: {fileID: 8768464024608347805}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -424,6 +457,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8f5fcb793f9dfa488139d06d08afa33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _connection: {fileID: 7591631190372742042}
   _tweenType: 16
   _emissionDefault: {r: 0, g: 0.9098039, b: 2.9960785, a: 1}
   _emissionCorrupted: {r: 2.5411766, g: 0.5019608, b: 5.992157, a: 1}
@@ -441,7 +475,7 @@ GameObject:
   - component: {fileID: 639845433922370264}
   - component: {fileID: 6541010078576690243}
   - component: {fileID: 4909628616095903017}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Shader_Efecto
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -532,6 +566,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e58ab5d3b463f74a81fe6e52ebfeb22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ParedFillConnection
+  _connection: {fileID: 7591631190372742042}
   duration: 1.2
 --- !u!1 &5845743357459041662
 GameObject:
@@ -557,12 +592,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5845743357459041662}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5, y: 0.5242, z: 0.0841}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1750193380023825211}
+  m_Father: {fileID: 1592907430173523846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5887017323745635751
 GameObject:
@@ -609,6 +644,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce7a27e1fe8c5b4da22dcd3b102648f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _connection: {fileID: 7591631190372742042}
 --- !u!1001 &2395883195868505947
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1025,6 +1061,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20669df7ab17d4e429e59c5ec35248e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _connection: {fileID: 7591631190372742042}
   _defaultColor: {r: 0.10980392, g: 0.7372549, b: 0.8666667, a: 0.6392157}
   _corruptedColor: {r: 0.5882353, g: 0.047058824, b: 0.77254903, a: 0.61960787}
 --- !u!1001 &6428651680225123517

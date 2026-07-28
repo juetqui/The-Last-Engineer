@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class ParedFillConnection : MonoBehaviour
 {
+    [SerializeField] private Connection _connection;
     [SerializeField] private float duration = 1.2f;
 
-    private Connection _connection = default;
+    // private Connection _connection = default;
     private CancellationTokenSource _cancelSource = default;
     private Renderer _renderer = default;
 
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();
-        _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += CheckConnectedNode;
 
         int isCorrupted = _connection.RequiredType == NodeType.Corrupted ? 1 : 0;

@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class ConnectionNegativeFeedback : MonoBehaviour
 {
+    [SerializeField] private Connection _connection;
+
     private List<ParticleSystem> _errorPS = new List<ParticleSystem>();
-    private Connection _connection;
 
     private void Start()
     {
         _errorPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
-        _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += playPS;
     }
 

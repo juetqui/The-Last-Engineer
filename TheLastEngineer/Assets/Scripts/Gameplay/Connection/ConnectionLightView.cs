@@ -3,13 +3,13 @@ using PrimeTween;
 
 public class ConnectionLightView : MonoBehaviour
 {
+    [SerializeField] private Connection _connection;
     [SerializeField] private Ease _tweenType = Ease.InOutSine;
 
     [SerializeField] private Color _lightDefault;
     [SerializeField] private Color _lightCorrupted;
     [SerializeField] private Color _lightOff;
     private Light _light = default;
-    private Connection _connection = default;
     private Color _lightOn = default;
     public bool _keepOn;
 
@@ -20,7 +20,6 @@ public class ConnectionLightView : MonoBehaviour
     void Start()
     {
         _light = GetComponent<Light>();
-        _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += SetCorrectNode;
 
         _lightOn = _connection.RequiredType == NodeType.Default ? _lightDefault : _lightCorrupted;

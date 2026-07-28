@@ -110,7 +110,7 @@ public class NodeView
     #region FX Helpers
     private void RefreshFX()
     {
-        // Encender FX solo si está en rango y el nodo está Corrupted
+        // Encender FX solo si estï¿½ en rango y el nodo estï¿½ Corrupted
         bool shouldPlay = _isNear && _currentType == NodeType.Corrupted;
 
         if (shouldPlay)

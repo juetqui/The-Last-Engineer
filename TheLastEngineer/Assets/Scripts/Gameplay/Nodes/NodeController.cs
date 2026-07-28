@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class NodeController : MonoBehaviour, IInteractable
+public class NodeController : MonoBehaviour, IInteractable, IProximityListener
 {
     #region INTERFACE VARIABLES
     public InteractablePriority Priority => InteractablePriority.High;
@@ -17,7 +17,7 @@ public class NodeController : MonoBehaviour, IInteractable
     #region VIEW
     [Header("VIEW")]
     private NodeView _nodeView = default;
-    private BoxCollider _collider = default;
+    private Collider _collider = default;
     private Renderer _renderer = default;
     private Animator _animator = default;
     private ParticleSystem[] _particles = new ParticleSystem[2];
@@ -36,20 +36,18 @@ public class NodeController : MonoBehaviour, IInteractable
     private PlayerNodeHandler _playerNodeHandler = null;
     private Transform _target = default;
     private IConnectable _connectable = default;
-    private Vector3 _resetPos = Vector3.zero;
     private bool _isChildren = false;
 
     public Action<bool> OnEnableOutline = delegate { };
 
     protected void Awake()
     {
-        _collider = GetComponent<BoxCollider>();
+        _collider = GetComponent<Collider>();
         _renderer = GetComponentInChildren<Renderer>();
         _animator = GetComponent<Animator>();
         _outline = GetComponentInChildren<Outline>();
         _particles = GetComponentsInChildren<ParticleSystem>();
         _originalShader = _renderer.material.shader;
-        _resetPos = transform.position;
 
         _currentColor = _nodeType == NodeType.Default ? _defaultColor : _corruptionColor;
 
@@ -66,8 +64,9 @@ public class NodeController : MonoBehaviour, IInteractable
 
     protected void Update()
     {
-        if (!_isChildren) _nodeView.EnableColl(true);
-        else _nodeView.SetCollectedAnim();
+        // El estado del collider lo fija Attach() en sus dos ramas; forzarlo por frame acá
+        // impedía que cualquier otro sistema lo desactivara temporalmente.
+        if (_isChildren) _nodeView.SetCollectedAnim();
     }
     
     public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler != null && !playerNodeHandler.HasNode;
@@ -127,6 +126,12 @@ public class NodeController : MonoBehaviour, IInteractable
             _nodeModel.SetPos(newPos, NodeType, newParent);
         else if (newParent == null && newScale == default)
             _nodeModel.SetPos(newPos, NodeType);
+
+        // Al soltarse, el collider se reactiva DENTRO del trigger del jugador. Que PhysX vuelva
+        // a emitir OnTriggerEnter en ese caso es el único eslabón del ciclo soltar -> levantar,
+        // y con autoSyncTransforms desactivado no conviene depender de él: nos re-anunciamos.
+        if (!parentIsPlayer && PlayerController.Instance != null)
+            PlayerController.Instance.RescanInteractable(this, _collider);
     }
     
     private void InteractWithGlitcheable(Glitcheable glitcheable)
@@ -145,22 +150,17 @@ public class NodeController : MonoBehaviour, IInteractable
         OnUpdatedNodeType?.Invoke(_nodeType);
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void OnPlayerProximity(bool inRange, PlayerController player)
     {
-        if (other.gameObject.TryGetComponent(out PlayerController player))
+        if (inRange)
         {
             if (_target == null) _target = player.transform;
 
             _nodeView.SetRangeAnim();
         }
-        else if (other.CompareTag("Void")) _nodeModel.ResetPos(_resetPos);
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.TryGetComponent(out PlayerController player))
+        else
         {
-            if (_target != null) _target = null;      
+            _target = null;
 
             _nodeView.SetIdleAnim();
         }
