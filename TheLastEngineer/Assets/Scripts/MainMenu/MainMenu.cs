@@ -38,16 +38,8 @@ public class MainMenu : MonoBehaviour
     public IEnumerator ButtonEnablerRoutine(Button button)
     {
         yield return new WaitForSeconds(_duration*1.01f);
-
-        if (button.interactable == true)
-        {
-            button.interactable = false;
-        }
-        else
-        {
-            button.interactable = true;
-
-        }
+        
+        button.interactable = !button.interactable;
     }
     public void MoveToPosAndFade(Transform newPos)
     {

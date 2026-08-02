@@ -49,6 +49,13 @@ public class InteractableHandler
 
     public bool HasLineOfSight(IInteractable it) => it != null && !_blocked.Contains(it);
 
+    /// <summary>
+    /// ¿Se lo puede seguir eligiendo? Suma a la línea de visión el seguir en la lista: el detector
+    /// da de baja lo que se va del radio aunque PhysX no haya emitido el OnTriggerExit (el
+    /// Glitcheable apaga sus colliders y se mueve, y ese evento nunca llega).
+    /// </summary>
+    public bool IsSelectable(IInteractable it) => HasLineOfSight(it) && _interactables.Contains(it);
+
     public IInteractable GetInteractable(PlayerNodeHandler nodeHandler, Vector3 playerPos)
     {
         if (_interactables.Count <= 0) return null;

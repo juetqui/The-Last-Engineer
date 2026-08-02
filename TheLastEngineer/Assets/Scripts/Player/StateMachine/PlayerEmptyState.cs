@@ -77,9 +77,10 @@ public class PlayerEmptyState : IPlayerState
     {
         if (!_holding || _target == null) return;
 
-        // Si aparece una pared en el medio del hold, se corta como si el jugador soltara el botón:
-        // el LOS se recalcula por frame, así que la interacción nunca se completa a través de ella.
-        if (!_player.HasLineOfSight(_target))
+        // Si aparece una pared en el medio del hold, o el objetivo se va del radio, se corta como
+        // si el jugador soltara el botón: ambos estados se recalculan por frame, así que la
+        // interacción nunca se completa a través de una pared ni sobre algo que ya no está.
+        if (!_player.IsInteractableAvailable(_target))
         {
             Cancel();
             return;

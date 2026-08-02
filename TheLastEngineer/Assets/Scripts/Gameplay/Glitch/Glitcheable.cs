@@ -214,6 +214,12 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     public void SetColliders(bool enable)
     {
         _coll.enabled = enable;
+
+        // Mismo motivo que en NodeController.Attach: el collider se apaga y se vuelve a prender
+        // (acá además el objeto se mueve y cambia de layer en el medio), y ninguno de esos casos
+        // garantiza que PhysX emita OnTriggerEnter/Exit. Nos re-anunciamos al detector del jugador.
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.RescanInteractable(this, _coll);
     }
 
     public void AdvanceToNextNode()

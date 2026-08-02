@@ -13,9 +13,15 @@ using UnityEngine;
 /// interactuable del handler por su cuenta, el interactuable queda con colliders contados pero
 /// fuera de la lista y no se lo puede volver a seleccionar nunca.
 ///
+/// Los eventos de PhysX se usan para DESCUBRIR interactuables, no como fuente de verdad: hay
+/// varias formas de dejar de solapar sin que se emita OnTriggerExit (apagar el collider, cambiar
+/// de layer, teletransportarse con autoSyncTransforms desactivado), y el ciclo del Glitcheable
+/// hace las tres. Por eso el barrido de Update revalida cada entrada contra el estado real de sus
+/// colliders en lugar de esperar el evento de salida.
+///
 /// También es el dueño del chequeo de línea de visión: lo evalúa por frame para todo lo que está
 /// solapado y publica el resultado en el handler. El estado efectivo de un interactuable es
-/// "solapado Y visible", y es ese estado (no el solapamiento crudo) el que se notifica como
+/// "presente Y visible", y es ese estado (no el solapamiento crudo) el que se notifica como
 /// proximidad, así el feedback del objeto nunca contradice lo que el botón puede hacer.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
@@ -23,16 +29,30 @@ using UnityEngine;
 public class PlayerInteractionDetector : MonoBehaviour
 {
     /// <summary>
-    /// Estado por interactuable solapado. Un mismo interactuable puede tener varios colliders
+    /// Estado por interactuable detectado. Un mismo interactuable puede tener varios colliders
     /// sólidos: guardamos el set en vez de un contador para que las altas sean idempotentes y
     /// Rescan no pueda inflar el conteo.
+    ///
+    /// Registered distingue "lo tenemos fichado" de "está en la lista de interactuables". Una
+    /// entrada puede quedar fichada pero sin registrar (dormida) cuando el objeto apaga sus
+    /// colliders: así conservamos las referencias para volver a registrarlo si reaparece dentro
+    /// del radio, sin depender de que PhysX emita un enter nuevo.
     /// </summary>
     private class Tracked
     {
         public readonly HashSet<Collider> Colliders = new();
+        public bool Registered;
         public bool Visible;
         public float PendingTime;
     }
+
+    // El barrido tiene que ser MÁS permisivo que PhysX: si diéramos de baja algo que PhysX todavía
+    // considera solapado, no llegaría ningún enter nuevo y el interactuable quedaría perdido hasta
+    // salir y volver a entrar. Por eso el test de rango usa el AABB (más grande que la geometría
+    // real) y encima un margen.
+    private const float RangeTolerance = 1.1f;
+
+    private static readonly System.Predicate<Collider> IsMissing = coll => coll == null;
 
     private InteractableHandler _handler;
     private PlayerController _player;
@@ -45,10 +65,11 @@ public class PlayerInteractionDetector : MonoBehaviour
 
     private readonly Dictionary<IInteractable, Tracked> _overlaps = new();
 
-    // Buffers reutilizados por el barrido: las notificaciones se despachan DESPUÉS de recorrer el
-    // diccionario porque un listener puede terminar llamando a Forget y mutar la colección.
-    private readonly List<IInteractable> _stale = new();
+    // Buffers reutilizados por el barrido: las bajas y las notificaciones se aplican DESPUÉS de
+    // recorrer el diccionario porque un listener puede terminar llamando a Forget y mutar la colección.
+    private readonly List<IInteractable> _dropped = new();
     private readonly List<(IInteractable interactable, bool visible)> _transitions = new();
+    private bool _dispatching;
 
     public float Radius
     {
@@ -62,6 +83,8 @@ public class PlayerInteractionDetector : MonoBehaviour
             return _sphere.radius * maxScale;
         }
     }
+
+    private Vector3 Center => _sphere == null ? transform.position : transform.TransformPoint(_sphere.center);
 
     private void Awake()
     {
@@ -83,9 +106,10 @@ public class PlayerInteractionDetector : MonoBehaviour
     }
 
     /// <summary>
-    /// Barrido de línea de visión. Corre por frame (o cada checkInterval) sobre lo que está
-    /// solapado, así el estado "tapado por una pared" se marca en el momento en que la pared se
-    /// cruza y no recién cuando el jugador aprieta el botón.
+    /// Barrido por frame (o cada checkInterval). Hace dos cosas sobre lo que tenemos fichado:
+    /// revalida la presencia real contra el estado de los colliders, y recalcula la línea de
+    /// visión, así "tapado por una pared" se marca en el momento en que la pared se cruza y no
+    /// recién cuando el jugador aprieta el botón.
     /// </summary>
     private void Update()
     {
@@ -99,19 +123,41 @@ public class PlayerInteractionDetector : MonoBehaviour
 
         if (_overlaps.Count == 0) return;
 
-        Vector3 origin = _player != null ? _player.transform.position : transform.position;
+        Vector3 center = Center;
+        Vector3 origin = _player != null ? _player.transform.position : center;
 
         foreach (var pair in _overlaps)
         {
             var interactable = pair.Key;
+            var tracked = pair.Value;
 
             if (IsDestroyed(interactable))
             {
-                _stale.Add(interactable);
+                _dropped.Add(interactable);
                 continue;
             }
 
-            var tracked = pair.Value;
+            bool present = IsPresent(tracked, center, out bool hasLiveCollider);
+
+            if (!present)
+            {
+                if (tracked.Registered) Unregister(interactable, tracked);
+
+                // Sin colliders vivos el objeto está dormido (el Glitcheable apaga los suyos
+                // mientras se desintegra y se mueve): mantenemos la ficha para poder darlo de alta
+                // solo si vuelve dentro del radio. Si ya tiene colliders vivos y aun así no está
+                // presente, se fue de verdad.
+                if (hasLiveCollider || tracked.Colliders.Count == 0) _dropped.Add(interactable);
+
+                continue;
+            }
+
+            if (!tracked.Registered)
+            {
+                Register(interactable, tracked, origin);
+                continue;
+            }
+
             bool visible = !IsObstructed(origin, interactable, tracked);
 
             if (visible == tracked.Visible)
@@ -133,18 +179,12 @@ public class PlayerInteractionDetector : MonoBehaviour
             _transitions.Add((interactable, visible));
         }
 
-        foreach (var interactable in _stale)
-        {
+        foreach (var interactable in _dropped)
             _overlaps.Remove(interactable);
-            _handler.Remove(interactable);
-        }
 
-        _stale.Clear();
+        _dropped.Clear();
 
-        foreach (var (interactable, visible) in _transitions)
-            (interactable as IProximityListener)?.OnPlayerProximity(visible, _player);
-
-        _transitions.Clear();
+        Dispatch();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -173,11 +213,15 @@ public class PlayerInteractionDetector : MonoBehaviour
     {
         if (_handler == null || interactable == null || coll == null) return;
 
-        bool inRange = coll.enabled
-            && coll.gameObject.activeInHierarchy
-            && (coll.transform.position - transform.position).sqrMagnitude <= Radius * Radius;
+        // Mismo criterio de presencia que el barrido, para que las dos vías no se contradigan y
+        // un objeto que reactiva su collider lejos del jugador no dé de alta por un frame.
+        float limit = Radius * RangeTolerance;
 
-        if (inRange) Track(interactable, coll);
+        bool present = coll.enabled
+            && coll.gameObject.activeInHierarchy
+            && coll.bounds.SqrDistance(Center) <= limit * limit;
+
+        if (present) Track(interactable, coll);
         else Untrack(interactable, coll);
     }
 
@@ -190,12 +234,14 @@ public class PlayerInteractionDetector : MonoBehaviour
     {
         if (interactable == null) return;
 
-        bool wasVisible = _overlaps.TryGetValue(interactable, out var tracked) && tracked.Visible;
+        if (_overlaps.TryGetValue(interactable, out var tracked))
+        {
+            _overlaps.Remove(interactable);
+            Unregister(interactable, tracked);
+        }
+        else _handler?.Remove(interactable);
 
-        _overlaps.Remove(interactable);
-        _handler?.Remove(interactable);
-
-        if (wasVisible) (interactable as IProximityListener)?.OnPlayerProximity(false, _player);
+        Dispatch();
     }
 
     /// <summary>
@@ -205,28 +251,21 @@ public class PlayerInteractionDetector : MonoBehaviour
     /// </summary>
     public void ResetTracking()
     {
-        // Se vacía el set ANTES de notificar: un listener puede terminar llamando a Forget y
-        // mutar el diccionario en medio del recorrido.
         foreach (var pair in _overlaps)
         {
-            if (pair.Value.Visible && !IsDestroyed(pair.Key)) _stale.Add(pair.Key);
+            if (pair.Value.Visible && !IsDestroyed(pair.Key)) _transitions.Add((pair.Key, false));
         }
 
         _overlaps.Clear();
 
-        foreach (var interactable in _stale)
-            (interactable as IProximityListener)?.OnPlayerProximity(false, _player);
-
-        _stale.Clear();
+        Dispatch();
     }
 
     private void Track(IInteractable interactable, Collider coll)
     {
         if (_handler == null) return;
 
-        bool isNew = !_overlaps.TryGetValue(interactable, out var tracked);
-
-        if (isNew)
+        if (!_overlaps.TryGetValue(interactable, out var tracked))
         {
             tracked = new Tracked();
             _overlaps[interactable] = tracked;
@@ -234,24 +273,17 @@ public class PlayerInteractionDetector : MonoBehaviour
 
         tracked.Colliders.Add(coll);
 
-        // Add ya chequea duplicados, así que llamarlo siempre sirve de red de seguridad ante
-        // cualquier desincronización previa entre el set y la lista.
-        _handler.Add(interactable);
+        if (tracked.Registered)
+        {
+            // Add ya chequea duplicados, así que llamarlo igual sirve de red de seguridad ante
+            // cualquier desincronización previa entre el set y la lista.
+            _handler.Add(interactable);
+            return;
+        }
 
-        if (!isNew) return;
+        Register(interactable, tracked, _player != null ? _player.transform.position : Center);
 
-        // Evaluamos el LOS en el alta en vez de asumir visible: si el objeto entra al radio ya
-        // tapado, queda registrado pero bloqueado y no dispara feedback que el jugador no puede usar.
-        Vector3 origin = _player != null ? _player.transform.position : transform.position;
-
-        tracked.Visible = !IsObstructed(origin, interactable, tracked);
-        tracked.PendingTime = 0f;
-
-        _handler.SetLineOfSight(interactable, tracked.Visible);
-
-        // La notificación solo en la transición fuera -> dentro: hay interactuables que
-        // reaccionan con feedback no idempotente (PlatformTeleport reinicia su ParticleSystem).
-        if (tracked.Visible) (interactable as IProximityListener)?.OnPlayerProximity(true, _player);
+        Dispatch();
     }
 
     private void Untrack(IInteractable interactable, Collider coll)
@@ -263,11 +295,93 @@ public class PlayerInteractionDetector : MonoBehaviour
         if (tracked.Colliders.Count > 0) return;
 
         _overlaps.Remove(interactable);
+        Unregister(interactable, tracked);
+
+        Dispatch();
+    }
+
+    /// <summary>
+    /// Alta en la lista de interactuables. El LOS se evalúa en el momento en vez de asumir
+    /// visible: si el objeto aparece dentro del radio ya tapado, queda registrado pero bloqueado
+    /// y no dispara feedback que el jugador no puede usar.
+    /// </summary>
+    private void Register(IInteractable interactable, Tracked tracked, Vector3 origin)
+    {
+        tracked.Registered = true;
+        tracked.PendingTime = 0f;
+        tracked.Visible = !IsObstructed(origin, interactable, tracked);
+
+        _handler.Add(interactable);
+        _handler.SetLineOfSight(interactable, tracked.Visible);
+
+        // La notificación solo en la transición fuera -> dentro: hay interactuables que
+        // reaccionan con feedback no idempotente (PlatformTeleport reinicia su ParticleSystem).
+        if (tracked.Visible) _transitions.Add((interactable, true));
+    }
+
+    private void Unregister(IInteractable interactable, Tracked tracked)
+    {
+        bool wasVisible = tracked.Visible;
+
+        tracked.Registered = false;
+        tracked.Visible = false;
+        tracked.PendingTime = 0f;
+
         _handler.Remove(interactable);
 
         // Si ya estaba tapado, su feedback está apagado desde que se cruzó la pared: avisar de
         // nuevo dispararía un apagado duplicado.
-        if (tracked.Visible) (interactable as IProximityListener)?.OnPlayerProximity(false, _player);
+        if (wasVisible) _transitions.Add((interactable, false));
+    }
+
+    /// <summary>
+    /// Notifica las transiciones acumuladas. El guard de reentrada es necesario porque un listener
+    /// puede llamar a Forget, que a su vez encola y despacha: sin el guard esa llamada anidada
+    /// volvería a recorrer las transiciones que el ciclo de afuera todavía no terminó de emitir.
+    /// El ciclo relee Count en cada vuelta, así que lo que se encole durante el despacho sale igual.
+    /// </summary>
+    private void Dispatch()
+    {
+        if (_dispatching || _transitions.Count == 0) return;
+
+        _dispatching = true;
+
+        for (int i = 0; i < _transitions.Count; i++)
+        {
+            var (interactable, visible) = _transitions[i];
+
+            if (!IsDestroyed(interactable))
+                (interactable as IProximityListener)?.OnPlayerProximity(visible, _player);
+        }
+
+        _transitions.Clear();
+        _dispatching = false;
+    }
+
+    /// <summary>
+    /// ¿El interactuable sigue realmente dentro del radio? Se apoya en el AABB de sus colliders
+    /// vivos y no en la posición del transform: un glitcheable grande puede tener el pivote lejos
+    /// y la superficie al lado del jugador.
+    /// </summary>
+    private bool IsPresent(Tracked tracked, Vector3 center, out bool hasLiveCollider)
+    {
+        hasLiveCollider = false;
+
+        tracked.Colliders.RemoveWhere(IsMissing);
+
+        float limit = Radius * RangeTolerance;
+        float sqrLimit = limit * limit;
+
+        foreach (var coll in tracked.Colliders)
+        {
+            if (!coll.enabled || !coll.gameObject.activeInHierarchy) continue;
+
+            hasLiveCollider = true;
+
+            if (coll.bounds.SqrDistance(center) <= sqrLimit) return true;
+        }
+
+        return false;
     }
 
     private bool IsObstructed(Vector3 origin, IInteractable interactable, Tracked tracked)

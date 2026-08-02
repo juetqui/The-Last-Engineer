@@ -1,5 +1,39 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6568160298176059604
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 558a8e2b6826cf840aae193990ba9f2e, type: 3}
+  m_Name: ShadowsMidtonesHighlights
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ShadowsMidtonesHighlights
+  active: 1
+  shadows:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 1, w: -0.06854521}
+  midtones:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 1, w: 0.106626056}
+  highlights:
+    m_OverrideState: 0
+    m_Value: {x: 1, y: 1, z: 1, w: 0}
+  shadowsStart:
+    m_OverrideState: 0
+    m_Value: 0
+  shadowsEnd:
+    m_OverrideState: 0
+    m_Value: 0.3
+  highlightsStart:
+    m_OverrideState: 0
+    m_Value: 0.55
+  highlightsEnd:
+    m_OverrideState: 0
+    m_Value: 1
 --- !u!114 &-1196558709431957020
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -297,11 +331,12 @@ MonoBehaviour:
   m_Name: Camera Profile
   m_EditorClassIdentifier: 
   components:
+  - {fileID: 4568350957131607374}
+  - {fileID: 461136383202084153}
+  - {fileID: -6568160298176059604}
   - {fileID: 8522911254531976132}
   - {fileID: 4551213848365299817}
   - {fileID: -1169091180241870311}
-  - {fileID: 4568350957131607374}
-  - {fileID: 461136383202084153}
   - {fileID: 549662751032356967}
   - {fileID: -738285469809723183}
   - {fileID: 8563785636815764917}
@@ -329,11 +364,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: {r: 0.9716981, g: 0.49914372, b: 0.42626378, a: 1}
   hueShift:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 11
   saturation:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 10
 --- !u!114 &549662751032356967
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -430,13 +465,13 @@ MonoBehaviour:
     m_Value: 0.9
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.3
   scatter:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.243
   clamp:
     m_OverrideState: 0
-    m_Value: 65472
+    m_Value: 0.4
   tint:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}

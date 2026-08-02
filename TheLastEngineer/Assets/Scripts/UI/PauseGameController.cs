@@ -33,7 +33,6 @@ public class PauseGameController : MonoBehaviour
         SetTimescale(_isPaused);
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-
     }
 
     public void ResumeGame()
@@ -73,6 +72,7 @@ public class PauseGameController : MonoBehaviour
             EventSystem.current.SetSelectedGameObject(_resumeBtn);
             _canvasController.EnableButtons();
             InputManager.Instance.UpdateActionMap(ActionMaps.PauseUI);
+            UIButtonsManager.Instance.PlaySoundOpenMenu();
         }
         else
         {

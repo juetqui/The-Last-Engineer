@@ -269,10 +269,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void RescanInteractable(IInteractable interactable, Collider coll)
         => _interactionDetector?.Rescan(interactable, coll);
 
-    // Estado de línea de visión cacheado por el detector. Lo consultan los estados del jugador
-    // para cortar una interacción en curso si aparece una pared en el medio.
-    public bool HasLineOfSight(IInteractable interactable)
-        => _interactableHandler == null || _interactableHandler.HasLineOfSight(interactable);
+    // Estado cacheado por el detector: sigue en rango y con línea de visión despejada. Lo consultan
+    // los estados del jugador para cortar una interacción en curso si aparece una pared en el medio
+    // o si el objetivo se va (el Glitcheable se mueve mientras se lo mantiene apretado).
+    public bool IsInteractableAvailable(IInteractable interactable)
+        => _interactableHandler == null || _interactableHandler.IsSelectable(interactable);
     public void SetPos(Vector3 targetPos) => _model.SetPos(targetPos);
     public void SetTeleport(Vector3 targetPos) => _teleportPos = targetPos;
     public void GetClosestGlitcheable()

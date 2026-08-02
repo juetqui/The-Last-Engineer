@@ -19,7 +19,6 @@ MonoBehaviour:
   fovAngle: 90
   coyoteTime: 0.3
   maxWallDist: 1.5
-  interactionRadius: 5
   wallMask:
     serializedVersion: 2
     m_Bits: 64
@@ -32,6 +31,11 @@ MonoBehaviour:
   teleportLayer:
     serializedVersion: 2
     m_Bits: 16384
+  interactionRadius: 15
+  losCheckInterval: 0
+  losDebounceTime: 0.08
+  losHeightOffset: 2
+  losEndMargin: 0.5
   dashSpeed: 50
   dashDuration: 0.3
   dashCD: 0.5

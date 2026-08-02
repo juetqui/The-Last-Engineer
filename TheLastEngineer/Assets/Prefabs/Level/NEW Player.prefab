@@ -179,7 +179,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 7
+  m_Radius: 15
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1046412467409411600
 MonoBehaviour:
@@ -5251,7 +5251,6 @@ Transform:
   m_Children:
   - {fileID: 2805711796862924767}
   - {fileID: 6800712088207926947}
-  - {fileID: 6139824882188832666}
   - {fileID: 5650326435207353033}
   - {fileID: 6516677645974770416}
   - {fileID: 2962128565666961125}
@@ -5261,6 +5260,7 @@ Transform:
   - {fileID: 3636385493050015316}
   - {fileID: 4162636666471046875}
   - {fileID: 6530098196738332311}
+  - {fileID: 6139824882188832666}
   - {fileID: 6683576638757940908}
   - {fileID: 8554808511021119401}
   m_Father: {fileID: 0}
@@ -21275,7 +21275,7 @@ GameObject:
   - component: {fileID: 8574516957212888696}
   - component: {fileID: 6980368401085771060}
   m_Layer: 8
-  m_Name: Point Light (1)
+  m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21290,7 +21290,7 @@ Transform:
   m_GameObject: {fileID: 4701801257064188555}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21307,8 +21307,8 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 0.7725491, g: 0.46274513, b: 0.3254902, a: 1}
-  m_Intensity: 1
-  m_Range: 10
+  m_Intensity: 5
+  m_Range: 100
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -36681,7 +36681,7 @@ GameObject:
   - component: {fileID: 8706984184455546785}
   - component: {fileID: 5772500219880887145}
   m_Layer: 8
-  m_Name: Point Light
+  m_Name: Spot Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36714,7 +36714,7 @@ Light:
   m_Type: 0
   m_Color: {r: 0.735849, g: 0.5846229, b: 0.38527945, a: 1}
   m_Intensity: 25
-  m_Range: 10
+  m_Range: 100
   m_SpotAngle: 78.88087
   m_InnerSpotAngle: 58.847687
   m_CookieSize2D: {x: 10, y: 10}
