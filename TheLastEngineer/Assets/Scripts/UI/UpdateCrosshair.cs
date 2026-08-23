@@ -1,11 +1,9 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using PrimeTween;
 
-public class UpdateCrosshair : MonoBehaviour
+public class UpdateCrosshair : UpdatePosToTarget
 {
-    [SerializeField] Camera _camera;
     [SerializeField] Image _circleImage;
 
     [SerializeField] private Color defaultColor;
@@ -20,60 +18,55 @@ public class UpdateCrosshair : MonoBehaviour
 
     private Animator _myAnim;
     private Glitcheable _currentTarget;
-   
-    private void Awake()
+
+    protected override void Awake()
     {
+        base.Awake();
+
         _myAnim = GetComponent<Animator>();
         _myAnim.speed = 1f;
-        UpdatePos(null);
+        ResetPos();
     }
 
-    void Start()
+    // El circulo no vive en el mismo objeto que el componente: la base tiene que mover su rect.
+    protected override RectTransform ResolveRectToMove() => _circleImage.rectTransform;
+
+    protected override void OnTargetChanged(IInteractable target)
     {
-        PlayerController.Instance.OnGlitcheableInArea += UpdatePos;
+        _currentTarget = target as Glitcheable;
+
+        _myAnim.SetBool("IsActivated", false);
+        _myAnim.SetBool("HasTarget", _currentTarget != null);
+
+        if (_currentTarget == null || PlayerNodeHandler.Instance.CurrentType == NodeType.None)
+            ResetPos();
     }
 
-    private void Update()
+    protected override void OnPositionUpdated(Vector3 screenPosition)
     {
         if (_currentTarget == null) return;
 
-        var targetPosition = _currentTarget.transform.position;
-        var screenPosition = _camera.WorldToScreenPoint(targetPosition);
-
-        if (screenPosition.z > 0) CompareGlitchWithPlayerNode(_currentTarget, screenPosition);
-        else ResetPos();
+        CompareGlitchWithPlayerNode(_currentTarget);
     }
 
-    private void UpdatePos(Glitcheable glitcheable)
-    {
-        _myAnim.SetBool("IsActivated", false);
-        _myAnim.SetBool("HasTarget", glitcheable != null);
-        _currentTarget = glitcheable;
+    protected override void OnTargetUnavailable() => ResetPos();
 
-        if (glitcheable == null || PlayerNodeHandler.Instance.CurrentType == NodeType.None)
-        {
-            ResetPos();
-            return;
-        }
-    }
-    
     private void ResetPos()
     {
         SetCircleEnabled(false);
         _circleImage.rectTransform.position = Vector3.zero;
-        
+
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", false);
     }
 
-    private void CompareGlitchWithPlayerNode(Glitcheable glitcheable, Vector3 screenPosition)
+    private void CompareGlitchWithPlayerNode(Glitcheable glitcheable)
     {
         var compatible =
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Default && !glitcheable.IsCorrupted);
 
         SetCircleEnabled(!compatible);
-        _circleImage.rectTransform.position = screenPosition;
         _circleImage.color = glitcheable.IsCorrupted ? glitchColor : defaultColor;
     }
 
