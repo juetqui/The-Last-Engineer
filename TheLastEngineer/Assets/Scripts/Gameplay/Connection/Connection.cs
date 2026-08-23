@@ -28,7 +28,6 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
     private Renderer _renderer = default;
     
     private float _timer = 0f;
-    private bool _canConnect = true;
 
     public NodeType RequiredType {  get { return _requiredType; } }
     public bool StartsConnected { get; private set; }
@@ -53,26 +52,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
         else StartsConnected = false;
     }
 
-    private void Update()
-    {
-        UpdateConnectionDelay();
-    }
-
-    private void UpdateConnectionDelay()
-    {
-        if (_canConnect) return;
-
-        if (_timer < connectDelay)
-        {
-            _timer += Time.deltaTime;
-            return;
-        }
-
-        _canConnect = true;
-        _timer = 0f;
-    }
-
-    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.HasNode && _recievedNode == null && _canConnect;
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.HasNode && _recievedNode == null;
 
     public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
@@ -100,7 +80,6 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
         if (_recievedNode.NodeType == _requiredType)
         {
             OnNodeConnected?.Invoke(node.NodeType, true);
-            _canConnect = false;
             _renderer.material.SetColor("_EmissiveColor", _emissionCorrect);
             //_particleNode.SetActive(false);
         }
@@ -114,7 +93,6 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
     public void UnsetNode(NodeController node)
     {
         OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
-        _canConnect = false;
         _renderer.material.SetColor("_EmissiveColor", _emissionOff);
         _recievedNode = null;
         //_particleNode.SetActive(true);

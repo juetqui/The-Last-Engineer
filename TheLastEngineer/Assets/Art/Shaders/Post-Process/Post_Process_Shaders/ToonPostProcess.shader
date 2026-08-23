@@ -47,16 +47,36 @@ Shader "TheLastEngineer/PostProcess/Toon"
             #pragma fragment Frag
             #pragma target 3.5
 
-            // Solo relevante en Deferred con Accurate G-buffer Normals; inofensivo en Forward.
-            #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
-
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            // Aporta: Varyings, Vert, _BlitTexture, _BlitMipLevel, sampler_LinearClamp
+            // Aporta: Varyings, Vert, _BlitTexture, _BlitMipLevel, sampler_LinearClamp, sampler_PointClamp
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
-            // Aporta: _CameraDepthTexture, _CameraDepthTexture_TexelSize, SampleSceneDepth
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
-            // Aporta: _CameraNormalsTexture, SampleSceneNormals (world space en Forward)
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareNormalsTexture.hlsl"
+
+            // ---------------------------------------------------------------
+            // Depth / normals propios (ToonDepthNormalsFeature)
+            //
+            // No se usan _CameraDepthTexture / _CameraNormalsTexture: el prepass de URP corre con
+            // RenderQueueRange.opaque fijo, asi que los transparentes nunca entran ahi y el outline
+            // terminaba calculandose sobre el opaco que esta DETRAS del vidrio, pisandolo.
+            // ToonDepthNormalsFeature rellena estas dos con opacos + transparentes seleccionados.
+            //
+            // Las normales llegan en world space sin codificar: el pass dibuja con los light modes
+            // DepthNormals / DepthNormalsOnly, nunca al G-buffer, asi que no aplica _GBUFFER_NORMALS_OCT.
+            // ---------------------------------------------------------------
+            TEXTURE2D_X_FLOAT(_ToonDepthTexture);
+            float4 _ToonDepthTexture_TexelSize;
+            TEXTURE2D_X_FLOAT(_ToonNormalsTexture);
+
+            float SampleToonDepth(float2 uv)
+            {
+                return SAMPLE_TEXTURE2D_X(_ToonDepthTexture, sampler_PointClamp,
+                                          UnityStereoTransformScreenSpaceTex(uv)).r;
+            }
+
+            float3 SampleToonNormals(float2 uv)
+            {
+                return SAMPLE_TEXTURE2D_X(_ToonNormalsTexture, sampler_PointClamp,
+                                          UnityStereoTransformScreenSpaceTex(uv)).xyz;
+            }
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _OutlineColor;
@@ -93,7 +113,7 @@ Shader "TheLastEngineer/PostProcess/Toon"
             // sobre el skybox no generen infinitos en la resta de Roberts.
             float SampleEyeDepth(float2 uv)
             {
-                float raw = SampleSceneDepth(uv);
+                float raw = SampleToonDepth(uv);
                 return min(LinearEyeDepth(raw, _ZBufferParams), _ProjectionParams.z);
             }
 
@@ -128,7 +148,7 @@ Shader "TheLastEngineer/PostProcess/Toon"
                 float2 uv = input.texcoord.xy;
                 half4 source = SAMPLE_TEXTURE2D_X_LOD(_BlitTexture, sampler_LinearClamp, uv, _BlitMipLevel);
 
-                float rawDepth = SampleSceneDepth(uv);
+                float rawDepth = SampleToonDepth(uv);
 
                 // Skybox / fondo: se devuelve el color original intacto, sin outline ni banding.
                 if (IsBackground(rawDepth))
@@ -139,7 +159,7 @@ Shader "TheLastEngineer/PostProcess/Toon"
                 // (Para Sobel: reemplazar por 8 taps y pesos [1 2 1] en cada eje;
                 //  duplica el costo y suaviza un poco mas las diagonales.)
                 // -----------------------------------------------------------
-                float2 texel = _CameraDepthTexture_TexelSize.xy * _Thickness;
+                float2 texel = _ToonDepthTexture_TexelSize.xy * _Thickness;
 
                 float2 uvTL = uv + float2(-1.0,  1.0) * texel;
                 float2 uvTR = uv + float2( 1.0,  1.0) * texel;
@@ -159,11 +179,11 @@ Shader "TheLastEngineer/PostProcess/Toon"
                 float depthEdge = sqrt(dDiag1 * dDiag1 + dDiag2 * dDiag2) / max(dC, 1e-4);
 
                 // --- Bordes por normales (esquinas internas, quiebres de angulo) ---
-                float3 nC  = SampleSceneNormals(uv);
-                float3 nTL = SampleSceneNormals(uvTL);
-                float3 nTR = SampleSceneNormals(uvTR);
-                float3 nBL = SampleSceneNormals(uvBL);
-                float3 nBR = SampleSceneNormals(uvBR);
+                float3 nC  = SampleToonNormals(uv);
+                float3 nTL = SampleToonNormals(uvTL);
+                float3 nTR = SampleToonNormals(uvTR);
+                float3 nBL = SampleToonNormals(uvBL);
+                float3 nBR = SampleToonNormals(uvBR);
 
                 float3 nDiag1 = nBR - nTL;
                 float3 nDiag2 = nBL - nTR;

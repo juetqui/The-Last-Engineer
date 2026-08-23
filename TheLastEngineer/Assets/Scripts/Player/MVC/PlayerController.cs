@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action<float> OnDissolving;
     public Action OnTeleported;
 
+    public Action<IInteractable> OnInteractableDetected;
+
     // Cinematic Events
     public Action<Transform, LayerMask, bool> OnCinematicSetupRequested; // parent, cinematicLayer, storeCCState
     public Action<LayerMask, bool> OnCinematicRestoreRequested; // defaultLayer, ccWasEnabled
@@ -125,6 +127,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         StateMachine.Tick();
 
         GetClosestGlitcheable();
+        
+        var target = _interactableHandler.GetInteractable(_nodeHandler, transform.position);
+        OnInteractableDetected?.Invoke(target);
     }
 
     private void OnDestroy()
