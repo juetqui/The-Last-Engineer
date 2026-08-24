@@ -31,7 +31,7 @@ public class UIActionController : MonoBehaviour
 
     private void SetUpUI(bool active)
     {
-        _bgImg.enabled = active;
+        // _bgImg.enabled = active;
         inputBtn.gameObject.SetActive(active);
         inputText.gameObject.SetActive(active);
     }

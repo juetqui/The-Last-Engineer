@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using PrimeTween;
 
 public class UpdateCrosshair : UpdatePosToTarget
 {
@@ -8,13 +7,6 @@ public class UpdateCrosshair : UpdatePosToTarget
 
     [SerializeField] private Color defaultColor;
     [SerializeField] private Color glitchColor;
-
-    [Header("Crosshair Scale")]
-    [SerializeField] private float targetMin = 0.01f;
-    [SerializeField] private float targetMax = 1f;
-    [SerializeField] private float easeTime = 0.5f;
-    [SerializeField] private float easeDelay = 0.25f;
-    [SerializeField] private Ease easeType = Ease.OutBack;
 
     private Animator _myAnim;
     private Glitcheable _currentTarget;
@@ -51,10 +43,13 @@ public class UpdateCrosshair : UpdatePosToTarget
 
     protected override void OnTargetUnavailable() => ResetPos();
 
+    // El reset de posicion espera a que la base termine de achicar el circulo: si lo hicieramos al
+    // pedir el ocultado, el circulo saltaria a la esquina de la pantalla mientras se encoge.
+    protected override void OnVisualHidden() => _circleImage.rectTransform.position = Vector3.zero;
+
     private void ResetPos()
     {
-        SetCircleEnabled(false);
-        _circleImage.rectTransform.position = Vector3.zero;
+        SetVisual(false);
 
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", false);
@@ -66,26 +61,8 @@ public class UpdateCrosshair : UpdatePosToTarget
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
             (PlayerNodeHandler.Instance.CurrentType == NodeType.Default && !glitcheable.IsCorrupted);
 
-        SetCircleEnabled(!compatible);
+        SetVisual(!compatible);
         _circleImage.color = glitcheable.IsCorrupted ? glitchColor : defaultColor;
-    }
-
-    private void SetCircleEnabled(bool value)
-    {
-        if (_circleImage.enabled == value) return;
-
-        Tween.StopAll(onTarget: _circleImage.rectTransform);
-
-        if (value)
-        {
-            _circleImage.enabled = true;
-            Tween.Scale(_circleImage.rectTransform, targetMax, easeTime, easeType, 1, CycleMode.Restart, easeDelay);
-        }
-        else
-        {
-            Tween.Scale(_circleImage.rectTransform, targetMin, easeTime, easeType, 1, CycleMode.Restart, easeDelay)
-                .OnComplete(() => _circleImage.enabled = false);
-        }
     }
 
     public void SetUpdateAnim()

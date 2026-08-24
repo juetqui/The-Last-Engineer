@@ -143,14 +143,14 @@ MonoBehaviour:
   _rectToMove: {fileID: 675711464190628816}
   _visual: {fileID: 8331892994490601961}
   _yOffset: 50
+  _minTargetScale: 0
+  _maxTargetScale: 1
+  _scaleDuration: 0.2
+  _scaleDelay: 0.25
+  _scaleEase: 27
   _circleImage: {fileID: 5424188084450946774}
   defaultColor: {r: 0.252047, g: 0.78553575, b: 0.9056604, a: 1}
   glitchColor: {r: 0.8773585, g: 0.22761661, b: 0.8017095, a: 1}
-  targetMin: 0
-  targetMax: 1
-  easeTime: 0.2
-  easeDelay: 0.25
-  easeType: 27
 --- !u!1 &4778341935671031176
 GameObject:
   m_ObjectHideFlags: 0
@@ -397,7 +397,7 @@ GameObject:
   - component: {fileID: 6810972501745016913}
   - component: {fileID: 6637698996643951543}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Interaction Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -412,8 +412,8 @@ RectTransform:
   m_GameObject: {fileID: 5847714821451125276}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6802551670337717371}
   - {fileID: 2672697086934482776}
@@ -518,6 +518,11 @@ MonoBehaviour:
   _rectToMove: {fileID: 0}
   _visual: {fileID: 5847714821451125276}
   _yOffset: 100
+  _minTargetScale: 0.01
+  _maxTargetScale: 1
+  _scaleDuration: 0.2
+  _scaleDelay: 0.25
+  _scaleEase: 31
 --- !u!1 &8331892994490601961
 GameObject:
   m_ObjectHideFlags: 0
