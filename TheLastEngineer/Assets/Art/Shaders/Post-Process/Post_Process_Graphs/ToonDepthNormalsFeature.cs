@@ -8,27 +8,30 @@ using UnityEngine.Rendering.Universal.Internal;
 
 /// <summary>
 /// Fills a private depth + normals pair, exposed as _ToonDepthTexture and _ToonNormalsTexture,
-/// with opaque AND selected transparent geometry.
+/// for the toon outline and posterize passes to read.
 ///
-/// URP builds its own DepthNormals prepass with RenderQueueRange.opaque hardcoded, so transparents
-/// never reach _CameraDepthTexture / _CameraNormalsTexture. ToonPostProcess used to read those, which
-/// meant a pixel covered by glass reported the depth of whatever was BEHIND it: the outline of the
-/// object behind was drawn on top of the glass, and the glass itself got no outline at all.
+/// It stays separate from URP's own prepass because that one resolves at a point in the frame we do
+/// not control, while ToonOutlineFeature needs the pair ready by BeforeRenderingTransparents. The
+/// transparent renderer list is kept as an escape hatch but is normally masked off: the outline is
+/// composited before the transparent queue runs, so a transparent silhouette in here would draw a
+/// line over an object that has not been rendered yet.
 /// </summary>
 public class ToonDepthNormalsFeature : ScriptableRendererFeature
 {
     [System.Serializable]
     public class Settings
     {
-        [Tooltip("Has to run before the Toon full screen pass, which sits at AfterRenderingPostProcessing.")]
+        [Tooltip("Has to run before ToonOutlineFeature, which sits at BeforeRenderingTransparents.")]
         public RenderPassEvent injectionPoint = RenderPassEvent.AfterRenderingPrePasses;
 
         [Tooltip("Opaque geometry that contributes edges. Mirror the renderer's Opaque Layer Mask here.")]
         public LayerMask opaqueLayerMask = ~0;
 
-        [Tooltip("Transparent geometry that contributes edges. Uncheck full screen effects such as fog, " +
-                 "clouds or laser beams: they would fill the whole depth buffer and erase every edge behind them.")]
-        public LayerMask transparentLayerMask = ~0;
+        [Tooltip("Leave empty: the outline is composited before the transparent queue, so transparents " +
+                 "cannot contribute edges. Only useful if the outline is moved back to a post transparent " +
+                 "injection point, and even then full screen effects such as fog, clouds or laser beams have " +
+                 "to stay unchecked: they would fill the whole depth buffer and erase every edge behind them.")]
+        public LayerMask transparentLayerMask = 0;
     }
 
     [SerializeField] private Settings _settings = new Settings();

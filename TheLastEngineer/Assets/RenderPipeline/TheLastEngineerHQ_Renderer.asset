@@ -124,6 +124,22 @@ MonoBehaviour:
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
+--- !u!114 &-2148956046552100862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b9e27f0c4a54d13b8f6e0d92a71c548, type: 3}
+  m_Name: ToonOutlineFeature
+  m_EditorClassIdentifier: Assembly-CSharp::ToonOutlineFeature
+  m_Active: 1
+  _settings:
+    injectionPoint: 450
+    outlineMaterial: {fileID: 2100000, guid: 2f6e83b1d94c47a5b0e28c7f5a19d3b6, type: 2}
 --- !u!114 &-2067882044079914387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,13 +150,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
-  m_Name: Toon
+  m_Name: ToonPosterize
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FullScreenPassRendererFeature
   m_Active: 1
   injectionPoint: 600
   fetchColorBuffer: 1
   requirements: 0
-  passMaterial: {fileID: 2100000, guid: 4e9a17c62b8d4f3ea05c7d81f6b32a90, type: 2}
+  passMaterial: {fileID: 2100000, guid: 8c0d51a4e6b74f39a72c9d0e4b83f125, type: 2}
   passIndex: 0
   bindDepthStencilAttachment: 0
   m_Version: 1
@@ -282,7 +298,8 @@ MonoBehaviour:
   - {fileID: -1969388747609271345}
   - {fileID: -1405385902226262468}
   - {fileID: 5927588467217425765}
-  m_RendererFeatureMap: 6d4235ad3c684de39ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a155c86b27dc858ff1d5bb730616016aa879c9c2cf591f6925cf13194a5e53abe43c3676cdf7107fec656532234e064352
+  - {fileID: -2148956046552100862}
+  m_RendererFeatureMap: 6d4235ad3c684de39ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a155c86b27dc858ff1d5bb730616016aa879c9c2cf591f6925cf13194a5e53abe43c3676cdf7107fec656532234e0643520290557fdc5f2de2
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -393,7 +410,7 @@ MonoBehaviour:
       m_Bits: 4294967295
     transparentLayerMask:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 0
 --- !u!114 &4825620356065025281
 MonoBehaviour:
   m_ObjectHideFlags: 0
