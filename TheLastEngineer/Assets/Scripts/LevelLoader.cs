@@ -10,8 +10,11 @@ public class LevelLoader : MonoBehaviour
     public static LevelLoader Instance;
     
     [SerializeField] private GameObject loadingCanvas;
+    [SerializeField] private GameObject loadingAnimator;
     [SerializeField] private Image loadingFade;
     [SerializeField] private Image loadingBar;
+    
+    [SerializeField] private Animator elevatorAnim;
 
     [Header("Loading Bar")]
     [SerializeField] private float loadingOffset = 0.1f;
@@ -24,6 +27,7 @@ public class LevelLoader : MonoBehaviour
     [SerializeField] private float initialFadeDelay = 1.5f;
 
     [Header("Debug")]
+    [SerializeField] private bool debug = false;
     [SerializeField] private string debugScene;
 
     private string _scene;
@@ -45,6 +49,7 @@ public class LevelLoader : MonoBehaviour
         else Destroy(gameObject);
 
         loadingCanvas.SetActive(false);
+        loadingAnimator.SetActive(false);
     }
 
     private void Start()
@@ -75,11 +80,19 @@ public class LevelLoader : MonoBehaviour
         _asyncScene.allowSceneActivation = false;
 
         loadingCanvas.SetActive(true);
+        loadingAnimator.SetActive(true);
         _loadingStartTime = Time.unscaledTime;
         _canUpdateLoadingBar = true;
+        
+        elevatorAnim.SetTrigger("NewStartLoading");
+        elevatorAnim.SetTrigger("IsLoading");
 
         // El fade arranca recien cuando la barra completo su fill, no cuando termino de cargar la escena.
         while (_barProgress < 1f) await Task.Yield();
+
+        elevatorAnim.ResetTrigger("NewStartLoading");
+        elevatorAnim.ResetTrigger("IsLoading");
+        elevatorAnim.SetTrigger("LoadingComplete");
 
         _canUpdateLoadingBar = false;
 
@@ -90,6 +103,8 @@ public class LevelLoader : MonoBehaviour
         while (!_asyncScene.isDone) await Task.Yield();
 
         loadingCanvas.SetActive(false);
+        loadingAnimator.SetActive(false);
+        
         _asyncScene = null;
     }
 

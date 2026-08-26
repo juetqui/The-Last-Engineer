@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5782008232166833086}
   - component: {fileID: 2977122360723105108}
   m_Layer: 5
-  m_Name: Image (3)
+  m_Name: Guides
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,14 +27,14 @@ RectTransform:
   m_GameObject: {fileID: 356629069851255680}
   m_LocalRotation: {x: -0, y: -0, z: 0.70710576, w: 0.70710784}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.09218749, y: 0.09218749, z: 0.09218749}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3032559658043763712}
+  m_Father: {fileID: 3400691941129779127}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.16677473, y: 1.3943119}
   m_SizeDelta: {x: 1128, y: 175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5782008232166833086
@@ -255,7 +255,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3695019469568670141}
-  - {fileID: 6631392137949987463}
   - {fileID: 3400691941129779127}
   - {fileID: 4584377282967182758}
   m_Father: {fileID: 0}
@@ -341,13 +340,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelLoader
   loadingCanvas: {fileID: 4401665317629433489}
+  loadingAnimator: {fileID: 7732950343471652231}
   loadingFade: {fileID: 6900949029493564135}
   loadingBar: {fileID: 4660050687052261835}
-  loadingScale: 2
+  elevatorAnim: {fileID: 2079846200364487111}
   loadingOffset: 0.1
+  minLoadingDuration: 3
   fadeDuration: 1
-  levelChangeDelay: 0.25
-  fadeInProgress: 0.9
+  levelChangeDelay: 2
+  initialFadeDelay: 1
+  debug: 0
   debugScene: 2 - TUTO 2
 --- !u!1 &1521225243466728719
 GameObject:
@@ -834,7 +836,7 @@ GameObject:
   - component: {fileID: 2079846200364487111}
   - component: {fileID: 5380793765109198726}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Elevator Animator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -856,6 +858,7 @@ Transform:
   - {fileID: 8583049437193561278}
   - {fileID: 5328548867883818538}
   - {fileID: 7516945430302516724}
+  - {fileID: 6631392137949987463}
   - {fileID: 6861409501700181016}
   - {fileID: 3504075035478741905}
   - {fileID: 1457343764919253671}
