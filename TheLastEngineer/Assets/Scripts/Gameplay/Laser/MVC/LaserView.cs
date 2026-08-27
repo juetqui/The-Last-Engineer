@@ -51,7 +51,10 @@ public class LaserView : MonoBehaviour
 
     public void PlayAudio()
     {
-        if (!_audio.isPlaying) _audio.Play();
+        if (_audio.isPlaying) return;
+
+        _audio.pitch = Random.Range(0.9f, 1.1f);
+        _audio.Play();
     }
 
     public void StopAudio()
