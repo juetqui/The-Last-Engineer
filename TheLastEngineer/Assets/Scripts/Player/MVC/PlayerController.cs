@@ -138,7 +138,12 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         _lastNearestGlitcheable = null;
         HookInputs(false);
-        
+
+        // El LevelLoader sobrevive al cambio de escena: si no desuscribimos,
+        // quedan delegates apuntando a players ya destruidos.
+        if (LevelLoader.Instance != null && _input != null)
+            LevelLoader.Instance.OnLoading -= _input.DisableInputs;
+
         // Unsubscribe from cinematic events
         OnCinematicSetupRequested -= HandleCinematicSetup;
         OnCinematicRestoreRequested -= HandleCinematicRestore;

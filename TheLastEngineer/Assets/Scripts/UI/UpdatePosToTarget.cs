@@ -51,8 +51,8 @@ public class UpdatePosToTarget : MonoBehaviour
 
             if (!_visualShown) _visual.SetActive(false);
 
-            if (_visualRect != null)
-                _visualRect.localScale = Vector3.one * (_visualShown ? _maxTargetScale : _minTargetScale);
+            // if (_visualRect != null)
+            //     _visualRect.localScale = Vector3.one * (_visualShown ? _maxTargetScale : _minTargetScale);
         }
     }
 
