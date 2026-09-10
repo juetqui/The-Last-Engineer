@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
@@ -55,16 +56,20 @@ public class PostProcessController : MonoBehaviour
         _shockWave.SetActive(false);
     }
 
-    private void OnDestroy()
+    private void OnDestroy() => ResetVariables();
+
+    private void OnDisable() => ResetVariables();
+
+    private void ResetVariables()
     {
         Tween.StopAll(onTarget: gameObject);
 
         if (_passiveMat != null)
-            _passiveMat.SetFloat("_VignetteAmount", _origPassiveVignette);
+            _passiveMat.SetFloat("_VignetteAmount", 30f);
 
         if (_corruptionMat != null)
         {
-            _corruptionMat.SetFloat("_VignetteAmount", _origCorruptionVignette);
+            _corruptionMat.SetFloat("_VignetteAmount", 30f);
             _corruptionMat.color = _origCorruptionColor;
         }
 
