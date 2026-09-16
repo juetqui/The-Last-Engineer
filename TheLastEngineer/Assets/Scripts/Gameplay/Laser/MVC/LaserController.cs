@@ -23,6 +23,8 @@ public class LaserController : MonoBehaviour
 
     private ILaserReceptor _ownReceptor;
     private Glitcheable _glitcheable;
+    
+    public bool StartsInitialized => _startsInitialized;
 
     private void Awake()
     {
@@ -37,11 +39,6 @@ public class LaserController : MonoBehaviour
             _glitcheable.FSM.OnStateChanged += UpdateGlitchedBehaviour;
         
         _isInitialized = _startsInitialized;
-
-        if (_startsInitialized)
-        {
-            
-        }
     }
 
     private void OnDestroy()
