@@ -51,7 +51,10 @@ public class UIButtonsManager : MonoBehaviour
     private void PlayTargetSound(ButtonType buttonType)
     {
         var targetSound = TargetSound(buttonType);
+        var randPitch = UnityEngine.Random.Range(0.97f, 1.15f);
+        
         _audioSource.clip = targetSound;
+        _audioSource.pitch = randPitch;
         _audioSource.Play();
     }
     
