@@ -6,9 +6,12 @@ public class LaserActivator : MonoBehaviour, ILaserReceptor
 {
     private List<LaserController> _lasers = default;
 
+    public LaserController Laser { get; private set; }
+
     private void Awake()
     {
         _lasers = GetComponentsInChildren<LaserController>().ToList();
+        Laser = _lasers.First();
     }
 
     public void LaserReceived()
