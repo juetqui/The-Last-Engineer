@@ -130,13 +130,15 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         FSM.Change(DisState.ResetAndReturn());
     }
 
-    private bool CheckStateChange(NodeType nodeType)
+    // hasNode reemplaza al viejo NodeType.None: Clean es un nivel legítimo del nodo, así que
+    // "el jugador no trae nada en la mano" ya no se puede deducir del nivel.
+    private bool CheckStateChange(GlitchState level, bool hasNode)
     {
-        if (nodeType == NodeType.None)
+        if (!hasNode)
             return false;
 
-        var toIdleCase = FSM.Current != IdleState && nodeType == NodeType.Default;
-        var toGlitchedCase = FSM.Current == IdleState && nodeType == NodeType.Corrupted;
+        var toIdleCase = FSM.Current != IdleState && level == GlitchState.Clean;
+        var toGlitchedCase = FSM.Current == IdleState && level == GlitchState.Glitched;
 
         return toIdleCase || toGlitchedCase;
     }
@@ -145,7 +147,7 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     // los interactuables registrados en cada pulsación, así que el feedback de rechazo tiene que
     // dispararse solo desde Interact (el objeto que el jugador realmente eligió).
     public bool CanInteract(PlayerNodeHandler player)
-        => CheckStateChange(player.CurrentType) && FSM.Current is IGlitchInterruptible;
+        => CheckStateChange(player.CurrentLevel, player.HasNode) && FSM.Current is IGlitchInterruptible;
 
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
     {

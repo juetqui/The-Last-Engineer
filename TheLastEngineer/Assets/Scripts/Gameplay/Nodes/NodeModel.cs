@@ -9,7 +9,7 @@ public class NodeModel
         _transform = transform;
     }
 
-    public void SetPos(Vector3 newPos, NodeType nodeType, Transform newParent = null, Vector3 newScale = default, Quaternion newRot = default)
+    public void SetPos(Vector3 newPos, GlitchState nodeType, Transform newParent = null, Vector3 newScale = default, Quaternion newRot = default)
     {
         if (newParent != null)
         {

@@ -28,11 +28,11 @@ public class BackPackColorChange : MonoBehaviour
         if (_changeColor) ChangeColor();
     }
 
-    private void CheckNode(bool hasNode, NodeType nodeType)
+    private void CheckNode(bool hasNode, GlitchState nodeType)
     {
-        if (!hasNode || nodeType == NodeType.None)
+        if (!hasNode)
             _targetColor = Color.black;
-        else if (nodeType == NodeType.Default)
+        else if (nodeType == GlitchState.Clean)
             _targetColor = _defultColor;
         else
             _targetColor = _glitchedColor;

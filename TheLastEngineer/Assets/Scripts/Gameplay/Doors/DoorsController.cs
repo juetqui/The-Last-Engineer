@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class DoorController : MonoBehaviour
 {
-    [SerializeField] NodeType tipo = NodeType.Default;
+    [SerializeField] private GlitchState _requiredLevel = GlitchState.Clean;
     [SerializeField] private List<Connection> _connections = new List<Connection>();
 
     private DoorsView _door;
@@ -52,9 +52,9 @@ public class DoorController : MonoBehaviour
         }
     }
 
-    private void OnConnectionStateChanged(NodeType type, bool connected)
+    private void OnConnectionStateChanged(GlitchState type, bool connected)
     {
-        if (type == tipo)
+        if (type == _requiredLevel)
             _activeCount += connected ? 1 : -1;
 
         _activeCount = Mathf.Clamp(_activeCount, 0, _connections.Count);

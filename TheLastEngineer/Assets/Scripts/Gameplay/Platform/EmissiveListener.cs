@@ -20,7 +20,7 @@ public class EmissiveListener : MonoBehaviour
     void Awake()
     {
         _renderer = GetComponent<Renderer>();
-        CheckConnectedNode(NodeType.Default, false);
+        CheckConnectedNode(GlitchState.Clean, false);
 
         if (_connection != null)
             _connection.OnInitialized += Initialize;
@@ -37,7 +37,7 @@ public class EmissiveListener : MonoBehaviour
             LerpColors();
     }
 
-    private void CheckConnectedNode(NodeType nodeType, bool connected)
+    private void CheckConnectedNode(GlitchState nodeType, bool connected)
     {
         if (connected) _targetColor = _enabledColor;
         else _targetColor = _disabledColor;

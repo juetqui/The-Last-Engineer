@@ -29,7 +29,7 @@ public class TubeLightController : MonoBehaviour
             StartSequence(fill: true);
     }
 
-    private void OnConnectionStateChanged(NodeType type, bool connected)
+    private void OnConnectionStateChanged(GlitchState type, bool connected)
     {
         StartSequence(fill: connected);
     }

@@ -35,7 +35,7 @@ public class PostProcessController : MonoBehaviour
     private Color _origCorruptionColor = Color.black;
     #endregion
 
-    private NodeType _requiredNode = NodeType.Corrupted;
+    private GlitchState _requiredLevel = GlitchState.Glitched;
 
     void Start()
     {
@@ -85,9 +85,9 @@ public class PostProcessController : MonoBehaviour
         PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
     }
 
-    private void ActivatePassive(bool hasNode, NodeType type)
+    private void ActivatePassive(bool hasNode, GlitchState type)
     {
-        if (!hasNode || type != _requiredNode)
+        if (!hasNode || type != _requiredLevel)
         {
             DeactivatePP(_passiveMat);
             PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;

@@ -11,7 +11,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
 
     [SerializeField] private NodeController _recievedNode;
     [SerializeField] private Transform _nodePos;
-    [SerializeField] private NodeType _requiredType = NodeType.Default;
+    [SerializeField] private GlitchState _requiredLevel = GlitchState.Clean;
     //[SerializeField] private GameObject _particleNode;
     
     [ColorUsageAttribute(true, true)]
@@ -29,12 +29,12 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
     
     private float _timer = 0f;
 
-    public NodeType RequiredType {  get { return _requiredType; } }
+    public GlitchState RequiredLevel {  get { return _requiredLevel; } }
     public bool StartsConnected { get; private set; }
     public bool IsConnected => _recievedNode != null;
 
     public Action OnInitialized;
-    public Action<NodeType, bool> OnNodeConnected;
+    public Action<GlitchState, bool> OnNodeConnected;
     public Action<bool> OnAvailableToConnect;
 
     private void Start()
@@ -77,9 +77,9 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
         node.Attach(_nodePos.localPosition, transform, Vector3.one * 0.15f, false, _nodePos.rotation);
         _recievedNode = node;
 
-        if (_recievedNode.NodeType == _requiredType)
+        if (_recievedNode.Level == _requiredLevel)
         {
-            OnNodeConnected?.Invoke(node.NodeType, true);
+            OnNodeConnected?.Invoke(node.Level, true);
             _renderer.material.SetColor("_EmissiveColor", _emissionCorrect);
             //_particleNode.SetActive(false);
         }
@@ -92,7 +92,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
 
     public void UnsetNode(NodeController node)
     {
-        OnNodeConnected?.Invoke(_recievedNode.NodeType, false);
+        OnNodeConnected?.Invoke(_recievedNode.Level, false);
         _renderer.material.SetColor("_EmissiveColor", _emissionOff);
         _recievedNode = null;
         //_particleNode.SetActive(true);
@@ -102,7 +102,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
     {
         if (inRange)
         {
-            if (player.NodeHandler.CurrentType == _requiredType && !IsConnected)
+            if (player.NodeHandler.HasNode && player.NodeHandler.CurrentLevel == _requiredLevel && !IsConnected)
                 OnAvailableToConnect?.Invoke(true);
         }
         else

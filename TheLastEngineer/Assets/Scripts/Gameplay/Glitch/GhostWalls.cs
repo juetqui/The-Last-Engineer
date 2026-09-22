@@ -20,7 +20,7 @@ public class GhostWalls : MonoBehaviour
     }
     private void Update()
     {
-        if (PlayerNodeHandler.Instance.CurrentType != NodeType.Corrupted)
+        if (PlayerNodeHandler.Instance.CurrentLevel != GlitchState.Glitched)
         {
             material.SetFloat("_Alpha", 0f);
             playerHasCorruption=false;

@@ -28,7 +28,7 @@ public class PlatformController : MonoBehaviour
     private IMovablePassenger _passenger;
     private IPlatformState _state;
     private PlatformStateMachine _fsm;
-    private NodeType _requiredType = NodeType.Default;
+    private GlitchState _requiredLevel = GlitchState.Clean;
     private Coroutine _changingColor = null;
     private PlayerController _player = default;
     private Tween _tween = default;
@@ -70,7 +70,7 @@ public class PlatformController : MonoBehaviour
     private void Initialize()
     {
         _connection.OnNodeConnected += OnConnectionChanged;
-        _requiredType = _connection.RequiredType;
+        _requiredLevel = _connection.RequiredLevel;
         _fsm = new PlatformStateMachine(this, _connection.StartsConnected);
         SetPositiveFeedback(_connection.StartsConnected);
     }
@@ -101,9 +101,9 @@ public class PlatformController : MonoBehaviour
     }
 
     /* -------------------- Eventos externos -------------------- */
-    private void OnConnectionChanged(NodeType type, bool active)
+    private void OnConnectionChanged(GlitchState type, bool active)
     {
-        bool canMove = (type == _requiredType) && active;
+        bool canMove = (type == _requiredLevel) && active;
         
         SetPositiveFeedback(canMove);
 

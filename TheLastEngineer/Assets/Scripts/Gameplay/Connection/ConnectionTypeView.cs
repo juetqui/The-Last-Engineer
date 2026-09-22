@@ -24,7 +24,7 @@ public class ConnectionTypeView : MonoBehaviour
         _renderer = GetComponent<Renderer>();
         _connection.OnNodeConnected += SetCorrectNode;
 
-        _emissionOn = _connection.RequiredType == NodeType.Default ? _emissionDefault : _emissionCorrupted;
+        _emissionOn = _connection.RequiredLevel == GlitchState.Clean ? _emissionDefault : _emissionCorrupted;
 
         if (!_connection.IsConnected)
         {
@@ -44,7 +44,7 @@ public class ConnectionTypeView : MonoBehaviour
         }
     }
 
-    public void SetCorrectNode(NodeType nodeType, bool a)
+    public void SetCorrectNode(GlitchState nodeType, bool a)
     {
         if (a)
         {

@@ -4,12 +4,6 @@ public enum PlayerState
     Corrupted
 }
 
-public enum NodeType
-{
-    None,
-    Default,
-    Corrupted
-}
 public enum StopType
 {
     None,

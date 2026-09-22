@@ -18,9 +18,9 @@ public class CristalNodeView : MonoBehaviour
         controller.OnUpdatedNodeType += ChangeColor;
     }
 
-    void ChangeColor(NodeType node)
+    void ChangeColor(GlitchState node)
     {
-        if (node == NodeType.Corrupted)
+        if (node == GlitchState.Glitched)
         {
             _renderer.material.SetColor("_EmissiveColor", _emissionCorrupted);
             _effectNode.material.SetFloat("_isCorrupted", 1);

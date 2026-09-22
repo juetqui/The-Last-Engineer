@@ -16,12 +16,12 @@ public class ParedFillConnection : MonoBehaviour
         _renderer = GetComponent<Renderer>();
         _connection.OnNodeConnected += CheckConnectedNode;
 
-        int isCorrupted = _connection.RequiredType == NodeType.Corrupted ? 1 : 0;
+        int isCorrupted = _connection.RequiredLevel == GlitchState.Glitched ? 1 : 0;
 
         _renderer.material.SetFloat("_IsCorrupted", isCorrupted);
     }
 
-    private void CheckConnectedNode(NodeType nodeType, bool isConnected)
+    private void CheckConnectedNode(GlitchState nodeType, bool isConnected)
     {
         if (isConnected) Fill();
         else Empty();

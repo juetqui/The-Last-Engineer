@@ -16,14 +16,14 @@ public class PlayerNodeHandler : MonoBehaviour
 
     #region GETTERS
     public NodeController CurrentNode => _node;
-    public NodeType CurrentType { get; private set; } = NodeType.None;
+    public GlitchState CurrentLevel { get; private set; } = GlitchState.Clean;
     public bool HasNode => _node != null;
     public bool IsCorrupted { get; private set; }
     public Transform AttachTransform { get; private set; }
     public Vector3 AttachPos { get; private set; }
     #endregion
 
-    public Action<bool, NodeType> OnNodeGrabbed;
+    public Action<bool, GlitchState> OnNodeGrabbed;
     public Action<bool> OnAbsorbCorruption;
     public Action<Glitcheable> OnGlitchChange;
 
@@ -40,15 +40,15 @@ public class PlayerNodeHandler : MonoBehaviour
         if (_node != null || node == null) return;
 
         _node = node;
-        CurrentType = node.NodeType;
+        CurrentLevel = node.Level;
 
         _view = PlayerController.Instance.View;
 
         _view.GrabNode(true, node.CurrentColor);
-        _view.PlayNodePS(node.NodeType);
+        _view.PlayNodePS(node.Level);
         _node.OnUpdatedNodeType += OnNodeTypeUpdated;
 
-        OnNodeGrabbed?.Invoke(true, CurrentType);
+        OnNodeGrabbed?.Invoke(true, CurrentLevel);
     }
 
     public void Release(bool isDropping = false)
@@ -66,16 +66,16 @@ public class PlayerNodeHandler : MonoBehaviour
     private void ResetNode()
     {
         _node = null;
-        CurrentType = NodeType.None;
+        CurrentLevel = GlitchState.Clean;
         _view.GrabNode(false, Color.black);
-        OnNodeGrabbed?.Invoke(false, CurrentType);
+        OnNodeGrabbed?.Invoke(false, CurrentLevel);
     }
 
-    private void OnNodeTypeUpdated(NodeType type)
+    private void OnNodeTypeUpdated(GlitchState type)
     {
-        CurrentType = type;
+        CurrentLevel = type;
 
-        if (_corruptionRoutine != null && CurrentType != NodeType.Corrupted)
+        if (_corruptionRoutine != null && CurrentLevel != GlitchState.Glitched)
         {
             StopCoroutine(_corruptionRoutine);
             _corruptionRoutine = null;
@@ -85,8 +85,8 @@ public class PlayerNodeHandler : MonoBehaviour
         }
 
         _view.GrabNode(true, _node.CurrentColor);
-        _view.PlayNodePS(CurrentType);
-        OnNodeGrabbed?.Invoke(true, CurrentType);
+        _view.PlayNodePS(CurrentLevel);
+        OnNodeGrabbed?.Invoke(true, CurrentLevel);
     }
 
     public void BeginCorruption(Transform playerTransform, Action<Vector3> setPlayerPos)

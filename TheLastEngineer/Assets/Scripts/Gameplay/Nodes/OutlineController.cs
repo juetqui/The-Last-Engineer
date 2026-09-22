@@ -15,9 +15,9 @@ public class OutlineController : MonoBehaviour
         _nodeController.OnUpdatedNodeType += ChangeOutline;
         _nodeController.OnEnableOutline += EnableOutline;
     }
-    private void ChangeOutline(NodeType node)
+    private void ChangeOutline(GlitchState node)
     {
-        if (node == NodeType.Corrupted)
+        if (node == GlitchState.Glitched)
         {
             _outline.OutlineColor = _emissionCorrupted;
         }

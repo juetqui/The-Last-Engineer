@@ -30,7 +30,7 @@ public class UpdateCrosshair : UpdatePosToTarget
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", _currentTarget != null);
 
-        if (_currentTarget == null || PlayerNodeHandler.Instance.CurrentType == NodeType.None)
+        if (_currentTarget == null || !PlayerNodeHandler.Instance.HasNode)
             ResetPos();
     }
 
@@ -57,9 +57,11 @@ public class UpdateCrosshair : UpdatePosToTarget
 
     private void CompareGlitchWithPlayerNode(Glitcheable glitcheable)
     {
-        var compatible =
-            (PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted && glitcheable.IsCorrupted) ||
-            (PlayerNodeHandler.Instance.CurrentType == NodeType.Default && !glitcheable.IsCorrupted);
+        // El gate de HasNode es el que antes hacía NodeType.None: sin nodo en mano, Clean haría
+        // pasar la segunda condición y el crosshair se mostraría como compatible.
+        var compatible = PlayerNodeHandler.Instance.HasNode &&
+            ((PlayerNodeHandler.Instance.CurrentLevel == GlitchState.Glitched && glitcheable.IsCorrupted) ||
+             (PlayerNodeHandler.Instance.CurrentLevel == GlitchState.Clean && !glitcheable.IsCorrupted));
 
         SetVisual(!compatible);
         _circleImage.color = glitcheable.IsCorrupted ? glitchColor : defaultColor;

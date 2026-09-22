@@ -16,9 +16,9 @@ public class GlitchAttractionController : MonoBehaviour
         _playerNodeHandler.OnNodeGrabbed += CheckNode;
     }
 
-    private void CheckNode(bool hasNode, NodeType nodeType)
+    private void CheckNode(bool hasNode, GlitchState nodeType)
     {
-        if (!hasNode || nodeType != NodeType.Corrupted)
+        if (!hasNode || nodeType != GlitchState.Glitched)
         {
             _vfx.Stop();
             _vfx.enabled = false;

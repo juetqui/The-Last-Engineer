@@ -120,11 +120,11 @@ public class PlayerView
         _orbitPS.Play();
     }
 
-    public void PlayNodePS(NodeType nodeType)
+    public void PlayNodePS(GlitchState nodeType)
     {
         _renderer.materials[1].SetFloat("_HasNode", 1);
 
-        if (nodeType == NodeType.Corrupted)
+        if (nodeType == GlitchState.Glitched)
         {
             _renderer.materials[1].SetFloat("_IsGlitched", 1);
             _corruptedPS.Play();

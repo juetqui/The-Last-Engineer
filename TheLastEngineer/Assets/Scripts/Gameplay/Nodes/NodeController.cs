@@ -10,9 +10,9 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     public bool RequiresHoldInteraction => false;
     #endregion
 
-    [SerializeField] private NodeType _nodeType;
-    public NodeType NodeType { get { return _nodeType; } }
-    public Action<NodeType> OnUpdatedNodeType = delegate { };
+    [SerializeField] private GlitchState _glitchLevel;
+    public GlitchState Level { get { return _glitchLevel; } }
+    public Action<GlitchState> OnUpdatedNodeType = delegate { };
 
     #region VIEW
     [Header("VIEW")]
@@ -49,7 +49,7 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
         _particles = GetComponentsInChildren<ParticleSystem>();
         _originalShader = _renderer.material.shader;
 
-        _currentColor = _nodeType == NodeType.Default ? _defaultColor : _corruptionColor;
+        _currentColor = _glitchLevel == GlitchState.Clean ? _defaultColor : _corruptionColor;
 
         _nodeModel = new NodeModel(transform);
         _nodeView = new NodeView(_renderer, _collider, _outline, _currentColor, _animator, _particles);
@@ -58,8 +58,8 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     protected void Start()
     {
         _nodeView.OnStart(); 
-        _nodeView.UpdateNodeType(_nodeType, _currentColor);
-        OnUpdatedNodeType?.Invoke(_nodeType);
+        _nodeView.UpdateNodeType(_glitchLevel, _currentColor);
+        OnUpdatedNodeType?.Invoke(_glitchLevel);
     }
 
     protected void Update()
@@ -121,11 +121,11 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
         else _isChildren = false;
 
         if (newParent != null && newScale != default)
-            _nodeModel.SetPos(newPos, NodeType, newParent, newScale, newRot);
+            _nodeModel.SetPos(newPos, Level, newParent, newScale, newRot);
         else if (newParent != null && newScale == default)
-            _nodeModel.SetPos(newPos, NodeType, newParent);
+            _nodeModel.SetPos(newPos, Level, newParent);
         else if (newParent == null && newScale == default)
-            _nodeModel.SetPos(newPos, NodeType);
+            _nodeModel.SetPos(newPos, Level);
 
         // Al soltarse, el collider se reactiva DENTRO del trigger del jugador. Que PhysX vuelva
         // a emitir OnTriggerEnter en ese caso es el único eslabón del ciclo soltar -> levantar,
@@ -143,11 +143,11 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
 
     private void UpdateNodeType()
     {
-        _nodeType = _nodeType == NodeType.Default ? NodeType.Corrupted : NodeType.Default;
-        _currentColor = _nodeType == NodeType.Default ? _defaultColor : _corruptionColor;
+        _glitchLevel = _glitchLevel == GlitchState.Clean ? GlitchState.Glitched : GlitchState.Clean;
+        _currentColor = _glitchLevel == GlitchState.Clean ? _defaultColor : _corruptionColor;
 
-        _nodeView.UpdateNodeType(_nodeType, _currentColor);
-        OnUpdatedNodeType?.Invoke(_nodeType);
+        _nodeView.UpdateNodeType(_glitchLevel, _currentColor);
+        OnUpdatedNodeType?.Invoke(_glitchLevel);
     }
 
     public void OnPlayerProximity(bool inRange, PlayerController player)

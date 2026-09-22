@@ -11,7 +11,7 @@ public class GlobalVolumeController : MonoBehaviour
     [SerializeField] private float _minPitch = 0.8f;
     [SerializeField] private float _maxPitch = 1f;
 
-    private NodeType _requiredNode = NodeType.Corrupted;
+    private GlitchState _requiredLevel = GlitchState.Glitched;
     private Volume _volume = null;
 
     private ChromaticAberration _chromatic;
@@ -31,11 +31,11 @@ public class GlobalVolumeController : MonoBehaviour
         PlayerNodeHandler.Instance.OnNodeGrabbed += AddEffects;
     }
 
-    private void AddEffects(bool hasNode, NodeType nodeType)
+    private void AddEffects(bool hasNode, GlitchState nodeType)
     {
         StopAllCoroutines();
 
-        bool enable = hasNode && nodeType == _requiredNode;
+        bool enable = hasNode && nodeType == _requiredLevel;
 
         if (_chromatic != null)
         {

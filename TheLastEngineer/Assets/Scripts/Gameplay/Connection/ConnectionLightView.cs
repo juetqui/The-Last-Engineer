@@ -22,7 +22,7 @@ public class ConnectionLightView : MonoBehaviour
         _light = GetComponent<Light>();
         _connection.OnNodeConnected += SetCorrectNode;
 
-        _lightOn = _connection.RequiredType == NodeType.Default ? _lightDefault : _lightCorrupted;
+        _lightOn = _connection.RequiredLevel == GlitchState.Clean ? _lightDefault : _lightCorrupted;
         //TurnOn();
     }
 
@@ -37,7 +37,7 @@ public class ConnectionLightView : MonoBehaviour
         }
 
     }
-    public void SetCorrectNode(NodeType nodeType, bool a)
+    public void SetCorrectNode(GlitchState nodeType, bool a)
     {
         if (a)
         {

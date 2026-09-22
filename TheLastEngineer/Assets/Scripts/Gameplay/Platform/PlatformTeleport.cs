@@ -12,7 +12,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable, IProximityListener
     [SerializeField] private ParticleSystem _salida;
     [SerializeField] private float _heightThershold = 0.5f;
 
-    private NodeType _requiredType = NodeType.Corrupted;
+    private GlitchState _requiredLevel = GlitchState.Glitched;
     // [SerializeField] private Renderer _renderer;
 
     public PlatformTeleport TargetPlatform { get { return _targetPlatform; } }
@@ -44,7 +44,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable, IProximityListener
         } 
     }
 
-    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.CurrentType == NodeType.Corrupted && playerNodeHandler != null;
+    public bool CanInteract(PlayerNodeHandler playerNodeHandler) => playerNodeHandler.CurrentLevel == GlitchState.Glitched && playerNodeHandler != null;
 
     public void Interact(PlayerNodeHandler playerNodeHandler, out bool succededInteraction)
     {
@@ -62,7 +62,7 @@ public class PlatformTeleport : MonoBehaviour, IInteractable, IProximityListener
     {
         if (inRange)
         {
-            if (player.NodeHandler.CurrentType == _requiredType)
+            if (player.NodeHandler.CurrentLevel == _requiredLevel)
             {
                 OnPlayerStepped?.Invoke(true);
                 _entrada.Play();

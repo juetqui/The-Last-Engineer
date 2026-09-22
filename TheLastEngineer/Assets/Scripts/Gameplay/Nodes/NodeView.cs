@@ -12,7 +12,7 @@ public class NodeView
     // Estado para FX
     private ParticleSystem[] _particles = System.Array.Empty<ParticleSystem>();
     private bool _isNear = false;
-    private NodeType _currentType = NodeType.Default;
+    private GlitchState _currentType = GlitchState.Clean;
 
     public bool IsReseting { get { return _isReseting; } }
 
@@ -32,7 +32,7 @@ public class NodeView
         StopAllFX();
     }
 
-    public void UpdateNodeType(NodeType nodeType, Color currentOutline)
+    public void UpdateNodeType(GlitchState nodeType, Color currentOutline)
     {
         _currentType = nodeType;
         _renderer.material.SetColor("_EmissiveColor", currentOutline);
@@ -111,7 +111,7 @@ public class NodeView
     private void RefreshFX()
     {
         // Encender FX solo si est� en rango y el nodo est� Corrupted
-        bool shouldPlay = _isNear && _currentType == NodeType.Corrupted;
+        bool shouldPlay = _isNear && _currentType == GlitchState.Glitched;
 
         if (shouldPlay)
             PlayAllFX();

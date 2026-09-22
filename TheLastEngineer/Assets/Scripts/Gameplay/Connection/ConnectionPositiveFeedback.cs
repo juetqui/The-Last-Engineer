@@ -15,15 +15,15 @@ public class ConnectionPositiveFeedback : MonoBehaviour
         _connection.OnNodeConnected += playPS;
     }
 
-    void playPS(NodeType nodeType, bool connected)
+    void playPS(GlitchState nodeType, bool connected)
     {
-        if (connected && nodeType == _connection.RequiredType)
+        if (connected && nodeType == _connection.RequiredLevel)
         {
             foreach (var ps in _positivePS)
             {
                 ParticleSystem.MainModule module = ps.main;
 
-                if(nodeType == NodeType.Default)
+                if(nodeType == GlitchState.Clean)
                     module.startColor = _defaultColor;
                 else
                     module.startColor = _corruptedColor;
