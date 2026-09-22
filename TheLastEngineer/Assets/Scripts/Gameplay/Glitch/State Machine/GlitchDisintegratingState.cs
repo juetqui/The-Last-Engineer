@@ -39,13 +39,17 @@ public class GlitchDisintegratingState : IState, IGlitchInterruptible
         g.SetAlpha(alpha);
         g.SetFeedbackAlpha(1f - alpha);
 
-        if (!_collidersOff && e >= 0.5f)
-        {
-            g.SetColliders(false);
-            _collidersOff = true;
-        }
+        // if (!_collidersOff && e >= 0.5f)
+        // {
+        //     g.SetColliders(false);
+        //     _collidersOff = true;
+        // }
 
         if (raw < 1f || _isChangingState) return;
+
+
+        g.SetColliders(false);
+        _collidersOff = true;
 
         _isChangingState = true;
         g.SetParticles(false, 1f);
