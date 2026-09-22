@@ -82,7 +82,7 @@ public class PostProcessController : MonoBehaviour
 
         PlayerNodeHandler.Instance.OnNodeGrabbed -= ActivatePassive;
         PlayerNodeHandler.Instance.OnAbsorbCorruption -= ActivateCorruption;
-        PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
+        PlayerNodeHandler.Instance.OnNodeLevelChanged -= RefNegVignette;
     }
 
     private void ActivatePassive(bool hasNode, GlitchState type)
@@ -90,13 +90,13 @@ public class PostProcessController : MonoBehaviour
         if (!hasNode || type != _requiredLevel)
         {
             DeactivatePP(_passiveMat);
-            PlayerNodeHandler.Instance.OnGlitchChange -= RefNegVignette;
+            PlayerNodeHandler.Instance.OnNodeLevelChanged -= RefNegVignette;
             return;
         }
 
         ActivatePP(_passiveMat);
         ActivateShockWave();
-        PlayerNodeHandler.Instance.OnGlitchChange += RefNegVignette;
+        PlayerNodeHandler.Instance.OnNodeLevelChanged += RefNegVignette;
     }
 
     private void ActivateCorruption(bool hasEffect)
@@ -138,7 +138,7 @@ public class PostProcessController : MonoBehaviour
         TweenFloat(mat, "_VignetteAmount", start, _speed / 2f, 0.4f);
     }
 
-    private void RefNegVignette(Glitcheable glt)
+    private void RefNegVignette()
     {
         if (animated) return;
         animated = true;

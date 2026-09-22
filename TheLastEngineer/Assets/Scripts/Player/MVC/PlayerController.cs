@@ -61,6 +61,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public bool IsDead { get { return _isDead; } }
     public Vector3 TeleportPos {  get { return _teleportPos; } }
     public PlayerNodeHandler NodeHandler => _nodeHandler;
+    public PlayerData Data => _playerData;
     #endregion
 
     private void Awake()
@@ -88,6 +89,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
 
         _checkPointPos = transform.position;
+
+        // No tiene campos serializados: resuelve todo desde este controller, así que se puede
+        // agregar en runtime y no hace falta cablearlo en el prefab del jugador.
+        if (GetComponent<GlitchTransferHandler>() == null) gameObject.AddComponent<GlitchTransferHandler>();
     }
 
     private void Start()
@@ -128,7 +133,13 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         GetClosestGlitcheable();
         
-        var target = _interactableHandler.GetInteractable(_nodeHandler, transform.position);
+        // El Glitcheable dejó de ser seleccionable con Interact (CanInteract => false), pero sigue
+        // siendo lo que el HUD tiene que señalar cuando el jugador puede transferirle carga. Va
+        // como fallback y no con prioridad, así no tapa a un nodo o una conexión que sí se pueden
+        // usar con Interact.
+        IInteractable target = _interactableHandler.GetInteractable(_nodeHandler, transform.position)
+            ?? ResolveGlitchHudTarget();
+
         OnInteractableDetected?.Invoke(target);
     }
 
@@ -294,6 +305,24 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         _lastNearestGlitcheable = nearest;
         OnGlitcheableInArea?.Invoke(nearest);
+    }
+    // Lo usa GlitchTransferHandler: el objetivo de Set/Take se resuelve con la misma lista y el
+    // mismo chequeo de linea de vision que el resto de la interaccion.
+    public Glitcheable FindTransferTarget(Func<Glitcheable, bool> filter)
+        => _interactableHandler.GetClosestGlitcheable(transform.position, filter);
+
+    // El glitcheable más cercano al que se le pueda dar o sacar carga con el nodo que el jugador
+    // trae. Si no hay transferencia posible en ninguna de las dos direcciones no se señala nada,
+    // para no prometer una interacción que el botón no va a poder hacer.
+    private Glitcheable ResolveGlitchHudTarget()
+    {
+        var node = _nodeHandler.CurrentGlitch;
+        if (node == null) return null;
+
+        return _interactableHandler.GetClosestGlitcheable(transform.position, g =>
+            g.Glitch != null &&
+            (GlitchTransferManager.Preview(node, g.Glitch) == GlitchTransferResult.Transferred ||
+             GlitchTransferManager.Preview(g.Glitch, node) == GlitchTransferResult.Transferred));
     }
     public void Dissolving(float timer) => OnDissolving?.Invoke(timer);
     public void SetCinematicMovement(Vector3 direction) => _model.SetCinematicMovement(direction);

@@ -92,7 +92,7 @@ public class ShaderFiller : MonoBehaviour
         {
             if (_isUnloading == true)
             {
-                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentType == NodeType.Corrupted)
+                if (PlayerNodeHandler.Instance.HasNode && PlayerNodeHandler.Instance.CurrentLevel == GlitchState.Glitched)
                 {
                     _currentLoad = _currentLoad - Time.deltaTime / unloadTime / timeModifier;
                 }

@@ -10,8 +10,11 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     public bool RequiresHoldInteraction => false;
     #endregion
 
-    [SerializeField] private GlitchState _glitchLevel;
-    public GlitchState Level { get { return _glitchLevel; } }
+    // El nivel ya no vive acá: la fuente de verdad es el GlitchComponent del mismo GameObject.
+    // Este controller solo escucha sus cambios y los traduce a color, animación y FX.
+    private GlitchComponent _glitch = default;
+    public GlitchComponent Glitch => _glitch;
+    public GlitchState Level => _glitch.CurrentState;
     public Action<GlitchState> OnUpdatedNodeType = delegate { };
 
     #region VIEW
@@ -21,8 +24,9 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     private Renderer _renderer = default;
     private Animator _animator = default;
     private ParticleSystem[] _particles = new ParticleSystem[2];
-    private Color _defaultColor = Color.cyan;
-    private Color _corruptionColor = Color.magenta;
+    private Color _cleanColor = new Color(0f, 1f, 1f);            // #00FFFF
+    private Color _intangibleColor = new Color(1f, 0.839f, 0f);   // #FFD600
+    private Color _glitchedColor = new Color(0.949f, 0f, 1f);     // #F200FF
     private Color _currentColor = default;
     private Outline _outline = default;
     #endregion
@@ -33,7 +37,6 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     private Shader _originalShader;
 
     private NodeModel _nodeModel = default;
-    private PlayerNodeHandler _playerNodeHandler = null;
     private Transform _target = default;
     private IConnectable _connectable = default;
     private bool _isChildren = false;
@@ -49,7 +52,10 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
         _particles = GetComponentsInChildren<ParticleSystem>();
         _originalShader = _renderer.material.shader;
 
-        _currentColor = _glitchLevel == GlitchState.Clean ? _defaultColor : _corruptionColor;
+        _glitch = GlitchComponent.Ensure(gameObject);
+        _glitch.OnGlitchStateChanged += OnLevelChanged;
+
+        _currentColor = ResolveColor(Level);
 
         _nodeModel = new NodeModel(transform);
         _nodeView = new NodeView(_renderer, _collider, _outline, _currentColor, _animator, _particles);
@@ -57,9 +63,16 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
 
     protected void Start()
     {
-        _nodeView.OnStart(); 
-        _nodeView.UpdateNodeType(_glitchLevel, _currentColor);
-        OnUpdatedNodeType?.Invoke(_glitchLevel);
+        // El nivel inicial se lee por pull: GlitchComponent no emite el evento en Awake/Start,
+        // así que este es el punto donde las views (outline, cristal) reciben el primer valor.
+        _nodeView.OnStart();
+        _nodeView.UpdateNodeType(Level, _currentColor);
+        OnUpdatedNodeType?.Invoke(Level);
+    }
+
+    private void OnDestroy()
+    {
+        if (_glitch != null) _glitch.OnGlitchStateChanged -= OnLevelChanged;
     }
 
     protected void Update()
@@ -75,12 +88,9 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     {
         if (!CanInteract(playerNodeHandler))
         {
-            _playerNodeHandler = null;
             succeeded = false;
             return;
         }
-
-        _playerNodeHandler = playerNodeHandler;
 
         Vector3 newScale = Vector3.one  * 0.75f;
         Attach(Vector3.zero, playerNodeHandler.AttachTransform, newScale, parentIsPlayer: true);
@@ -91,19 +101,12 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     {
         if (parentIsPlayer)
         {
-            _playerNodeHandler.OnGlitchChange += InteractWithGlitcheable;
             _nodeView.EnableColl(false);
             _nodeView.EnableOutline(false);
             OnEnableOutline?.Invoke(false);
         }
         else
         {
-            if (_playerNodeHandler != null)
-            {
-                _playerNodeHandler.OnGlitchChange -= InteractWithGlitcheable;
-                _playerNodeHandler = null;
-            }
-            
             _nodeView.EnableColl(true);
             _nodeView.EnableOutline(true);
             OnEnableOutline?.Invoke(true);
@@ -134,20 +137,24 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
             PlayerController.Instance.RescanInteractable(this, _collider);
     }
     
-    private void InteractWithGlitcheable(Glitcheable glitcheable)
+    // Antes esto era un toggle binario que disparaba el jugador al glitchear. Ahora el nivel lo
+    // mueve solo GlitchTransferManager y acá únicamente se reacciona al cambio.
+    private void OnLevelChanged(GlitchState level)
     {
-        if (glitcheable == null) return;
-        
-        UpdateNodeType();
+        _currentColor = ResolveColor(level);
+
+        _nodeView.UpdateNodeType(level, _currentColor);
+        OnUpdatedNodeType?.Invoke(level);
     }
 
-    private void UpdateNodeType()
+    private Color ResolveColor(GlitchState level)
     {
-        _glitchLevel = _glitchLevel == GlitchState.Clean ? GlitchState.Glitched : GlitchState.Clean;
-        _currentColor = _glitchLevel == GlitchState.Clean ? _defaultColor : _corruptionColor;
-
-        _nodeView.UpdateNodeType(_glitchLevel, _currentColor);
-        OnUpdatedNodeType?.Invoke(_glitchLevel);
+        switch (level)
+        {
+            case GlitchState.Intangible: return _intangibleColor;
+            case GlitchState.Glitched: return _glitchedColor;
+            default: return _cleanColor;
+        }
     }
 
     public void OnPlayerProximity(bool inRange, PlayerController player)

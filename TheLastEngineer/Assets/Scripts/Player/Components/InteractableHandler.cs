@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -68,12 +69,17 @@ public class InteractableHandler
             .FirstOrDefault();
     }
 
-    public Glitcheable GetClosestGlitcheable(Vector3 playerPos)
+    /// <summary>
+    /// El glitcheable visible más cercano. El filtro opcional lo usan Set y Take para descartar
+    /// los que no pueden recibir o dar carga: sin eso, con dos objetos en rango, la transferencia
+    /// fallaría sobre el que sí servía solo porque el otro estaba unos centímetros más cerca.
+    /// </summary>
+    public Glitcheable GetClosestGlitcheable(Vector3 playerPos, Func<Glitcheable, bool> filter = null)
     {
         if (_interactables.Count <= 0) return null;
 
         return _interactables.OfType<Glitcheable>()
-            .Where(i => HasLineOfSight(i))
+            .Where(i => HasLineOfSight(i) && (filter == null || filter(i)))
             .OrderBy(i => Vector3.Distance(i.transform.position, playerPos))
             .FirstOrDefault();
     }

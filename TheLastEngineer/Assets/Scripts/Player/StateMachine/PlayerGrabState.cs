@@ -67,10 +67,6 @@ public class PlayerGrabState : IPlayerState
             _player.RemoveInteractable(interactable);
             _stateMachine.TransitionToDissolving();
         }
-        else if (interactable is Glitcheable glitcheable)
-        {
-            _playerNodeHandler.OnGlitchChange(glitcheable);
-        }
         else if (interactable is Connection)
         {
             _player.ReleaseNode();

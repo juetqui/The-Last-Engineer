@@ -16,7 +16,9 @@ public class PlayerNodeHandler : MonoBehaviour
 
     #region GETTERS
     public NodeController CurrentNode => _node;
-    public GlitchState CurrentLevel { get; private set; } = GlitchState.Clean;
+    // Derivado del nodo en mano: no hay copia local que pueda quedar desincronizada.
+    public GlitchState CurrentLevel => _node != null ? _node.Level : GlitchState.Clean;
+    public GlitchComponent CurrentGlitch => _node != null ? _node.Glitch : null;
     public bool HasNode => _node != null;
     public bool IsCorrupted { get; private set; }
     public Transform AttachTransform { get; private set; }
@@ -25,7 +27,8 @@ public class PlayerNodeHandler : MonoBehaviour
 
     public Action<bool, GlitchState> OnNodeGrabbed;
     public Action<bool> OnAbsorbCorruption;
-    public Action<Glitcheable> OnGlitchChange;
+    // Reemplaza a OnGlitchChange: avisa que cambio el nivel del nodo en mano, sin decir por que.
+    public Action OnNodeLevelChanged;
 
     private void Awake()
     {
@@ -40,7 +43,6 @@ public class PlayerNodeHandler : MonoBehaviour
         if (_node != null || node == null) return;
 
         _node = node;
-        CurrentLevel = node.Level;
 
         _view = PlayerController.Instance.View;
 
@@ -66,16 +68,13 @@ public class PlayerNodeHandler : MonoBehaviour
     private void ResetNode()
     {
         _node = null;
-        CurrentLevel = GlitchState.Clean;
         _view.GrabNode(false, Color.black);
         OnNodeGrabbed?.Invoke(false, CurrentLevel);
     }
 
     private void OnNodeTypeUpdated(GlitchState type)
     {
-        CurrentLevel = type;
-
-        if (_corruptionRoutine != null && CurrentLevel != GlitchState.Glitched)
+        if (_corruptionRoutine != null && type != GlitchState.Glitched)
         {
             StopCoroutine(_corruptionRoutine);
             _corruptionRoutine = null;
@@ -85,8 +84,9 @@ public class PlayerNodeHandler : MonoBehaviour
         }
 
         _view.GrabNode(true, _node.CurrentColor);
-        _view.PlayNodePS(CurrentLevel);
-        OnNodeGrabbed?.Invoke(true, CurrentLevel);
+        _view.PlayNodePS(type);
+        OnNodeGrabbed?.Invoke(true, type);
+        OnNodeLevelChanged?.Invoke();
     }
 
     public void BeginCorruption(Transform playerTransform, Action<Vector3> setPlayerPos)

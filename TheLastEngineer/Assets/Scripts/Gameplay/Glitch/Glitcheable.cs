@@ -28,7 +28,8 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     [SerializeField] public float _radialDonutPS = -4.91f;
 
     [Header("Estados iniciales")]
-    [SerializeField] public bool _startInIdle = false;
+    // El viejo _startInIdle se fue: ahora el estado inicial lo decide el nivel del GlitchComponent
+    // (Glitched arranca el ciclo, Clean e Intangible se quedan en Idle).
     [SerializeField] private bool _isPlatform = false;
     
     [Header("Debug")]
@@ -57,6 +58,12 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     public Quaternion CurrentTargetRot => _newPosList != null && _newPosList.Count > 0 ? _newPosList[_index].rotation : transform.rotation;
 
     public bool IsCorrupted { get { return FSM.Current != IdleState; } }
+
+    private GlitchComponent _glitch = default;
+    private bool _syncing = false;
+
+    public GlitchComponent Glitch => _glitch;
+    public GlitchState Level => _glitch.CurrentState;
 
     public Action<PlayerController, bool> OnPlayerInRange;
     public Action OnInteractionRejected;
@@ -87,6 +94,10 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         _ps.Stop();
         _timer = GetComponent<TimerController>();
 
+        // Se puede leer con seguridad desde acá aunque esta clase corra con DefaultExecutionOrder(-1):
+        // GlitchComponent no inicializa nada en Awake, su nivel es el campo serializado.
+        _glitch = GlitchComponent.Ensure(gameObject);
+
         SetAlpha(1f);
         SetFeedbackAlpha(0f);
         // SetBoolCorrupted(0f);
@@ -108,9 +119,50 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 
     private void Start()
     {
-        if (_startInIdle && _isPlatform) _index++; 
-        
-        FSM.Change(_startInIdle ? IdleState : DisState);
+        var startsCycling = Level == GlitchState.Glitched;
+
+        if (!startsCycling && _isPlatform) _index++;
+
+        FSM.Change(startsCycling ? DisState : IdleState);
+
+        // Las suscripciones van DESPUÉS del Change inicial: así el arranque no pasa por el
+        // reconciliador. Igual es idempotente, pero es más fácil de seguir en el debugger.
+        _glitch.OnGlitchStateChanged += OnLevelChanged;
+        FSM.OnStateChanged += OnFsmStateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        if (_glitch != null) _glitch.OnGlitchStateChanged -= OnLevelChanged;
+        if (FSM != null) FSM.OnStateChanged -= OnFsmStateChanged;
+    }
+
+    private void OnLevelChanged(GlitchState level) => SyncFsmWithLevel();
+    private void OnFsmStateChanged(IState state) => SyncFsmWithLevel();
+
+    /// <summary>
+    /// Acerca la FSM a lo que pide el nivel. Es idempotente y se llama desde los dos lados (cambio
+    /// de nivel y cambio de estado) porque GlitchMovingState no es interrumpible: si el jugador
+    /// descarga el objeto mientras se está moviendo, no se puede cortar ahí sin partir el lerp y
+    /// el reparent de GlitchMovingState.Exit. Se deja terminar el movimiento y este mismo método
+    /// vuelve a correr al entrar a Reintegrating, que sí es interrumpible.
+    /// </summary>
+    private void SyncFsmWithLevel()
+    {
+        // La FSM emite OnStateChanged DESPUÉS del Enter del estado nuevo, así que un Change hecho
+        // desde acá reentraría en este mismo método.
+        if (_syncing) return;
+
+        _syncing = true;
+
+        var wantsCycle = Level == GlitchState.Glitched;
+
+        if (wantsCycle && FSM.Current == IdleState)
+            BeginCycle();
+        else if (!wantsCycle && FSM.Current != IdleState && FSM.Current is IGlitchInterruptible interruptible)
+            interruptible.Interrupt();
+
+        _syncing = false;
     }
 
     private void Update()
@@ -130,37 +182,20 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         FSM.Change(DisState.ResetAndReturn());
     }
 
-    // hasNode reemplaza al viejo NodeType.None: Clean es un nivel legítimo del nodo, así que
-    // "el jugador no trae nada en la mano" ya no se puede deducir del nivel.
-    private bool CheckStateChange(GlitchState level, bool hasNode)
-    {
-        if (!hasNode)
-            return false;
-
-        var toIdleCase = FSM.Current != IdleState && level == GlitchState.Clean;
-        var toGlitchedCase = FSM.Current == IdleState && level == GlitchState.Glitched;
-
-        return toIdleCase || toGlitchedCase;
-    }
-
-    // Sin efectos colaterales: InteractableHandler.GetInteractable evalúa CanInteract sobre TODOS
-    // los interactuables registrados en cada pulsación, así que el feedback de rechazo tiene que
-    // dispararse solo desde Interact (el objeto que el jugador realmente eligió).
-    public bool CanInteract(PlayerNodeHandler player)
-        => CheckStateChange(player.CurrentLevel, player.HasNode) && FSM.Current is IGlitchInterruptible;
+    // Interact quedó exclusivo de manipulación física (agarrar, soltar, enchufar); el glitch se
+    // mueve con Set/Take. Seguimos siendo IInteractable solo para que PlayerInteractionDetector
+    // nos siga registrando: GetClosestGlitcheable sale de esa misma lista y, a diferencia de
+    // GetInteractable, NO filtra por CanInteract.
+    //
+    // Devolver false además saca al Glitcheable de la selección por prioridad: aunque seguimos
+    // declarando Highest, GetInteractable filtra por CanInteract antes de ordenar, así que dejamos
+    // de tapar al NodeController o a la Connection que el jugador quiere usar con Interact.
+    public bool CanInteract(PlayerNodeHandler player) => false;
 
     public void Interact(PlayerNodeHandler player, out bool succeededInteraction)
     {
-        succeededInteraction = CanInteract(player);
-
-        if (!succeededInteraction)
-        {
-            OnInteractionRejected?.Invoke();
-            return;
-        }
-
-        var ii = (IGlitchInterruptible) FSM.Current;
-        ii.Interrupt();
+        succeededInteraction = false;
+        OnInteractionRejected?.Invoke();
     }
 
     public void SetAlpha(float a)

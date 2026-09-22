@@ -39,6 +39,24 @@ public class PlayerData : ScriptableObject
     [Header("Gamepad Interactions")]
     public float holdInteractionTime = default;
 
+    [Header("Glitch Transfer")]
+    [Tooltip("Cuánto hay que mantener Set/Take apretado desde la primera carga para que arranque el modo continuo.")]
+    public float transferHoldDelay = 0.3f;
+
+    [Tooltip("Cada cuánto se transfiere una carga mientras se mantiene apretado.")]
+    public float transferRepeatInterval = 0.25f;
+
+    [Tooltip("Rumble de la primera carga (x = motor bajo, y = motor alto).")]
+    public Vector2 transferInitialRumble = new Vector2(0.35f, 0.5f);
+
+    [Tooltip("Rumble sostenido mientras se transfieren cargas en modo continuo.")]
+    public Vector2 transferHoldRumble = new Vector2(0.6f, 1f);
+
+    [Tooltip("Rumble corto y seco cuando la transferencia no se puede hacer.")]
+    public Vector2 transferErrorRumble = new Vector2(0f, 0.8f);
+
+    public float transferErrorRumbleDuration = 0.08f;
+
     [Header("Gamepad Rumble")]
     public float lowRumbleFrequency = default;
     public float highRumbleFrequency = default;

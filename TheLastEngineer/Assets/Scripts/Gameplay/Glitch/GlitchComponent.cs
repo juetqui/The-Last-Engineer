@@ -35,6 +35,22 @@ public class GlitchComponent : MonoBehaviour
     /// Rechaza (en vez de clampear) todo lo que se salga de [0, MaxLevel]: el clamp silencioso
     /// destruiria cargas y romperia la conservacion del total nodo + objeto.
     /// </summary>
+    /// <summary>
+    /// Red de seguridad para un prefab al que se le olvido agregar el componente: lo agrega en
+    /// runtime arrancando en Clean y avisa. No reemplaza al componente autorizado en el prefab,
+    /// que es el unico lugar donde se puede elegir el nivel inicial.
+    /// </summary>
+    public static GlitchComponent Ensure(GameObject go)
+    {
+        var glitch = go.GetComponent<GlitchComponent>();
+        if (glitch != null) return glitch;
+
+        Debug.LogWarning($"[GlitchComponent] {go.name} no tiene GlitchComponent: se agrega en runtime " +
+                         "arrancando en Clean. Agregalo al prefab para poder setear el nivel inicial.", go);
+
+        return go.AddComponent<GlitchComponent>();
+    }
+
     public bool TryApplyDelta(int delta)
     {
         if (delta == 0) return false;
