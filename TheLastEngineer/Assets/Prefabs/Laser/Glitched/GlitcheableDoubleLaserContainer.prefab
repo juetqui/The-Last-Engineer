@@ -122,6 +122,7 @@ GameObject:
   - component: {fileID: 9012416793114071167}
   - component: {fileID: 388869991194834864}
   - component: {fileID: 4043270034183087401}
+  - component: {fileID: -4509672473723742838}
   m_Layer: 18
   m_Name: GlitcheableDoubleLaserContainer
   m_TagString: Untagged
@@ -272,7 +273,6 @@ MonoBehaviour:
   _audioSource: {fileID: 388869991194834864}
   _sounds: {fileID: 11400000, guid: 78250e8c4e3f351419546d7464dba6ef, type: 2}
   _radialDonutPS: -4.91
-  _startInIdle: 0
   _isPlatform: 0
   debug: 0
   _timer: {fileID: 9012416793114071167}
@@ -409,6 +409,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialPosSetter
   targetMinMaxPos: {x: -6, y: 26}
+--- !u!114 &-4509672473723742838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332061995615490714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be248f7e7c4491647816c9fb34c1526a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitchComponent
+  _currentLevel: 2
 --- !u!1 &2594923253240675911
 GameObject:
   m_ObjectHideFlags: 0
