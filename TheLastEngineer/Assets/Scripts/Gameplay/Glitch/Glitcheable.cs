@@ -62,6 +62,18 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     private GlitchComponent _glitch = default;
     private bool _syncing = false;
 
+    // Intangibilidad (nivel 1): el collider pasa a trigger en vez de apagarse. Apagarlo sacaría
+    // al objeto del PlayerInteractionDetector y el jugador no podría hacer Take para recuperar la
+    // carga: el estado se autosostendría (softlock).
+    private const float OverlapSkin = 0.02f;
+    private const float RescanWindow = 0.25f;
+    private static readonly Collider[] _overlapBuffer = new Collider[16];
+
+    private bool _fsmWantsSolid = true;
+    private bool _isIntangible = false;
+    private bool _baseIsTrigger = false;
+    private float _rescanUntil = -1f;
+
     public GlitchComponent Glitch => _glitch;
     public GlitchState Level => _glitch.CurrentState;
 
@@ -83,7 +95,9 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 
         if (_coll == null)
             _coll = GetComponent<Collider>();
-        
+
+        _baseIsTrigger = _coll.isTrigger;
+
         if (_renderer == null)
             _renderer = GetComponent<Renderer>();
 
@@ -168,6 +182,109 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     private void Update()
     {
         FSM.Tick(Time.deltaTime);
+        UpdateIntangibility();
+    }
+
+    /// <summary>
+    /// Por pull y no por evento: si el jugador muere con el nodo en 1, RespawnPlayer hace
+    /// ResetTracking y este objeto deja de recibir proximidad, así que ningún evento avisaría que
+    /// tiene que volver a sólido.
+    /// </summary>
+    private void UpdateIntangibility()
+    {
+        var wantsIntangible = WantsIntangible();
+
+        if (wantsIntangible != _isIntangible)
+        {
+            if (wantsIntangible)
+            {
+                if (debug && IsPlayerStandingOnTop())
+                    Debug.LogWarning($"[Glitcheable] {name} se vuelve intangible con el jugador parado encima", this);
+
+                _isIntangible = true;
+                ApplyPhysicsState();
+            }
+            // Volver a sólido con la cápsula del jugador adentro lo dejaría trabado o lo
+            // escupiría: se difiere y se reintenta cada frame hasta que salga.
+            else if (!IsPlayerInside())
+            {
+                _isIntangible = false;
+                ApplyPhysicsState();
+            }
+        }
+
+        // Cambiar isTrigger hace que PhysX pierda y reencuentre el par con el trigger del
+        // detector, y un OnTriggerExit tardío nos daría de baja. Nos re-anunciamos durante unos
+        // pasos de física para que el objeto siga siendo targeteable por Take.
+        if (Time.time <= _rescanUntil) Rescan();
+    }
+
+    private bool WantsIntangible()
+    {
+        var player = PlayerNodeHandler.Instance;
+
+        return Level == GlitchState.Intangible
+            && FSM.Current == IdleState
+            && player != null
+            && player.HasNode
+            && player.CurrentLevel == GlitchState.Intangible;
+    }
+
+    /// <summary>Único lugar que escribe el collider: combina lo que pide la FSM con la intangibilidad.</summary>
+    private void ApplyPhysicsState()
+    {
+        var wasTrigger = _coll.isTrigger;
+
+        _coll.enabled = _fsmWantsSolid;
+        _coll.isTrigger = _baseIsTrigger || _isIntangible;
+
+        if (_coll.isTrigger != wasTrigger) _rescanUntil = Time.time + RescanWindow;
+
+        Rescan();
+    }
+
+    private void Rescan()
+    {
+        // Mismo motivo que en NodeController.Attach: el collider se apaga y se vuelve a prender
+        // (acá además el objeto se mueve y cambia de layer en el medio), y ninguno de esos casos
+        // garantiza que PhysX emita OnTriggerEnter/Exit. Nos re-anunciamos al detector del jugador.
+        if (PlayerController.Instance != null)
+            PlayerController.Instance.RescanInteractable(this, _coll);
+    }
+
+    private bool IsPlayerInside()
+    {
+        var player = PlayerController.Instance;
+        if (player == null || player.CC == null || !_coll.enabled) return false;
+
+        var cc = player.CC;
+        var t = cc.transform;
+        var scale = t.lossyScale;
+
+        var radius = cc.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+        var height = Mathf.Max(cc.height * Mathf.Abs(scale.y), radius * 2f);
+        var center = t.TransformPoint(cc.center);
+        var offset = t.up * (height * 0.5f - radius);
+
+        // El margen evita que estar apoyado contra una cara cuente como estar adentro.
+        var count = Physics.OverlapCapsuleNonAlloc(center + offset, center - offset, Mathf.Max(0.01f, radius - OverlapSkin),
+            _overlapBuffer, 1 << _coll.gameObject.layer, QueryTriggerInteraction.Collide);
+
+        for (int i = 0; i < count; i++)
+            if (_overlapBuffer[i] == _coll) return true;
+
+        return false;
+    }
+
+    private bool IsPlayerStandingOnTop()
+    {
+        var player = PlayerController.Instance;
+        if (player == null || player.CC == null || !player.CC.isGrounded) return false;
+
+        var cc = player.CC;
+        var ray = new Ray(cc.transform.TransformPoint(cc.center), Vector3.down);
+
+        return _coll.Raycast(ray, out _, cc.height * 0.5f + cc.skinWidth + 0.1f);
     }
     public void HologramSwitch(bool enable)
     {
@@ -248,15 +365,12 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         _audioSource.Play();
     }
 
+    // Lo llaman los estados de la FSM. Solo registra lo que piden; quien escribe el collider es
+    // ApplyPhysicsState, para que la FSM y la intangibilidad no se pisen.
     public void SetColliders(bool enable)
     {
-        _coll.enabled = enable;
-
-        // Mismo motivo que en NodeController.Attach: el collider se apaga y se vuelve a prender
-        // (acá además el objeto se mueve y cambia de layer en el medio), y ninguno de esos casos
-        // garantiza que PhysX emita OnTriggerEnter/Exit. Nos re-anunciamos al detector del jugador.
-        if (PlayerController.Instance != null)
-            PlayerController.Instance.RescanInteractable(this, _coll);
+        _fsmWantsSolid = enable;
+        ApplyPhysicsState();
     }
 
     public void AdvanceToNextNode()
