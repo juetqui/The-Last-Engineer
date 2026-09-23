@@ -24,9 +24,6 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
     private Renderer _renderer = default;
     private Animator _animator = default;
     private ParticleSystem[] _particles = new ParticleSystem[2];
-    private Color _cleanColor = new Color(0f, 1f, 1f);            // #00FFFF
-    private Color _intangibleColor = new Color(1f, 0.839f, 0f);   // #FFD600
-    private Color _glitchedColor = new Color(0.949f, 0f, 1f);     // #F200FF
     private Color _currentColor = default;
     private Outline _outline = default;
     #endregion
@@ -147,15 +144,7 @@ public class NodeController : MonoBehaviour, IInteractable, IProximityListener
         OnUpdatedNodeType?.Invoke(level);
     }
 
-    private Color ResolveColor(GlitchState level)
-    {
-        switch (level)
-        {
-            case GlitchState.Intangible: return _intangibleColor;
-            case GlitchState.Glitched: return _glitchedColor;
-            default: return _cleanColor;
-        }
-    }
+    private Color ResolveColor(GlitchState level) => GlitchPalette.Default.ColorFor(level);
 
     public void OnPlayerProximity(bool inRange, PlayerController player)
     {

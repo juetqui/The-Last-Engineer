@@ -5,26 +5,27 @@ public class OutlineController : MonoBehaviour
     Outline _outline;
     NodeController _nodeController;
 
-    [SerializeField] private Color _emissionDefault;
-    [SerializeField] private Color _emissionCorrupted;
-
     private void Awake()
     {
-        _outline = GetComponent<Outline>();   
+        _outline = GetComponent<Outline>();
         _nodeController = GetComponentInParent<NodeController>();
         _nodeController.OnUpdatedNodeType += ChangeOutline;
         _nodeController.OnEnableOutline += EnableOutline;
     }
-    private void ChangeOutline(GlitchState node)
+
+    private void OnDestroy()
     {
-        if (node == GlitchState.Glitched)
-        {
-            _outline.OutlineColor = _emissionCorrupted;
-        }
-        else
-        {
-            _outline.OutlineColor = _emissionDefault;
-        }
+        if (_nodeController == null) return;
+
+        _nodeController.OnUpdatedNodeType -= ChangeOutline;
+        _nodeController.OnEnableOutline -= EnableOutline;
+    }
+
+    // Los colores salen de la paleta compartida: con tres niveles, tenerlos serializados en cada
+    // prefab era la forma más fácil de que el outline y el cristal quedaran desincronizados.
+    private void ChangeOutline(GlitchState level)
+    {
+        _outline.OutlineColor = GlitchPalette.Default.EmissionFor(level);
     }
 
     private void EnableOutline(bool enable)

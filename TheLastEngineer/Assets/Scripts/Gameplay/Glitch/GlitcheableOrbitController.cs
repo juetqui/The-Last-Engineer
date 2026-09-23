@@ -20,58 +20,119 @@ public class GlitcheableOrbitController : MonoBehaviour
 
     [Header("PS Ease Type")]
     [SerializeField] private Ease scaleEaseType = Ease.OutQuad;
-    
+
     [Header("Debug")]
     [SerializeField] private bool debug = false;
 
     private bool _isPlayerInRange;
+    // Proximidad real, independiente de si este orbe es el que se ve: cuando cambia el nivel y le
+    // toca a otro orbe, el nuevo tiene que saber si crecer sin esperar a que el jugador salga y entre.
+    private bool _playerNear;
     private Glitcheable _glitcheable;
     private ParticleSystem[] _particleSystem;
-    
+    private ParticleSystem.MinMaxGradient[] _originalColors;
+    private PlayerController _subscribedPlayer;
+
+    // Si el prefab no trae un orbe propio para Intangible, el de Idle lo cubre teñido con la
+    // paleta. Así el nivel 1 se distingue sin obligar a tocar cada prefab.
+    private bool _hasIntangibleOrbit;
+
     public Action<bool> OnPlayerInRange;
-    
+
+    // Intangible va al final: el enum se serializa como int en los prefabs.
     private enum PSType
     {
         Idle,
-        Corrupted
+        Corrupted,
+        Intangible
     }
-    
+
     private void Awake()
     {
         _glitcheable = GetComponentInParent<Glitcheable>();
         _particleSystem = GetComponentsInChildren<ParticleSystem>(true);
+
+        _originalColors = new ParticleSystem.MinMaxGradient[_particleSystem.Length];
+        for (int i = 0; i < _particleSystem.Length; i++)
+            _originalColors[i] = _particleSystem[i].main.startColor;
     }
 
     private void Start()
     {
+        // En Start y no en Awake: hace falta que todos los orbes hermanos ya estén despiertos.
+        foreach (var orbit in _glitcheable.GetComponentsInChildren<GlitcheableOrbitController>(true))
+            if (orbit.psType == PSType.Intangible) _hasIntangibleOrbit = true;
+
         _glitcheable.FSM.OnStateChanged += SetUpPSColor;
         _glitcheable.OnInteractionRejected += BouncePS;
         _glitcheable.OnPlayerInRange += SetUpPlayerInRange;
+        _glitcheable.Glitch.OnGlitchStateChanged += OnLevelChanged;
+
+        ApplyTint();
     }
+
+    private void OnDestroy()
+    {
+        if (_glitcheable != null)
+        {
+            if (_glitcheable.FSM != null) _glitcheable.FSM.OnStateChanged -= SetUpPSColor;
+            if (_glitcheable.Glitch != null) _glitcheable.Glitch.OnGlitchStateChanged -= OnLevelChanged;
+            _glitcheable.OnInteractionRejected -= BouncePS;
+            _glitcheable.OnPlayerInRange -= SetUpPlayerInRange;
+        }
+
+        if (_subscribedPlayer != null) _subscribedPlayer.OnGlitcheableInArea -= SetUpParticles;
+
+        if (_particleSystem == null) return;
+
+        foreach (var ps in _particleSystem)
+        {
+            if (ps != null)
+                Tween.StopAll(onTarget: ps.transform);
+        }
+    }
+
+    private PSType ActiveType()
+    {
+        if (_glitcheable.IsCorrupted) return PSType.Corrupted;
+        if (_glitcheable.Level == GlitchState.Intangible && _hasIntangibleOrbit) return PSType.Intangible;
+
+        return PSType.Idle;
+    }
+
+    private bool IsMyTurn() => psType == ActiveType();
 
     private void SetUpPlayerInRange(PlayerController player, bool entered)
     {
-        if (entered) player.OnGlitcheableInArea += SetUpParticles;
+        if (entered)
+        {
+            if (_subscribedPlayer != null) _subscribedPlayer.OnGlitcheableInArea -= SetUpParticles;
+
+            _subscribedPlayer = player;
+            player.OnGlitcheableInArea += SetUpParticles;
+        }
         else
         {
             player.OnGlitcheableInArea -= SetUpParticles;
+            if (_subscribedPlayer == player) _subscribedPlayer = null;
+
             SetUpParticles(null);
         }
     }
 
     private void SetUpParticles(Glitcheable glitcheable)
     {
-        var newIsInRange = _glitcheable == glitcheable && glitcheable != null;
+        _playerNear = _glitcheable == glitcheable && glitcheable != null;
 
-        if (newIsInRange == _isPlayerInRange) return;
+        ApplyRange();
+    }
 
-        if (_glitcheable.IsCorrupted && psType != PSType.Corrupted
-        || !_glitcheable.IsCorrupted && psType != PSType.Idle)
-        {
-            return;
-        }
+    private void ApplyRange()
+    {
+        if (_playerNear == _isPlayerInRange) return;
+        if (!IsMyTurn()) return;
 
-        _isPlayerInRange = newIsInRange;
+        _isPlayerInRange = _playerNear;
         OnPlayerInRange?.Invoke(_isPlayerInRange);
 
         foreach (var ps in _particleSystem)
@@ -82,7 +143,7 @@ public class GlitcheableOrbitController : MonoBehaviour
                 ps.Play();
             }
             else ps.Stop();
-            
+
             var targetScale = _isPlayerInRange ? Vector3.one * upScale : Vector3.one * downScale;
 
             Tween.StopAll(onTarget: ps.transform);
@@ -95,9 +156,24 @@ public class GlitcheableOrbitController : MonoBehaviour
 
     private void SetUpPSColor(IState state)
     {
-        var condition = _glitcheable.IsCorrupted && psType == PSType.Corrupted || !_glitcheable.IsCorrupted && psType == PSType.Idle;
+        RefreshVisibility();
 
-        if (condition)
+        if (state == _glitcheable.DisState)
+            SetUpParticles(null);
+    }
+
+    // Clean <-> Intangible no cambia el estado de la FSM, así que sin esto el orbe no se enteraría.
+    private void OnLevelChanged(GlitchState level)
+    {
+        RefreshVisibility();
+        ApplyRange();
+    }
+
+    private void RefreshVisibility()
+    {
+        ApplyTint();
+
+        if (IsMyTurn())
         {
             foreach (var ps in _particleSystem)
             {
@@ -114,18 +190,21 @@ public class GlitcheableOrbitController : MonoBehaviour
             }
         }
 
-        if (state == _glitcheable.DisState)
-            SetUpParticles(null);
+        if (debug) Debug.Log($"[GlitcheableOrbitController] {name} ({psType}) activo={IsMyTurn()} nivel={_glitcheable.Level}", this);
     }
 
-    private void OnDestroy()
+    private void ApplyTint()
     {
-        if (_particleSystem == null) return;
+        if (psType != PSType.Idle || _hasIntangibleOrbit) return;
 
-        foreach (var ps in _particleSystem)
+        var tinted = _glitcheable.Level == GlitchState.Intangible;
+
+        for (int i = 0; i < _particleSystem.Length; i++)
         {
-            if (ps != null)
-                Tween.StopAll(onTarget: ps.transform);
+            var main = _particleSystem[i].main;
+            main.startColor = tinted
+                ? new ParticleSystem.MinMaxGradient(GlitchPalette.Default.ColorFor(GlitchState.Intangible))
+                : _originalColors[i];
         }
     }
 

@@ -39,6 +39,16 @@ public class InputPromptIcon : MonoBehaviour
             _detector.OnDeviceChanged -= Refresh;
     }
 
+    /// <summary>Cambia la acción mostrada en runtime (el HUD alterna entre Interact, Set y Take).</summary>
+    public void SetAction(InputPromptDatabase.PromptAction action)
+    {
+        if (_action == action) return;
+
+        _action = action;
+
+        if (_detector != null) Refresh(_detector.CurrentDevice);
+    }
+
     private void Refresh(DeviceType device)
     {
         if (_image == null || _database == null) return;

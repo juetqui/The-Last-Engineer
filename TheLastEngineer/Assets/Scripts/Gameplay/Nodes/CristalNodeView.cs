@@ -3,10 +3,6 @@ using UnityEngine;
 public class CristalNodeView : MonoBehaviour
 {
     [SerializeField] Renderer _effectNode;
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _emissionDefault;
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _emissionCorrupted;
 
     NodeController controller;
     private Renderer _renderer;
@@ -18,17 +14,17 @@ public class CristalNodeView : MonoBehaviour
         controller.OnUpdatedNodeType += ChangeColor;
     }
 
-    void ChangeColor(GlitchState node)
+    private void OnDestroy()
     {
-        if (node == GlitchState.Glitched)
-        {
-            _renderer.material.SetColor("_EmissiveColor", _emissionCorrupted);
-            _effectNode.material.SetFloat("_isCorrupted", 1);
-        }
-        else
-        {
-            _renderer.material.SetColor("_EmissiveColor", _emissionDefault);
-            _effectNode.material.SetFloat("_isCorrupted", 0);
-        }
+        if (controller != null) controller.OnUpdatedNodeType -= ChangeColor;
+    }
+
+    void ChangeColor(GlitchState level)
+    {
+        _renderer.material.SetColor("_EmissiveColor", GlitchPalette.Default.EmissionFor(level));
+
+        // _isCorrupted es un booleano en S_NodeLiquidEffect: hasta que el shader tenga un tercer
+        // estado, Intangible se ve como Clean y solo lo distingue el color emisivo.
+        _effectNode.material.SetFloat("_isCorrupted", level == GlitchState.Glitched ? 1 : 0);
     }
 }

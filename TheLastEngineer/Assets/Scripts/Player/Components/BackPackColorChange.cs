@@ -1,14 +1,7 @@
-using TMPro;
 using UnityEngine;
 
 public class BackPackColorChange : MonoBehaviour
 {
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _defultColor;
-    
-    [ColorUsageAttribute(true, true)]
-    [SerializeField] private Color _glitchedColor;
-
     private Renderer _renderer = default;
     private Color _targetColor = default;
 
@@ -23,19 +16,19 @@ public class BackPackColorChange : MonoBehaviour
         PlayerNodeHandler.Instance.OnNodeGrabbed += CheckNode;
     }
 
+    private void OnDestroy()
+    {
+        if (PlayerNodeHandler.Instance != null) PlayerNodeHandler.Instance.OnNodeGrabbed -= CheckNode;
+    }
+
     private void Update()
     {
         if (_changeColor) ChangeColor();
     }
 
-    private void CheckNode(bool hasNode, GlitchState nodeType)
+    private void CheckNode(bool hasNode, GlitchState level)
     {
-        if (!hasNode)
-            _targetColor = Color.black;
-        else if (nodeType == GlitchState.Clean)
-            _targetColor = _defultColor;
-        else
-            _targetColor = _glitchedColor;
+        _targetColor = hasNode ? GlitchPalette.Default.EmissionFor(level) : Color.black;
 
         _changeColor = true;
     }

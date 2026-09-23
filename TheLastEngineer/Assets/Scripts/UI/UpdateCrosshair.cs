@@ -5,9 +5,6 @@ public class UpdateCrosshair : UpdatePosToTarget
 {
     [SerializeField] Image _circleImage;
 
-    [SerializeField] private Color defaultColor;
-    [SerializeField] private Color glitchColor;
-
     private Animator _myAnim;
     private Glitcheable _currentTarget;
 
@@ -57,14 +54,18 @@ public class UpdateCrosshair : UpdatePosToTarget
 
     private void CompareGlitchWithPlayerNode(Glitcheable glitcheable)
     {
-        // El gate de HasNode es el que antes hacía NodeType.None: sin nodo en mano, Clean haría
-        // pasar la segunda condición y el crosshair se mostraría como compatible.
-        var compatible = PlayerNodeHandler.Instance.HasNode &&
-            ((PlayerNodeHandler.Instance.CurrentLevel == GlitchState.Glitched && glitcheable.IsCorrupted) ||
-             (PlayerNodeHandler.Instance.CurrentLevel == GlitchState.Clean && !glitcheable.IsCorrupted));
+        // Se muestra si Set o Take pueden mover carga: misma regla que usa el HUD de acciones
+        // (PlayerController.ResolveGlitchHudTarget), para que los dos no se contradigan. Sin nodo
+        // en mano CurrentGlitch es null y Preview devuelve NoSource/NoTarget.
+        var node = PlayerNodeHandler.Instance.CurrentGlitch;
+        var obj = glitcheable.Glitch;
 
-        SetVisual(!compatible);
-        _circleImage.color = glitcheable.IsCorrupted ? glitchColor : defaultColor;
+        var canTransfer =
+            GlitchTransferManager.Preview(node, obj) == GlitchTransferResult.Transferred ||
+            GlitchTransferManager.Preview(obj, node) == GlitchTransferResult.Transferred;
+
+        SetVisual(canTransfer);
+        _circleImage.color = GlitchPalette.Default.ColorFor(glitcheable.Level);
     }
 
     public void SetUpdateAnim()

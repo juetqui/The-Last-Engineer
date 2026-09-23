@@ -8,6 +8,7 @@ public class PlayerView
     private Material[] _originalMats = default, _corruptionMats = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
     private ParticleSystem _defaultPS = default, _corruptedPS = default;
+    private ParticleSystem.MinMaxGradient _defaultPSColor = default;
     private ParticleSystem _teleportPS = default;
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
@@ -38,6 +39,8 @@ public class PlayerView
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
         _teleportPS = teleportPS;
+
+        if (_defaultPS != null) _defaultPSColor = _defaultPS.main.startColor;
     }
 
     public void OnStart()
@@ -128,12 +131,20 @@ public class PlayerView
         {
             _renderer.materials[1].SetFloat("_IsGlitched", 1);
             _corruptedPS.Play();
+            return;
         }
-        else
-        {
-            _renderer.materials[1].SetFloat("_IsGlitched", 0);
-            _defaultPS.Play();
-        }
+
+        // _IsGlitched es un booleano en S_GlowCharacter, así que Intangible se ve como Clean en el
+        // material. Lo que lo distingue son las partículas: las de Clean teñidas con el color de la
+        // paleta, restaurando el color original del prefab cuando se vuelve a Clean.
+        _renderer.materials[1].SetFloat("_IsGlitched", 0);
+
+        var main = _defaultPS.main;
+        main.startColor = nodeType == GlitchState.Intangible
+            ? new ParticleSystem.MinMaxGradient(GlitchPalette.Default.ColorFor(GlitchState.Intangible))
+            : _defaultPSColor;
+
+        _defaultPS.Play();
     }
 
     public void TeleportPS()

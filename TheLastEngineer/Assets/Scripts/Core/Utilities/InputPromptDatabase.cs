@@ -18,7 +18,11 @@ public class InputPromptDatabase : ScriptableObject
         ResetCam,
         CameraLeft,
         CameraRight,
-        Cancel
+        Cancel,
+        // Al final a propósito: el enum se serializa como int en el .asset y en cada
+        // InputPromptIcon, e insertarlos en el medio correría los valores existentes.
+        Set,
+        Take
     }
 
     [Serializable]
