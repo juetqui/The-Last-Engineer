@@ -15,6 +15,8 @@ public class PlayerData : ScriptableObject
     public LayerMask glitchDetectionLayer = default;
     public LayerMask defaultLayer = default;
     public LayerMask teleportLayer = default;
+    
+    public Material intangibleMat = default;
 
     [Header("Interaction")]
     public float interactionRadius = 2.5f;

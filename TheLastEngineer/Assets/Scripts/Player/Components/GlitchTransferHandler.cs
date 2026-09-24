@@ -19,10 +19,10 @@ public class GlitchTransferHandler : MonoBehaviour
         Take    // del objeto al nodo
     }
 
-    private PlayerController _player = default;
-    private PlayerNodeHandler _nodeHandler = default;
-    private InputHandler _input = default;
-    private PlayerData _data = default;
+    private PlayerController _player;
+    private PlayerNodeHandler _nodeHandler;
+    private InputHandler _input;
+    private PlayerData _data;
 
     private bool _active = false;
     private bool _continuous = false;

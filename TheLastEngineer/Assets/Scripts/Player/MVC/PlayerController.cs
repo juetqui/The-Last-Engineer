@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
                 _playerData.interactionRadius, _playerData.losCheckInterval, _playerData.losDebounceTime);
 
         _model = new PlayerModel(CC, transform, _playerData, _collider);
-        View = new PlayerView(_renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
+        View = new PlayerView(gameObject, _renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
 
         _checkPointPos = transform.position;
 

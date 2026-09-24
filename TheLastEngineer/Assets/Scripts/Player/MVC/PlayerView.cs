@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
-using UnityEngine.UIElements;
+using PrimeTween;
 
 public class PlayerView
 {
+    private GameObject _playerObj;
     private Renderer _renderer = default;
     private Material[] _originalMats = default, _corruptionMats = default;
     private ParticleSystem _walkPS = default, _orbitPS = default;
@@ -13,16 +14,18 @@ public class PlayerView
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip = default, _fallClip = default;
+    private Material _intangibleMat;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
     public Action OnDashViewPlayed = delegate { };
 
-    public PlayerView(Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS, ParticleSystem teleportPS)
+    public PlayerView(GameObject playerObj, Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS, ParticleSystem teleportPS)
     {
         if (renderer == null || playerData == null)
             throw new System.ArgumentNullException("Core dependencies cannot be null");
 
+        _playerObj = playerObj;
         _renderer = renderer;
         _walkPS = walkPS;
         _orbitPS = orbitPS;
@@ -39,6 +42,7 @@ public class PlayerView
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
         _teleportPS = teleportPS;
+        _intangibleMat = playerData.intangibleMat;
 
         if (_defaultPS != null) _defaultPSColor = _defaultPS.main.startColor;
     }
@@ -127,11 +131,22 @@ public class PlayerView
     {
         _renderer.materials[1].SetFloat("_HasNode", 1);
 
-        if (nodeType == GlitchState.Glitched)
+        var intangibleMatFrom = _intangibleMat.GetFloat("_Alpha");
+        
+        if (nodeType == GlitchState.Intangible)
         {
+            TweenFloat(_intangibleMat, "_Alpha", intangibleMatFrom, 1f, 0.5f);
+        }
+        else if (nodeType == GlitchState.Glitched)
+        {
+            TweenFloat(_intangibleMat, "_Alpha", intangibleMatFrom, 0f, 0.5f);
             _renderer.materials[1].SetFloat("_IsGlitched", 1);
             _corruptedPS.Play();
             return;
+        }
+        else
+        {
+            TweenFloat(_intangibleMat, "_Alpha", intangibleMatFrom, 0f, 0.5f);
         }
 
         // _IsGlitched es un booleano en S_GlowCharacter, así que Intangible se ve como Clean en el
@@ -200,5 +215,12 @@ public class PlayerView
         source.clip = clip;
         source.pitch = pitch;
         source.Play();
+    }
+    
+    private Tween TweenFloat(Material mat, string prop, float from, float to, float dur)
+    {
+        mat.SetFloat(prop, from);
+        return Tween.Custom(_playerObj, from, to, dur,
+            (_, v) => mat.SetFloat(prop, v), Ease.Linear);
     }
 }

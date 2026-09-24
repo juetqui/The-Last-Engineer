@@ -31,6 +31,7 @@ MonoBehaviour:
   teleportLayer:
     serializedVersion: 2
     m_Bits: 16384
+  intangibleMat: {fileID: 2100000, guid: 54000a144e3f8f84ba369fa0a6439258, type: 2}
   interactionRadius: 7
   losCheckInterval: 0
   losDebounceTime: 0.08
@@ -40,6 +41,12 @@ MonoBehaviour:
   dashDuration: 0.3
   dashCD: 0.5
   holdInteractionTime: 0
+  transferHoldDelay: 0.3
+  transferRepeatInterval: 0.25
+  transferInitialRumble: {x: 0.35, y: 0.5}
+  transferHoldRumble: {x: 0.6, y: 1}
+  transferErrorRumble: {x: 0, y: 0.8}
+  transferErrorRumbleDuration: 0.08
   lowRumbleFrequency: 0.25
   highRumbleFrequency: 1
   rumbleDuration: 0.25
