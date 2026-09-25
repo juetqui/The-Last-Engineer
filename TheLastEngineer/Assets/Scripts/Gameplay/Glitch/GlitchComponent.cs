@@ -31,11 +31,6 @@ public class GlitchComponent : MonoBehaviour
     public event Action<GlitchState> OnGlitchStateChanged;
 
     /// <summary>
-    /// Unico mutador del nivel en todo el proyecto, y solo lo llama GlitchTransferManager.
-    /// Rechaza (en vez de clampear) todo lo que se salga de [0, MaxLevel]: el clamp silencioso
-    /// destruiria cargas y romperia la conservacion del total nodo + objeto.
-    /// </summary>
-    /// <summary>
     /// Red de seguridad para un prefab al que se le olvido agregar el componente: lo agrega en
     /// runtime arrancando en Clean y avisa. No reemplaza al componente autorizado en el prefab,
     /// que es el unico lugar donde se puede elegir el nivel inicial.
@@ -51,6 +46,11 @@ public class GlitchComponent : MonoBehaviour
         return go.AddComponent<GlitchComponent>();
     }
 
+    /// <summary>
+    /// Unico mutador del nivel en todo el proyecto, y solo lo llama GlitchTransferManager.
+    /// Rechaza (en vez de clampear) todo lo que se salga de [0, MaxLevel]: el clamp silencioso
+    /// destruiria cargas y romperia la conservacion del total nodo + objeto.
+    /// </summary>
     public bool TryApplyDelta(int delta)
     {
         if (delta == 0) return false;

@@ -290,6 +290,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void RescanInteractable(IInteractable interactable, Collider coll)
         => _interactionDetector?.Rescan(interactable, coll);
 
+    // Solo distancia al radio del detector: ignora línea de visión y registro.
+    public bool IsInInteractionRange(Collider coll)
+        => _interactionDetector != null && _interactionDetector.IsInRange(coll);
+
     // Estado cacheado por el detector: sigue en rango y con línea de visión despejada. Lo consultan
     // los estados del jugador para cortar una interacción en curso si aparece una pared en el medio
     // o si el objetivo se va (el Glitcheable se mueve mientras se lo mantiene apretado).

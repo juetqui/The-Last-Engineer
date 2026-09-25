@@ -213,16 +213,24 @@ public class PlayerInteractionDetector : MonoBehaviour
     {
         if (_handler == null || interactable == null || coll == null) return;
 
-        // Mismo criterio de presencia que el barrido, para que las dos vías no se contradigan y
-        // un objeto que reactiva su collider lejos del jugador no dé de alta por un frame.
+        if (IsInRange(coll)) Track(interactable, coll);
+        else Untrack(interactable, coll);
+    }
+
+    /// <summary>
+    /// Test geométrico de rango, sin pasar por el registro ni por eventos de PhysX. Es el mismo
+    /// criterio de presencia que el barrido, para que las vías no se contradigan y un objeto que
+    /// reactiva su collider lejos del jugador no dé de alta por un frame. Lo consulta también el
+    /// Glitcheable para su intangibilidad: no puede depender del registro porque cambiar isTrigger
+    /// provoca un OnTriggerExit tardío que lo daría de baja por un instante.
+    /// </summary>
+    public bool IsInRange(Collider coll)
+    {
+        if (coll == null || !coll.enabled || !coll.gameObject.activeInHierarchy) return false;
+
         float limit = Radius * RangeTolerance;
 
-        bool present = coll.enabled
-            && coll.gameObject.activeInHierarchy
-            && coll.bounds.SqrDistance(Center) <= limit * limit;
-
-        if (present) Track(interactable, coll);
-        else Untrack(interactable, coll);
+        return coll.bounds.SqrDistance(Center) <= limit * limit;
     }
 
     /// <summary>

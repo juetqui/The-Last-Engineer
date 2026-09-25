@@ -227,7 +227,21 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
             && FSM.Current == IdleState
             && player != null
             && player.HasNode
-            && player.CurrentLevel == GlitchState.Intangible;
+            && player.CurrentLevel == GlitchState.Intangible
+            && IsPlayerInRange();
+    }
+
+    /// <summary>
+    /// Intangible solo dentro del rango de interacción: al alejarse el objeto vuelve a sólido.
+    /// Se consulta geométricamente y no con OnPlayerProximity porque cambiar isTrigger dispara un
+    /// OnTriggerExit tardío en el detector: lo daría "fuera de rango", volvería a sólido, el Rescan
+    /// lo re-registraría y quedaría oscilando. Los bounds no cambian al togglear el trigger.
+    /// </summary>
+    private bool IsPlayerInRange()
+    {
+        var player = PlayerController.Instance;
+
+        return player != null && player.IsInInteractionRange(_coll);
     }
 
     /// <summary>Único lugar que escribe el collider: combina lo que pide la FSM con la intangibilidad.</summary>
