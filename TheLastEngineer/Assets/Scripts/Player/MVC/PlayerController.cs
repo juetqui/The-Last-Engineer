@@ -34,6 +34,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action OnTeleported;
 
     public Action<IInteractable> OnInteractableDetected;
+    // Todos los frames, como OnInteractableDetected: el glitcheable al que Set o Take pueden
+    // mover carga con el nodo en mano, o null si no hay ninguno.
+    public Action<Glitcheable> OnGlitcheableDetected;
 
     // Cinematic Events
     public Action<Transform, LayerMask, bool> OnCinematicSetupRequested; // parent, cinematicLayer, storeCCState
@@ -133,14 +136,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         GetClosestGlitcheable();
         
-        // El Glitcheable dejó de ser seleccionable con Interact (CanInteract => false), pero sigue
-        // siendo lo que el HUD tiene que señalar cuando el jugador puede transferirle carga. Va
-        // como fallback y no con prioridad, así no tapa a un nodo o una conexión que sí se pueden
-        // usar con Interact.
-        IInteractable target = _interactableHandler.GetInteractable(_nodeHandler, transform.position)
-            ?? ResolveGlitchHudTarget();
-
-        OnInteractableDetected?.Invoke(target);
+        // Dos señales separadas porque son dos HUDs que conviven: el de Interact (nodo, conexión) y
+        // el de Set/Take. Si el glitcheable fuera un fallback de la misma señal, un nodo cercano
+        // taparía las acciones de glitch que el jugador sí puede hacer.
+        OnInteractableDetected?.Invoke(_interactableHandler.GetInteractable(_nodeHandler, transform.position));
+        OnGlitcheableDetected?.Invoke(ResolveGlitchHudTarget());
     }
 
     private void OnDestroy()

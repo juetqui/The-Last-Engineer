@@ -1,54 +1,118 @@
+using System;
+using PrimeTween;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using PromptAction = InputPromptDatabase.PromptAction;
 
+/// <summary>
+/// HUD de la acción disponible. En modo Interactable muestra el prompt de Interact (Put / Grab)
+/// sobre el nodo o la conexión seleccionada. En modo Glitcheable vive en un panel padre con un
+/// hijo por acción (Set y Take) y prende cada uno según lo que la carga permita mover.
+/// </summary>
 public class UIActionController : MonoBehaviour
 {
+    [Tooltip("Que señal del PlayerController muestra este HUD.")]
+    [SerializeField] private UITargetSource _source = UITargetSource.Interactable;
+
+    [Header("Interactable")]
     [SerializeField] private Image inputBtn;
     [SerializeField] private TextMeshProUGUI inputText;
 
-    private Image _bgImg;
+    [Header("Glitcheable")]
+    [Tooltip("Panel padre. No se desactiva, solo se escala.")]
+    [SerializeField] private RectTransform _glitchRoot;
+    [SerializeField] private GlitchActionPanel _setPanel = new GlitchActionPanel();
+    [SerializeField] private GlitchActionPanel _takePanel = new GlitchActionPanel();
+
+    [Header("Glitcheable Scale Tween")]
+    [SerializeField] private float _minScale = 0f;
+    [SerializeField] private float _maxScale = 1f;
+    [SerializeField] private float _scaleDuration = 0.2f;
+    [SerializeField] private Ease _scaleEase = Ease.OutBack;
+
+    [Serializable]
+    private class GlitchActionPanel
+    {
+        public RectTransform panel;
+        public Image inputBtn;
+        public TextMeshProUGUI inputText;
+
+        [NonSerialized] public bool shown;
+        [NonSerialized] public LayoutElement layout;
+    }
+
     private InputPromptIcon _promptIcon;
+    private UIScaleTween _scaleTween;
+    private bool _rootShown;
+
+    private void Awake()
+    {
+        _scaleTween = new UIScaleTween(_minScale, _maxScale, _scaleDuration, _scaleEase);
+    }
 
     private void Start()
     {
-        _bgImg = GetComponent<Image>();
-        _promptIcon = inputBtn.GetComponent<InputPromptIcon>();
-        SetUpUI(false);
+        if (_source == UITargetSource.Glitcheable)
+        {
+            InitGlitchPanels();
+        }
+        else
+        {
+            _promptIcon = inputBtn.GetComponent<InputPromptIcon>();
+            SetUpUI(inputBtn, inputText, false);
+        }
 
-        PlayerController.Instance.OnInteractableDetected += OnInteractableDetected;
+        Subscribe(true);
     }
 
     private void OnDestroy()
     {
-        if (PlayerController.Instance != null)
-            PlayerController.Instance.OnInteractableDetected -= OnInteractableDetected;
+        _scaleTween?.Stop(_glitchRoot);
+        _scaleTween?.Stop(_setPanel.panel);
+        _scaleTween?.Stop(_takePanel.panel);
+
+        Subscribe(false);
     }
 
+    private void Subscribe(bool value)
+    {
+        var player = PlayerController.Instance;
+        if (player == null) return;
+
+        if (_source == UITargetSource.Glitcheable)
+        {
+            if (value) player.OnGlitcheableDetected += OnGlitcheableDetected;
+            else player.OnGlitcheableDetected -= OnGlitcheableDetected;
+        }
+        else
+        {
+            if (value) player.OnInteractableDetected += OnInteractableDetected;
+            else player.OnInteractableDetected -= OnInteractableDetected;
+        }
+    }
+
+    private static void SetUpUI(Image btn, TextMeshProUGUI text, bool active)
+    {
+        if (btn != null) btn.gameObject.SetActive(active);
+        if (text != null) text.gameObject.SetActive(active);
+    }
+
+    #region -----INTERACTABLE-----
     private void OnInteractableDetected(IInteractable interactable)
     {
         if (interactable == null)
         {
-            SetUpUI(false);
+            SetUpUI(inputBtn, inputText, false);
             return;
         }
 
         SetUpText(interactable);
-        SetUpUI(true);
-    }
-
-    private void SetUpUI(bool active)
-    {
-        // _bgImg.enabled = active;
-        inputBtn.gameObject.SetActive(active);
-        inputText.gameObject.SetActive(active);
+        SetUpUI(inputBtn, inputText, true);
     }
 
     private void SetUpText(IInteractable interactable)
     {
-        var action = PromptAction.Interact;
-
         if (interactable is Connection)
         {
             inputText.text = "Put";
@@ -58,43 +122,91 @@ public class UIActionController : MonoBehaviour
             // "Grab" y no "Take": Take es ahora la acción de sacarle glitch a un objeto.
             inputText.text = "Grab";
         }
-        else if (interactable is Glitcheable glitcheable)
-        {
-            action = SetUpGlitchText(glitcheable);
-        }
         else
         {
             inputText.text = "Caso no contemplado";
         }
 
-        if (_promptIcon != null) _promptIcon.SetAction(action);
+        if (_promptIcon != null) _promptIcon.SetAction(PromptAction.Interact);
+    }
+    #endregion
+
+    #region -----GLITCHEABLE-----
+    private void InitGlitchPanels()
+    {
+        _rootShown = false;
+        _scaleTween.SnapHidden(_glitchRoot);
+
+        InitGlitchPanel(_setPanel);
+        InitGlitchPanel(_takePanel);
+    }
+
+    private void InitGlitchPanel(GlitchActionPanel p)
+    {
+        if (p.panel == null) return;
+
+        // El LayoutGroup del padre ignora la escala: un hijo achicado a cero seguiría ocupando su
+        // lugar y dejaría un hueco. Se lo saca del layout mientras está oculto.
+        p.layout = p.panel.GetComponent<LayoutElement>();
+        if (p.layout == null) p.layout = p.panel.gameObject.AddComponent<LayoutElement>();
+
+        p.shown = false;
+        p.layout.ignoreLayout = true;
+        _scaleTween.SnapHidden(p.panel);
+        SetUpUI(p.inputBtn, p.inputText, false);
     }
 
     /// <summary>
-    /// El Glitcheable solo llega acá como fallback de PlayerController.ResolveGlitchHudTarget, que
-    /// ya garantiza que al menos una dirección es posible. Las dos a la vez solo se dan con objeto
-    /// y nodo en Intangible: el texto nombra ambas y el ícono muestra Set.
+    /// Llega todos los frames. Solo dispara tweens cuando cambia lo que se puede hacer, y cada
+    /// panel se toca únicamente si su propio estado cambió: si deja de poder hacerse Take pero Set
+    /// sigue, solo se achica Take.
     /// </summary>
-    private PromptAction SetUpGlitchText(Glitcheable glitcheable)
+    private void OnGlitcheableDetected(Glitcheable glitcheable)
     {
         var node = PlayerNodeHandler.Instance != null ? PlayerNodeHandler.Instance.CurrentGlitch : null;
+        var obj = glitcheable != null ? glitcheable.Glitch : null;
 
-        var canSet = GlitchTransferManager.Preview(node, glitcheable.Glitch) == GlitchTransferResult.Transferred;
-        var canTake = GlitchTransferManager.Preview(glitcheable.Glitch, node) == GlitchTransferResult.Transferred;
+        var canSet = GlitchTransferManager.Preview(node, obj) == GlitchTransferResult.Transferred;
+        var canTake = GlitchTransferManager.Preview(obj, node) == GlitchTransferResult.Transferred;
+        var showRoot = canSet || canTake;
 
-        if (canSet && canTake)
+        if (showRoot && !_rootShown)
         {
-            inputText.text = "Set / Take";
-            return PromptAction.Set;
+            _rootShown = true;
+            _scaleTween.Show(_glitchRoot);
         }
 
-        if (canTake)
-        {
-            inputText.text = "Take";
-            return PromptAction.Take;
-        }
+        SetGlitchPanel(_setPanel, canSet);
+        SetGlitchPanel(_takePanel, canTake);
 
-        inputText.text = "Set";
-        return PromptAction.Set;
+        if (!showRoot && _rootShown)
+        {
+            _rootShown = false;
+            _scaleTween.Hide(_glitchRoot);
+        }
     }
+
+    private void SetGlitchPanel(GlitchActionPanel p, bool show)
+    {
+        if (p.panel == null || p.shown == show) return;
+
+        p.shown = show;
+
+        if (show)
+        {
+            // Vuelve al layout antes de crecer, así crece ya en su lugar final.
+            p.layout.ignoreLayout = false;
+            SetUpUI(p.inputBtn, p.inputText, true);
+            _scaleTween.Show(p.panel);
+        }
+        else
+        {
+            SetUpUI(p.inputBtn, p.inputText, false);
+
+            // Sale del layout recién al terminar de achicarse: si saliera al pedir el ocultado, el
+            // hermano saltaría a su lugar mientras este todavía se ve.
+            _scaleTween.Hide(p.panel, () => p.layout.ignoreLayout = true);
+        }
+    }
+    #endregion
 }

@@ -17,6 +17,10 @@ public class UpdateCrosshair : UpdatePosToTarget
         ResetPos();
     }
 
+    // El crosshair solo señala glitcheables: antes le llegaban como fallback de OnInteractableDetected,
+    // ahora tienen su propia señal. Se fija por código para no depender del enum del prefab.
+    protected override UITargetSource Source => UITargetSource.Glitcheable;
+
     // El circulo no vive en el mismo objeto que el componente: la base tiene que mover su rect.
     protected override RectTransform ResolveRectToMove() => _circleImage.rectTransform;
 

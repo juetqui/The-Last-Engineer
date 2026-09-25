@@ -8,6 +8,9 @@ using PrimeTween;
 /// </summary>
 public class UpdatePosToTarget : MonoBehaviour
 {
+    [Tooltip("Que señal del PlayerController sigue: el interactuable de Interact o el glitcheable de Set/Take.")]
+    [SerializeField] private UITargetSource _source = UITargetSource.Interactable;
+
     #region -----REFS-----
     [Header("Refs")]
     [SerializeField] protected Camera _camera;
@@ -32,10 +35,16 @@ public class UpdatePosToTarget : MonoBehaviour
 
     private RectTransform _visualRect;
     private bool _visualShown;
+    private UIScaleTween _scaleTween;
+
+    /// <summary>Los hijos que solo tienen sentido con una de las dos señales la fijan acá.</summary>
+    protected virtual UITargetSource Source => _source;
 
     protected virtual void Awake()
     {
         if (_camera == null) _camera = Camera.main;
+
+        _scaleTween = new UIScaleTween(_minTargetScale, _maxTargetScale, _scaleDuration, _scaleEase);
 
         Rect = ResolveRectToMove();
 
@@ -64,8 +73,7 @@ public class UpdatePosToTarget : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        // Ojo: StopAll con un target null frena TODOS los tweens del juego, de ahi el guard.
-        if (_visualRect != null) Tween.StopAll(onTarget: _visualRect);
+        _scaleTween?.Stop(_visualRect);
 
         Subscribe(false);
     }
@@ -79,11 +87,23 @@ public class UpdatePosToTarget : MonoBehaviour
 
     private void Subscribe(bool value)
     {
-        if (PlayerController.Instance == null) return;
+        var player = PlayerController.Instance;
+        if (player == null) return;
 
-        if (value) PlayerController.Instance.OnInteractableDetected += SetTarget;
-        else PlayerController.Instance.OnInteractableDetected -= SetTarget;
+        if (Source == UITargetSource.Glitcheable)
+        {
+            if (value) player.OnGlitcheableDetected += SetGlitcheableTarget;
+            else player.OnGlitcheableDetected -= SetGlitcheableTarget;
+        }
+        else
+        {
+            if (value) player.OnInteractableDetected += SetTarget;
+            else player.OnInteractableDetected -= SetTarget;
+        }
     }
+
+    // El == de UnityEngine.Object descarta un glitcheable destruido antes de perder el tipo concreto.
+    private void SetGlitcheableTarget(Glitcheable glitcheable) => SetTarget(glitcheable != null ? glitcheable : null);
 
     // OnInteractableDetected se dispara todos los frames: el guard de cambio hace que los hijos
     // reciban OnTargetChanged solo cuando el objetivo realmente cambia.
@@ -151,26 +171,18 @@ public class UpdatePosToTarget : MonoBehaviour
     {
         if (_visual == null || _visualRect == null) return;
 
-        Tween.StopAll(onTarget: _visualRect);
-
         if (value)
         {
             _visual.SetActive(true);
-
-            // PrimeTween no corta los tweens cuando el target se desactiva, asi que forzamos el
-            // punto de partida para que un show pegado a un hide no arranque de una escala media.
-            _visualRect.localScale = Vector3.one * _minTargetScale;
-
-            Tween.Scale(_visualRect, _maxTargetScale, _scaleDuration, _scaleEase);
+            _scaleTween.Show(_visualRect);
         }
         else
         {
-            Tween.Scale(_visualRect, _minTargetScale, _scaleDuration, _scaleEase)
-                .OnComplete(() =>
-                {
-                    _visual.SetActive(false);
-                    OnVisualHidden();
-                }, warnIfTargetDestroyed: false);
+            _scaleTween.Hide(_visualRect, () =>
+            {
+                _visual.SetActive(false);
+                OnVisualHidden();
+            });
         }
     }
 }
