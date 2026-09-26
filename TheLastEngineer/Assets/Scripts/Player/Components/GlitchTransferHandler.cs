@@ -6,9 +6,11 @@ using UnityEngine;
 /// que el jugador esté mirando. Interact quedó exclusivo de manipulación física, así que esta es
 /// la única vía por la que el jugador mueve glitch.
 ///
-/// Tap = una carga. Hold = esa primera carga y después una cada transferRepeatInterval, mientras
-/// las capacidades lo permitan. El tiempo se mide acá y no con interactions del Input System, que
-/// es el mismo patrón que ya usa el hold de PlayerEmptyState.
+/// Al apretar solo se valida (el error se siente en el momento); la transferencia se decide
+/// después. Soltar antes de transferHoldDelay = tap, una carga. Llegar a transferHoldDelay = hold,
+/// se mueve de una sola vez el máximo posible entre los dos (1 o 2 niveles), sin paso intermedio.
+/// El tiempo se mide acá y no con interactions del Input System, que es el mismo patrón que ya
+/// usa el hold de PlayerEmptyState.
 /// </summary>
 [DisallowMultipleComponent]
 public class GlitchTransferHandler : MonoBehaviour
@@ -25,11 +27,9 @@ public class GlitchTransferHandler : MonoBehaviour
     private PlayerData _data;
 
     private bool _active = false;
-    private bool _continuous = false;
     private TransferDirection _direction = TransferDirection.Set;
     private Glitcheable _target = default;
     private float _holdTimer = 0f;
-    private float _repeatTimer = 0f;
 
     /// <summary>Resultado de cada intento, para que el HUD y el audio reaccionen sin consultar por frame.</summary>
     public Action<GlitchTransferResult, Glitcheable> OnTransferResolved;
@@ -74,13 +74,13 @@ public class GlitchTransferHandler : MonoBehaviour
 
     // Cada dirección solo cancela lo suyo: si el jugador tiene Set apretado y toca Take, el
     // canceled de Take no tiene que cortar el hold de Set.
-    private void OnSetCancel() { if (_active && _direction == TransferDirection.Set) EndHold(); }
-    private void OnTakeCancel() { if (_active && _direction == TransferDirection.Take) EndHold(); }
+    private void OnSetCancel() { if (_active && _direction == TransferDirection.Set) ReleaseAsTap(); }
+    private void OnTakeCancel() { if (_active && _direction == TransferDirection.Take) ReleaseAsTap(); }
 
     private void BeginHold(TransferDirection direction)
     {
         // Idempotente a propósito: EnableInputs puede correr más de una vez y dejar el evento
-        // suscrito dos veces, y una pulsación no puede mover dos cargas.
+        // suscrito dos veces, y una pulsación no puede arrancar dos holds.
         if (_active) return;
 
         // Mismo gate que OnInteractPressed: en el aire o en pleno dash no se interactúa.
@@ -95,7 +95,7 @@ public class GlitchTransferHandler : MonoBehaviour
         }
 
         var target = ResolveTarget(direction);
-        var result = Execute(direction, node, target);
+        var result = Preview(direction, node, target);
 
         if (result != GlitchTransferResult.Transferred)
         {
@@ -104,20 +104,16 @@ public class GlitchTransferHandler : MonoBehaviour
         }
 
         _active = true;
-        _continuous = false;
         _direction = direction;
         _target = target;
         _holdTimer = 0f;
-        _repeatTimer = 0f;
-
-        Rumble(_data.transferInitialRumble, _data.rumbleDuration);
-        OnTransferResolved?.Invoke(result, target);
     }
 
     private void Update()
     {
         if (!_active) return;
 
+        // Perder el objetivo o el nodo en medio del hold cancela sin transferir nada.
         if (!StillValid())
         {
             EndHold();
@@ -125,35 +121,47 @@ public class GlitchTransferHandler : MonoBehaviour
         }
 
         _holdTimer += Time.deltaTime;
+        if (_holdTimer < _data.transferHoldDelay) return;
 
-        if (!_continuous)
-        {
-            if (_holdTimer < _data.transferHoldDelay) return;
+        // El máximo se calcula ahora y no al apretar: el objeto pudo cambiar de nivel en el medio.
+        var node = _nodeHandler.CurrentGlitch;
+        var target = _target;
+        var amount = MaxTransferable(_direction, node, target);
+        var result = Execute(_direction, node, target, amount);
 
-            _continuous = true;
-            _repeatTimer = 0f;
-        }
-
-        _repeatTimer += Time.deltaTime;
-        if (_repeatTimer < _data.transferRepeatInterval) return;
-
-        _repeatTimer = 0f;
-
-        var result = Execute(_direction, _nodeHandler.CurrentGlitch, _target);
+        // EndHold antes del feedback: deja _active en false para que el canceled que llega al
+        // soltar el botón no dispare además un tap.
+        EndHold();
 
         if (result != GlitchTransferResult.Transferred)
         {
-            // Quedarse sin carga (o llenar el destino) es un final limpio del hold, no un error:
-            // repetir el feedback de rechazo cada tick sería insoportable.
-            EndHold();
+            ReportFailure(result, target);
             return;
         }
 
-        // Pulso por carga, más corto que el intervalo: con la sobrecarga de RumblePulse que lleva
-        // duración, cada llamada arranca su corrutina, y si se superponen la vieja apaga los
-        // motores en medio del pulso nuevo.
-        Rumble(_data.transferHoldRumble, _data.transferRepeatInterval * 0.5f);
-        OnTransferResolved?.Invoke(result, _target);
+        Rumble(_data.transferHoldRumble, _data.rumbleDuration);
+        OnTransferResolved?.Invoke(result, target);
+    }
+
+    private void ReleaseAsTap()
+    {
+        var target = _target;
+        var valid = StillValid();
+        EndHold();
+
+        // Si el objetivo se perdió justo en este frame, se cancela en silencio igual que en Update.
+        if (!valid) return;
+
+        var result = Execute(_direction, _nodeHandler.CurrentGlitch, target, 1);
+
+        if (result != GlitchTransferResult.Transferred)
+        {
+            ReportFailure(result, target);
+            return;
+        }
+
+        Rumble(_data.transferInitialRumble, _data.rumbleDuration);
+        OnTransferResolved?.Invoke(result, target);
     }
 
     /// <summary>
@@ -184,23 +192,40 @@ public class GlitchTransferHandler : MonoBehaviour
         return _player.FindTransferTarget(filter);
     }
 
-    private GlitchTransferResult Execute(TransferDirection direction, GlitchComponent node, Glitcheable target)
+    private GlitchTransferResult Preview(TransferDirection direction, GlitchComponent node, Glitcheable target)
     {
         if (node == null) return GlitchTransferResult.NoSource;
         if (target == null) return GlitchTransferResult.NoTarget;
 
         return direction == TransferDirection.Set
-            ? GlitchTransferManager.ExecuteTransfer(node, target.Glitch)
-            : GlitchTransferManager.ExecuteTransfer(target.Glitch, node);
+            ? GlitchTransferManager.Preview(node, target.Glitch)
+            : GlitchTransferManager.Preview(target.Glitch, node);
+    }
+
+    private int MaxTransferable(TransferDirection direction, GlitchComponent node, Glitcheable target)
+    {
+        if (node == null || target == null) return 0;
+
+        return direction == TransferDirection.Set
+            ? GlitchTransferManager.MaxTransferable(node, target.Glitch)
+            : GlitchTransferManager.MaxTransferable(target.Glitch, node);
+    }
+
+    private GlitchTransferResult Execute(TransferDirection direction, GlitchComponent node, Glitcheable target, int amount)
+    {
+        if (node == null) return GlitchTransferResult.NoSource;
+        if (target == null) return GlitchTransferResult.NoTarget;
+
+        return direction == TransferDirection.Set
+            ? GlitchTransferManager.ExecuteTransfer(node, target.Glitch, amount)
+            : GlitchTransferManager.ExecuteTransfer(target.Glitch, node, amount);
     }
 
     private void EndHold()
     {
         _active = false;
-        _continuous = false;
         _target = null;
         _holdTimer = 0f;
-        _repeatTimer = 0f;
     }
 
     private void ReportFailure(GlitchTransferResult result, Glitcheable target)

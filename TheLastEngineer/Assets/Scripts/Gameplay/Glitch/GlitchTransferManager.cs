@@ -33,19 +33,38 @@ public static class GlitchTransferManager
     }
 
     /// <summary>
+    /// Cuantas cargas se pueden mover de una sola vez: lo que tiene la fuente, limitado por el
+    /// espacio libre del destino. 0 si la transferencia no es valida.
+    /// </summary>
+    public static int MaxTransferable(GlitchComponent source, GlitchComponent target)
+    {
+        if (Preview(source, target) != GlitchTransferResult.Transferred) return 0;
+
+        return System.Math.Min(source.CurrentLevel, GlitchComponent.MaxLevel - target.CurrentLevel);
+    }
+
+    /// <summary>Transferencia de una carga (tap).</summary>
+    public static GlitchTransferResult ExecuteTransfer(GlitchComponent source, GlitchComponent target)
+        => ExecuteTransfer(source, target, 1);
+
+    /// <summary>
     /// Atomico: valida los dos extremos ANTES de mutar, y si el segundo delta fallara igual
     /// (no deberia) revierte el primero, para que no quede una carga colgada en el limbo.
+    /// Mueve las cargas en un solo delta por extremo, asi el hold salta directo al nivel final
+    /// (un unico OnGlitchStateChanged) en vez de pasar por el intermedio.
     /// </summary>
-    public static GlitchTransferResult ExecuteTransfer(GlitchComponent source, GlitchComponent target)
+    public static GlitchTransferResult ExecuteTransfer(GlitchComponent source, GlitchComponent target, int amount)
     {
         var preview = Preview(source, target);
         if (preview != GlitchTransferResult.Transferred) return preview;
 
-        if (!source.TryApplyDelta(-1)) return GlitchTransferResult.Invalid;
+        if (amount < 1 || amount > MaxTransferable(source, target)) return GlitchTransferResult.Invalid;
 
-        if (!target.TryApplyDelta(1))
+        if (!source.TryApplyDelta(-amount)) return GlitchTransferResult.Invalid;
+
+        if (!target.TryApplyDelta(amount))
         {
-            source.TryApplyDelta(1);
+            source.TryApplyDelta(amount);
             return GlitchTransferResult.Invalid;
         }
 
