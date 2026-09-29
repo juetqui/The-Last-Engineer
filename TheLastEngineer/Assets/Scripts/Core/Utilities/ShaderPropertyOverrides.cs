@@ -110,7 +110,16 @@ public class ShaderPropertyOverrides : MonoBehaviour
     /// <summary>False si el projector ya no apunta a la copia (le cambiaron el material a mano).</summary>
     public bool IsDecalInstanceAssigned => _decalInstance != null && Decal != null && _decal.material == _decalInstance;
 
-    private void OnEnable() => Apply();
+    private void OnEnable()
+    {
+#if UNITY_EDITOR
+        // Al salir de Play la escena se recarga desde el backup, donde el projector quedo con el
+        // material en null (la copia es DontSave) y URP ya le puso su default. Aplicar aca tomaria
+        // ese default como fuente: se posterga a EnteredEditMode (ver OnPlayModeStateChanged).
+        if (IsDecal && !Application.isPlaying && SessionState.GetBool(ReturningFromPlayKey, false)) return;
+#endif
+        Apply();
+    }
 
     // Apagar o quitar el componente devuelve el objeto al look de su material.
     private void OnDisable() => ClearOverrides();
@@ -287,6 +296,31 @@ public class ShaderPropertyOverrides : MonoBehaviour
         EditorSceneManager.sceneSaved += scene => ForEachDecalIn(scene, o => o.Apply());
         PrefabStage.prefabSaving += root => ForEachDecalIn(root.scene, o => o.RestoreDecalSource());
         PrefabStage.prefabSaved += root => ForEachDecalIn(root.scene, o => o.Apply());
+        EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+    }
+
+    // SessionState sobrevive al domain reload que hay entre salir de Play y volver a Edit Mode.
+    private const string ReturningFromPlayKey = "ShaderPropertyOverrides.ReturningFromPlay";
+
+    private static void OnPlayModeStateChanged(PlayModeStateChange state)
+    {
+        if (state == PlayModeStateChange.ExitingPlayMode)
+        {
+            SessionState.SetBool(ReturningFromPlayKey, true);
+        }
+        else if (state == PlayModeStateChange.EnteredEditMode)
+        {
+            SessionState.EraseBool(ReturningFromPlayKey);
+            // Con la escena ya restaurada, se le devuelve al projector el original serializado
+            // (descartando el default de URP) y recien ahi se reconstruye la copia.
+            foreach (ShaderPropertyOverrides o in FindObjectsByType<ShaderPropertyOverrides>(FindObjectsSortMode.None))
+            {
+                if (!o.isActiveAndEnabled || !o.IsDecal) continue;
+                if (o._decalSourceMaterial != null && o._decal.material != o._decalInstance)
+                    o._decal.material = o._decalSourceMaterial;
+                o.Apply();
+            }
+        }
     }
 
     private static void ForEachDecalIn(Scene scene, Action<ShaderPropertyOverrides> action)

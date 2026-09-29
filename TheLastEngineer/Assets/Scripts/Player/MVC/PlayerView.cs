@@ -78,7 +78,9 @@ public class PlayerView
     {
         OnDashViewPlayed?.Invoke();
         _walkPS.Stop();
-        PlayAudioWithRandomPitch(_fxSource, _dashClip);
+     
+        SFXManager.Instance.PlaySFX(_dashClip, _playerObj.transform, 1f);   
+        // PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
     
     public void SetAnimatorSpeed(float speed)
@@ -104,17 +106,20 @@ public class PlayerView
 
     public void DeathSound()
     {
-        PlayAudioWithRandomPitch(_fxSource, _deathClip, 1f);
+        SFXManager.Instance.PlaySFX(_deathClip, _playerObj.transform, 1f);
+        // PlayAudioWithRandomPitch(_fxSource, _deathClip, 1f);
     }
 
     public void FallSound()
     {
-        PlayAudioWithRandomPitch(_fxSource, _fallClip, 1f);
+        SFXManager.Instance.PlaySFX(_fallClip, _playerObj.transform, 1f);
+        // PlayAudioWithRandomPitch(_fxSource, _fallClip, 1f);
     }
 
     public void WalkSound()
     {
-        PlayAudioWithRandomPitch(_walkSource, _walkClip);
+        SFXManager.Instance.PlaySFX(_walkClip, _playerObj.transform, 0.25f);
+        // PlayAudioWithRandomPitch(_walkSource, _walkClip);
     }
 
     public void PlayPS(Color color)
@@ -185,10 +190,12 @@ public class PlayerView
         _fxSource.volume = 1f;
 
         if (grab)
-            PlayAudioWithRandomPitch(_fxSource, _liftClip);
+            SFXManager.Instance.PlaySFX(_liftClip, _playerObj.transform, 1f);
+            // PlayAudioWithRandomPitch(_fxSource, _liftClip);
         else
         {
-            PlayAudioWithRandomPitch(_fxSource, _putDownClip);
+            SFXManager.Instance.PlaySFX(_putDownClip, _playerObj.transform, 1f);
+            // PlayAudioWithRandomPitch(_fxSource, _putDownClip);
 
             // SACAR ESTO DE ACA
             _renderer.materials[1].SetFloat("_HasNode", 0);
@@ -205,7 +212,8 @@ public class PlayerView
     {
         if (_fxSource.isPlaying) return;
         
-        PlayAudioWithRandomPitch(_fxSource, clip);
+        SFXManager.Instance.PlaySFX(clip, _playerObj.transform, 1f);
+        // PlayAudioWithRandomPitch(_fxSource, clip);
     }
 
     private void PlayAudioWithRandomPitch(AudioSource source, AudioClip clip, float pitch = 0)
