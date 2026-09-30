@@ -1,73 +1,19 @@
 using UnityEngine;
-using PrimeTween;
 
-public class ConnectionLightView : MonoBehaviour
+/// <summary>
+/// Point Light de la Connection. Usa el color base de GlitchPalette (no el emisivo): una Light
+/// ya tiene su propia intensidad y no necesita HDR en el color.
+/// </summary>
+public class ConnectionLightView : ConnectionPulseView
 {
-    [SerializeField] private Connection _connection;
-    [SerializeField] private Ease _tweenType = Ease.InOutSine;
-
-    [SerializeField] private Color _lightDefault;
-    [SerializeField] private Color _lightCorrupted;
     [SerializeField] private Color _lightOff;
+
     private Light _light = default;
-    private Color _lightOn = default;
-    public bool _keepOn;
 
-    private void Awake()
-    {
+    protected override Color OffColor => _lightOff;
+    protected override Color CurrentColor => _light.color;
 
-    }
-    void Start()
-    {
-        _light = GetComponent<Light>();
-        _connection.OnNodeConnected += SetCorrectNode;
-
-        _lightOn = _connection.RequiredLevel == GlitchState.Clean ? _lightDefault : _lightCorrupted;
-        //TurnOn();
-    }
-
-    private void TurnOn()
-    {
-        Color currentColor = _light.color;
-
-        var tween=Tween.Custom(gameObject, currentColor, _lightOn, 0.6f, (_, c) => UpdateColor(c), _tweenType);
-        if (!_keepOn)
-        {
-            tween.OnComplete(turnOff, warnIfTargetDestroyed: false);
-        }
-
-    }
-    public void SetCorrectNode(GlitchState nodeType, bool a)
-    {
-        if (a)
-        {
-            _keepOn = true;
-
-        }
-        else
-        {
-            _keepOn = false;
-
-        }
-        TurnOn();
-
-    }
-
-    private void turnOff()
-    {
-        Color currentColor = _light.color;
-
-        Tween.Custom(gameObject, currentColor, _lightOff, 0.6f, (_, c) => UpdateColor(c), _tweenType)
-            .OnComplete(TurnOn, warnIfTargetDestroyed: false);
-    }
-
-    private void UpdateColor(Color c)
-    {
-        _light.color = c;
-    }
-
-    private void OnDestroy()
-    {
-        Tween.StopAll(onTarget: gameObject);
-    }
+    protected override void CacheComponents() => _light = GetComponent<Light>();
+    protected override Color OnColorFor(GlitchState level) => GlitchPalette.Default.ColorFor(level);
+    protected override void ApplyColor(Color color) => _light.color = color;
 }

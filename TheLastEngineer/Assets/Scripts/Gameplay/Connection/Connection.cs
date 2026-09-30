@@ -29,9 +29,15 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
     
     private float _timer = 0f;
 
+    // Se guarda en vez de calcularse contra _recievedNode.Level: el nivel del nodo puede cambiar
+    // mientras esta conectado, y las vistas necesitan saber lo que se ANUNCIO por OnNodeConnected
+    // para sincronizarse sin depender del orden de ejecucion.
+    private bool _isCorrectlyConnected = false;
+
     public GlitchState RequiredLevel {  get { return _requiredLevel; } }
     public bool StartsConnected { get; private set; }
     public bool IsConnected => _recievedNode != null;
+    public bool IsCorrectlyConnected => _isCorrectlyConnected;
 
     public Action OnInitialized;
     public Action<GlitchState, bool> OnNodeConnected;
@@ -79,6 +85,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
 
         if (_recievedNode.Level == _requiredLevel)
         {
+            _isCorrectlyConnected = true;
             OnNodeConnected?.Invoke(node.Level, true);
             _renderer.material.SetColor("_EmissiveColor", _emissionCorrect);
             //_particleNode.SetActive(false);
@@ -92,10 +99,21 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
 
     public void UnsetNode(NodeController node)
     {
-        OnNodeConnected?.Invoke(_recievedNode.Level, false);
-        _renderer.material.SetColor("_EmissiveColor", _emissionOff);
+        bool wasCorrect = _isCorrectlyConnected;
+
+        // El estado se limpia antes de avisar para que quien consulte IsConnected /
+        // IsCorrectlyConnected desde el callback ya vea la conexion libre.
+        _isCorrectlyConnected = false;
         _recievedNode = null;
+        _renderer.material.SetColor("_EmissiveColor", _emissionOff);
         //_particleNode.SetActive(true);
+
+        // Un nodo incorrecto nunca anuncio la conexion, asi que tampoco anuncia la desconexion:
+        // el evento siempre llega en pares true/false y las vistas no apagan algo que no prendieron.
+        // Se anuncia con _requiredLevel (el nivel con el que se anuncio el true) y no con node.Level,
+        // que pudo cambiar mientras estaba conectado y dejaria a DoorsController sin descontar.
+        if (wasCorrect)
+            OnNodeConnected?.Invoke(_requiredLevel, false);
     }
 
     public void OnPlayerProximity(bool inRange, PlayerController player)

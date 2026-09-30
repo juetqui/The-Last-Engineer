@@ -13,20 +13,19 @@ public class TubeLightController : MonoBehaviour
     private bool _currentDesiredFill = true; // true=llenar/encender, false=vaciar/apagar
     private int _runId = 0;     // Para evitar callbacks "viejos" si reinicias la corrida en mitad de otra.
 
+    // GetComponent en Awake para que el OnEnable inicial ya pueda suscribirse (antes _connection
+    // era null en ese momento y la suscripcion real quedaba en Start).
+    private void Awake()
+    {
+        _connection = GetComponent<Connection>();
+    }
+
+    // Suscripcion en OnEnable: corre antes que cualquier Start, asi el evento que dispara
+    // Connection.Start con un nodo pre-asignado siempre llega y no hace falta mirar StartsConnected.
     private void OnEnable()
     {
         if (_connection != null)
             _connection.OnNodeConnected += OnConnectionStateChanged;
-    }
-
-    private void Start()
-    {
-        _connection = GetComponent<Connection>();
-        if (_connection != null)
-            _connection.OnNodeConnected += OnConnectionStateChanged;
-        //Opcional: si tu Connection puede arrancar ya conectada, podés disparar la corrida al inicio.
-         if (_connection != null && _connection.StartsConnected)
-            StartSequence(fill: true);
     }
 
     private void OnConnectionStateChanged(GlitchState type, bool connected)

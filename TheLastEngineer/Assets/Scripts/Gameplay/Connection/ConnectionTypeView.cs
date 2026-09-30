@@ -19,49 +19,34 @@ public class ConnectionTypeView : MonoBehaviour
     private Color _emissionOn = default;
     public bool _keepOn;
 
-    void Start()
+    private void Awake()
     {
         _renderer = GetComponent<Renderer>();
         _connection.OnNodeConnected += SetCorrectNode;
 
         _emissionOn = _connection.RequiredLevel == GlitchState.Clean ? _emissionDefault : _emissionCorrupted;
 
-        if (!_connection.IsConnected)
-        {
-            TurnOn();
-
-        }
+        if (!_connection.IsConnected) TurnOn();
     }
 
     private void TurnOn()
     {
-        Color currentColor = _renderer.material.GetColor("_EmissiveColor");
+        var currentColor = _renderer.material.GetColor("_EmissiveColor");
 
         var tween = Tween.Custom(gameObject, currentColor, _emissionOn, 0.6f, (_, c) => UpdateColor(c), _tweenType);
+        
         if (!_keepOn)
-        {
             tween.OnComplete(turnOff, warnIfTargetDestroyed: false);
-        }
     }
 
     public void SetCorrectNode(GlitchState nodeType, bool a)
     {
-        if (a)
-        {
-            _keepOn = true;
-
-        }
-        else
-        {
-            _keepOn = false;
-
-        }
+        _keepOn = a;
         TurnOn();
-
     }
     private void turnOff()
     {
-        Color currentColor = _renderer.material.GetColor("_EmissiveColor");
+        var currentColor = _renderer.material.GetColor("_EmissiveColor");
 
         Tween.Custom(gameObject, currentColor, _emissionOff, 0.6f, (_, c) => UpdateColor(c), _tweenType)
             .OnComplete(TurnOn, warnIfTargetDestroyed: false);
