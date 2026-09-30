@@ -79,7 +79,7 @@ public class PlayerView
         OnDashViewPlayed?.Invoke();
         _walkPS.Stop();
      
-        SFXManager.Instance.PlaySFX(_dashClip, _playerObj.transform, 1f);   
+        SFXManager.Instance.PlaySFX(_dashClip, _playerObj.transform, 1f, false);   
         // PlayAudioWithRandomPitch(_fxSource, _dashClip);
     }
     
@@ -106,19 +106,19 @@ public class PlayerView
 
     public void DeathSound()
     {
-        SFXManager.Instance.PlaySFX(_deathClip, _playerObj.transform, 1f);
+        SFXManager.Instance.PlaySFX(_deathClip, _playerObj.transform, 1f, false);
         // PlayAudioWithRandomPitch(_fxSource, _deathClip, 1f);
     }
 
     public void FallSound()
     {
-        SFXManager.Instance.PlaySFX(_fallClip, _playerObj.transform, 1f);
+        SFXManager.Instance.PlaySFX(_fallClip, _playerObj.transform, 1f, false);
         // PlayAudioWithRandomPitch(_fxSource, _fallClip, 1f);
     }
 
     public void WalkSound()
     {
-        SFXManager.Instance.PlaySFX(_walkClip, _playerObj.transform, 0.25f);
+        SFXManager.Instance.PlaySFX(_walkClip, _playerObj.transform, 0.25f, false);
         // PlayAudioWithRandomPitch(_walkSource, _walkClip);
     }
 
@@ -190,11 +190,11 @@ public class PlayerView
         _fxSource.volume = 1f;
 
         if (grab)
-            SFXManager.Instance.PlaySFX(_liftClip, _playerObj.transform, 1f);
+            SFXManager.Instance.PlaySFX(_liftClip, _playerObj.transform, 1f, false);
             // PlayAudioWithRandomPitch(_fxSource, _liftClip);
         else
         {
-            SFXManager.Instance.PlaySFX(_putDownClip, _playerObj.transform, 1f);
+            SFXManager.Instance.PlaySFX(_putDownClip, _playerObj.transform, 1f, false);
             // PlayAudioWithRandomPitch(_fxSource, _putDownClip);
 
             // SACAR ESTO DE ACA
