@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6622573030770761945}
   - component: {fileID: 5569323615469767385}
   - component: {fileID: 4639057647756485585}
-  m_Layer: 18
+  m_Layer: 21
   m_Name: Particle System (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4854,7 +4854,7 @@ GameObject:
   - component: {fileID: 2060325497639247304}
   - component: {fileID: 2217608446055450339}
   - component: {fileID: 4694357798645460333}
-  m_Layer: 18
+  m_Layer: 21
   m_Name: Glitcheable Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4917,6 +4917,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 77b00abc6f5dd794fbfde56f2b5521ec, type: 2}
+  - {fileID: 2100000, guid: 54000a144e3f8f84ba369fa0a6439258, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5004,13 +5005,15 @@ MonoBehaviour:
   feedbackMinMaxPS: {x: 0, y: 2000}
   _defaultLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 2097152
   _glitchedLayer:
     serializedVersion: 2
     m_Bits: 262144
   _intangibleLayer:
     serializedVersion: 2
     m_Bits: 1048576
+  _intangibleFadeTime: 0.4
+  _intangibleEase: 6
 --- !u!114 &2060325497639247304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5146,7 +5149,7 @@ GameObject:
   - component: {fileID: 4911349713852570661}
   - component: {fileID: 2078661097148658113}
   - component: {fileID: 5063293732857129786}
-  m_Layer: 18
+  m_Layer: 21
   m_Name: Particle System (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10198,7 +10201,7 @@ GameObject:
   - component: {fileID: 8301119984829714747}
   - component: {fileID: 7672798766777683271}
   - component: {fileID: 7526396118443110963}
-  m_Layer: 18
+  m_Layer: 21
   m_Name: Glitchable Feedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10302,7 +10305,7 @@ GameObject:
   - component: {fileID: 3576800593818850351}
   - component: {fileID: 2924790856894543484}
   - component: {fileID: 9146551859587475715}
-  m_Layer: 18
+  m_Layer: 21
   m_Name: Particle System (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15214,7 +15217,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5857082574178549785, guid: 9fdac549a87d3db498e0602dfbdc8028, type: 3}
       propertyPath: m_Layer
-      value: 18
+      value: 21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15253,7 +15256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8149460489347095763, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
       propertyPath: m_Layer
-      value: 18
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 8414339696103262109, guid: 74c1ae771dcfadb4199020e1658dcc46, type: 3}
       propertyPath: m_LocalPosition.x
@@ -15353,9 +15356,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2392480081061731246, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
     - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_Name
       value: Glitcheable Default Orbit PS
+      objectReference: {fileID: 0}
+    - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6385239532833733944, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 6509508166144001965, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 8227913821248668606, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_Layer
+      value: 21
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15375,6 +15402,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4045016863836570219}
     m_Modifications:
+    - target: {fileID: 2083600441042187074, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 2495470902742522391, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
     - target: {fileID: 3443280430484661589, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -15415,9 +15450,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8063979054765715356, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 8320788159297549805, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
     - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
       propertyPath: m_Name
       value: Glitcheable Glitched Orbit PS
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_Layer
+      value: 21
+      objectReference: {fileID: 0}
+    - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

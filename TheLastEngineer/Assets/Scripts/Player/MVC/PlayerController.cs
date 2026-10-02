@@ -89,6 +89,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
             _interactionDetector.Initialize(_interactableHandler, this, _obstruction,
                 _playerData.interactionRadius, _playerData.losCheckInterval, _playerData.losDebounceTime);
 
+        // Se establece valor del material a mano para modificar la instancia sobre el jugador y no el material en si
+        // evitando bugs visuales.
+        _playerData.intangibleMat = _renderer.materials[1];
+
         _model = new PlayerModel(CC, transform, _playerData, _collider);
         View = new PlayerView(gameObject, _renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
 

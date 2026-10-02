@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PrimeTween;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1)]
@@ -47,6 +48,25 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     [Tooltip("Layer en Idle con nivel Intangible. El jugador la excluye (PlayerData.intangibleExcludeLayers) con el nodo en Intangible.")]
     [SerializeField] private LayerMask _intangibleLayer;
     private ParticleSystem.EmissionModule _feedbackPS;
+
+    [Header("Intangibilidad (visual)")]
+    [Tooltip("Duración del fade del overlay intangible y de la distorsión al cambiar de nivel.")]
+    [SerializeField] private float _intangibleFadeTime = 0.4f;
+    [SerializeField] private Ease _intangibleEase = Ease.OutQuad;
+
+    // Slots del renderer: [0] material del glitch (alpha, corrupción, distorsión) y [1] overlay
+    // que se muestra con nivel Intangible.
+    private const int GlitchMatIndex = 0;
+    private const int IntangibleMatIndex = 1;
+    private static readonly int AlphaId = Shader.PropertyToID("_Alpha");
+    private static readonly int IsCorruptedId = Shader.PropertyToID("_IsCorrupted");
+    private static readonly int DistortionId = Shader.PropertyToID("_DistortionAmount");
+
+    private Material[] _materialInstances;
+    private Material _glitchMat;
+    private Material _intangibleMat;
+    private float _initialDistortion;
+    private Tween _intangibleTween;
 
     public GlitchStateMachine FSM;
     public GlitchIdleState IdleState;
@@ -99,6 +119,8 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         if (_renderer == null)
             _renderer = GetComponent<Renderer>();
 
+        ResolveMaterials();
+
         if (_feedbackRenderer != null)
             _feedbackPS = _feedbackRenderer.GetComponentInChildren<ParticleSystem>().emission;
         
@@ -137,6 +159,9 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 
         FSM.Change(startsCycling ? DisState : IdleState);
 
+        // Sin animar: el objeto arranca ya con el look de su nivel (el overlay viene con _Alpha 1 en el .mat).
+        ApplyIntangibleVisual(false);
+
         // Las suscripciones van DESPUÉS del Change inicial: así el arranque no pasa por el
         // reconciliador. Igual es idempotente, pero es más fácil de seguir en el debugger.
         _glitch.OnGlitchStateChanged += OnLevelChanged;
@@ -147,6 +172,38 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     {
         if (_glitch != null) _glitch.OnGlitchStateChanged -= OnLevelChanged;
         if (FSM != null) FSM.OnStateChanged -= OnFsmStateChanged;
+
+        if (_intangibleTween.isAlive) _intangibleTween.Stop();
+        // renderer.materials crea copias que Unity no libera solo.
+        if (_materialInstances != null)
+        {
+            foreach (var mat in _materialInstances)
+                if (mat != null) Destroy(mat);
+        }
+    }
+
+    /// <summary>
+    /// Toma las copias propias de este objeto (renderer.materials, no sharedMaterials): escribir
+    /// sobre el .mat compartido cambiaría a todos los glitcheables y en el Editor quedaría guardado
+    /// en disco al salir de Play.
+    /// </summary>
+    private void ResolveMaterials()
+    {
+        _materialInstances = _renderer.materials;
+        _glitchMat = _materialInstances.Length > GlitchMatIndex ? _materialInstances[GlitchMatIndex] : null;
+        _intangibleMat = _materialInstances.Length > IntangibleMatIndex ? _materialInstances[IntangibleMatIndex] : null;
+
+        if (_glitchMat == null)
+            Debug.LogWarning($"[Glitcheable] {name}: el renderer no tiene material en el slot {GlitchMatIndex}", this);
+        else if (!_glitchMat.HasProperty(DistortionId))
+            Debug.LogWarning($"[Glitcheable] {name}: '{_glitchMat.name}' no tiene _DistortionAmount", this);
+
+        // Sin overlay se puede vivir (solo se pierde el feedback visual de Intangible): avisa en debug.
+        if (_intangibleMat == null && debug)
+            Debug.LogWarning($"[Glitcheable] {name}: el renderer no tiene overlay intangible en el slot {IntangibleMatIndex}", this);
+
+        // Se lee acá, antes de que nada lo modifique: es el valor al que vuelve al dejar Intangible.
+        _initialDistortion = _glitchMat != null && _glitchMat.HasProperty(DistortionId) ? _glitchMat.GetFloat(DistortionId) : 0f;
     }
 
     private void OnLevelChanged(GlitchState level)
@@ -158,6 +215,7 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         // el par con el trigger del detector: nos re-anunciamos.
         ApplyLayer();
         Rescan();
+        ApplyIntangibleVisual(true);
     }
 
     private void OnFsmStateChanged(IState state) => SyncFsmWithLevel();
@@ -267,7 +325,42 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 
     public void SetAlpha(float a)
     {
-        _renderer.material.SetFloat("_Alpha", Mathf.Clamp01(a));
+        if (_glitchMat != null) _glitchMat.SetFloat(AlphaId, Mathf.Clamp01(a));
+    }
+
+    public float GetAlpha() => _glitchMat != null ? Mathf.Clamp01(_glitchMat.GetFloat(AlphaId)) : 0f;
+
+    /// <summary>
+    /// Overlay intangible (_Alpha) y distorsión del glitch según el nivel: con Intangible el overlay
+    /// va a 1 y la distorsión a 0; con cualquier otro, al revés (la distorsión vuelve a la inicial).
+    /// Interpola desde los valores actuales, así un cambio a mitad del fade sigue sin saltos.
+    /// </summary>
+    private void ApplyIntangibleVisual(bool animate)
+    {
+        if (_intangibleTween.isAlive) _intangibleTween.Stop();
+
+        bool intangible = Level == GlitchState.Intangible;
+        float targetAlpha = intangible ? 1f : 0f;
+        float targetDistortion = intangible ? 0f : _initialDistortion;
+
+        if (!animate || _intangibleFadeTime <= 0f)
+        {
+            SetIntangibleVisual(targetAlpha, targetDistortion);
+            return;
+        }
+
+        float fromAlpha = _intangibleMat != null ? _intangibleMat.GetFloat(AlphaId) : targetAlpha;
+        float fromDistortion = _glitchMat != null ? _glitchMat.GetFloat(DistortionId) : targetDistortion;
+
+        _intangibleTween = Tween.Custom(gameObject, 0f, 1f, _intangibleFadeTime, (_, t) =>
+            SetIntangibleVisual(Mathf.Lerp(fromAlpha, targetAlpha, t), Mathf.Lerp(fromDistortion, targetDistortion, t)),
+            _intangibleEase);
+    }
+
+    private void SetIntangibleVisual(float alpha, float distortion)
+    {
+        if (_intangibleMat != null) _intangibleMat.SetFloat(AlphaId, alpha);
+        if (_glitchMat != null) _glitchMat.SetFloat(DistortionId, distortion);
     }
 
     public void SetFeedbackAlpha(float a)
@@ -279,14 +372,14 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 
     public void SetBoolCorrupted(float v)
     {
-        _renderer.material.SetFloat("_IsCorrupted", v);
+        if (_glitchMat != null) _glitchMat.SetFloat(IsCorruptedId, v);
 
         ApplyLayer();
     }
 
     private LayerMask ResolveTargetLayer()
     {
-        if (FSM.Current != IdleState) return _defaultLayer;
+        if (FSM.Current != IdleState) return _glitchedLayer;
 
         if (Level == GlitchState.Intangible)
         {
@@ -294,7 +387,7 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
             if (debug) Debug.LogWarning($"[Glitcheable] {name}: _intangibleLayer vacía, uso _glitchedLayer", this);
         }
 
-        return _glitchedLayer;
+        return _defaultLayer;
     }
 
     /// <summary>

@@ -154,9 +154,6 @@ MonoBehaviour:
   _maxDist: 100
   _offsetZ: 1
   _easeTime: 0.1
-  _layer:
-    serializedVersion: 2
-    m_Bits: 262464
   _startsInitialized: 1
   _debug: 0
   _gizmosColor: {r: 1, g: 0, b: 0, a: 1}
@@ -364,6 +361,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 77b00abc6f5dd794fbfde56f2b5521ec, type: 2}
+  - {fileID: 2100000, guid: 54000a144e3f8f84ba369fa0a6439258, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -452,10 +450,15 @@ MonoBehaviour:
   feedbackMinMaxPS: {x: 0, y: 2000}
   _defaultLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 2097152
   _glitchedLayer:
     serializedVersion: 2
     m_Bits: 262144
+  _intangibleLayer:
+    serializedVersion: 2
+    m_Bits: 1048576
+  _intangibleFadeTime: 0.4
+  _intangibleEase: 6
 --- !u!114 &9012416793114071167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,9 +645,6 @@ MonoBehaviour:
   _maxDist: 100
   _offsetZ: 1
   _easeTime: 0.1
-  _layer:
-    serializedVersion: 2
-    m_Bits: 262464
   _startsInitialized: 1
   _debug: 0
   _gizmosColor: {r: 1, g: 0, b: 0, a: 1}

@@ -22,6 +22,7 @@ public class UpdatePosToTarget : MonoBehaviour
 
     [Header("Screen Offset")]
     [SerializeField] private float _yOffset = 0f;
+    [SerializeField] private float _xOffset = 0f;
 
     [Header("Visual Scale Tween")]
     [SerializeField] private float _minTargetScale = 0f;
@@ -133,6 +134,7 @@ public class UpdatePosToTarget : MonoBehaviour
             return;
         }
 
+        screenPosition.x += _xOffset;
         screenPosition.y += _yOffset;
         Rect.position = screenPosition;
 

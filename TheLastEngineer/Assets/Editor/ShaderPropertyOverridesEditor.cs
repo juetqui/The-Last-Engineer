@@ -1,24 +1,26 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 /// <summary>
-/// Inspector de ShaderPropertyOverrides: lista las propiedades del shader del material para
-/// agregarlas como override, y dibuja cada una con el campo que corresponde a su tipo.
+/// Inspector de ShaderPropertyOverrides: un bloque por material a sobrescribir, cada uno con su
+/// selector de material, la lista de propiedades del shader para agregar como override y cada
+/// override dibujado con el campo que corresponde a su tipo.
 /// Todo se edita via SerializedProperty para tener Undo y dirty de escena/prefab gratis.
 /// </summary>
 [CustomEditor(typeof(ShaderPropertyOverrides))]
 public class ShaderPropertyOverridesEditor : UnityEditor.Editor
 {
-    private SerializedProperty _materialIndexProp;
-    private SerializedProperty _overridesProp;
+    private const int AllMaterials = ShaderPropertyOverrides.AllMaterials;
+
+    private SerializedProperty _setsProp;
 
     private ShaderPropertyOverrides Target => (ShaderPropertyOverrides)target;
 
     private void OnEnable()
     {
-        _materialIndexProp = serializedObject.FindProperty("_materialIndex");
-        _overridesProp = serializedObject.FindProperty("_overrides");
+        _setsProp = serializedObject.FindProperty("_materialSets");
         // OnValidate no siempre corre tras un undo de un cambio hecho desde este inspector.
         Undo.undoRedoPerformed += OnUndoRedo;
     }
@@ -48,34 +50,26 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
         // Si al DecalProjector le asignaron otro material a mano, Apply lo toma como nuevo original.
         if (isDecal && Target.isActiveAndEnabled && !Target.IsDecalInstanceAssigned) Target.Apply();
 
-        int materialCount = isDecal ? 1 : Target.Renderer.sharedMaterials.Length;
-        if (!isDecal)
-        {
-            EditorGUILayout.IntSlider(_materialIndexProp, -1, Mathf.Max(0, materialCount - 1),
-                new GUIContent("Material Index", "-1 = todos los submateriales."));
-        }
-
-        Material material = Target.GetSourceMaterial();
-        if (material == null || material.shader == null)
-        {
-            EditorGUILayout.HelpBox(isDecal ? "El DecalProjector no tiene material." : "El renderer no tiene material en ese indice.",
-                MessageType.Warning);
-            ApplyIfChanged();
-            return;
-        }
-
-        if (!isDecal && _materialIndexProp.intValue < 0 && materialCount > 1)
-            EditorGUILayout.HelpBox("Con varios materiales, las propiedades se listan del primero.", MessageType.None);
-
-        DrawToolbar(material);
+        Material decalSource = isDecal ? Target.GetSourceMaterial(0) : null;
         EditorGUILayout.HelpBox(isDecal
-                ? $"Decal: usa una copia en memoria de '{material.name}' (en disco siempre queda el original). " +
-                  "No apliques al prefab el override del material del DecalProjector."
-                : "Solo propiedades expuestas. Las keywords (Boolean/Enum Keyword de Shader Graph) no se pueden variar por objeto.",
+                ? $"Decal: usa una copia en memoria de '{(decalSource != null ? decalSource.name : "?")}' " +
+                  "(en disco siempre queda el original). No apliques al prefab el override del material del DecalProjector."
+                : "Solo propiedades expuestas. Las keywords (Boolean/Enum Keyword de Shader Graph) no se pueden variar por objeto. " +
+                  "Un material con su propio bloque pisa al de 'Todos' en las propiedades que repiten.",
             MessageType.Info);
 
-        EditorGUILayout.Space();
-        DrawOverrides(material);
+        Material[] materials = isDecal ? new[] { decalSource } : Target.Renderer.sharedMaterials;
+        if (GUILayout.Button("Agregar material")) ShowAddSetMenu(materials, isDecal);
+
+        for (int i = 0; i < _setsProp.arraySize; i++)
+        {
+            EditorGUILayout.Space(2);
+            if (DrawSet(i, materials, isDecal))
+            {
+                _setsProp.DeleteArrayElementAtIndex(i);
+                break;
+            }
+        }
 
         ApplyIfChanged();
     }
@@ -92,17 +86,153 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
         SceneView.RepaintAll();
     }
 
-    private void DrawToolbar(Material material)
+    #region Sets
+
+    /// <summary>Dibuja un bloque de material; devuelve true si se pidio quitarlo.</summary>
+    private bool DrawSet(int setIndex, Material[] materials, bool isDecal)
+    {
+        SerializedProperty set = _setsProp.GetArrayElementAtIndex(setIndex);
+        SerializedProperty indexProp = set.FindPropertyRelative("materialIndex");
+        SerializedProperty overridesProp = set.FindPropertyRelative("overrides");
+        int materialIndex = indexProp.intValue;
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.BeginHorizontal();
+        // isExpanded vive en el editor: plegar un bloque no ensucia la escena.
+        // Ancho fijo: EditorGUILayout.Foldout se estira y empujaria el selector de material.
+        Rect foldoutRect = GUILayoutUtility.GetRect(36, EditorGUIUtility.singleLineHeight, GUILayout.Width(36));
+        set.isExpanded = EditorGUI.Foldout(foldoutRect, set.isExpanded, $"({overridesProp.arraySize})", true);
+        if (isDecal) EditorGUILayout.LabelField("Material del decal", EditorStyles.boldLabel);
+        else DrawMaterialPopup(indexProp, materials);
+        bool remove = GUILayout.Button("✕", GUILayout.Width(22));
+        EditorGUILayout.EndHorizontal();
+
+        if (IsDuplicated(setIndex, materialIndex))
+            EditorGUILayout.HelpBox("Ya hay otro bloque para este material: solo se aplica el primero.", MessageType.Warning);
+
+        if (set.isExpanded) DrawSetContents(overridesProp, materialIndex, materials, isDecal);
+
+        EditorGUILayout.EndVertical();
+        return remove;
+    }
+
+    private void DrawSetContents(SerializedProperty overridesProp, int materialIndex, Material[] materials, bool isDecal)
+    {
+        if (!isDecal && materialIndex >= materials.Length)
+        {
+            EditorGUILayout.HelpBox($"El renderer no tiene material en el indice {materialIndex}.", MessageType.Warning);
+            return;
+        }
+
+        Material material = Target.GetSourceMaterial(materialIndex);
+        if (material == null || material.shader == null)
+        {
+            EditorGUILayout.HelpBox(isDecal ? "El DecalProjector no tiene material." : "El renderer no tiene material en ese indice.",
+                MessageType.Warning);
+            return;
+        }
+
+        if (!isDecal && materialIndex == AllMaterials && materials.Length > 1)
+            EditorGUILayout.HelpBox($"Las propiedades se listan del primer material ({material.name}).", MessageType.None);
+
+        DrawToolbar(overridesProp, material);
+        EditorGUILayout.Space();
+        DrawOverrides(overridesProp, material);
+    }
+
+    private static void DrawMaterialPopup(SerializedProperty indexProp, Material[] materials)
+    {
+        var options = new List<string> { "Todos los materiales" };
+        for (int i = 0; i < materials.Length; i++) options.Add(MaterialLabel(materials, i));
+
+        // Un indice que ya no existe (le sacaron materiales al renderer) se muestra igual para no perderlo.
+        int current = indexProp.intValue;
+        if (current >= materials.Length) options.Add($"[{current}] (no existe)");
+        int selected = current < 0 ? 0 : current + 1;
+
+        int chosen = EditorGUILayout.Popup(selected, options.ToArray());
+        if (chosen != selected) indexProp.intValue = chosen - 1;
+    }
+
+    private void ShowAddSetMenu(Material[] materials, bool isDecal)
+    {
+        var menu = new GenericMenu();
+        if (isDecal)
+        {
+            // El projector tiene un solo material: alcanza con un bloque.
+            AddSetMenuItem(menu, "Material del decal", 0, _setsProp.arraySize > 0);
+        }
+        else
+        {
+            AddSetMenuItem(menu, "Todos los materiales", AllMaterials, FindSet(AllMaterials) >= 0);
+            for (int i = 0; i < materials.Length; i++)
+                AddSetMenuItem(menu, MaterialLabel(materials, i).Replace('/', '∕'), i, FindSet(i) >= 0);
+        }
+        menu.ShowAsContext();
+    }
+
+    private void AddSetMenuItem(GenericMenu menu, string label, int materialIndex, bool alreadyUsed)
+    {
+        var content = new GUIContent(label);
+        if (alreadyUsed)
+        {
+            menu.AddDisabledItem(content, true);
+            return;
+        }
+        menu.AddItem(content, false, () =>
+        {
+            // El callback corre fuera de OnInspectorGUI: hay que sincronizar y aplicar a mano.
+            serializedObject.Update();
+            AddSet(materialIndex);
+            serializedObject.ApplyModifiedProperties();
+        });
+    }
+
+    private void AddSet(int materialIndex)
+    {
+        int index = _setsProp.arraySize;
+        _setsProp.InsertArrayElementAtIndex(index);
+        // InsertArrayElementAtIndex duplica el ultimo elemento: hay que vaciar la copia.
+        SerializedProperty set = _setsProp.GetArrayElementAtIndex(index);
+        set.FindPropertyRelative("materialIndex").intValue = materialIndex;
+        set.FindPropertyRelative("overrides").ClearArray();
+        set.isExpanded = true;
+    }
+
+    private int FindSet(int materialIndex)
+    {
+        for (int i = 0; i < _setsProp.arraySize; i++)
+        {
+            if (_setsProp.GetArrayElementAtIndex(i).FindPropertyRelative("materialIndex").intValue == materialIndex)
+                return i;
+        }
+        return -1;
+    }
+
+    private bool IsDuplicated(int setIndex, int materialIndex)
+    {
+        int first = FindSet(materialIndex);
+        return first >= 0 && first < setIndex;
+    }
+
+    private static string MaterialLabel(Material[] materials, int index) =>
+        $"[{index}] {(materials[index] != null ? materials[index].name : "(vacio)")}";
+
+    #endregion
+
+    #region Overrides
+
+    private void DrawToolbar(SerializedProperty overridesProp, Material material)
     {
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Agregar propiedad")) ShowAddMenu(material);
+        if (GUILayout.Button("Agregar propiedad")) ShowAddMenu(overridesProp, material);
         if (GUILayout.Button("Agregar todas"))
         {
             Shader shader = material.shader;
             for (int i = 0; i < shader.GetPropertyCount(); i++)
             {
                 string name = shader.GetPropertyName(i);
-                if (IsEditable(shader, i) && FindOverride(name) < 0) AddOverride(material, i);
+                if (IsEditable(shader, i) && FindOverride(overridesProp, name) < 0) AddOverride(overridesProp, material, i);
             }
         }
         EditorGUILayout.EndHorizontal();
@@ -110,19 +240,19 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Resetear todas al material"))
         {
-            for (int i = 0; i < _overridesProp.arraySize; i++)
-                CopyFromMaterial(_overridesProp.GetArrayElementAtIndex(i), material);
+            for (int i = 0; i < overridesProp.arraySize; i++)
+                CopyFromMaterial(overridesProp.GetArrayElementAtIndex(i), material);
         }
-        if (GUILayout.Button("Limpiar")) _overridesProp.ClearArray();
+        if (GUILayout.Button("Limpiar")) overridesProp.ClearArray();
         EditorGUILayout.EndHorizontal();
     }
 
-    private void DrawOverrides(Material material)
+    private static void DrawOverrides(SerializedProperty overridesProp, Material material)
     {
         Shader shader = material.shader;
-        for (int i = 0; i < _overridesProp.arraySize; i++)
+        for (int i = 0; i < overridesProp.arraySize; i++)
         {
-            SerializedProperty element = _overridesProp.GetArrayElementAtIndex(i);
+            SerializedProperty element = overridesProp.GetArrayElementAtIndex(i);
             string name = element.FindPropertyRelative("name").stringValue;
             int shaderIndex = shader.FindPropertyIndex(name);
 
@@ -150,7 +280,7 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
 
             if (remove)
             {
-                _overridesProp.DeleteArrayElementAtIndex(i);
+                overridesProp.DeleteArrayElementAtIndex(i);
                 break;
             }
         }
@@ -190,9 +320,11 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
         }
     }
 
-    private void ShowAddMenu(Material material)
+    private void ShowAddMenu(SerializedProperty overridesProp, Material material)
     {
         Shader shader = material.shader;
+        // El SerializedProperty no sobrevive al Update del callback: se lo vuelve a buscar por path.
+        string overridesPath = overridesProp.propertyPath;
         var menu = new GenericMenu();
         for (int i = 0; i < shader.GetPropertyCount(); i++)
         {
@@ -200,7 +332,7 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
             string name = shader.GetPropertyName(i);
             // "/" en el texto del GenericMenu crea submenus: se reemplaza por una barra similar.
             var content = new GUIContent($"{shader.GetPropertyDescription(i)}  ({name})".Replace('/', '∕'));
-            if (FindOverride(name) >= 0)
+            if (FindOverride(overridesProp, name) >= 0)
             {
                 menu.AddDisabledItem(content, true);
                 continue;
@@ -210,7 +342,9 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
             {
                 // El callback corre fuera de OnInspectorGUI: hay que sincronizar y aplicar a mano.
                 serializedObject.Update();
-                AddOverride(material, propertyIndex);
+                SerializedProperty prop = serializedObject.FindProperty(overridesPath);
+                if (prop == null) return;
+                AddOverride(prop, material, propertyIndex);
                 serializedObject.ApplyModifiedProperties();
                 Target.Apply();
                 SceneView.RepaintAll();
@@ -228,23 +362,23 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
         return (shader.GetPropertyFlags(index) & hidden) == 0;
     }
 
-    private int FindOverride(string name)
+    private static int FindOverride(SerializedProperty overridesProp, string name)
     {
-        for (int i = 0; i < _overridesProp.arraySize; i++)
+        for (int i = 0; i < overridesProp.arraySize; i++)
         {
-            if (_overridesProp.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue == name)
+            if (overridesProp.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue == name)
                 return i;
         }
         return -1;
     }
 
     /// <summary>Agrega el override tomando el valor actual del material como punto de partida.</summary>
-    private void AddOverride(Material material, int shaderIndex)
+    private static void AddOverride(SerializedProperty overridesProp, Material material, int shaderIndex)
     {
         Shader shader = material.shader;
-        int index = _overridesProp.arraySize;
-        _overridesProp.InsertArrayElementAtIndex(index);
-        SerializedProperty element = _overridesProp.GetArrayElementAtIndex(index);
+        int index = overridesProp.arraySize;
+        overridesProp.InsertArrayElementAtIndex(index);
+        SerializedProperty element = overridesProp.GetArrayElementAtIndex(index);
 
         element.FindPropertyRelative("name").stringValue = shader.GetPropertyName(shaderIndex);
         element.FindPropertyRelative("type").enumValueIndex = (int)ToOverrideType(shader.GetPropertyType(shaderIndex));
@@ -291,4 +425,6 @@ public class ShaderPropertyOverridesEditor : UnityEditor.Editor
             default: return ShaderPropertyOverrides.OverrideType.Float;
         }
     }
+
+    #endregion
 }

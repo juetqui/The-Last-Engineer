@@ -43882,11 +43882,11 @@ GameObject:
   - component: {fileID: 3508126504357504154}
   - component: {fileID: 4374111025490452814}
   - component: {fileID: 3489353922982094340}
+  - component: {fileID: 3802240224278305597}
   - component: {fileID: 8165069047663773820}
   - component: {fileID: 997490275640581414}
   - component: {fileID: 1940636985936242311}
   - component: {fileID: 4265608909172201822}
-  - component: {fileID: 3802240224278305597}
   m_Layer: 18
   m_Name: GlitcheablePlatform
   m_TagString: Untagged
@@ -43954,6 +43954,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 77b00abc6f5dd794fbfde56f2b5521ec, type: 2}
+  - {fileID: 2100000, guid: 54000a144e3f8f84ba369fa0a6439258, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -44019,6 +44020,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 8.154171, y: 4.1872673, z: 8.447693}
   m_Center: {x: -0.08097267, y: 1.6322532, z: 0.007949829}
+--- !u!114 &3802240224278305597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6601680895224882296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be248f7e7c4491647816c9fb34c1526a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlitchComponent
+  _currentLevel: 2
 --- !u!114 &8165069047663773820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44049,10 +44063,15 @@ MonoBehaviour:
   feedbackMinMaxPS: {x: 0, y: 2000}
   _defaultLayer:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 2097152
   _glitchedLayer:
     serializedVersion: 2
     m_Bits: 262144
+  _intangibleLayer:
+    serializedVersion: 2
+    m_Bits: 1048576
+  _intangibleFadeTime: 0.4
+  _intangibleEase: 6
 --- !u!114 &997490275640581414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44177,19 +44196,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaterialPosSetter
   targetMinMaxPos: {x: -10, y: 10}
---- !u!114 &3802240224278305597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6601680895224882296}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be248f7e7c4491647816c9fb34c1526a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GlitchComponent
-  _currentLevel: 2
 --- !u!1 &6882588358997771639
 GameObject:
   m_ObjectHideFlags: 0

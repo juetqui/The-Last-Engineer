@@ -21,11 +21,7 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         _nextInterrupt = nextInterrupt;
     }
 
-    private float ReadCurrentAlpha()
-    {
-        if (g._renderer == null || g._renderer.material == null) return 0f;
-        return Mathf.Clamp01(g._renderer.material.GetFloat("_Alpha"));
-    }
+    private float ReadCurrentAlpha() => g.GetAlpha();
 
     public void Enter()
     {

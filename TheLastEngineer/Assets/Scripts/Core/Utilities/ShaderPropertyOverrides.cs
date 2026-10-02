@@ -14,9 +14,13 @@ using UnityEngine.SceneManagement;
 /// varios objetos a la vez sin entrar a Play. Los valores quedan serializados en la escena/prefab
 /// y se mantienen en Play y en build.
 ///
+/// Los overrides se agrupan en sets, uno por submaterial: un set con indice -1 aplica a todos los
+/// materiales del objeto y uno con indice >= 0 solo a ese material, pisando al general.
+///
 /// Funciona sobre un Renderer o sobre un DecalProjector de URP, con dos tecnicas distintas:
-/// - Renderer: MaterialPropertyBlock. No instancia materiales. Limitaciones: no varia keywords,
-///   el renderer sale del SRP Batcher y pisa cualquier otro MPB del mismo renderer (ej. TubeLight).
+/// - Renderer: MaterialPropertyBlock por submaterial. No instancia materiales. Limitaciones: no
+///   varia keywords, el renderer sale del SRP Batcher y un bloque por material ignora el MPB
+///   general del renderer (ej. el de TubeLight) en ese material.
 /// - DecalProjector: no es un Renderer y URP agrupa los decals por material con un MPB interno
 ///   compartido, asi que la unica forma de variar uno solo es darle una copia del material.
 ///   La copia vive solo en memoria (HideFlags.DontSave) y al guardar la escena/prefab se le
@@ -24,8 +28,11 @@ using UnityEngine.SceneManagement;
 /// </summary>
 [ExecuteAlways]
 [DisallowMultipleComponent]
-public class ShaderPropertyOverrides : MonoBehaviour
+public class ShaderPropertyOverrides : MonoBehaviour, ISerializationCallbackReceiver
 {
+    /// <summary>Indice de set que aplica a todos los submateriales.</summary>
+    public const int AllMaterials = -1;
+
     public enum OverrideType { Float, Range, Color, Vector, Texture, Int }
 
     [Serializable]
@@ -86,9 +93,42 @@ public class ShaderPropertyOverrides : MonoBehaviour
         }
     }
 
-    [Tooltip("Solo Renderer. -1 = aplica a todos los submateriales. >= 0 = solo al material de ese indice.")]
-    [SerializeField] private int _materialIndex = -1;
-    [SerializeField] private List<ShaderOverride> _overrides = new List<ShaderOverride>();
+    /// <summary>Overrides de un submaterial (o de todos, con indice -1).</summary>
+    [Serializable]
+    public class MaterialOverrideSet
+    {
+        public int materialIndex = AllMaterials;
+        public List<ShaderOverride> overrides = new List<ShaderOverride>();
+
+        /// <summary>Escribe los overrides habilitados; devuelve true si escribio alguno.</summary>
+        public bool WriteTo(MaterialPropertyBlock mpb)
+        {
+            bool wrote = false;
+            foreach (ShaderOverride o in overrides)
+            {
+                if (!IsActive(o)) continue;
+                o.WriteTo(mpb);
+                wrote = true;
+            }
+            return wrote;
+        }
+
+        public void WriteTo(Material material)
+        {
+            foreach (ShaderOverride o in overrides)
+            {
+                if (IsActive(o)) o.WriteTo(material);
+            }
+        }
+
+        private static bool IsActive(ShaderOverride o) => o != null && o.enabled && !string.IsNullOrEmpty(o.name);
+    }
+
+    [SerializeField] private List<MaterialOverrideSet> _materialSets = new List<MaterialOverrideSet>();
+    // Legacy: formato anterior a los sets (una sola lista para un indice). Solo se leen para
+    // migrar escenas viejas en OnAfterDeserialize; quedan vacios al guardar de nuevo.
+    [SerializeField, HideInInspector] private int _materialIndex = AllMaterials;
+    [SerializeField, HideInInspector] private List<ShaderOverride> _overrides = new List<ShaderOverride>();
     // Solo decals: el material original del projector. Se serializa porque mientras el componente
     // esta activo el projector apunta a la copia, y un duplicado del objeto hereda esa copia ajena.
     [SerializeField, HideInInspector] private Material _decalSourceMaterial;
@@ -97,11 +137,10 @@ public class ShaderPropertyOverrides : MonoBehaviour
     private DecalProjector _decal;
     private MaterialPropertyBlock _mpb;
     private Material _decalInstance;
-    // Indice sobre el que se aplico el ultimo bloque, para limpiarlo si cambia _materialIndex.
-    private int _appliedIndex = int.MinValue;
+    // Submateriales que tienen un bloque nuestro, para limpiarlos cuando dejan de tener overrides.
+    private readonly HashSet<int> _appliedIndices = new HashSet<int>();
 
-    public int MaterialIndex => _materialIndex;
-    public List<ShaderOverride> Overrides => _overrides;
+    public List<MaterialOverrideSet> MaterialSets => _materialSets;
     public Renderer Renderer => _renderer != null ? _renderer : (_renderer = GetComponent<Renderer>());
     public DecalProjector Decal => _decal != null ? _decal : (_decal = GetComponent<DecalProjector>());
     // El Renderer tiene prioridad: un DecalProjector nunca convive con uno en el mismo objeto.
@@ -157,14 +196,14 @@ public class ShaderPropertyOverrides : MonoBehaviour
 
     /// <summary>
     /// Material del que se leen las propiedades disponibles y los valores por defecto.
-    /// Renderer: el sharedMaterial del indice elegido (el primero si es -1). Decal: el original.
+    /// Renderer: el sharedMaterial de ese indice (el primero si es -1). Decal: el original.
     /// </summary>
-    public Material GetSourceMaterial()
+    public Material GetSourceMaterial(int materialIndex)
     {
         if (Renderer != null)
         {
             Material[] materials = _renderer.sharedMaterials;
-            int index = Mathf.Max(0, _materialIndex);
+            int index = Mathf.Max(0, materialIndex);
             return index < materials.Length ? materials[index] : null;
         }
         if (Decal == null) return null;
@@ -172,36 +211,61 @@ public class ShaderPropertyOverrides : MonoBehaviour
         return current != null && !IsMemoryInstance(current) ? current : _decalSourceMaterial;
     }
 
+    /// <summary>Primer set con ese indice, o null. El inspector evita que haya dos iguales.</summary>
+    public MaterialOverrideSet FindSet(int materialIndex)
+    {
+        foreach (MaterialOverrideSet set in _materialSets)
+        {
+            if (set != null && set.materialIndex == materialIndex) return set;
+        }
+        return null;
+    }
+
     #region Renderer
 
     private void ApplyToRenderer()
     {
         _mpb ??= new MaterialPropertyBlock();
+        int materialCount = _renderer.sharedMaterials.Length;
+        MaterialOverrideSet allSet = FindSet(AllMaterials);
 
-        if (_appliedIndex != int.MinValue && _appliedIndex != _materialIndex) ClearRendererBlock();
-
-        // Clear en vez de Get: asi un override desactivado o borrado vuelve al valor del material.
-        _mpb.Clear();
-        foreach (ShaderOverride o in _overrides)
+        // Siempre un bloque por submaterial, ya combinado: un bloque por material no se suma al
+        // general del renderer, lo reemplaza, asi que no se pueden usar los dos a la vez.
+        for (int i = 0; i < materialCount; i++)
         {
-            if (o == null || !o.enabled || string.IsNullOrEmpty(o.name)) continue;
-            o.WriteTo(_mpb);
-        }
+            // Clear en vez de Get: asi un override desactivado o borrado vuelve al valor del material.
+            _mpb.Clear();
+            bool wrote = allSet != null && allSet.WriteTo(_mpb);
+            // El set especifico va despues para pisar al general en las propiedades que comparten.
+            MaterialOverrideSet ownSet = FindSet(i);
+            if (ownSet != null) wrote |= ownSet.WriteTo(_mpb);
 
-        if (_materialIndex < 0) _renderer.SetPropertyBlock(_mpb);
-        else _renderer.SetPropertyBlock(_mpb, _materialIndex);
-        _appliedIndex = _materialIndex;
+            if (wrote)
+            {
+                _renderer.SetPropertyBlock(_mpb, i);
+                _appliedIndices.Add(i);
+            }
+            else if (_appliedIndices.Remove(i))
+            {
+                _renderer.SetPropertyBlock(_mpb, i);
+            }
+        }
+        // Si le sacaron materiales al renderer, esos indices ya no tienen bloque que limpiar.
+        _appliedIndices.RemoveWhere(i => i >= materialCount);
     }
 
     private void ClearRendererBlock()
     {
-        if (Renderer == null || _appliedIndex == int.MinValue) return;
+        if (Renderer == null || _appliedIndices.Count == 0) return;
 
         _mpb ??= new MaterialPropertyBlock();
         _mpb.Clear();
-        if (_appliedIndex < 0) _renderer.SetPropertyBlock(null);
-        else _renderer.SetPropertyBlock(_mpb, _appliedIndex);
-        _appliedIndex = int.MinValue;
+        int materialCount = _renderer.sharedMaterials.Length;
+        foreach (int i in _appliedIndices)
+        {
+            if (i < materialCount) _renderer.SetPropertyBlock(_mpb, i);
+        }
+        _appliedIndices.Clear();
     }
 
     #endregion
@@ -236,11 +300,9 @@ public class ShaderPropertyOverrides : MonoBehaviour
             _decalInstance.CopyPropertiesFromMaterial(_decalSourceMaterial);
         }
 
-        foreach (ShaderOverride o in _overrides)
-        {
-            if (o == null || !o.enabled || string.IsNullOrEmpty(o.name)) continue;
-            o.WriteTo(_decalInstance);
-        }
+        // El projector tiene un solo material: valen el set general y el del indice 0, en ese orden.
+        FindSet(AllMaterials)?.WriteTo(_decalInstance);
+        FindSet(0)?.WriteTo(_decalInstance);
 
         if (_decal.material != _decalInstance) _decal.material = _decalInstance;
 #if UNITY_EDITOR
@@ -274,6 +336,24 @@ public class ShaderPropertyOverrides : MonoBehaviour
     }
 
     private static bool IsMemoryInstance(Material material) => (material.hideFlags & HideFlags.DontSave) != 0;
+
+    #endregion
+
+    #region Serializacion
+
+    public void OnBeforeSerialize() { }
+
+    // Escenas/prefabs guardados antes de los sets: la lista vieja pasa a un set con su indice.
+    // Corre en cada carga hasta que se guarde de nuevo, y es idempotente.
+    public void OnAfterDeserialize()
+    {
+        if (_overrides == null || _overrides.Count == 0) return;
+        _materialSets ??= new List<MaterialOverrideSet>();
+        if (_materialSets.Count == 0)
+            _materialSets.Add(new MaterialOverrideSet { materialIndex = _materialIndex, overrides = _overrides });
+        _overrides = new List<ShaderOverride>();
+        _materialIndex = AllMaterials;
+    }
 
     #endregion
 
