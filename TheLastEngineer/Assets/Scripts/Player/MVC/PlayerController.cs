@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private CinemachineImpulseSource _impulse;
     private InteractableHandler _interactableHandler;
     private LineOfSightChecker _obstruction;
+    private PlayerIntangibilityHandler _intangibility;
 
     private Vector2 _move = Vector2.zero;
     private float _currentSpeed;
@@ -91,6 +92,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _model = new PlayerModel(CC, transform, _playerData, _collider);
         View = new PlayerView(gameObject, _renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
 
+        // CapsuleCollider explícito: GetComponent<Collider>() puede devolver el propio CharacterController.
+        _intangibility = new PlayerIntangibilityHandler(CC, GetComponent<CapsuleCollider>(), _nodeHandler, _playerData);
+
         _checkPointPos = transform.position;
 
         // No tiene campos serializados: resuelve todo desde este controller, así que se puede
@@ -106,7 +110,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         StateMachine = new PlayerStateMachine(this, _nodeHandler);
 
         HookInputs(true);
-        
+        _intangibility.Enable();
+
         OnDied += _input.DisableInputs;
         OnRespawned += _input.EnableInputs;
 
@@ -133,6 +138,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         View.Walk(actualMovement);
         StateMachine.Tick();
+        _intangibility.Tick();
 
         GetClosestGlitcheable();
         
@@ -149,6 +155,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         _lastNearestGlitcheable = null;
         HookInputs(false);
+        _intangibility?.Disable();
 
         // El LevelLoader sobrevive al cambio de escena: si no desuscribimos,
         // quedan delegates apuntando a players ya destruidos.

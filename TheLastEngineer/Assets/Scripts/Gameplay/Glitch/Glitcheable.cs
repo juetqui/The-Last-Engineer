@@ -44,6 +44,8 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     [SerializeField] private Vector2 feedbackMinMaxPS = new Vector2(0, 200);
     [SerializeField] private LayerMask _defaultLayer;
     [SerializeField] private LayerMask _glitchedLayer;
+    [Tooltip("Layer en Idle con nivel Intangible. El jugador la excluye (PlayerData.intangibleExcludeLayers) con el nodo en Intangible.")]
+    [SerializeField] private LayerMask _intangibleLayer;
     private ParticleSystem.EmissionModule _feedbackPS;
 
     public GlitchStateMachine FSM;
@@ -62,17 +64,15 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     private GlitchComponent _glitch = default;
     private bool _syncing = false;
 
-    // Intangibilidad (nivel 1): el collider pasa a trigger en vez de apagarse. Apagarlo sacaría
-    // al objeto del PlayerInteractionDetector y el jugador no podría hacer Take para recuperar la
-    // carga: el estado se autosostendría (softlock).
+    // Intangibilidad (nivel 1): el collider nunca deja de ser sólido. En Idle con nivel Intangible
+    // el objeto pasa a _intangibleLayer y es el jugador quien la excluye mientras lleva un nodo en
+    // Intangible (PlayerIntangibilityHandler). Así sigue registrado en el PlayerInteractionDetector
+    // y el jugador siempre puede hacer Take para recuperar la carga.
     private const float OverlapSkin = 0.02f;
-    private const float RescanWindow = 0.25f;
     private static readonly Collider[] _overlapBuffer = new Collider[16];
 
     private bool _fsmWantsSolid = true;
-    private bool _isIntangible = false;
-    private bool _baseIsTrigger = false;
-    private float _rescanUntil = -1f;
+    private bool _pendingLayerChange = false;
 
     public GlitchComponent Glitch => _glitch;
     public GlitchState Level => _glitch.CurrentState;
@@ -95,8 +95,6 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
 
         if (_coll == null)
             _coll = GetComponent<Collider>();
-
-        _baseIsTrigger = _coll.isTrigger;
 
         if (_renderer == null)
             _renderer = GetComponent<Renderer>();
@@ -151,7 +149,17 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         if (FSM != null) FSM.OnStateChanged -= OnFsmStateChanged;
     }
 
-    private void OnLevelChanged(GlitchState level) => SyncFsmWithLevel();
+    private void OnLevelChanged(GlitchState level)
+    {
+        SyncFsmWithLevel();
+
+        // Un Set/Take cambia el nivel estando en Idle sin pasar por ningún estado de la FSM, así
+        // que la layer (Intangible o Glitched) se recalcula acá. El cambio de layer puede cortar
+        // el par con el trigger del detector: nos re-anunciamos.
+        ApplyLayer();
+        Rescan();
+    }
+
     private void OnFsmStateChanged(IState state) => SyncFsmWithLevel();
 
     /// <summary>
@@ -182,78 +190,16 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     private void Update()
     {
         FSM.Tick(Time.deltaTime);
-        UpdateIntangibility();
+
+        // Por pull: el jugador tiene que salir del objeto para que deje la layer Intangible, y
+        // eso no lo avisa ningún evento.
+        if (_pendingLayerChange) ApplyLayer();
     }
 
-    /// <summary>
-    /// Por pull y no por evento: si el jugador muere con el nodo en 1, RespawnPlayer hace
-    /// ResetTracking y este objeto deja de recibir proximidad, así que ningún evento avisaría que
-    /// tiene que volver a sólido.
-    /// </summary>
-    private void UpdateIntangibility()
-    {
-        var wantsIntangible = WantsIntangible();
-
-        if (wantsIntangible != _isIntangible)
-        {
-            if (wantsIntangible)
-            {
-                if (debug && IsPlayerStandingOnTop())
-                    Debug.LogWarning($"[Glitcheable] {name} se vuelve intangible con el jugador parado encima", this);
-
-                _isIntangible = true;
-                ApplyPhysicsState();
-            }
-            // Volver a sólido con la cápsula del jugador adentro lo dejaría trabado o lo
-            // escupiría: se difiere y se reintenta cada frame hasta que salga.
-            else if (!IsPlayerInside())
-            {
-                _isIntangible = false;
-                ApplyPhysicsState();
-            }
-        }
-
-        // Cambiar isTrigger hace que PhysX pierda y reencuentre el par con el trigger del
-        // detector, y un OnTriggerExit tardío nos daría de baja. Nos re-anunciamos durante unos
-        // pasos de física para que el objeto siga siendo targeteable por Take.
-        if (Time.time <= _rescanUntil) Rescan();
-    }
-
-    private bool WantsIntangible()
-    {
-        var player = PlayerNodeHandler.Instance;
-
-        return Level == GlitchState.Intangible
-            && FSM.Current == IdleState
-            && player != null
-            && player.HasNode
-            && player.CurrentLevel == GlitchState.Intangible
-            && IsPlayerInRange();
-    }
-
-    /// <summary>
-    /// Intangible solo dentro del rango de interacción: al alejarse el objeto vuelve a sólido.
-    /// Se consulta geométricamente y no con OnPlayerProximity porque cambiar isTrigger dispara un
-    /// OnTriggerExit tardío en el detector: lo daría "fuera de rango", volvería a sólido, el Rescan
-    /// lo re-registraría y quedaría oscilando. Los bounds no cambian al togglear el trigger.
-    /// </summary>
-    private bool IsPlayerInRange()
-    {
-        var player = PlayerController.Instance;
-
-        return player != null && player.IsInInteractionRange(_coll);
-    }
-
-    /// <summary>Único lugar que escribe el collider: combina lo que pide la FSM con la intangibilidad.</summary>
+    /// <summary>Único lugar que escribe el collider: solo refleja lo que pide la FSM.</summary>
     private void ApplyPhysicsState()
     {
-        var wasTrigger = _coll.isTrigger;
-
         _coll.enabled = _fsmWantsSolid;
-        _coll.isTrigger = _baseIsTrigger || _isIntangible;
-
-        if (_coll.isTrigger != wasTrigger) _rescanUntil = Time.time + RescanWindow;
-
         Rescan();
     }
 
@@ -290,16 +236,6 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
         return false;
     }
 
-    private bool IsPlayerStandingOnTop()
-    {
-        var player = PlayerController.Instance;
-        if (player == null || player.CC == null || !player.CC.isGrounded) return false;
-
-        var cc = player.CC;
-        var ray = new Ray(cc.transform.TransformPoint(cc.center), Vector3.down);
-
-        return _coll.Raycast(ray, out _, cc.height * 0.5f + cc.skinWidth + 0.1f);
-    }
     public void HologramSwitch(bool enable)
     {
         if (_objectHolograms.Count <= 0) return;
@@ -345,15 +281,46 @@ public class Glitcheable : MonoBehaviour, IInteractable, IProximityListener
     {
         _renderer.material.SetFloat("_IsCorrupted", v);
 
-        var targetLayer = _glitchedLayer;
-        if (FSM.Current != IdleState) targetLayer = _defaultLayer;
+        ApplyLayer();
+    }
 
-        int mask = targetLayer.value;
-        if (mask == 0) { if (debug) Debug.LogWarning($"[Glitcheable] {name}: LayerMask vacía", this); return; }                                                                                                                                                                                                              
+    private LayerMask ResolveTargetLayer()
+    {
+        if (FSM.Current != IdleState) return _defaultLayer;
+
+        if (Level == GlitchState.Intangible)
+        {
+            if (_intangibleLayer.value != 0) return _intangibleLayer;
+            if (debug) Debug.LogWarning($"[Glitcheable] {name}: _intangibleLayer vacía, uso _glitchedLayer", this);
+        }
+
+        return _glitchedLayer;
+    }
+
+    /// <summary>
+    /// Layer según estado de la FSM y nivel. Salir de _intangibleLayer con el jugador adentro lo
+    /// dejaría trabado (él ya no excluiría la layer nueva): se difiere y Update reintenta.
+    /// </summary>
+    private void ApplyLayer()
+    {
+        int mask = ResolveTargetLayer().value;
+        if (mask == 0) { if (debug) Debug.LogWarning($"[Glitcheable] {name}: LayerMask vacía", this); return; }
         int layerIndex = Mathf.RoundToInt(Mathf.Log(mask, 2));
+
+        bool leavingIntangible = _intangibleLayer.value != 0
+            && (_intangibleLayer.value & (1 << gameObject.layer)) != 0
+            && layerIndex != gameObject.layer;
+
+        if (leavingIntangible && IsPlayerInside())
+        {
+            _pendingLayerChange = true;
+            return;
+        }
+
+        _pendingLayerChange = false;
         SetLayerRecursively(gameObject, layerIndex);
 
-        if (debug) Debug.Log($"[Glitcheable] {name} -> layer {layerIndex} (corrupted={v}, state={FSM.Current?.GetType().Name})", this);
+        if (debug) Debug.Log($"[Glitcheable] {name} -> layer {layerIndex} (level={Level}, state={FSM.Current?.GetType().Name})", this);
     }
     
     private static void SetLayerRecursively(GameObject go, int layer)

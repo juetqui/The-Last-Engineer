@@ -7,7 +7,6 @@ public class LaserController : MonoBehaviour
     [SerializeField] private int _maxDist = 100;
     [SerializeField] private float _offsetZ = 1f;
     [SerializeField] private float _easeTime = 0.5f;
-    [SerializeField] private LayerMask _layer;
     [SerializeField] private bool _startsInitialized = true;
     [SerializeField] private bool _debug = false;
     [SerializeField] private Color _gizmosColor = Color.red;
@@ -26,9 +25,12 @@ public class LaserController : MonoBehaviour
     
     public bool StartsInitialized => _startsInitialized;
 
+    // La máscara es la misma para todos los láseres: sale de Resources/LaserData.asset.
+    private static LayerMask Layer => LaserData.Default.layer;
+
     private void Awake()
     {
-        _model = new LaserModel(_maxDist, _layer, _easeTime, _debug);
+        _model = new LaserModel(_maxDist, Layer, _easeTime, _debug);
         _view = GetComponent<LaserView>();
 
         _view.Init(1);
@@ -140,7 +142,7 @@ public class LaserController : MonoBehaviour
         origin = GetLaserOrigin();
         dir = transform.forward;
 
-        didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, _layer, QueryTriggerInteraction.Ignore);
+        didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, Layer, QueryTriggerInteraction.Ignore);
         return hit;
     }
 

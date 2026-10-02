@@ -15,7 +15,10 @@ public class PlayerData : ScriptableObject
     public LayerMask glitchDetectionLayer = default;
     public LayerMask defaultLayer = default;
     public LayerMask teleportLayer = default;
-    
+
+    [Tooltip("Layers que el CharacterController y el CapsuleCollider excluyen mientras el jugador lleva un nodo en Intangible.")]
+    public LayerMask intangibleExcludeLayers = default;
+
     public Material intangibleMat = default;
 
     [Header("Interaction")]
