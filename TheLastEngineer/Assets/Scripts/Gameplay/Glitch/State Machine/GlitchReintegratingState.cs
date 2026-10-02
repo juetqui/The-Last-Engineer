@@ -34,7 +34,7 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         _elapsed = 0f; _duration = t ? t.TransparencyDuration : 1f;
         _startAlpha = ReadCurrentAlpha();
 
-        // g.HologramSwitch();
+        g.HologramSwitch(false);
         g.SetBoolCorrupted(1f);
         g.SetParticles(true, 1f);
         g.PlaySfx(g._sounds ? g._sounds.endSFX : null);
@@ -54,7 +54,7 @@ public class GlitchReintegratingState : IState, IGlitchInterruptible
         if (raw < 1f || _isChangingState) return;
 
         _isChangingState = true;
-        g.HologramSwitch(false);
+        // g.HologramSwitch(false);
         g.SetParticles(false, 1f);
         g.SetBoolCorrupted(0f);
         g.FSM?.Change(_next);
