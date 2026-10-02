@@ -6,6 +6,10 @@ public class LaserView : MonoBehaviour
     [SerializeField] private GameObject _lineRendererPrefab;
     [SerializeField] private ParticleSystem _hitLaser;
     [SerializeField] private ParticleSystem _beamLaser;
+    [SerializeField] private ParticleSystem _Sparks;
+    [SerializeField] private ParticleSystem _Smoke;
+    [SerializeField] private TrailRenderer _trailRenderer;
+    [SerializeField] private Vector3 _particleOffset;
     
     private LineRenderer _line;
     private AudioSource _audio;
@@ -30,10 +34,15 @@ public class LaserView : MonoBehaviour
 
     public void ShowHitEffect(Vector3 pos, Vector3 normal)
     {
+        _trailRenderer.transform.position = pos;
+        _Sparks.transform.position = pos;
+        _Sparks.transform.rotation = Quaternion.LookRotation(normal);
+        _Smoke.transform.position = pos + _particleOffset;
         _hitLaser.transform.position = pos;
         _hitLaser.transform.rotation = Quaternion.LookRotation(normal);
         _hitLaser.gameObject.SetActive(true);
-        if (!_hitLaser.isPlaying) _hitLaser.Play();
+        if (!_hitLaser.isPlaying) _hitLaser.Play(); _Sparks.Play(); _Smoke.Play();
+
     }
 
     public void StopHitEffect()

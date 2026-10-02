@@ -175,6 +175,10 @@ MonoBehaviour:
   _lineRendererPrefab: {fileID: 8293129748803608604, guid: c0c24c1539e8d7146a4ddfb49c6ade37, type: 3}
   _hitLaser: {fileID: 6085274857839134753}
   _beamLaser: {fileID: 8109082270097695807}
+  _Sparks: {fileID: 4941306813691069794}
+  _Smoke: {fileID: 3732677368869966385}
+  _trailRenderer: {fileID: 5217085522294346589}
+  _particleOffset: {x: 0, y: 0.5, z: 0}
 --- !u!82 &320023511320343330
 AudioSource:
   m_ObjectHideFlags: 0
@@ -765,6 +769,10 @@ MonoBehaviour:
   _lineRendererPrefab: {fileID: 8293129748803608604, guid: c0c24c1539e8d7146a4ddfb49c6ade37, type: 3}
   _hitLaser: {fileID: 1004458419254785295}
   _beamLaser: {fileID: 1479547144672380073}
+  _Sparks: {fileID: 2094381618806192204}
+  _Smoke: {fileID: 7660221558143102751}
+  _trailRenderer: {fileID: 1289576530287718003}
+  _particleOffset: {x: 0, y: 0.5, z: 0}
 --- !u!82 &8783546998683337045
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10606,6 +10614,10 @@ MonoBehaviour:
   _lineRendererPrefab: {fileID: 8293129748803608604, guid: c0c24c1539e8d7146a4ddfb49c6ade37, type: 3}
   _hitLaser: {fileID: 3092101113148054416}
   _beamLaser: {fileID: 3572863692193188528}
+  _Sparks: {fileID: 4181989128061032147}
+  _Smoke: {fileID: 5573001007962243456}
+  _trailRenderer: {fileID: 3962229847654760684}
+  _particleOffset: {x: 0, y: 0.5, z: 0}
 --- !u!82 &5298351131847424749
 AudioSource:
   m_ObjectHideFlags: 0
@@ -15964,6 +15976,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 443800218145281556, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
   m_PrefabInstance: {fileID: 3857662613523310273}
   m_PrefabAsset: {fileID: 0}
+--- !u!198 &3732677368869966385 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 451496853851010288, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 3857662613523310273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &4941306813691069794 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8149870355785884579, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 3857662613523310273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!96 &5217085522294346589 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 9074722537609147804, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 3857662613523310273}
+  m_PrefabAsset: {fileID: 0}
 --- !u!198 &6085274857839134753 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
@@ -16216,9 +16243,24 @@ ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
   m_PrefabInstance: {fileID: 5409754562611721584}
   m_PrefabAsset: {fileID: 0}
+--- !u!96 &3962229847654760684 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 9074722537609147804, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 5409754562611721584}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &4181989128061032147 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8149870355785884579, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 5409754562611721584}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5565322065441940324 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 443800218145281556, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 5409754562611721584}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &5573001007962243456 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 451496853851010288, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
   m_PrefabInstance: {fileID: 5409754562611721584}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6034839595994529226
@@ -16746,8 +16788,23 @@ ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
   m_PrefabInstance: {fileID: 7785205420344630255}
   m_PrefabAsset: {fileID: 0}
+--- !u!96 &1289576530287718003 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 9074722537609147804, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 7785205420344630255}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &2094381618806192204 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8149870355785884579, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 7785205420344630255}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7647722286956154363 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 443800218145281556, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 7785205420344630255}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &7660221558143102751 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 451496853851010288, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
   m_PrefabInstance: {fileID: 7785205420344630255}
   m_PrefabAsset: {fileID: 0}

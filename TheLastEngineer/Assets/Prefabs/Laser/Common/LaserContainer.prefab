@@ -289,6 +289,10 @@ MonoBehaviour:
   _lineRendererPrefab: {fileID: 8293129748803608604, guid: c0c24c1539e8d7146a4ddfb49c6ade37, type: 3}
   _hitLaser: {fileID: 3353326685394369612}
   _beamLaser: {fileID: 6542890659539897451}
+  _Sparks: {fileID: 4497224360731144463}
+  _Smoke: {fileID: 5275817074012759644}
+  _trailRenderer: {fileID: 3646959412358866736}
+  _particleOffset: {x: 0, y: 0.5, z: 0}
 --- !u!82 &9201921563146836264
 AudioSource:
   m_ObjectHideFlags: 0
@@ -727,14 +731,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: LaserHit
       objectReference: {fileID: 0}
-    - target: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
-      propertyPath: InitialModule.startSize.scalar
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
-      propertyPath: InitialModule.startSize.minScalar
-      value: 4
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -743,6 +739,21 @@ PrefabInstance:
 --- !u!198 &3353326685394369612 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 7059980142319415008, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 5725058442818114220}
+  m_PrefabAsset: {fileID: 0}
+--- !u!96 &3646959412358866736 stripped
+TrailRenderer:
+  m_CorrespondingSourceObject: {fileID: 9074722537609147804, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 5725058442818114220}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &4497224360731144463 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 8149870355785884579, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+  m_PrefabInstance: {fileID: 5725058442818114220}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &5275817074012759644 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 451496853851010288, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
   m_PrefabInstance: {fileID: 5725058442818114220}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &5286046874880181432 stripped
