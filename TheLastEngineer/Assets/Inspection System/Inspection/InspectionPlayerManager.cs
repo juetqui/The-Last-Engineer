@@ -57,7 +57,7 @@ public class InspectionPlayerManager : MonoBehaviour
 
     private void HandleFinishedInteraction()
     {
-        _camera.enabled = false;
+        _camera.enabled = false; 
         InspectionSystem.Instance.enabled = false;
 
         InputManager.Instance.UpdateActionMap(ActionMaps.Player);
