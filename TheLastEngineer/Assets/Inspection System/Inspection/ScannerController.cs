@@ -5,6 +5,7 @@ public class ScannerController : MonoBehaviour
 {
     public static ScannerController Instance = null;
 
+    [SerializeField] private float _startScale = 0.1f;
     [SerializeField] private float _targetScale = 6f;
     [SerializeField] private float _targetTime = 1f;
 
@@ -26,12 +27,12 @@ public class ScannerController : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
+    private void Start()
     {
         InspectorController.Instance.OnTargetEnabled += ListenToTarget;
     }
 
-    void Update()
+    private void Update()
     {
         if (_scan) StartScanning();
     }
@@ -62,18 +63,18 @@ public class ScannerController : MonoBehaviour
     private void StartScanning()
     {
         _timer += Time.deltaTime;
-        
-        Vector3 newScale = Vector3.one * (_targetScale * _timer);
+
+        var newScale = Vector3.one * (_targetScale * _timer);
 
         transform.localScale = newScale;
 
-        if (_timer >= _targetTime)
-        {
-            InspectionSystem.Instance.OnResetRot -= SetUpScanning;
+        // Si no funciona correctamente invertir el if a >= y anidar la logica siguiente.
+        if (_timer < _targetTime) return;
 
-            _scan = false;
-            transform.localScale = Vector3.one;
-            OnScanFinished?.Invoke();
-        }
+        InspectionSystem.Instance.OnResetRot -= SetUpScanning;
+
+        _scan = false;
+        transform.localScale = Vector3.one * _startScale;
+        OnScanFinished?.Invoke();
     }
 }
