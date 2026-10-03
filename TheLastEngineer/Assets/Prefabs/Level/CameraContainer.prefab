@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 5051394870504857925}
   - component: {fileID: 4258404439544188137}
+  - component: {fileID: 1428605559635285209}
   - component: {fileID: 2847022742103415339}
-  - component: {fileID: 3195478052025661708}
   - component: {fileID: 1808422472160323465}
   - component: {fileID: 1340282394226460606}
-  - component: {fileID: 6556185406477496244}
+  - component: {fileID: 3195478052025661708}
   m_Layer: 0
   m_Name: CM Target Camera
   m_TagString: Untagged
@@ -80,6 +80,69 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
+--- !u!114 &1428605559635285209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142232106386274392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b5d7c088409d9a40b7b09aa707777f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineOrbitalFollow
+  TargetOffset: {x: 0, y: 0, z: 0}
+  TrackerSettings:
+    BindingMode: 4
+    PositionDamping: {x: 1, y: 1, z: 1}
+    AngularDampingMode: 0
+    RotationDamping: {x: 1, y: 1, z: 1}
+    QuaternionDamping: 1
+  OrbitStyle: 1
+  Radius: 5
+  Orbits:
+    Top:
+      Radius: 2
+      Height: 5
+    Center:
+      Radius: 4
+      Height: 2.25
+    Bottom:
+      Radius: 2.5
+      Height: 0.1
+    SplineCurvature: 0.5
+  RecenteringTarget: 2
+  HorizontalAxis:
+    Value: 0
+    Center: 0
+    Range: {x: -180, y: 180}
+    Wrap: 1
+    Recentering:
+      Enabled: 0
+      Wait: 1
+      Time: 2
+    Restrictions: 0
+  VerticalAxis:
+    Value: 17.5
+    Center: 17.5
+    Range: {x: -10, y: 45}
+    Wrap: 0
+    Recentering:
+      Enabled: 0
+      Wait: 1
+      Time: 2
+    Restrictions: 0
+  RadialAxis:
+    Value: 1
+    Center: 1
+    Range: {x: 1, y: 1}
+    Wrap: 0
+    Recentering:
+      Enabled: 0
+      Wait: 1
+      Time: 2
+    Restrictions: 0
 --- !u!114 &2847022742103415339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,19 +167,6 @@ MonoBehaviour:
     FrequencyGain: 1
     Duration: 1
     m_NoiseOffsets: {x: 0, y: 0, z: 0}
---- !u!114 &3195478052025661708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1142232106386274392}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6cbb27bb09bd9f04aa382ce02de80dff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _timeModifier: 0.00125
 --- !u!114 &1808422472160323465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,7 +235,7 @@ MonoBehaviour:
   AmplitudeGain: 0
   FrequencyGain: 0
   m_NoiseOffsets: {x: 0, y: 0, z: 0}
---- !u!114 &6556185406477496244
+--- !u!114 &3195478052025661708
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -194,16 +244,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1142232106386274392}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89875cdc57c54474a8a74efd9b2a3b5d, type: 3}
+  m_Script: {fileID: 11500000, guid: 6cbb27bb09bd9f04aa382ce02de80dff, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineInputAxisController
-  ScanRecursively: 1
-  SuppressInputWhileBlending: 1
-  IgnoreTimeScale: 0
-  m_ControllerManager:
-    Controllers: []
-  PlayerIndex: -1
-  AutoEnableInputs: 1
+  m_EditorClassIdentifier: 
+  _timeModifier: 0.00125
 --- !u!1 &2947574232500616496
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,7 +281,7 @@ Transform:
   m_GameObject: {fileID: 2947574232500616496}
   serializedVersion: 2
   m_LocalRotation: {x: 0.4204114, y: 0.007917805, z: -0.0036688705, w: 0.90729165}
-  m_LocalPosition: {x: -0.34904814, y: 30, z: -19.996954}
+  m_LocalPosition: {x: -0.3490486, y: 30, z: -19.996956}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1052,7 +1096,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8545623352203006106}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 523bfb31337a7504596ff177c5a76cae, type: 3}
   m_Name: 

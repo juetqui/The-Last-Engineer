@@ -40,7 +40,8 @@ public class InspectionPlayerManager : MonoBehaviour
         InspectionSystem.Instance.enabled = true;
         PlayerController.Instance.SetCanMove(false);
         InputManager.Instance.UpdateActionMap(ActionMaps.UI);
-        
+        GamepadCursor.Instance.SetInspectionMode(true);
+
         _currentInteractable = interactable;
         _currentInteractable.Interact(PlayerNodeHandler.Instance, out bool succeded);
 
@@ -60,6 +61,7 @@ public class InspectionPlayerManager : MonoBehaviour
         InspectionSystem.Instance.enabled = false;
 
         InputManager.Instance.UpdateActionMap(ActionMaps.Player);
+        GamepadCursor.Instance.SetInspectionMode(false);
         PlayerController.Instance.SetCanMove(true);
         _currentInteractable = null;
         _isInspecting = false;

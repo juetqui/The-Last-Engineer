@@ -20,6 +20,7 @@ public class GamepadCursor : MonoBehaviour
     private Camera _mainCamera = default;
 
     private bool _prevMouseState = default;
+    private bool _isInspecting = false;
 
     private string _prevControlScheme = "";
     public const string GamepadScheme = "Gamepad";
@@ -27,6 +28,7 @@ public class GamepadCursor : MonoBehaviour
 
     public string PrevControlScheme { get { return _prevControlScheme; } }
     public Mouse CurrentMouse { get { return _currentMouse; } }
+    public bool IsInspecting { get { return _isInspecting; } }
 
     private void Awake()
     {
@@ -155,21 +157,46 @@ public class GamepadCursor : MonoBehaviour
     {
         if (_playerInput.currentControlScheme == MouseScheme && _prevControlScheme != MouseScheme)
         {
-            _cursorTransform.gameObject.SetActive(false);
-            Cursor.visible = true;
             _currentMouse.WarpCursorPosition(_virtualMouse.position.ReadValue());
             _prevControlScheme = MouseScheme;
+            RefreshCursorVisibility();
         }
         else if (_playerInput.currentControlScheme == GamepadScheme && _prevControlScheme != GamepadScheme)
         {
-            _cursorTransform.gameObject.SetActive(true);
-            Cursor.visible = false;
+            // Al cambiar de esquema, PlayerInput desempareja todos los devices y solo empareja los
+            // del esquema Gamepad: sin re-emparejar, el mouse virtual queda fuera del usuario y la
+            // acción UI/Point (<VirtualMouse>/position) deja de resolverse.
+            if (_virtualMouse != null && _virtualMouse.added)
+                InputUser.PerformPairingWithDevice(_virtualMouse, _playerInput.user);
+
             InputState.Change(_virtualMouse.position, _currentMouse.position.ReadValue());
             AnchorCursor(_currentMouse.position.ReadValue());
             _prevControlScheme = GamepadScheme;
+            RefreshCursorVisibility();
         }
-        
+
         InputManager.Instance.SetControlScheme(_prevControlScheme);
+    }
+
+    // Durante la inspección el cursor tiene que estar libre: PauseGameController lo bloquea al
+    // arrancar y, bloqueado, <Mouse>/position no cambia (no se puede rotar ni apuntar).
+    public void SetInspectionMode(bool active)
+    {
+        _isInspecting = active;
+        Cursor.lockState = active ? CursorLockMode.None : CursorLockMode.Locked;
+        RefreshCursorVisibility();
+    }
+
+    // Cursor del sistema con mouse, cursor virtual con gamepad; fuera de la inspección, ninguno.
+    // No toca lockState para no pisar a los menús de pausa si cambia el esquema estando pausado.
+    public void RefreshCursorVisibility()
+    {
+        bool usingGamepad = IsUsingGamepad();
+
+        if (_cursorTransform != null)
+            _cursorTransform.gameObject.SetActive(_isInspecting && usingGamepad);
+
+        Cursor.visible = _isInspecting && !usingGamepad;
     }
 
     public bool IsUsingGamepad()
@@ -197,7 +224,9 @@ public class GamepadCursor : MonoBehaviour
         if (_virtualMouse != null && _virtualMouse.added)
             InputState.Change(_virtualMouse.position, centerPos);
 
-        if (_currentMouse != null)
+        // Mover el mouse físico genera un evento real del SO: con el esquema Gamepad ese mouse no
+        // está emparejado y PlayerInput saltaría a Keyboard&Mouse, ocultando el cursor virtual.
+        if (_currentMouse != null && !IsUsingGamepad())
             _currentMouse.WarpCursorPosition(centerPos);
 
         if (_cursorTransform != null)

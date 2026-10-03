@@ -94,6 +94,10 @@ public class InputDeviceDetector : ScriptableObject
 
     private void OnKeyboardMouseInput(InputAction.CallbackContext context)
     {
+        // El mouse virtual de GamepadCursor también es un Mouse: sus clicks (botón A) y su delta
+        // (stick) no deben contar como uso de teclado/mouse.
+        if (context.control.device.layout == "VirtualMouse") return;
+
         // Movimiento del mouse: exigir un desplazamiento mínimo (en pixeles) para
         // evitar que un micro-jitter del sensor cambie el dispositivo mientras se
         // está usando el gamepad. Las teclas/botones (magnitud 0-1) no se filtran.

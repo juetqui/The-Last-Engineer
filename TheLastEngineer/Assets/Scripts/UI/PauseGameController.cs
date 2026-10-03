@@ -31,17 +31,37 @@ public class PauseGameController : MonoBehaviour
     {
         _isPaused = !_isPaused;
         SetTimescale(_isPaused);
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+
+        if (_isPaused)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+        else
+        {
+            RestoreCursor();
+        }
     }
 
     public void ResumeGame()
     {
         _isPaused = false;
         SetTimescale(_isPaused);
+        RestoreCursor();
+    }
+
+    // Si se pausó en medio de una inspección, el cursor tiene que volver libre; bloquearlo
+    // siempre congela <Mouse>/position y corta la rotación/raycast del minijuego.
+    private void RestoreCursor()
+    {
+        if (GamepadCursor.Instance != null && GamepadCursor.Instance.IsInspecting)
+        {
+            GamepadCursor.Instance.SetInspectionMode(true);
+            return;
+        }
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-
     }
 
     public void RestartLevel()
