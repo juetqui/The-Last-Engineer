@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Inspectionable : MonoBehaviour, IInteractable
+public class Inspectionable : MonoBehaviour, IInteractable, IActivationSource
 {
     #region -----INTERFACE VARIABLES-----
     public InteractablePriority Priority => InteractablePriority.Low;
@@ -14,12 +14,17 @@ public class Inspectionable : MonoBehaviour, IInteractable
     [SerializeField] private ParticlesFeedbackManager _positiveFM = default;
     [SerializeField] private ParticlesFeedbackManager _negativeFM = default;
 
+    // Una vez limpio queda limpio: como fuente de activacion nunca vuelve a false.
+    private bool _isCleaned = false;
+
     public CorruptionGenerator CorruptionGenerator { get; private set; }
 
     public event Action OnFinished;
     public event Action OnCleaned;
+    public event Action<bool> OnActivationChanged;
 
     public InspectionType Type { get { return _type; } }
+    public bool IsActive => _isCleaned;
 
     private void Start()
     {
@@ -48,6 +53,9 @@ public class Inspectionable : MonoBehaviour, IInteractable
         _positiveFM.StartParticles();
         OnFinished?.Invoke();
         OnCleaned?.Invoke();
+
+        _isCleaned = true;
+        OnActivationChanged?.Invoke(true);
 
         _collider.enabled = false;
     }

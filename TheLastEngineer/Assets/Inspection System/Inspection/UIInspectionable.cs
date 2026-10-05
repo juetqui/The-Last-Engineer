@@ -5,6 +5,7 @@ public class UIInspectionable : MonoBehaviour
     [SerializeField] private InspectionType _type = InspectionType.None;
     // Referencia explícita: GetComponentInChildren también encontraría los PS de la Corruption.
     [SerializeField] private ParticleSystem _shapeParticles = default;
+    [SerializeField] private CleaningProgressShader _cleaningProgress = default;
 
     // Densidad del objeto sin limpiar; se escala según las corrupciones restantes.
     private int _baseMaxParticles = 0;
@@ -36,7 +37,18 @@ public class UIInspectionable : MonoBehaviour
             // El progreso vive en el generador del mundo: al reabrir un objeto a medio limpiar
             // las partículas tienen que arrancar con la densidad que le corresponde.
             RefreshShapeParticles();
+
+            if (_cleaningProgress != null)
+                _cleaningProgress.SetUp(CorruptionGenerator);
         }
+    }
+
+    public void RefreshCleaningProgress()
+    {
+        RefreshShapeParticles();
+
+        if (_cleaningProgress != null)
+            _cleaningProgress.SyncWithGenerator();
     }
 
     public void RefreshShapeParticles()

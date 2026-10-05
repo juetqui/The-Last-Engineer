@@ -78,6 +78,6 @@ public class InspectorController : MonoBehaviour
             return;
 
         _currentGenerator.RefreshCorruptionVisual(_currentUIInspectionable.UICorruption);
-        _currentUIInspectionable.RefreshShapeParticles();
+        _currentUIInspectionable.RefreshCleaningProgress();
     }
 }

@@ -88,6 +88,10 @@ public class GamepadCursor : MonoBehaviour
 
     private void UpdateMotion()
     {
+        // El mouse virtual solo se usa en la inspección. Fuera de ella, escribir el stick izquierdo en su
+        // delta hace que cualquier binding <Pointer>/delta o <Mouse>/delta (p. ej. la cámara orbital) lo
+        // tome como input de mirar y la cámara rote al mover al player.
+        if (!_isInspecting) return;
         if (_virtualMouse == null || Gamepad.current == null) return;
         if (_canvas == null || _canvasTransform == null || _cursorTransform == null) return;
 
@@ -182,9 +186,25 @@ public class GamepadCursor : MonoBehaviour
     // arrancar y, bloqueado, <Mouse>/position no cambia (no se puede rotar ni apuntar).
     public void SetInspectionMode(bool active)
     {
+        if (_isInspecting && !active)
+            ReleaseVirtualMouse();
+
         _isInspecting = active;
         Cursor.lockState = active ? CursorLockMode.None : CursorLockMode.Locked;
         RefreshCursorVisibility();
+    }
+
+    // Al dejar de actualizarse fuera de la inspección, el mouse virtual conservaría el último delta y el
+    // click si se salió con el botón sur apretado: se limpian para no dejar input colgado.
+    private void ReleaseVirtualMouse()
+    {
+        if (_virtualMouse == null || !_virtualMouse.added) return;
+
+        _virtualMouse.CopyState<MouseState>(out var mouseState);
+        mouseState.delta = Vector2.zero;
+        mouseState.WithButton(MouseButton.Left, false);
+        InputState.Change(_virtualMouse, mouseState);
+        _prevMouseState = false;
     }
 
     // Cursor del sistema con mouse, cursor virtual con gamepad; fuera de la inspección, ninguno.

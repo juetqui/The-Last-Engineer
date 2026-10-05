@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximityListener
+public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximityListener, IActivationSource
 {
     #region -----INTERFACE VARIABLES-----
     public InteractablePriority Priority => InteractablePriority.Medium;
@@ -38,10 +38,12 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
     public bool StartsConnected { get; private set; }
     public bool IsConnected => _recievedNode != null;
     public bool IsCorrectlyConnected => _isCorrectlyConnected;
+    public bool IsActive => _isCorrectlyConnected;
 
     public Action OnInitialized;
     public Action<GlitchState, bool> OnNodeConnected;
     public Action<bool> OnAvailableToConnect;
+    public event Action<bool> OnActivationChanged;
 
     private void Start()
     {
@@ -87,6 +89,7 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
         {
             _isCorrectlyConnected = true;
             OnNodeConnected?.Invoke(node.Level, true);
+            OnActivationChanged?.Invoke(true);
             _renderer.material.SetColor("_EmissiveColor", _emissionCorrect);
             //_particleNode.SetActive(false);
         }
@@ -113,7 +116,10 @@ public class Connection : MonoBehaviour, IInteractable, IConnectable, IProximity
         // Se anuncia con _requiredLevel (el nivel con el que se anuncio el true) y no con node.Level,
         // que pudo cambiar mientras estaba conectado y dejaria a DoorsController sin descontar.
         if (wasCorrect)
+        {
             OnNodeConnected?.Invoke(_requiredLevel, false);
+            OnActivationChanged?.Invoke(false);
+        }
     }
 
     public void OnPlayerProximity(bool inRange, PlayerController player)

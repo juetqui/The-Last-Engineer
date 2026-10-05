@@ -26,6 +26,9 @@ public class CorruptionRemover : MonoBehaviour
     private float _timer = 0f;
     private bool _isHolding = false;
 
+    // OnHittingCorruption manda el timer en segundos: con esto se normaliza contra el tiempo de hold.
+    public float HoldTimer => _holdTimer;
+
     public Action<Corruption> OnCorruptionHit = delegate { };
     public Action<float> OnHittingCorruption = delegate { };
     public Action<Corruption> OnCorruptionRemoved = delegate { };
