@@ -23,7 +23,10 @@ public class InputPromptDatabase : ScriptableObject
         // InputPromptIcon, e insertarlos en el medio correría los valores existentes.
         Set,
         Take,
-        Clean
+        // Minigame inputs
+        InspectionAim,
+        InspectionRotate,
+        InspectionClean,
     }
 
     [Serializable]
