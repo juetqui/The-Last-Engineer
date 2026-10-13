@@ -28,6 +28,9 @@ public class LaserController : MonoBehaviour
     // La máscara es la misma para todos los láseres: sale de Resources/LaserData.asset.
     private static LayerMask Layer => LaserData.Default.layer;
 
+    // Buffer compartido para el raycast del láser intangible (evita allocs por frame).
+    private static readonly RaycastHit[] _hitBuffer = new RaycastHit[16];
+
     private void Awake()
     {
         _model = new LaserModel(_maxDist, Layer, _easeTime, _debug);
@@ -142,8 +145,41 @@ public class LaserController : MonoBehaviour
         origin = GetLaserOrigin();
         dir = transform.forward;
 
-        didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, Layer, QueryTriggerInteraction.Ignore);
-        return hit;
+        if (!PassesThroughIntangibles)
+        {
+            didHit = Physics.Raycast(origin, dir, out var hit, _maxDist, Layer, QueryTriggerInteraction.Ignore);
+            return hit;
+        }
+
+        // Un láser intangible atraviesa los Glitcheables que también están en Intangible: hace falta
+        // ver detrás del primer impacto, así que se piden todos los hits y se queda con el más cercano
+        // que no sea ignorable (RaycastNonAlloc no garantiza orden).
+        int count = Physics.RaycastNonAlloc(origin, dir, _hitBuffer, _maxDist, Layer, QueryTriggerInteraction.Ignore);
+
+        var closest = default(RaycastHit);
+        didHit = false;
+
+        for (int i = 0; i < count; i++)
+        {
+            var candidate = _hitBuffer[i];
+
+            if (didHit && candidate.distance >= closest.distance) continue;
+            if (IsIntangibleGlitcheable(candidate.collider)) continue;
+
+            closest = candidate;
+            didHit = true;
+        }
+
+        return closest;
+    }
+
+    private bool PassesThroughIntangibles => _glitcheable != null && _glitcheable.Level == GlitchState.Intangible;
+
+    // GetComponentInParent por si el collider está en un hijo del Glitcheable.
+    private static bool IsIntangibleGlitcheable(Collider coll)
+    {
+        var glitcheable = coll.GetComponentInParent<Glitcheable>();
+        return glitcheable != null && glitcheable.Level == GlitchState.Intangible;
     }
 
     private void CheckCommonBehaviour()
