@@ -1,5 +1,32 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7688290700980421789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b122603e20ab68449a658d7e4d9d341e, type: 3}
+  m_Name: PlayerXRayFeature
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerXRayFeature
+  m_Active: 1
+  _settings:
+    occluderDepthEvent: 200
+    compositeEvent: 500
+    xrayMaterial: {fileID: 2100000, guid: 12330e83748bd0045b6532eb1b492965, type: 2}
+    occluderLayerMask:
+      serializedVersion: 2
+      m_Bits: 4171715
+    playerRenderingLayer:
+      serializedVersion: 0
+      m_Bits: 4
+    ditheredRenderingLayer:
+      serializedVersion: 0
+      m_Bits: 8
+    includeSceneView: 0
 --- !u!114 &-6786851833439470812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,7 +326,8 @@ MonoBehaviour:
   - {fileID: -1405385902226262468}
   - {fileID: 5927588467217425765}
   - {fileID: -2148956046552100862}
-  m_RendererFeatureMap: 6d4235ad3c684de39ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a155c86b27dc858ff1d5bb730616016aa879c9c2cf591f6925cf13194a5e53abe43c3676cdf7107fec656532234e0643520290557fdc5f2de2fd40b3b0a150d58d
+  - {fileID: -7688290700980421789}
+  m_RendererFeatureMap: 6d4235ad3c684de39ecb4937da9929e2d50eeb092df39934aa98f826dcf731e1015d2688250cf842a0ea35402ea8514624bba13c3742d0a155c86b27dc858ff1d5bb730616016aa879c9c2cf591f6925cf13194a5e53abe43c3676cdf7107fec656532234e0643520290557fdc5f2de2fd40b3b0a150d58d637b1f7e57b44d95
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
