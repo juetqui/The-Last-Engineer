@@ -345,7 +345,7 @@ Menú **GameObject → Hierarchy Folder** (`HierarchyFolderEditor`, `[Initialize
 
 - **Para agregar un estado al jugador** → crear `Player/StateMachine/PlayerXState : IPlayerState`, instanciarlo y cachearlo en `PlayerStateMachine` (constructor) y agregar `TransitionToX()`; la lógica de qué hacer con cada `IInteractable` va en `HandleInteraction`.
 - **Para hacer un objeto interactuable** → implementar `IInteractable` (+ `IProximityListener` si quiere feedback de rango) y darle un collider **sólido**; no hace falta trigger propio. Elegir `InteractablePriority` según qué debe ganar cuando hay varios al alcance. Si consume la interacción, el estado del player debe llamar `player.RemoveInteractable`.
-- **Para el nivel de glitch de un nodo u objeto** → `GlitchComponent._currentLevel` en el prefab o como override de la instancia en escena (0 `Clean`, 1 `Intangible`, 2 `Glitched`). Colores en `Resources/GlitchPalette.asset` (todos los consumidores la leen); shaders binarios en `PlayerView.PlayNodePS` y `CristalNodeView`; lo que pide una conexión, `Connection._requiredLevel`.
+- **Para el nivel de glitch de un nodo u objeto** → `GlitchComponent._currentLevel` en el prefab o como override de la instancia en escena (0 `Clean`, 1 `Intangible`, 2 `Glitched`). Colores en `Resources/GlitchPalette.asset` (todos los consumidores la leen); shader binario en `PlayerView.PlayNodePS` (el líquido del nodo, `S_NodeLiquidEffect`, recibe un único `_Color` desde `CristalNodeView`); lo que pide una conexión, `Connection._requiredLevel`.
 - **Para mover carga de glitch** → solo `GlitchTransferManager.ExecuteTransfer(source, target)`; nunca `TryApplyDelta` directo. Input y feedback en `Player/Components/GlitchTransferHandler.cs`, tiempos en `PlayerData` (`transfer*`).
 - **Para un objeto glitcheable nuevo** → prefab con `Glitcheable` + `GlitchComponent` (nivel 2 = arranca ciclando) + `TimerController` + `Collider` + `Renderer` con shader que tenga `_Alpha`/`_IsCorrupted`, lista `_newPosList` de anclas (cada ancla puede tener `MeshRenderer` = holograma), `GlitchSounds`. Si es plataforma, `_isPlatform`.
 - **Para cambiar el ciclo glitch (duraciones, orden)** → `TimerController` (duraciones) y el encadenado `SetNext` en `Glitcheable.Awake`.
@@ -484,7 +484,7 @@ Formato de columnas: **SerializeFields** (solo nombre; `pub` = campo público se
 
 | Clase | Archivo | Hereda / Implementa | SerializeFields | Públicos | Notas |
 |---|---|---|---|---|---|
-| `CristalNodeView` | `Scripts/Gameplay/Nodes/CristalNodeView.cs` | MonoBehaviour | `_effectNode` | `Awake()` (público) | Emisión desde `GlitchPalette` |
+| `CristalNodeView` | `Scripts/Gameplay/Nodes/CristalNodeView.cs` | MonoBehaviour | `_effectNode` | `Awake()` (público) | Emisión del cristal y `_Color` del líquido desde `GlitchPalette` |
 | `PlayerState` | `Scripts/Gameplay/Nodes/Enums.cs` | enum | — | `Default, Corrupted` | sin uso |
 | `StopType` | `Scripts/Gameplay/Nodes/Enums.cs` | enum | — | `None, TimeStop, CorruptedStop` | sin uso |
 | `InteractablePriority` | `Scripts/Gameplay/Nodes/Enums.cs` | enum | — | `Low=0, Medium, High, Highest, MaxPriority=4` | |

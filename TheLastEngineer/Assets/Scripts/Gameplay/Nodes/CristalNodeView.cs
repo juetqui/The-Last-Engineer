@@ -23,8 +23,9 @@ public class CristalNodeView : MonoBehaviour
     {
         _renderer.material.SetColor("_EmissiveColor", GlitchPalette.Default.EmissionFor(level));
 
-        // _isCorrupted es un booleano en S_NodeLiquidEffect: hasta que el shader tenga un tercer
-        // estado, Intangible se ve como Clean y solo lo distingue el color emisivo.
-        _effectNode.material.SetFloat("_isCorrupted", level == GlitchState.Glitched ? 1 : 0);
+        // S_NodeLiquidEffect recibe un único color en vez de elegir entre dos con un booleano: así
+        // cada nivel (Intangible incluido) toma su color de la paleta sin tocar el shader.
+        // ColorFor y no EmissionFor: el líquido no es emisivo y el ruido ya se suma encima.
+        _effectNode.material.SetColor("_Color", GlitchPalette.Default.ColorFor(level));
     }
 }
