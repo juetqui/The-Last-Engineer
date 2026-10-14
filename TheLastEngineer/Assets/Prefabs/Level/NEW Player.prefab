@@ -5222,6 +5222,7 @@ GameObject:
   - component: {fileID: 3727752383668633934}
   - component: {fileID: 8660092158971689740}
   - component: {fileID: 5006840802130871716}
+  - component: {fileID: 6671940326419652411}
   - component: {fileID: 7706525547897074516}
   - component: {fileID: 4174438192924241526}
   - component: {fileID: 4951687775519819803}
@@ -5418,6 +5419,32 @@ MonoBehaviour:
   _shockWaveMat: {fileID: 2100000, guid: 294d9d745ac599242893c741f0b8d4b7, type: 2}
   _colorNeg: {r: 16.948381, g: 0.62114483, b: 0.62114483, a: 1}
   _colorOriginal: {r: 5.6784315, g: 0.8784314, b: 5.1137257, a: 1}
+--- !u!114 &6671940326419652411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091603815914027958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5084cbe1572c6f345b39b7ec183ca751, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerXRayTarget
+  _player: {fileID: 1003385001025871253}
+  _nodeHandler: {fileID: 3156403094411963407}
+  _renderers:
+  - {fileID: 7041227213348162}
+  - {fileID: 5571796698612883786}
+  - {fileID: 8598641226491789740}
+  _xrayLayer:
+    serializedVersion: 0
+    m_Bits: 4
+  _fadeDuration: 0.25
+  _fadeEase: 6
+  _colorDuration: 0.2
+  _colorEase: 6
+  _useEmissionForOutline: 1
 --- !u!114 &7706525547897074516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37266,6 +37293,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 336967876538944131}
   m_SourcePrefab: {fileID: 100100000, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}
+--- !u!23 &5571796698612883786 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}
+  m_PrefabInstance: {fileID: 6526677049969573326}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6220038311313686687 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}

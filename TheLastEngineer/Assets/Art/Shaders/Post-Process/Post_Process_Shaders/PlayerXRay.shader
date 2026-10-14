@@ -51,6 +51,12 @@ Shader "TheLastEngineer/PostProcess/PlayerXRay"
 
         // Global, lo escribe PlayerXRayTarget: fades de muerte/cinematica/dissolve sin tocar el material.
         float _XRayIntensity;
+
+        // Globales, los escribe PlayerXRayTarget con el color de GlitchPalette segun el nodo en mano.
+        // El alpha es el peso del reemplazo: sin nadie que los escriba valen 0 y queda el color del
+        // material (Scene view, escenas sin jugador). La opacidad siempre sale del material.
+        float4 _XRayOutlineTint;
+        float4 _XRayFillTint;
         ENDHLSL
 
         // -------------------------------------------------------------------
@@ -154,7 +160,7 @@ Shader "TheLastEngineer/PostProcess/PlayerXRay"
 
                 // Dentro de la silueta: solo relleno, y solo en la parte tapada.
                 if (center.r > 0.5)
-                    return half4(_FillColor.rgb, center.g * _FillColor.a * _FillOpacity * _XRayIntensity);
+                    return half4(lerp(_FillColor.rgb, _XRayFillTint.rgb, _XRayFillTint.a), center.g * _FillColor.a * _FillOpacity * _XRayIntensity);
 
                 float2 texel = _XRayMaskTexel.xy;
 
@@ -170,7 +176,7 @@ Shader "TheLastEngineer/PostProcess/PlayerXRay"
                     coverage = max(coverage, SampleMask(uv + dir * 0.5).g);
                 }
 
-                return half4(_OutlineColor.rgb, coverage * _OutlineColor.a * _OutlineOpacity * _XRayIntensity);
+                return half4(lerp(_OutlineColor.rgb, _XRayOutlineTint.rgb, _XRayOutlineTint.a), coverage * _OutlineColor.a * _OutlineOpacity * _XRayIntensity);
             }
             ENDHLSL
         }
