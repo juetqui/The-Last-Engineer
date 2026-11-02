@@ -1,5 +1,5 @@
 # Mapa del proyecto — The Last Engineer
-<!-- meta: commit=a166df9913aea20d17a93330f229d04930c72375 fecha=2026-10-13 unity=6000.3.6f1 scripts=204 escenas=26 -->
+<!-- meta: commit=7fbf40fb04b10c44ebbf689251d66411d6a6b092 fecha=2026-11-01 unity=6000.3.6f1 scripts=209 escenas=27 -->
 
 > Generado por `/init-project`. Mantener con `/update-project` después de cambios o `git pull`.
 > Para encontrar algo: §10 (recetas) → §11 (grepear el nombre de la clase) → abrir el archivo.
@@ -77,7 +77,7 @@ referencia) · `Assets/TextMesh Pro/`, `Assets/Samples/`, `Assets/Plugins/*/inte
 - Raíz: `DiagonalTest`, `TestLights`
 - `Fer/`: `IntroGameplayTest`, `New Scene`, `Test VFX`
 - `Juli/`: `TEST SaveLoad Data`
-- `Mati/`: `Floors_Testing` (verticalidad: pisos con `S_FloorDither`, `FloorChanger` + `FloorDitherManager`), `Light Tests`, `Mati_Testing`, `Minigame_Testing` (minijuego de inspección aislado: `NEW Player` con `GamepadCursor` cableado al `Inspection Canvas` del prefab `InspectionSystem`, `Pause Menu`, `CameraContainer`), `PersistentScene` (+ `Mati/Scripts/CameraShakeController.cs`, `CinematicSpaceshipController.cs`: prototipo de cinemática de nave con spline)
+- `Mati/`: `Cauldron_Testing` (prototipo del caldero: 2 `Glitcheable Container` que tapan `CauldronCrack`s y hacen avanzar el pivot de `CauldronController`), `Floors_Testing` (verticalidad: pisos con `S_FloorDither`, `FloorChanger` + `FloorDitherManager`), `Light Tests`, `Mati_Testing`, `Minigame_Testing` (minijuego de inspección aislado: `NEW Player` con `GamepadCursor` cableado al `Inspection Canvas` del prefab `InspectionSystem`, `Pause Menu`, `CameraContainer`), `PersistentScene` (+ `Mati/Scripts/CameraShakeController.cs`, `CinematicSpaceshipController.cs`: prototipo de cinemática de nave con spline)
 
 **Otras**: `Scenes/Template_Scene.unity` (plantilla base para crear escenas nuevas), `Scenes/LVL 1/` con `LVL 1 1.0`, `LVL 1 1.1` y `LVL 1 1.2` (versiones del primer nivel nuevo; aún no están en el build), `Scenes/NIVEL HUB EfectosVisuales.unity` (pruebas de VFX del HUB). Carpetas `NIVEL 1 - Entregable/`, `MainMenu/`, `LightBakeTest/` solo tienen datos de lighting/occlusion de escenas ya movidas.
 
@@ -126,7 +126,7 @@ Assets/Editor/                PrefabPainter (ventana + scene tool + palette), Ob
 Assets/Tools/                 FolderTool/ (HierarchyFolder + editores), MapCreator/ (MapBuilderTool + palette)
 Assets/Inspection System/     Inspection/, Corruption/, UI/ — sistema de inspección (ver §5)
 Assets/Art/, Assets/Art-2/    scripts de shaders/render features/VFX
-Assets/Scenes/TEST LEVELS/Mati/Scripts/   prototipo de cinemática de nave, pisos con dither por altura (FloorDitherManager, FloorChanger)
+Assets/Scenes/TEST LEVELS/Mati/Scripts/   prototipo de cinemática de nave, pisos con dither por altura (FloorDitherManager, FloorChanger), Cauldron/ (caldero que avanza al tapar grietas con Glitcheables)
 ```
 
 Scripts sueltos en la raíz de `Scripts/`:
@@ -658,6 +658,11 @@ Formato de columnas: **SerializeFields** (solo nombre; `pub` = campo público se
 | `FloorChanger` | `Scenes/TEST LEVELS/Mati/Scripts/FloorChanger.cs` | MonoBehaviour | `targetFloor` (`FloorHeight`) | — | Trigger: al entrar el `PlayerController` llama `FloorDitherManager.Instance.DitherFloor` (⚠️ `OnTriggerEnter` propio, prototipo) |
 | `FloorDitherManager` | `Scenes/TEST LEVELS/Mati/Scripts/FloorDitherManager.cs` | MonoBehaviour | `materials[]` (un `M_FloorDither*` por piso, de abajo hacia arriba), `ease`, `easeDuration`, `targetLowerFloorOpacity`, `targetUpperFloorOpacity`, `_ditheredOccluderLayer` (`RenderingLayerMask`), `_occluderOpacityThreshold` | `static Instance`; `CurrentFloor`; `event Action<FloorHeight> OnFloorChanged`; `DitherFloor(FloorHeight)`, `RegisterFloorRenderer(Renderer, FloorHeight)`, `UnregisterFloorRenderer(...)` | Tweenea `_Opacity` (shader `S_FloorDither`, opaco con alpha clip): piso actual 1, el de abajo/arriba a su opacidad, el resto 0; un tween por piso. Cachea en `Awake` los renderers de cada piso por material y les pone `DitheredOccluder` al bajar la opacidad (al arrancar) y se lo saca al volver a 1 (al terminar), para `PlayerXRayFeature` |
 | `FloorHeight` | `Scenes/TEST LEVELS/Mati/Scripts/FloorDitherManager.cs` | enum | — | `Underground=0, Base, First, Second` | Índice en `materials[]` |
+| `CauldronController` | `Scenes/TEST LEVELS/Mati/Scripts/Cauldron/CauldronController.cs` | MonoBehaviour | `targetPos`, `pivotMover` (`CauldronView`), `cracks` (`List<CauldronCrack>`), `progressCurve`, `approachEase`, `retreatEase` | — | Prototipo (escena `Cauldron_Testing`). Cada `OnCrackCovered` avanza/retrocede un paso de `CauldronModel` (máx = cantidad de grietas) y mueve el pivot hacia `targetPos` según `Easing.Evaluate(Progress, progressCurve)` |
+| `CauldronModel` | `Scenes/TEST LEVELS/Mati/Scripts/Cauldron/CauldronModel.cs` | clase plana | — | `CurrentStep`, `MaxSteps`, `Progress`; `StepForward()`, `StepBack()` (devuelven si cambió) | Contador clampeado a `[0, maxSteps]` |
+| `CauldronView` | `Scenes/TEST LEVELS/Mati/Scripts/Cauldron/CauldronView.cs` | MonoBehaviour, `IPivotMover` | `_pivot`, `_stepDuration` | `Position`; `MoveTo(Vector3, Ease)` | Tween de posición con PrimeTween, se encadena desde la posición actual |
+| `IPivotMover` | `Scenes/TEST LEVELS/Mati/Scripts/Cauldron/IPivotMover.cs` | interface | — | `Position`; `MoveTo(Vector3, Ease)` | |
+| `CauldronCrack` | `Scenes/TEST LEVELS/Mati/Scripts/Cauldron/CauldronCrack.cs` | MonoBehaviour (`RequireComponent(Rigidbody)`) | `debug` | `Action<bool> OnCrackCovered`; `IsCovered` | Trigger con Rigidbody kinematic (sin él no hay eventos: el Glitcheable no tiene Rigidbody). Registra Glitcheables en `OnTriggerEnter` y se suscribe a su `FSM.OnStateChanged`; la salida es `!g._coll.enabled` al cambiar de estado (Unity no manda `OnTriggerExit` al apagar un collider), y ahí se desuscribe. Avisa solo en los bordes vacía↔tapada. ⚠️ `OnTriggerEnter` propio, prototipo |
 
 ## 12. Notas del equipo
 
@@ -667,6 +672,7 @@ _(Sección manual. Todo lo que se escriba acá lo respetan /init-project y /upda
 
 | Fecha | Commit | Resumen |
 |---|---|---|
+| 2026-11-01 | `7fbf40fb` | Commits `5b4fc30b`/`d92276d7`/`7fbf40fb` ya documentados como wt (`PlayerXRayFeature`/`PlayerXRayTarget`, `_Color` del líquido en `CristalNodeView`; `FloorDitherManager` solo formato); wt: +5 scripts (sistema `Cauldron` en `TEST LEVELS/Mati/Scripts/Cauldron/`: `CauldronController`, `CauldronModel`, `CauldronView`, `IPivotMover`, `CauldronCrack` — Rigidbody kinematic, registra Glitcheables por trigger y detecta la salida por `FSM.OnStateChanged` con el collider apagado); +1 escena `TEST LEVELS/Mati/Cauldron_Testing`; commits: 3 (wt: 5 scripts) |
 | 2026-10-13 | `a166df99` | +2 ~4 scripts en commits (`FloorChanger`/`FloorDitherManager` nuevos con escena `Floors_Testing` y shader `S_FloorDither`; `LaserController` intangible atraviesa glitcheables intangibles; `InputPromptDatabase` suma `InspectionAim/Rotate/Clean`; fix del nombre `DoorController._activationSources`; el resto ya documentado como wt); escenas `LVL 1 1.0/1.1` movidas a `Scenes/LVL 1/` + `LVL 1 1.2`; wt: +2 ~1 scripts (`PlayerXRayFeature` + `PlayerXRay.shader`, `PlayerXRayTarget`, `FloorDitherManager` con Rendering Layer `DitheredOccluder`, `OnFloorChanged`, tween por piso); commits: 12 (wt: 3 scripts) |
 | 2026-10-05 | `f678687e` | wt: +1 ~3 scripts (`IActivationSource` nuevo; `Connection` e `Inspectionable` lo implementan; `DoorController._connections` → `_sources` de `IActivationSource`, sin `_requiredLevel`); commits: 0 (wt: 4 scripts) |
 | 2026-10-03 | `f678687e` | Commits `88d56c3b`/`de5030d8`/`f678687e` ya documentados como wt (partículas `PS_Shape` por progreso); wt: +1 ~3 scripts (`CleaningProgressShader` nuevo: progreso de limpieza en la gradiente de `S_Inspectionable` vía `_CleanProgress`; `CorruptionRemover.HoldTimer`; `UIInspectionable._cleaningProgress` + `RefreshCleaningProgress()`, que ahora llama `InspectorController.HandleGeneratorUpdated`); commits: 3 (wt: 4 scripts) |
@@ -681,4 +687,3 @@ _(Sección manual. Todo lo que se escriba acá lo respetan /init-project y /upda
 | 2026-09-30 | `62e43588` | +1 ~3 scripts (`PlayPSCollisionSFX` nuevo; `CutoutObject._colorLerpTime` + color según nodo en mano; `PlayerView` reproduce vía `SFXManager`; `ShaderPropertyOverrides(Editor)` ya documentado como wt; wt: `SFXManager` sobrecargas por `Vector3`, `PlayPSCollisionSFX` filtra rebotes por `minImpactSpeed` + `maxSoundsPerFrame` y suma `burstClip` al emitirse cada burst); commits: 3 (wt: 2 scripts) |
 | 2026-09-27 | `c51a0cb0` | +2 scripts (wt: `ShaderPropertyOverrides` + `ShaderPropertyOverridesEditor`, overrides de shader por objeto en Edit Mode, sobre Renderer vía MPB y sobre DecalProjector vía copia del material); commits: 2 (`96178b5c` ya documentado como wt; `c51a0cb0` solo assets/escena) (wt: 2 scripts) |
 | 2026-09-26 | `fc042895` | ~3 scripts (wt: hold de Set/Take transfiere el máximo de una vez: `GlitchTransferManager.MaxTransferable` + `ExecuteTransfer(..., amount)`, `GlitchTransferHandler` decide tap/hold al soltar o al cumplir `transferHoldDelay`, se elimina `PlayerData.transferRepeatInterval`; commit `fc042895` ya documentado como wt en la fila anterior); commits: 1 (wt: 3 scripts) |
-| 2026-09-25 | `1d22809e` | +2 ~4 scripts (wt: `UITargetSource`, `UIScaleTween`; `PlayerController.OnGlitcheableDetected` separa el HUD de glitch de `OnInteractableDetected`; `UIActionController` con modo Interactable/Glitcheable y paneles Set/Take; `UpdatePosToTarget._source`; commit previo ya documentado: `IsInRange`/`IsInInteractionRange`); commits: 1 (wt: 6 scripts + prefab) |
