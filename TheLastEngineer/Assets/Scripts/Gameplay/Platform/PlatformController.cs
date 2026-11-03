@@ -35,6 +35,7 @@ public class PlatformController : MonoBehaviour
 
     public bool isStopped;
     public bool isReversed;
+    public bool isVertical;
 
     public float CurrentSpeed { get; private set; }
     public float SegmentSpeed { get; private set; }
@@ -239,6 +240,10 @@ public class PlatformController : MonoBehaviour
 
             _passenger = passenger;
             _player = player;
+            if (isVertical)
+            {
+                _player.SetVerticalPlatform(true);
+            }
             _player.OnDied += CleanPlayerReferences;
         }
     }
@@ -248,6 +253,10 @@ public class PlatformController : MonoBehaviour
         if (coll.TryGetComponent(out IMovablePassenger passenger) && _passenger == passenger)
         {
             _passenger.OnPlatformMoving(Vector3.zero);
+            if(_player)
+            {
+                _player.SetVerticalPlatform(false);
+            }
             _passenger = null;
         }
     }

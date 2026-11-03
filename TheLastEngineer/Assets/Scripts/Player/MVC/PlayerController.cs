@@ -105,7 +105,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         // agregar en runtime y no hace falta cablearlo en el prefab del jugador.
         if (GetComponent<GlitchTransferHandler>() == null) gameObject.AddComponent<GlitchTransferHandler>();
     }
-
+    public void SetVerticalPlatform(bool bul)
+    {
+        print(bul);
+        _model.SetVerticalPlatform(bul);
+    }
     private void Start()
     {
         _currentSpeed = _playerData.moveSpeed;

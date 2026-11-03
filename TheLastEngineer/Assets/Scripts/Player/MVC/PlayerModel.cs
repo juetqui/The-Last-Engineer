@@ -18,6 +18,7 @@ public class PlayerModel
 
     private Vector3 _cinematicMovementDirection = Vector3.zero;
     private bool _isInCinematicMode = false;
+    private bool onVerticalPlatform = false;
 
     #region Teleport Variables
     private float _teleportDuration = 0.25f;
@@ -61,7 +62,17 @@ public class PlayerModel
         
         return actualMovement;
     }
-
+    public void SetVerticalPlatform(bool bul)
+    {
+        if(bul== true)
+        {
+            _gravity = 0;
+        }
+        else
+        {
+            _gravity = -50;
+        }
+    }
     private Vector3 MovePlayer(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight)
     {
         if (_isDashing) return Vector3.zero;
@@ -134,7 +145,7 @@ public class PlayerModel
 
     private Vector3 HandleVerticalMovement()
     {
-        if (!_isDashing && _useGravity)
+        if (!_isDashing && _useGravity && !onVerticalPlatform)
         {
             if (_cc.isGrounded) _velocity.y = -1f;
             else _velocity.y += _gravity * Time.deltaTime;
