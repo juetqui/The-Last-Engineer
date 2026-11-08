@@ -1,0 +1,59 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(trail ask *)",
+      "Bash(trail grep *)",
+      "Bash(trail skeleton *)",
+      "Bash(trail callers *)",
+      "Bash(trail map*)",
+      "Bash(trail check*)",
+      "Bash(trail status*)"
+    ],
+    "deny": [
+      "Read(/Library/**)",
+      "Read(/Temp/**)",
+      "Read(/Obj/**)",
+      "Read(/Logs/**)",
+      "Read(/Build/**)",
+      "Read(/Builds/**)",
+      "Read(/UserSettings/**)",
+      "Read(/MemoryCaptures/**)",
+      "Read(**/*.csproj)",
+      "Read(/*.sln)",
+      "Read(/Assets/**/*.png)",
+      "Read(/Assets/**/*.jpg)",
+      "Read(/Assets/**/*.jpeg)",
+      "Read(/Assets/**/*.tga)",
+      "Read(/Assets/**/*.psd)",
+      "Read(/Assets/**/*.exr)",
+      "Read(/Assets/**/*.hdr)",
+      "Read(/Assets/**/*.wav)",
+      "Read(/Assets/**/*.mp3)",
+      "Read(/Assets/**/*.ogg)",
+      "Read(/Assets/**/*.fbx)",
+      "Read(/Assets/**/*.obj)",
+      "Read(/Assets/**/*.blend)",
+      "Read(/Assets/**/*.dll)",
+      "Read(/Assets/**/*.so)",
+      "Read(/Assets/**/*.bytes)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/guard-protected-files.cjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

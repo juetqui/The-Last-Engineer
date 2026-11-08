@@ -71,3 +71,18 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 [Aa]ssets/[Ss]treamingAssets/aa.meta
 [Aa]ssets/[Ss]treamingAssets/aa/*
+
+# --- Claude Code: personal / transient ---
+.claude/settings.local.json
+.claude/worktrees/
+
+# /run-tests and /build write their results and logs here (Logs/ is read-denied for Claude).
+/[Rr]eports/
+
+# --- trail ---
+# .trail/learnings/ IS committed; .trail/.gitignore already ignores cache/ and statusline.cjs.
+# trail's global hooks drop a graft/ cache at the repo root.
+graft/
+
+# The [Bb]uild/ pattern above is unanchored; keep the editor build script (/build) tracked.
+!/[Aa]ssets/[Ee]ditor/[Bb]uild/
