@@ -1,73 +1,59 @@
-public enum GlitchTransferResult
-{
-    Transferred,
-    NoSource,
-    NoTarget,
-    SourceEmpty,
-    TargetFull,
-    Invalid
-}
-
 /// <summary>
-/// Unico lugar donde se mueve carga de glitch. Nada mas puede crear ni destruir cargas, asi que
-/// la suma de niveles del sistema cerrado (nodo en mano + objeto) se mantiene constante.
+/// The only place where glitch states change hands. Set and Take swap the whole state between the
+/// node in hand and the object; GlitchSwapRules decides what is allowed.
 ///
-/// Devuelve un resultado en vez de disparar feedback: el rumble y los sonidos los resuelve
-/// GlitchTransferHandler, del lado del jugador, para no meter dependencias de input ni de audio
-/// aca adentro.
+/// Returns a result instead of firing feedback: rumble and sounds are GlitchTransferHandler's job,
+/// on the player side, so input and audio stay out of here.
 /// </summary>
 public static class GlitchTransferManager
 {
-    /// <summary>Misma validacion que ExecuteTransfer pero sin efectos, para el HUD y la seleccion de objetivo.</summary>
-    public static GlitchTransferResult Preview(GlitchComponent source, GlitchComponent target)
+    /// <summary>Same validation as Set but with no effects, for the HUD and target selection.</summary>
+    public static GlitchTransferResult PreviewSet(GlitchComponent node, IGlitchSwapTarget target)
     {
-        // Comparacion contra null con el operador de UnityEngine.Object: tambien cubre destruidos.
-        if (source == null) return GlitchTransferResult.NoSource;
-        if (target == null) return GlitchTransferResult.NoTarget;
-        if (ReferenceEquals(source, target)) return GlitchTransferResult.Invalid;
+        // UnityEngine.Object == null also covers destroyed objects.
+        if (node == null) return GlitchTransferResult.NoSource;
+        if (!IsAlive(target)) return GlitchTransferResult.NoTarget;
 
-        if (!source.CanGive()) return GlitchTransferResult.SourceEmpty;
-        if (!target.CanReceive()) return GlitchTransferResult.TargetFull;
-
-        return GlitchTransferResult.Transferred;
+        return GlitchSwapRules.EvaluateSet(node.CurrentState, target.Kind, target.Glitch.CurrentState);
     }
 
-    /// <summary>
-    /// Cuantas cargas se pueden mover de una sola vez: lo que tiene la fuente, limitado por el
-    /// espacio libre del destino. 0 si la transferencia no es valida.
-    /// </summary>
-    public static int MaxTransferable(GlitchComponent source, GlitchComponent target)
+    /// <summary>Same validation as Take but with no effects, for the HUD and target selection.</summary>
+    public static GlitchTransferResult PreviewTake(GlitchComponent node, IGlitchSwapTarget target)
     {
-        if (Preview(source, target) != GlitchTransferResult.Transferred) return 0;
+        if (node == null) return GlitchTransferResult.NoSource;
+        if (!IsAlive(target)) return GlitchTransferResult.NoTarget;
 
-        return System.Math.Min(source.CurrentLevel, GlitchComponent.MaxLevel - target.CurrentLevel);
+        return GlitchSwapRules.EvaluateTake(node.CurrentState, target.Glitch.CurrentState);
     }
 
-    /// <summary>Transferencia de una carga (tap).</summary>
-    public static GlitchTransferResult ExecuteTransfer(GlitchComponent source, GlitchComponent target)
-        => ExecuteTransfer(source, target, 1);
-
-    /// <summary>
-    /// Atomico: valida los dos extremos ANTES de mutar, y si el segundo delta fallara igual
-    /// (no deberia) revierte el primero, para que no quede una carga colgada en el limbo.
-    /// Mueve las cargas en un solo delta por extremo, asi el hold salta directo al nivel final
-    /// (un unico OnGlitchStateChanged) en vez de pasar por el intermedio.
-    /// </summary>
-    public static GlitchTransferResult ExecuteTransfer(GlitchComponent source, GlitchComponent target, int amount)
+    public static GlitchTransferResult Set(GlitchComponent node, IGlitchSwapTarget target)
     {
-        var preview = Preview(source, target);
-        if (preview != GlitchTransferResult.Transferred) return preview;
+        var result = PreviewSet(node, target);
+        if (result == GlitchTransferResult.Swapped) Swap(node, target.Glitch);
 
-        if (amount < 1 || amount > MaxTransferable(source, target)) return GlitchTransferResult.Invalid;
+        return result;
+    }
 
-        if (!source.TryApplyDelta(-amount)) return GlitchTransferResult.Invalid;
+    public static GlitchTransferResult Take(GlitchComponent node, IGlitchSwapTarget target)
+    {
+        var result = PreviewTake(node, target);
+        if (result == GlitchTransferResult.Swapped) Swap(node, target.Glitch);
 
-        if (!target.TryApplyDelta(amount))
-        {
-            source.TryApplyDelta(amount);
-            return GlitchTransferResult.Invalid;
-        }
+        return result;
+    }
 
-        return GlitchTransferResult.Transferred;
+    // Both sides were validated before: one of them is always Clean, so the swap cannot leave an
+    // invalid state behind.
+    private static void Swap(GlitchComponent node, GlitchComponent target)
+    {
+        var nodeState = node.CurrentState;
+
+        node.SetState(target.CurrentState);
+        target.SetState(nodeState);
+    }
+
+    private static bool IsAlive(IGlitchSwapTarget target)
+    {
+        return target is UnityEngine.Object obj && obj != null && target.Glitch != null;
     }
 }

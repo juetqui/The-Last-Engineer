@@ -1,17 +1,17 @@
-# <!-- team: project name -->
+# The Last Engineer
 
-<!-- team: one line — what the game is and who it is for. -->
+Third-person 3D puzzle game: carry nodes, move glitch charge and plug connections to open doors and drive platforms. Audience: TODO.
 
 ## Stack
 Filled by `/init-unity` from `ProjectSettings/` and `Packages/manifest.json`; unknowns stay `TODO:`.
-- Unity: 6 or newer — exact version <!-- team: from ProjectSettings/ProjectVersion.txt -->
-- Unity editor: <!-- team: path to Unity.exe, e.g. C:\Program Files\Unity\Hub\Editor\<version>\Editor\Unity.exe -->
-- Render pipeline: <!-- team: Built-in | URP | HDRP -->
-- UI: UGUI and UI Toolkit — check which one a screen uses before changing it.
-- Input: Input System package. No legacy `UnityEngine.Input` in new code.
-- Addressables: <!-- team: yes | no -->
-- DI container: <!-- team: VContainer | Zenject | none -->
-- Target platforms: <!-- team: e.g. Win64, Android -->
+- Unity: 6000.3.6f1
+- Unity editor: `C:\Program Files\Unity\Hub\Editor\6000.3.6f1\Editor\Unity.exe`
+- Render pipeline: URP 17.3.0 (+ Volumetric Fog, VFX Graph); Cinemachine 3, Timeline, PrimeTween.
+- UI: UGUI and UI Toolkit — check which one a screen uses before changing it. (Runtime UI is UGUI + TextMesh Pro; UI Toolkit only in editor tools.)
+- Input: Input System package. No legacy `UnityEngine.Input` in new code. (Active Input Handling is set to Both.)
+- Addressables: no (`Resources/` is used)
+- DI container: none (singletons + C# events)
+- Target platforms: Windows (Build Profiles also include Web) — TODO: confirm shipping targets.
 - CI: none.
 
 ## Finding code

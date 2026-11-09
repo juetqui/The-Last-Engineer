@@ -6,7 +6,7 @@ public class UpdateCrosshair : UpdatePosToTarget
     [SerializeField] Image _circleImage;
 
     private Animator _myAnim;
-    private Glitcheable _currentTarget;
+    private IGlitchSwapTarget _currentTarget;
 
     protected override void Awake()
     {
@@ -26,7 +26,7 @@ public class UpdateCrosshair : UpdatePosToTarget
 
     protected override void OnTargetChanged(IInteractable target)
     {
-        _currentTarget = target as Glitcheable;
+        _currentTarget = target as IGlitchSwapTarget;
 
         _myAnim.SetBool("IsActivated", false);
         _myAnim.SetBool("HasTarget", _currentTarget != null);
@@ -37,7 +37,8 @@ public class UpdateCrosshair : UpdatePosToTarget
 
     protected override void OnPositionUpdated(Vector3 screenPosition)
     {
-        if (_currentTarget == null) return;
+        // Through Object so a destroyed target also counts as null (the interface skips Unity's ==).
+        if (_currentTarget as Object == null) return;
 
         CompareGlitchWithPlayerNode(_currentTarget);
     }
@@ -56,20 +57,19 @@ public class UpdateCrosshair : UpdatePosToTarget
         _myAnim.SetBool("HasTarget", false);
     }
 
-    private void CompareGlitchWithPlayerNode(Glitcheable glitcheable)
+    private void CompareGlitchWithPlayerNode(IGlitchSwapTarget target)
     {
-        // Se muestra si Set o Take pueden mover carga: misma regla que usa el HUD de acciones
-        // (PlayerController.ResolveGlitchHudTarget), para que los dos no se contradigan. Sin nodo
-        // en mano CurrentGlitch es null y Preview devuelve NoSource/NoTarget.
+        // Shown when Set or Take can swap: same rule as the action HUD
+        // (PlayerController.ResolveSwapHudTarget), so both never disagree. With no node in hand
+        // CurrentGlitch is null and the previews return NoSource.
         var node = PlayerNodeHandler.Instance.CurrentGlitch;
-        var obj = glitcheable.Glitch;
 
-        var canTransfer =
-            GlitchTransferManager.Preview(node, obj) == GlitchTransferResult.Transferred ||
-            GlitchTransferManager.Preview(obj, node) == GlitchTransferResult.Transferred;
+        var canSwap =
+            GlitchTransferManager.PreviewSet(node, target) == GlitchTransferResult.Swapped ||
+            GlitchTransferManager.PreviewTake(node, target) == GlitchTransferResult.Swapped;
 
-        SetVisual(canTransfer);
-        _circleImage.color = GlitchPalette.Default.ColorFor(glitcheable.Level);
+        SetVisual(canSwap);
+        if (target.Glitch != null) _circleImage.color = GlitchPalette.Default.ColorFor(target.Glitch.CurrentState);
     }
 
     public void SetUpdateAnim()

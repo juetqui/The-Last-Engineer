@@ -1,9 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Intangibilidad (nivel 1) del lado del jugador: con el nodo en Intangible, el CharacterController
-/// y el CapsuleCollider excluyen las layers de PlayerData.intangibleExcludeLayers. Los objetos siguen
-/// sólidos (y registrados en el PlayerInteractionDetector), así que Take sigue pudiendo targetearlos.
+/// Intangibility on the player side: with an Intangible node in hand, the CharacterController and
+/// CapsuleCollider exclude PlayerData.intangibleExcludeLayers, where Intangible objects sit while in
+/// their Intangible state. Those objects stay solid (and registered in PlayerInteractionDetector),
+/// so Take can still target them. Needing a second Intangible node to pass is the intended puzzle.
 /// </summary>
 public class PlayerIntangibilityHandler
 {

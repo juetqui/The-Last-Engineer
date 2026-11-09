@@ -82,8 +82,8 @@ public class UIActionController : MonoBehaviour
 
         if (_source == UITargetSource.Glitcheable)
         {
-            if (value) player.OnGlitcheableDetected += OnGlitcheableDetected;
-            else player.OnGlitcheableDetected -= OnGlitcheableDetected;
+            if (value) player.OnSwapTargetDetected += OnSwapTargetDetected;
+            else player.OnSwapTargetDetected -= OnSwapTargetDetected;
         }
         else
         {
@@ -161,13 +161,12 @@ public class UIActionController : MonoBehaviour
     /// panel se toca únicamente si su propio estado cambió: si deja de poder hacerse Take pero Set
     /// sigue, solo se achica Take.
     /// </summary>
-    private void OnGlitcheableDetected(Glitcheable glitcheable)
+    private void OnSwapTargetDetected(IGlitchSwapTarget target)
     {
         var node = PlayerNodeHandler.Instance != null ? PlayerNodeHandler.Instance.CurrentGlitch : null;
-        var obj = glitcheable != null ? glitcheable.Glitch : null;
 
-        var canSet = GlitchTransferManager.Preview(node, obj) == GlitchTransferResult.Transferred;
-        var canTake = GlitchTransferManager.Preview(obj, node) == GlitchTransferResult.Transferred;
+        var canSet = GlitchTransferManager.PreviewSet(node, target) == GlitchTransferResult.Swapped;
+        var canTake = GlitchTransferManager.PreviewTake(node, target) == GlitchTransferResult.Swapped;
         var showRoot = canSet || canTake;
 
         if (showRoot && !_rootShown)

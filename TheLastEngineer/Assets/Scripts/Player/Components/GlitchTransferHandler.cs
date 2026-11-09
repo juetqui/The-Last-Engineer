@@ -2,23 +2,17 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Traduce los inputs Set y Take en transferencias de carga entre el nodo en mano y el glitcheable
-/// que el jugador esté mirando. Interact quedó exclusivo de manipulación física, así que esta es
-/// la única vía por la que el jugador mueve glitch.
-///
-/// Al apretar solo se valida (el error se siente en el momento); la transferencia se decide
-/// después. Soltar antes de transferHoldDelay = tap, una carga. Llegar a transferHoldDelay = hold,
-/// se mueve de una sola vez el máximo posible entre los dos (1 o 2 niveles), sin paso intermedio.
-/// El tiempo se mide acá y no con interactions del Input System, que es el mismo patrón que ya
-/// usa el hold de PlayerEmptyState.
+/// Turns the Set and Take inputs into state swaps between the node in hand and the swap target
+/// (Glitcheable or Intangible) the player is looking at. Interact is only for physical
+/// manipulation, so this is the only way the player moves glitch. Tap only: the swap runs on press.
 /// </summary>
 [DisallowMultipleComponent]
 public class GlitchTransferHandler : MonoBehaviour
 {
     private enum TransferDirection
     {
-        Set,    // del nodo al objeto
-        Take    // del objeto al nodo
+        Set,    // node -> object
+        Take    // object -> node
     }
 
     private PlayerController _player;
@@ -26,19 +20,21 @@ public class GlitchTransferHandler : MonoBehaviour
     private InputHandler _input;
     private PlayerData _data;
 
-    private bool _active = false;
-    private TransferDirection _direction = TransferDirection.Set;
-    private Glitcheable _target = default;
-    private float _holdTimer = 0f;
+    // Cached so the target filter doesn't allocate a closure per press.
+    private Func<IGlitchSwapTarget, bool> _canSetFilter;
+    private Func<IGlitchSwapTarget, bool> _canTakeFilter;
 
-    /// <summary>Resultado de cada intento, para que el HUD y el audio reaccionen sin consultar por frame.</summary>
-    public Action<GlitchTransferResult, Glitcheable> OnTransferResolved;
+    /// <summary>Result of every attempt, so the HUD and audio can react without polling.</summary>
+    public Action<GlitchTransferResult, IGlitchSwapTarget> OnTransferResolved;
 
     private void Awake()
     {
         _player = GetComponent<PlayerController>();
         _nodeHandler = GetComponent<PlayerNodeHandler>();
         _input = GetComponent<InputHandler>();
+
+        _canSetFilter = t => GlitchTransferManager.PreviewSet(_nodeHandler.CurrentGlitch, t) == GlitchTransferResult.Swapped;
+        _canTakeFilter = t => GlitchTransferManager.PreviewTake(_nodeHandler.CurrentGlitch, t) == GlitchTransferResult.Swapped;
     }
 
     private void Start()
@@ -56,34 +52,21 @@ public class GlitchTransferHandler : MonoBehaviour
         if (enable)
         {
             _input.OnSetStart += OnSetStart;
-            _input.OnSetCancel += OnSetCancel;
             _input.OnTakeStart += OnTakeStart;
-            _input.OnTakeCancel += OnTakeCancel;
         }
         else
         {
             _input.OnSetStart -= OnSetStart;
-            _input.OnSetCancel -= OnSetCancel;
             _input.OnTakeStart -= OnTakeStart;
-            _input.OnTakeCancel -= OnTakeCancel;
         }
     }
 
-    private void OnSetStart() => BeginHold(TransferDirection.Set);
-    private void OnTakeStart() => BeginHold(TransferDirection.Take);
+    private void OnSetStart() => TrySwap(TransferDirection.Set);
+    private void OnTakeStart() => TrySwap(TransferDirection.Take);
 
-    // Cada dirección solo cancela lo suyo: si el jugador tiene Set apretado y toca Take, el
-    // canceled de Take no tiene que cortar el hold de Set.
-    private void OnSetCancel() { if (_active && _direction == TransferDirection.Set) ReleaseAsTap(); }
-    private void OnTakeCancel() { if (_active && _direction == TransferDirection.Take) ReleaseAsTap(); }
-
-    private void BeginHold(TransferDirection direction)
+    private void TrySwap(TransferDirection direction)
     {
-        // Idempotente a propósito: EnableInputs puede correr más de una vez y dejar el evento
-        // suscrito dos veces, y una pulsación no puede arrancar dos holds.
-        if (_active) return;
-
-        // Mismo gate que OnInteractPressed: en el aire o en pleno dash no se interactúa.
+        // Same gate as OnInteractPressed: no interaction in the air or mid-dash.
         if (_player.IsDead || !_player.CC.isGrounded) return;
 
         var node = _nodeHandler.CurrentGlitch;
@@ -94,69 +77,18 @@ public class GlitchTransferHandler : MonoBehaviour
             return;
         }
 
-        var target = ResolveTarget(direction);
-        var result = Preview(direction, node, target);
+        // The filter keeps a false error away when two objects are in range and the closest one
+        // is exactly the one that can't take part in this swap.
+        var target = _player.FindTransferTarget(direction == TransferDirection.Set ? _canSetFilter : _canTakeFilter);
 
-        if (result != GlitchTransferResult.Transferred)
+        var result = direction == TransferDirection.Set
+            ? GlitchTransferManager.Set(node, target)
+            : GlitchTransferManager.Take(node, target);
+
+        if (result != GlitchTransferResult.Swapped)
         {
-            ReportFailure(result, target);
-            return;
-        }
-
-        _active = true;
-        _direction = direction;
-        _target = target;
-        _holdTimer = 0f;
-    }
-
-    private void Update()
-    {
-        if (!_active) return;
-
-        // Perder el objetivo o el nodo en medio del hold cancela sin transferir nada.
-        if (!StillValid())
-        {
-            EndHold();
-            return;
-        }
-
-        _holdTimer += Time.deltaTime;
-        if (_holdTimer < _data.transferHoldDelay) return;
-
-        // El máximo se calcula ahora y no al apretar: el objeto pudo cambiar de nivel en el medio.
-        var node = _nodeHandler.CurrentGlitch;
-        var target = _target;
-        var amount = MaxTransferable(_direction, node, target);
-        var result = Execute(_direction, node, target, amount);
-
-        // EndHold antes del feedback: deja _active en false para que el canceled que llega al
-        // soltar el botón no dispare además un tap.
-        EndHold();
-
-        if (result != GlitchTransferResult.Transferred)
-        {
-            ReportFailure(result, target);
-            return;
-        }
-
-        Rumble(_data.transferHoldRumble, _data.rumbleDuration);
-        OnTransferResolved?.Invoke(result, target);
-    }
-
-    private void ReleaseAsTap()
-    {
-        var target = _target;
-        var valid = StillValid();
-        EndHold();
-
-        // Si el objetivo se perdió justo en este frame, se cancela en silencio igual que en Update.
-        if (!valid) return;
-
-        var result = Execute(_direction, _nodeHandler.CurrentGlitch, target, 1);
-
-        if (result != GlitchTransferResult.Transferred)
-        {
-            ReportFailure(result, target);
+            // With no valid target, report why against the node alone (Clean node on Set, etc.).
+            ReportFailure(target == null ? ExplainMissingTarget(direction, node) : result, target);
             return;
         }
 
@@ -164,77 +96,20 @@ public class GlitchTransferHandler : MonoBehaviour
         OnTransferResolved?.Invoke(result, target);
     }
 
-    /// <summary>
-    /// Las condiciones de corte del hold: todas se revalidan por frame porque ninguna avisa.
-    /// El objetivo puede irse solo (el glitcheable se mueve), taparse detrás de una pared, o el
-    /// nodo puede soltarse o enchufarse en una Connection en medio de la pulsación.
-    /// </summary>
-    private bool StillValid()
+    private static GlitchTransferResult ExplainMissingTarget(TransferDirection direction, GlitchComponent node)
     {
-        if (_player.IsDead) return false;
-        if (_target == null) return false;
-        if (_nodeHandler.CurrentGlitch == null) return false;
+        if (direction == TransferDirection.Set && node.CurrentState == GlitchState.Clean) return GlitchTransferResult.NodeClean;
+        if (direction == TransferDirection.Take && node.CurrentState != GlitchState.Clean) return GlitchTransferResult.NodeNotClean;
 
-        return _player.IsInteractableAvailable(_target);
+        return GlitchTransferResult.NoTarget;
     }
 
-    private Glitcheable ResolveTarget(TransferDirection direction)
-    {
-        // El filtro por capacidad es lo que evita el error falso cuando hay dos glitcheables en
-        // rango y el más cercano es justo el que no puede dar (o recibir) carga.
-        Func<Glitcheable, bool> filter;
-
-        if (direction == TransferDirection.Set)
-            filter = g => g.Glitch != null && g.Glitch.CanReceive();
-        else
-            filter = g => g.Glitch != null && g.Glitch.CanGive();
-
-        return _player.FindTransferTarget(filter);
-    }
-
-    private GlitchTransferResult Preview(TransferDirection direction, GlitchComponent node, Glitcheable target)
-    {
-        if (node == null) return GlitchTransferResult.NoSource;
-        if (target == null) return GlitchTransferResult.NoTarget;
-
-        return direction == TransferDirection.Set
-            ? GlitchTransferManager.Preview(node, target.Glitch)
-            : GlitchTransferManager.Preview(target.Glitch, node);
-    }
-
-    private int MaxTransferable(TransferDirection direction, GlitchComponent node, Glitcheable target)
-    {
-        if (node == null || target == null) return 0;
-
-        return direction == TransferDirection.Set
-            ? GlitchTransferManager.MaxTransferable(node, target.Glitch)
-            : GlitchTransferManager.MaxTransferable(target.Glitch, node);
-    }
-
-    private GlitchTransferResult Execute(TransferDirection direction, GlitchComponent node, Glitcheable target, int amount)
-    {
-        if (node == null) return GlitchTransferResult.NoSource;
-        if (target == null) return GlitchTransferResult.NoTarget;
-
-        return direction == TransferDirection.Set
-            ? GlitchTransferManager.ExecuteTransfer(node, target.Glitch, amount)
-            : GlitchTransferManager.ExecuteTransfer(target.Glitch, node, amount);
-    }
-
-    private void EndHold()
-    {
-        _active = false;
-        _target = null;
-        _holdTimer = 0f;
-    }
-
-    private void ReportFailure(GlitchTransferResult result, Glitcheable target)
+    private void ReportFailure(GlitchTransferResult result, IGlitchSwapTarget target)
     {
         _player.View.PlayErrorSound(_data.emptyHand);
         Rumble(_data.transferErrorRumble, _data.transferErrorRumbleDuration);
 
-        // Mismo feedback visual que tenía el rechazo de Interact: el orbe del glitcheable rebota.
-        if (target != null) target.OnInteractionRejected?.Invoke();
+        if (target != null) target.NotifyRejected();
 
         OnTransferResolved?.Invoke(result, target);
     }

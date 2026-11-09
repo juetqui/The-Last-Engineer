@@ -34,9 +34,9 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Action OnTeleported;
 
     public Action<IInteractable> OnInteractableDetected;
-    // Todos los frames, como OnInteractableDetected: el glitcheable al que Set o Take pueden
-    // mover carga con el nodo en mano, o null si no hay ninguno.
-    public Action<Glitcheable> OnGlitcheableDetected;
+    // Every frame, like OnInteractableDetected: the Glitcheable or Intangible that Set or Take can
+    // swap with the node in hand, or null if there is none.
+    public Action<IGlitchSwapTarget> OnSwapTargetDetected;
 
     // Cinematic Events
     public Action<Transform, LayerMask, bool> OnCinematicSetupRequested; // parent, cinematicLayer, storeCCState
@@ -61,6 +61,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     private Vector3 _checkPointPos;
     private Vector3 _teleportPos;
     private Glitcheable _lastNearestGlitcheable;
+    // Cached method group: ResolveSwapHudTarget runs every frame.
+    private Func<IGlitchSwapTarget, bool> _canSwapFilter;
 
     public bool IsDead { get { return _isDead; } }
     public Vector3 TeleportPos {  get { return _teleportPos; } }
@@ -154,7 +156,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         // el de Set/Take. Si el glitcheable fuera un fallback de la misma señal, un nodo cercano
         // taparía las acciones de glitch que el jugador sí puede hacer.
         OnInteractableDetected?.Invoke(_interactableHandler.GetInteractable(_nodeHandler, transform.position));
-        OnGlitcheableDetected?.Invoke(ResolveGlitchHudTarget());
+        OnSwapTargetDetected?.Invoke(ResolveSwapHudTarget());
     }
 
     private void OnDestroy()
@@ -318,7 +320,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void SetTeleport(Vector3 targetPos) => _teleportPos = targetPos;
     public void GetClosestGlitcheable()
     {
-        var nearest = _interactableHandler.GetClosestGlitcheable(transform.position);
+        var nearest = _interactableHandler.GetClosest<Glitcheable>(transform.position);
 
         if (nearest == _lastNearestGlitcheable) return;
 
@@ -327,21 +329,25 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     }
     // Lo usa GlitchTransferHandler: el objetivo de Set/Take se resuelve con la misma lista y el
     // mismo chequeo de linea de vision que el resto de la interaccion.
-    public Glitcheable FindTransferTarget(Func<Glitcheable, bool> filter)
-        => _interactableHandler.GetClosestGlitcheable(transform.position, filter);
+    public IGlitchSwapTarget FindTransferTarget(Func<IGlitchSwapTarget, bool> filter)
+        => _interactableHandler.GetClosest(transform.position, filter);
 
-    // El glitcheable más cercano al que se le pueda dar o sacar carga con el nodo que el jugador
-    // trae. Si no hay transferencia posible en ninguna de las dos direcciones no se señala nada,
-    // para no prometer una interacción que el botón no va a poder hacer.
-    private Glitcheable ResolveGlitchHudTarget()
+    // The closest target the node in hand can Set into or Take from. If neither works nothing is
+    // shown, so the HUD never promises a swap the button can't do.
+    private IGlitchSwapTarget ResolveSwapHudTarget()
+    {
+        if (_nodeHandler.CurrentGlitch == null) return null;
+
+        _canSwapFilter ??= CanSwapWithNodeInHand;
+        return _interactableHandler.GetClosest(transform.position, _canSwapFilter);
+    }
+
+    private bool CanSwapWithNodeInHand(IGlitchSwapTarget target)
     {
         var node = _nodeHandler.CurrentGlitch;
-        if (node == null) return null;
 
-        return _interactableHandler.GetClosestGlitcheable(transform.position, g =>
-            g.Glitch != null &&
-            (GlitchTransferManager.Preview(node, g.Glitch) == GlitchTransferResult.Transferred ||
-             GlitchTransferManager.Preview(g.Glitch, node) == GlitchTransferResult.Transferred));
+        return GlitchTransferManager.PreviewSet(node, target) == GlitchTransferResult.Swapped ||
+               GlitchTransferManager.PreviewTake(node, target) == GlitchTransferResult.Swapped;
     }
     public void Dissolving(float timer) => OnDissolving?.Invoke(timer);
     public void SetCinematicMovement(Vector3 direction) => _model.SetCinematicMovement(direction);
