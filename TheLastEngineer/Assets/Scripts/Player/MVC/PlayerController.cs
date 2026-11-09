@@ -419,7 +419,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     #endregion
 
     #region LASER MANAGEMENT
-    public void LaserReceived()
+    // Any laser kills, whatever its glitch state.
+    public void LaserReceived(GlitchState emitterState)
     {
         if (_isDead) return;
         View.SetAnimatorSpeed(0f);
@@ -427,7 +428,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         StartCoroutine(RespawnPlayer(CauseOfDeath.Laser));
     }
     
-    public void LaserNotReceived() { }
+    public void LaserNotReceived(GlitchState emitterState) { }
     #endregion
 
     #region CheckPoint y Respawn

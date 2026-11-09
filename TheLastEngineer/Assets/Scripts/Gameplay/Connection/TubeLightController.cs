@@ -5,7 +5,7 @@ public class TubeLightController : MonoBehaviour
 {
     [SerializeField] private bool _autoReverseOnComplete = true; // invierte la lista al completar una corrida
     [SerializeField] private List<TubeLight> _tubes = new List<TubeLight>();
-    private Connection _connection;
+    private IActivationSource _source;
 
     public int Index => _index;
     private int _index = -1;
@@ -13,24 +13,28 @@ public class TubeLightController : MonoBehaviour
     private bool _currentDesiredFill = true; // true=llenar/encender, false=vaciar/apagar
     private int _runId = 0;     // Para evitar callbacks "viejos" si reinicias la corrida en mitad de otra.
 
-    // GetComponent en Awake para que el OnEnable inicial ya pueda suscribirse (antes _connection
-    // era null en ese momento y la suscripcion real quedaba en Start).
+    // Any IActivationSource on the same object drives the tubes (a Connection, a LaserReceptor...):
+    // fill when it activates, empty when it deactivates. GetComponent in Awake so the first OnEnable
+    // can already subscribe.
     private void Awake()
     {
-        _connection = GetComponent<Connection>();
+        _source = GetComponent<IActivationSource>();
+
+        if (_source == null)
+            Debug.LogWarning($"{nameof(TubeLightController)}: {name} has no IActivationSource; the tubes will never light up.", this);
     }
 
-    // Suscripcion en OnEnable: corre antes que cualquier Start, asi el evento que dispara
-    // Connection.Start con un nodo pre-asignado siempre llega y no hace falta mirar StartsConnected.
+    // Subscribing in OnEnable runs before any Start, so an activation raised from a source's Start
+    // (a Connection with a pre-assigned node) always arrives.
     private void OnEnable()
     {
-        if (_connection != null)
-            _connection.OnNodeConnected += OnConnectionStateChanged;
+        if (_source != null)
+            _source.OnActivationChanged += OnActivationChanged;
     }
 
-    private void OnConnectionStateChanged(GlitchState type, bool connected)
+    private void OnActivationChanged(bool active)
     {
-        StartSequence(fill: connected);
+        StartSequence(fill: active);
     }
 
     public void StartSequence(bool fill)
@@ -129,8 +133,8 @@ public class TubeLightController : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_connection != null)
-            _connection.OnNodeConnected -= OnConnectionStateChanged;
+        if (_source != null)
+            _source.OnActivationChanged -= OnActivationChanged;
 
         UnsubscribeFromCurrentTube();
         _isRunning = false;
