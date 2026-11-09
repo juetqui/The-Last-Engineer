@@ -22,7 +22,8 @@ public class LaserController : MonoBehaviour
 
     private ILaserReceptor _ownReceptor;
     private Glitcheable _glitcheable;
-    
+    private Intangible _intangible;
+
     public bool StartsInitialized => _startsInitialized;
 
     // La máscara es la misma para todos los láseres: sale de Resources/LaserData.asset.
@@ -39,7 +40,8 @@ public class LaserController : MonoBehaviour
         _view.Init(1);
         _ownReceptor = GetComponentInParent<ILaserReceptor>();
         _glitcheable = GetComponentInParent<Glitcheable>();
-        
+        _intangible = GetComponentInParent<Intangible>();
+
         if (_glitcheable != null)
             _glitcheable.FSM.OnStateChanged += UpdateGlitchedBehaviour;
         
@@ -151,7 +153,7 @@ public class LaserController : MonoBehaviour
             return hit;
         }
 
-        // Un láser intangible atraviesa los Glitcheables que también están en Intangible: hace falta
+        // Un láser intangible atraviesa los objetos Intangible que también están en Intangible: hace falta
         // ver detrás del primer impacto, así que se piden todos los hits y se queda con el más cercano
         // que no sea ignorable (RaycastNonAlloc no garantiza orden).
         int count = Physics.RaycastNonAlloc(origin, dir, _hitBuffer, _maxDist, Layer, QueryTriggerInteraction.Ignore);
@@ -164,7 +166,7 @@ public class LaserController : MonoBehaviour
             var candidate = _hitBuffer[i];
 
             if (didHit && candidate.distance >= closest.distance) continue;
-            if (IsIntangibleGlitcheable(candidate.collider)) continue;
+            if (IsPhasedIntangible(candidate.collider)) continue;
 
             closest = candidate;
             didHit = true;
@@ -173,13 +175,14 @@ public class LaserController : MonoBehaviour
         return closest;
     }
 
-    private bool PassesThroughIntangibles => _glitcheable != null && _glitcheable.Level == GlitchState.Intangible;
+    // Only the Intangible laser variant, and only while its own container is Intangible.
+    private bool PassesThroughIntangibles => _intangible != null && _intangible.IsPhased;
 
-    // GetComponentInParent por si el collider está en un hijo del Glitcheable.
-    private static bool IsIntangibleGlitcheable(Collider coll)
+    // GetComponentInParent por si el collider está en un hijo del Intangible.
+    private static bool IsPhasedIntangible(Collider coll)
     {
-        var glitcheable = coll.GetComponentInParent<Glitcheable>();
-        return glitcheable != null && glitcheable.Level == GlitchState.Intangible;
+        var intangible = coll.GetComponentInParent<Intangible>();
+        return intangible != null && intangible.IsPhased;
     }
 
     private void CheckCommonBehaviour()

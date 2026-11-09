@@ -2,13 +2,14 @@ using UnityEngine;
 
 public class CristalController : MonoBehaviour
 {
-    private Glitcheable _glitcheable;
+    // Glitcheable and Intangible lasers both show the glitch effect: the player can swap their state.
+    private bool _isSwapTarget;
     private Renderer _cristalShader;
     private LaserActivator _activator;
 
     private void Awake()
     {
-        _glitcheable = GetComponentInParent<Glitcheable>();
+        _isSwapTarget = GetComponentInParent<IGlitchSwapTarget>() != null;
         _cristalShader = GetComponent<Renderer>();
     }
 
@@ -21,7 +22,7 @@ public class CristalController : MonoBehaviour
 
     public void SetGlitcheableCristalView()
     {
-        if (_glitcheable != null)
+        if (_isSwapTarget)
         {
             _cristalShader.material.SetFloat("_GlitchAmount", 1);
         }

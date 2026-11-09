@@ -93,8 +93,8 @@ public class UpdatePosToTarget : MonoBehaviour
 
         if (Source == UITargetSource.Glitcheable)
         {
-            if (value) player.OnGlitcheableDetected += SetGlitcheableTarget;
-            else player.OnGlitcheableDetected -= SetGlitcheableTarget;
+            if (value) player.OnSwapTargetDetected += SetSwapTarget;
+            else player.OnSwapTargetDetected -= SetSwapTarget;
         }
         else
         {
@@ -103,8 +103,8 @@ public class UpdatePosToTarget : MonoBehaviour
         }
     }
 
-    // El == de UnityEngine.Object descarta un glitcheable destruido antes de perder el tipo concreto.
-    private void SetGlitcheableTarget(Glitcheable glitcheable) => SetTarget(glitcheable != null ? glitcheable : null);
+    // Through UnityEngine.Object so a destroyed target turns into a real null.
+    private void SetSwapTarget(IGlitchSwapTarget target) => SetTarget(target as Object != null ? target : null);
 
     // OnInteractableDetected se dispara todos los frames: el guard de cambio hace que los hijos
     // reciban OnTargetChanged solo cuando el objetivo realmente cambia.
