@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using PrimeTween;
 
 public class PlayerView
 {
@@ -14,7 +13,6 @@ public class PlayerView
     private Animator _animator = default;
     private AudioSource _walkSource = default, _fxSource = default;
     private AudioClip _walkClip = default, _dashClip = default, _chargedDashClip = default, _liftClip = default, _putDownClip = default, _deathClip = default, _fallClip = default;
-    private Material _intangibleMat;
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
@@ -42,7 +40,6 @@ public class PlayerView
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
         _teleportPS = teleportPS;
-        _intangibleMat = playerData.intangibleMat;
 
         if (_defaultPS != null) _defaultPSColor = _defaultPS.main.startColor;
     }
@@ -136,22 +133,12 @@ public class PlayerView
     {
         _renderer.materials[1].SetFloat("_HasNode", 1);
 
-        var intangibleMatFrom = _intangibleMat.GetFloat("_Alpha");
-        
-        if (nodeType == GlitchState.Intangible)
+        // El overlay Intangible (_Alpha) lo maneja PlayerIntangibleOverlay, compartido con la mochila.
+        if (nodeType == GlitchState.Glitched)
         {
-            TweenFloat(_intangibleMat, "_Alpha", intangibleMatFrom, 1f, 0.5f);
-        }
-        else if (nodeType == GlitchState.Glitched)
-        {
-            TweenFloat(_intangibleMat, "_Alpha", intangibleMatFrom, 0f, 0.5f);
             _renderer.materials[1].SetFloat("_IsGlitched", 1);
             _corruptedPS.Play();
             return;
-        }
-        else
-        {
-            TweenFloat(_intangibleMat, "_Alpha", intangibleMatFrom, 0f, 0.5f);
         }
 
         // _IsGlitched es un booleano en S_GlowCharacter, así que Intangible se ve como Clean en el
@@ -200,6 +187,10 @@ public class PlayerView
             // SACAR ESTO DE ACA
             _renderer.materials[1].SetFloat("_HasNode", 0);
             _renderer.materials[1].SetFloat("_IsGlitched", 0);
+
+            // Stop() deja terminar las partículas vivas, igual que _orbitPS en StopPS.
+            if (_defaultPS != null) _defaultPS.Stop();
+            if (_corruptedPS != null) _corruptedPS.Stop();
         }
 
         if (outlineColor != Color.black)
@@ -223,12 +214,5 @@ public class PlayerView
         source.clip = clip;
         source.pitch = pitch;
         source.Play();
-    }
-    
-    private Tween TweenFloat(Material mat, string prop, float from, float to, float dur)
-    {
-        mat.SetFloat(prop, from);
-        return Tween.Custom(_playerObj, from, to, dur,
-            (_, v) => mat.SetFloat(prop, v), Ease.Linear);
     }
 }

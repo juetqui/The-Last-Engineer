@@ -21198,6 +21198,7 @@ GameObject:
   - component: {fileID: 6800712088207926947}
   - component: {fileID: 7041227213348162}
   - component: {fileID: 3861183634563676880}
+  - component: {fileID: 4664237378059968901}
   m_Layer: 8
   m_Name: Armature
   m_TagString: Untagged
@@ -21321,6 +21322,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fa76e60418cbfe48871fed7aeefc2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4664237378059968901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4636088832093638122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db4ef119d25257b45bebdacd4760f4ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerIntangibleOverlay
+  _renderer: {fileID: 7041227213348162}
+  _materialIndex: 1
+  _nodeHandler: {fileID: 3156403094411963407}
 --- !u!1 &4701801257064188555
 GameObject:
   m_ObjectHideFlags: 0
@@ -37292,6 +37308,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 336967876538944131}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8910472607495457639}
   m_SourcePrefab: {fileID: 100100000, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}
 --- !u!23 &5571796698612883786 stripped
 MeshRenderer:
@@ -37327,6 +37346,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fa76e60418cbfe48871fed7aeefc2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8910472607495457639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6220038311313686687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db4ef119d25257b45bebdacd4760f4ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerIntangibleOverlay
+  _renderer: {fileID: 5571796698612883786}
+  _materialIndex: 1
+  _nodeHandler: {fileID: 3156403094411963407}
 --- !u!4 &6708625456362166821 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: df3c0a8149976c9419f0924e62c1bcb7, type: 3}
