@@ -2,45 +2,51 @@ using UnityEngine;
 
 public class CristalController : MonoBehaviour
 {
+    private static readonly int GlitchAmountId = Shader.PropertyToID("_GlitchAmount");
+    private static readonly int EmissiveColorId = Shader.PropertyToID("_EmissiveColor");
+
+    private const float On = 1f;
+    private const float Off = 0f;
+
     // Glitcheable and Intangible lasers both show the glitch effect: the player can swap their state.
     private bool _isSwapTarget;
-    private Renderer _cristalShader;
-    private LaserActivator _activator;
+    private Material _material;
+
+    // Resolved exactly like LaserController.EmitterState, so the crystal and its beams never disagree.
+    private GlitchComponent _glitch;
+
+    private GlitchState EmitterState => _glitch != null ? _glitch.CurrentState : GlitchState.Clean;
 
     private void Awake()
     {
         _isSwapTarget = GetComponentInParent<IGlitchSwapTarget>() != null;
-        _cristalShader = GetComponent<Renderer>();
+        _glitch = GetComponentInParent<GlitchComponent>();
+
+        // renderer.material makes a per-instance copy: cache it once instead of on every setter.
+        _material = GetComponent<Renderer>().material;
     }
 
     private void Start()
     {
-        _activator = GetComponentInParent<LaserActivator>();
         SetGlitcheableCristalView();
-        SetBrightnes();
+
+        // GlitchComponent never raises its initial state: pull it here, then follow the changes.
+        ApplyEmissiveColor(EmitterState);
+        if (_glitch != null) _glitch.OnGlitchStateChanged += ApplyEmissiveColor;
+    }
+
+    private void OnDestroy()
+    {
+        if (_glitch != null) _glitch.OnGlitchStateChanged -= ApplyEmissiveColor;
     }
 
     public void SetGlitcheableCristalView()
     {
-        if (_isSwapTarget)
-        {
-            _cristalShader.material.SetFloat("_GlitchAmount", 1);
-        }
-        else
-        {
-            _cristalShader.material.SetFloat("_GlitchAmount", 0);
-        }
+        _material.SetFloat(GlitchAmountId, _isSwapTarget ? On : Off);
     }
 
-    public void SetBrightnes()
+    private void ApplyEmissiveColor(GlitchState state)
     {
-        if(_activator.LaserStartsInitialized)
-        {
-            _cristalShader.material.SetFloat("_IsInitialized", 1);
-        }
-        else
-        {
-            _cristalShader.material.SetFloat("_IsInitialized", 0);
-        }
+        _material.SetColor(EmissiveColorId, GlitchPalette.Default.EmissionFor(state));
     }
 }

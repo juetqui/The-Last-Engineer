@@ -53,10 +53,24 @@ public class LaserController : MonoBehaviour
         _isInitialized = _startsInitialized;
     }
 
+    private void Start()
+    {
+        // GlitchComponent never raises its initial state: pull it here, then follow the changes.
+        ApplyEmissionColor(EmitterState);
+        if (_glitch != null) _glitch.OnGlitchStateChanged += ApplyEmissionColor;
+    }
+
     private void OnDestroy()
     {
         if (_glitcheable != null)
             _glitcheable.FSM.OnStateChanged -= UpdateGlitchedBehaviour;
+
+        if (_glitch != null) _glitch.OnGlitchStateChanged -= ApplyEmissionColor;
+    }
+
+    private void ApplyEmissionColor(GlitchState state)
+    {
+        _view.SetEmissionColor(GlitchPalette.Default.EmissionFor(state));
     }
 
     private void Update()

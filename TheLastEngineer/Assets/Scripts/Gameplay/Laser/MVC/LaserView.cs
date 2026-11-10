@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class LaserView : MonoBehaviour
 {
+    private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
+
     [Header("View References")]
     [SerializeField] private GameObject _lineRendererPrefab;
     [SerializeField] private ParticleSystem _hitLaser;
@@ -12,6 +14,7 @@ public class LaserView : MonoBehaviour
     [SerializeField] private Vector3 _particleOffset;
     
     private LineRenderer _line;
+    private Material _lineMaterial;
     private AudioSource _audio;
 
     public void Init(float width)
@@ -23,7 +26,15 @@ public class LaserView : MonoBehaviour
         _line.startWidth = width;
         _line.endWidth = width;
 
+        // renderer.material makes a per-instance copy: every laser tints only its own beam.
+        _lineMaterial = _line.material;
+
         _audio = GetComponent<AudioSource>();
+    }
+
+    public void SetEmissionColor(Color color)
+    {
+        _lineMaterial.SetColor(EmissionColorId, color);
     }
 
     public void SetLaserPositions(Vector3 start, Vector3 end)
