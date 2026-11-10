@@ -1,202 +1,222 @@
-using UnityEngine;
-using UnityEngine.Events;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using static UnityEngine.Rendering.DebugUI;
+using PrimeTween;
+using UnityEngine;
 
-public class LaserReceptor : MonoBehaviour, ILaserReceptor
+/// <summary>
+/// Charges while at least one laser in its required glitch state hits it, and is an activation source
+/// (doors, tube lights) while fully charged. Lasers in any other state are ignored except for the
+/// negative feedback hook. Timings come from a LaserReceptorConfig preset.
+/// </summary>
+public class LaserReceptor : MonoBehaviour, ILaserReceptor, IActivationSource
 {
-    public UnityEvent OnEndHit;
-    public UnityEvent OnHit;
-    public UnityEvent OnCompleated;
-    public UnityEvent OnDepleated;
+    private const float Empty = 0f;
+    private const float Full = 1f;
 
-    private Collider _collider = default;
-    public bool _isCompleted = false;
-    Material _myMaterial;
-    [SerializeField] float minBound;
-    [SerializeField] float maxBound;
-    public bool _completed;
-    [SerializeField] float unfillTime;
-    [SerializeField] float fillTime;
-    public float _currentLoad = 0;
-    bool _isCurrentlyLoading;
-    bool _isCurrentlyUnloading;
-    //public float _timeToUnfill = 0;
-    //public float timeModifier;
-    public bool _canBeUnfilled= false;
+    private static readonly int GlowStepId = Shader.PropertyToID("_GlowStep");
+    private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
-    private CancellationTokenSource _cancelSource = default;
-    private Renderer _renderer = default;
-    [SerializeField] private float duration = 1.2f;
+    [SerializeField] private LaserReceptorConfig _config;
+
+    [Tooltip("Glitch state an emitting laser must be in to charge this receptor.")]
+    [GlitchStateOptions(GlitchState.Clean, GlitchState.Intangible)]
+    [SerializeField] private GlitchState _requiredState = GlitchState.Clean;
+
     [SerializeField] private ParticleSystem _completeFillPartcle;
     [SerializeField] private List<ParticleSystem> _FinishFillParticle;
-
     [SerializeField] private List<ParticleSystem> _hitPS = new List<ParticleSystem>();
 
+    // Public on purpose: the legacy LaserReceptorChecker reads and writes them directly.
+    public bool _isCompleted = false;
+    public float _currentLoad = 0;
 
+    private Collider _collider = default;
+    private Renderer _renderer = default;
+    private Material _material = default;
     private AudioSource _audioSource = default;
+
+    // LaserModel notifies in enter/exit pairs with the same state, so a plain count of the valid
+    // beams currently hitting is enough to know when the first arrives and the last leaves.
+    private int _validHitCount = 0;
+    private bool _isCurrentlyLoading;
+    private bool _isCurrentlyUnloading;
+    private Coroutine _chargeRoutine;
+    private Tween _glowTween;
+
+    public bool IsActive => _isCompleted;
+    public event Action<bool> OnActivationChanged;
 
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();
-        _renderer.material.SetFloat("_GlowStep", 0f);
         _audioSource = GetComponent<AudioSource>();
         _collider = GetComponent<Collider>();
         _hitPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
+
+        if (_config == null)
+            Debug.LogError($"[LaserReceptor] {name} has no LaserReceptorConfig: it will ignore lasers.", this);
+
+        if (!LaserReceptorRules.IsValidRequiredState(_requiredState))
+        {
+            Debug.LogError($"[LaserReceptor] {name} cannot require {_requiredState}: using Clean.", this);
+            _requiredState = LaserReceptorRules.SanitizeRequiredState(_requiredState);
+        }
+
+        _material = _renderer.material;
+        _material.SetFloat(GlowStepId, Empty);
+        _material.SetColor(EmissionColorId, GlitchPalette.Default.EmissionFor(_requiredState));
     }
 
-    public void ChargeCompleted()
+    private void OnDestroy()
     {
-        _audioSource.Stop();
-        
-        foreach (var ps in _hitPS)
-        {
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        }
-        
-        OnCompleated?.Invoke();
-        _isCompleted = true;
-    }
-    
-    public void SetUnCompleted()
-    {
-        _isCompleted = false;
-    }
-    
-    public void ChargeDepleted()
-    {
-        OnDepleated?.Invoke();
+        _glowTween.Stop();
+
+        // renderer.material made a per-instance copy that Unity does not free with the object.
+        if (_material != null) Destroy(_material);
     }
 
-    public void LaserReceived()
+    public void LaserReceived(GlitchState emitterState)
     {
-        OnHit?.Invoke();
-        
-        if (_isCurrentlyUnloading||(!_isCompleted && !_isCurrentlyLoading))
+        if (_config == null) return;
+
+        if (!LaserReceptorRules.AcceptsEmitter(_requiredState, emitterState))
         {
-            _isCurrentlyUnloading = false;
-            _isCurrentlyLoading = true;
-            StartCoroutine(LoadRoutine(fillTime));
+            OnInvalidLaser(emitterState);
+            return;
         }
+
+        _validHitCount++;
+
+        if (_validHitCount == 1) StartCharging();
     }
+
+    public void LaserNotReceived(GlitchState emitterState)
+    {
+        if (_config == null || !LaserReceptorRules.AcceptsEmitter(_requiredState, emitterState)) return;
+
+        if (_validHitCount == 0)
+        {
+            Debug.LogWarning($"[LaserReceptor] {name} got a LaserNotReceived without its LaserReceived.", this);
+            return;
+        }
+
+        _validHitCount--;
+
+        if (_validHitCount == 0) StopCharging();
+    }
+
+    public void SetUnCompleted() => SetCompleted(false);
 
     public void TurnOffObject()
     {
         _collider.enabled = false;
     }
 
-    public void LaserNotReceived()
+    // Hook for the negative feedback (its own particles come in a later task). LaserModel notifies
+    // only when a beam enters, so this logs once per entering beam, never per frame.
+    private void OnInvalidLaser(GlitchState emitterState)
+    {
+        Debug.LogWarning($"[LaserReceptor] {name} requires a {_requiredState} laser; ignored a {emitterState} one.", this);
+    }
+
+    private void StartCharging()
+    {
+        // Completed means full and not emptying (emptying clears it), so there is nothing to charge.
+        if (_isCurrentlyLoading || _isCompleted) return;
+
+        _isCurrentlyUnloading = false;
+        _isCurrentlyLoading = true;
+        RunChargeRoutine(LoadRoutine());
+    }
+
+    private void StopCharging()
     {
         _completeFillPartcle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        _audioSource.Stop();
-        foreach (var ps in _hitPS)
-        {
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        }
-        if (!_isCompleted||_canBeUnfilled)
-        {
-            OnEndHit?.Invoke();
-            //if ((!_isCompleted && !_isCurrentlyUnloading))
-            if (!_isCurrentlyUnloading) 
-            {
-                _isCurrentlyLoading = false;
-                _isCurrentlyUnloading = true;
-                StartCoroutine(UnLoadRoutine(unfillTime));
-            }
-        }
+        StopHitFeedback();
+
+        if (_isCompleted && !_config.CanBeUnfilled) return;
+        if (_isCurrentlyUnloading) return;
+
+        _isCurrentlyLoading = false;
+        _isCurrentlyUnloading = true;
+        SetCompleted(false);
+        RunChargeRoutine(UnloadRoutine());
     }
 
-    public void Fill()
+    // Only one of Load/Unload runs at a time: a beam leaving and re-entering within one frame
+    // would otherwise leave the previous routine alive next to the new one.
+    private void RunChargeRoutine(IEnumerator routine)
     {
-        StartFill(1f);
+        if (_chargeRoutine != null) StopCoroutine(_chargeRoutine);
+
+        _chargeRoutine = StartCoroutine(routine);
     }
 
-    public void Empty()
-    {
-        StartFill(0f);
-    }
-
-    private void StartFill(float target)
-    {
-        _cancelSource?.Cancel();
-        _cancelSource = new CancellationTokenSource();
-
-        _ = AnimateFill(target, _cancelSource.Token);
-    }
-
-    private async Task AnimateFill(float target, CancellationToken token)
-    {
-        float startValue = _renderer.material.GetFloat("_GlowStep");
-        float time = 0f;
-
-        while (time < duration)
-        {
-            if (token.IsCancellationRequested) return;
-
-            time += Time.deltaTime;
-            float t = time / duration;
-
-            float value = Mathf.Lerp(startValue, target, t);
-            _renderer.material.SetFloat("_GlowStep", value);
-
-            await Task.Yield();
-        }
-
-        _renderer.material.SetFloat("_GlowStep", target);
-    }
-
-    private IEnumerator LoadRoutine(float loadTime)
+    private IEnumerator LoadRoutine()
     {
         _audioSource.Stop();
-        if(!_isCompleted)
         _audioSource.Play();
+
         foreach (var ps in _hitPS)
-        {
             ps.Play();
-        }
-        while (_currentLoad <= 1f)
+
+        TweenGlow(Full);
+
+        while (_currentLoad < Full)
         {
-            if (_isCurrentlyLoading == true && _isCurrentlyUnloading == false)
-            {
-                Fill();
-                _currentLoad = _currentLoad + Time.deltaTime / loadTime;
-                yield return null;
-            }
-            else if (_isCurrentlyLoading == false || _isCurrentlyUnloading == true)
-            {
-                yield break;
-            }
+            if (!_isCurrentlyLoading) yield break;
+
+            _currentLoad += Time.deltaTime / _config.FillTime;
+            yield return null;
         }
+
+        _currentLoad = Full;
+        _isCurrentlyLoading = false;
 
         foreach (var ps in _FinishFillParticle)
-        {
             ps.Play();
-        }
+
         _completeFillPartcle.Play();
-        _currentLoad = 1;
-        ChargeCompleted();
+        StopHitFeedback();
+        SetCompleted(true);
     }
 
-    private IEnumerator UnLoadRoutine(float unloadTime)
+    private IEnumerator UnloadRoutine()
     {
-        while (_currentLoad >= 0f)
+        TweenGlow(Empty);
+
+        while (_currentLoad > Empty)
         {
-            if (_isCurrentlyLoading == false && _isCurrentlyUnloading == true)
-            {
-                Empty();
-                _currentLoad = _currentLoad - Time.deltaTime / unloadTime;
-                yield return null;
-            }
-            else if (_isCurrentlyLoading == true || _isCurrentlyUnloading == false)
-            {
-                yield break;
-            }
+            if (!_isCurrentlyUnloading) yield break;
+
+            _currentLoad -= Time.deltaTime / _config.UnfillTime;
+            yield return null;
         }
-        
-        _currentLoad = 0;
-        ChargeDepleted();
+
+        _currentLoad = Empty;
+        _isCurrentlyUnloading = false;
+    }
+
+    private void StopHitFeedback()
+    {
+        _audioSource.Stop();
+
+        foreach (var ps in _hitPS)
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    }
+
+    private void TweenGlow(float target)
+    {
+        _glowTween.Stop();
+        _glowTween = Tween.MaterialProperty(_material, GlowStepId, target, _config.GlowDuration);
+    }
+
+    private void SetCompleted(bool completed)
+    {
+        if (_isCompleted == completed) return;
+
+        _isCompleted = completed;
+        OnActivationChanged?.Invoke(completed);
     }
 }

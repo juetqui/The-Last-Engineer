@@ -23,8 +23,12 @@ public class LaserController : MonoBehaviour
     private ILaserReceptor _ownReceptor;
     private Glitcheable _glitcheable;
     private Intangible _intangible;
+    private GlitchComponent _glitch;
 
     public bool StartsInitialized => _startsInitialized;
+
+    // What receptors validate against. A laser without a GlitchComponent above it counts as Clean.
+    public GlitchState EmitterState => _glitch != null ? _glitch.CurrentState : GlitchState.Clean;
 
     // La máscara es la misma para todos los láseres: sale de Resources/LaserData.asset.
     private static LayerMask Layer => LaserData.Default.layer;
@@ -41,6 +45,7 @@ public class LaserController : MonoBehaviour
         _ownReceptor = GetComponentInParent<ILaserReceptor>();
         _glitcheable = GetComponentInParent<Glitcheable>();
         _intangible = GetComponentInParent<Intangible>();
+        _glitch = GetComponentInParent<GlitchComponent>();
 
         if (_glitcheable != null)
             _glitcheable.FSM.OnStateChanged += UpdateGlitchedBehaviour;
@@ -203,7 +208,7 @@ public class LaserController : MonoBehaviour
 
         if (!_isInitialized) return;
         
-        if (didHit) _model.ProcessReceptor(hit, _ownReceptor);
+        if (didHit) _model.ProcessReceptor(hit, _ownReceptor, EmitterState);
         else _model.ClearReceptor();
 
         _model.UpdateRaycastDistance();

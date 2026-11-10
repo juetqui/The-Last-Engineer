@@ -77,7 +77,7 @@ public class Laser : MonoBehaviour
         {
             if (_lastHit != null)
             {
-                _lastHit.LaserNotReceived();
+                _lastHit.LaserNotReceived(GlitchState.Clean);
                 _lastHit = null;
             }
             _audioSource.Stop();
@@ -154,12 +154,12 @@ public class Laser : MonoBehaviour
             if (_lastHit != receptor)
             {
                 if (_lastHit != null)
-                    _lastHit.LaserNotReceived();
+                    _lastHit.LaserNotReceived(GlitchState.Clean);
 
                 _lastHit = receptor;
             }
 
-            receptor.LaserReceived();
+            receptor.LaserReceived(GlitchState.Clean);
         }
         else
         {
@@ -189,7 +189,7 @@ public class Laser : MonoBehaviour
     private void NotifyReceptor(ILaserReceptor receptor)
     {
         if (_lastHit != null && _lastHit != receptor)
-            _lastHit.LaserNotReceived();
+            _lastHit.LaserNotReceived(GlitchState.Clean);
 
         _lastHit = receptor;
     }
@@ -198,7 +198,7 @@ public class Laser : MonoBehaviour
     {
         if (_lastHit == null) return;
 
-        _lastHit.LaserNotReceived();
+        _lastHit.LaserNotReceived(GlitchState.Clean);
         _lastHit = null;
     }
 

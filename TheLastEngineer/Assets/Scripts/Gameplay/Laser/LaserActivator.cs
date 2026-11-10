@@ -14,7 +14,8 @@ public class LaserActivator : MonoBehaviour, ILaserReceptor
         LaserStartsInitialized = _lasers.First().StartsInitialized;
     }
 
-    public void LaserReceived()
+    // The incoming beam's state does not matter: each child laser reports its own state downstream.
+    public void LaserReceived(GlitchState emitterState)
     {
         foreach (var laser in _lasers)
         {
@@ -22,7 +23,7 @@ public class LaserActivator : MonoBehaviour, ILaserReceptor
         }
     }
 
-    public void LaserNotReceived()
+    public void LaserNotReceived(GlitchState emitterState)
     {
         foreach (var laser in _lasers)
         {

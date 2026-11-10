@@ -10,13 +10,14 @@ public class LaserModel
     private float _startDist = 0f;
     private float _transitionTimer = 0f;
     private float _easeTime = 0f;
-    
+
     public bool IsTransitioning => _isTransitioning;
 
     private bool _isTransitioning = false;
     private bool _debug = false;
 
     private ILaserReceptor _lastHit;
+    private GlitchState _lastState;
 
     public LaserModel(int maxDist, LayerMask layer, float easeTime, bool debug)
     {
@@ -26,7 +27,9 @@ public class LaserModel
         _debug = debug;
     }
 
-    public void ProcessReceptor(RaycastHit hit, ILaserReceptor own)
+    // The state sent on enter is stored and sent again on exit, so the receptor's per-state count
+    // always pairs up. A change of the emitter's state while hitting the same receptor re-notifies.
+    public void ProcessReceptor(RaycastHit hit, ILaserReceptor own, GlitchState emitterState)
     {
         if (!hit.collider.TryGetComponent(out ILaserReceptor receptor) || receptor == own)
         {
@@ -34,16 +37,17 @@ public class LaserModel
             return;
         }
 
-        if (receptor == _lastHit) return;
+        if (receptor == _lastHit && emitterState == _lastState) return;
 
-        _lastHit?.LaserNotReceived();
+        _lastHit?.LaserNotReceived(_lastState);
         _lastHit = receptor;
-        _lastHit.LaserReceived();
+        _lastState = emitterState;
+        _lastHit.LaserReceived(_lastState);
     }
 
     public void ClearReceptor()
     {
-        _lastHit?.LaserNotReceived();
+        _lastHit?.LaserNotReceived(_lastState);
         _lastHit = null;
     }
 
