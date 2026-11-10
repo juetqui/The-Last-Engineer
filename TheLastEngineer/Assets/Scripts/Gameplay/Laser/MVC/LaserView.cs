@@ -16,9 +16,14 @@ public class LaserView : MonoBehaviour
     private LineRenderer _line;
     private Material _lineMaterial;
     private AudioSource _audio;
+    private bool _trailEmitting;
 
     public void Init(float width)
     {
+        // The trail starts off: the controller turns it on once the beam length is stable.
+        _trailEmitting = false;
+        _trailRenderer.emitting = false;
+
         var instance = Instantiate(_lineRendererPrefab);
         _line = instance.GetComponent<LineRenderer>();
         
@@ -60,6 +65,17 @@ public class LaserView : MonoBehaviour
     {
         _hitLaser.gameObject.SetActive(false);
         if (_hitLaser.isPlaying) _hitLaser.Stop();
+    }
+
+    // Off = stop emitting (what is already drawn fades out). On = drop the stale points first, so the
+    // trail doesn't draw a streak from where it was before. Guarded so it can be called every frame.
+    public void SetTrailEmitting(bool emitting)
+    {
+        if (_trailEmitting == emitting) return;
+
+        _trailEmitting = emitting;
+        if (emitting) _trailRenderer.Clear();
+        _trailRenderer.emitting = emitting;
     }
 
     public void EnableBeam(bool enable)

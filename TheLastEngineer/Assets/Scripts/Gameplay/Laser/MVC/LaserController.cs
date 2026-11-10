@@ -20,6 +20,11 @@ public class LaserController : MonoBehaviour
     private bool _isToggling = false;
     private bool _idleSetupDone = false;
 
+    // Beam length of the previous frame, to tell when it has stopped changing. NoDistance forces
+    // the next frame to count as a change.
+    private const float NoDistance = -1f;
+    private float _lastDist = NoDistance;
+
     private ILaserReceptor _ownReceptor;
     private Glitcheable _glitcheable;
     private Intangible _intangible;
@@ -126,7 +131,7 @@ public class LaserController : MonoBehaviour
         {
             var hit = CheckRaycast(out var origin, out var dir, out var didHit);
             
-            _model.SetLaserLength(didHit ? hit.distance : _maxDist);
+            StartLengthTransition(didHit ? hit.distance : _maxDist);
             _isToggling = true;
             _idleSetupDone = true;
         }
@@ -141,7 +146,7 @@ public class LaserController : MonoBehaviour
         if (!_isToggling)
         {
             _isToggling = true;
-            _model.SetLaserLength(0f);
+            StartLengthTransition(0f);
         }
 
         _model.ClearReceptor();
@@ -220,8 +225,19 @@ public class LaserController : MonoBehaviour
         _isToggling = false;
         _model.SetInstant(_isInitialized ? (didHit ? hit.distance : _maxDist) : 0f);
 
-        if (!_isInitialized) return;
-        
+        if (!_isInitialized)
+        {
+            _view.SetTrailEmitting(false);
+            return;
+        }
+
+        // Any change in the beam length (something entering or leaving the beam) turns the trail off;
+        // it comes back on the first frame the length repeats. No hit = no trail: it lives under the
+        // hit effect, which StopHitEffect deactivates.
+        var dist = didHit ? hit.distance : _maxDist;
+        var lengthIsStable = Mathf.Approximately(dist, _lastDist);
+        _lastDist = dist;
+
         if (didHit) _model.ProcessReceptor(hit, _ownReceptor, EmitterState);
         else _model.ClearReceptor();
 
@@ -235,8 +251,20 @@ public class LaserController : MonoBehaviour
             _view.ShowHitEffect(hit.point, hit.normal);
         else
             _view.StopHitEffect();
-        
+
+        // After ShowHitEffect, so the trail is already at the hit point when it is cleared and turned on.
+        _view.SetTrailEmitting(didHit && lengthIsStable);
+
         _view.PlayAudio();
+    }
+
+    // Every eased length change turns the trail off; CheckCommonBehaviour turns it back on once the
+    // transition is over and the length is stable.
+    private void StartLengthTransition(float length)
+    {
+        _model.SetLaserLength(length);
+        _lastDist = NoDistance;
+        _view.SetTrailEmitting(false);
     }
 
     public void LaserReceived()
@@ -248,7 +276,7 @@ public class LaserController : MonoBehaviour
 
         var hit = CheckRaycast(out var origin, out var dir, out var didHit);
 
-        _model.SetLaserLength(didHit ? hit.distance : _maxDist);
+        StartLengthTransition(didHit ? hit.distance : _maxDist);
     }
 
     public void LaserNotReceived()
@@ -259,7 +287,7 @@ public class LaserController : MonoBehaviour
         _isToggling = true;
         _idleSetupDone = false;
         _model.ClearReceptor();
-        _model.SetLaserLength(0f);
+        StartLengthTransition(0f);
         _view.StopAudio();
     }
 
