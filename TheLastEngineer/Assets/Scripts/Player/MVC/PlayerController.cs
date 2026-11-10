@@ -60,6 +60,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     private Vector3 _checkPointPos;
     private Vector3 _teleportPos;
+    private Coroutine _respawnRoutine;
     private Glitcheable _lastNearestGlitcheable;
     // Cached method group: ResolveSwapHudTarget runs every frame.
     private Func<IGlitchSwapTarget, bool> _canSwapFilter;
@@ -126,7 +127,10 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         OnRespawned += _input.EnableInputs;
 
         if (LevelLoader.Instance != null)
+        {
             LevelLoader.Instance.OnLoading += _input.DisableInputs;
+            LevelLoader.Instance.OnLoading += CancelRespawn;
+        }
 
         // Subscribe to cinematic events
         OnCinematicSetupRequested += HandleCinematicSetup;
@@ -169,8 +173,11 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         // El LevelLoader sobrevive al cambio de escena: si no desuscribimos,
         // quedan delegates apuntando a players ya destruidos.
-        if (LevelLoader.Instance != null && _input != null)
-            LevelLoader.Instance.OnLoading -= _input.DisableInputs;
+        if (LevelLoader.Instance != null)
+        {
+            LevelLoader.Instance.OnLoading -= CancelRespawn;
+            if (_input != null) LevelLoader.Instance.OnLoading -= _input.DisableInputs;
+        }
 
         // Unsubscribe from cinematic events
         OnCinematicSetupRequested -= HandleCinematicSetup;
@@ -425,7 +432,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         if (_isDead) return;
         View.SetAnimatorSpeed(0f);
         //_solvingController?.BurnShader();
-        StartCoroutine(RespawnPlayer(CauseOfDeath.Laser));
+        _respawnRoutine = StartCoroutine(RespawnPlayer(CauseOfDeath.Laser));
     }
     
     public void LaserNotReceived(GlitchState emitterState) { }
@@ -435,6 +442,16 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public void SetCheckPointPos(Vector3 newPos)
     {
         _checkPointPos = newPos;
+    }
+
+    // A level load during the respawn cuts the sequence: no OnRespawned and no inputs back on
+    // while the scene unloads. Camera and death effect are left as they are.
+    private void CancelRespawn()
+    {
+        if (_respawnRoutine == null) return;
+
+        StopCoroutine(_respawnRoutine);
+        _respawnRoutine = null;
     }
 
     public IEnumerator RespawnPlayer(CauseOfDeath cause)
@@ -462,6 +479,12 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
         yield return new WaitForSeconds(0.5f);
 
+        // The whole logical respawn waits for the camera pan; the death effect holds its exit
+        // level meanwhile and fades out once the pan ends.
+        yield return _followController.PanToTarget();
+        GlitchDeathController.Instance.ReleaseHold();
+
+        _respawnRoutine = null;
         _isDead = false;
         View.SetAnimatorSpeed(1f);
         //_solvingController?.RespawnPlayer();
@@ -482,7 +505,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     {
         // El registro de interactuables lo maneja PlayerInteractionDetector (trigger fijo del jugador).
         if (coll.CompareTag("Void") && !_isDead)
-            StartCoroutine(RespawnPlayer(CauseOfDeath.Fall));
+            _respawnRoutine = StartCoroutine(RespawnPlayer(CauseOfDeath.Fall));
     }
     #endregion
 
