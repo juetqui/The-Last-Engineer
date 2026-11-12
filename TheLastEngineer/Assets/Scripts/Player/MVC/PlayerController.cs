@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
 
     public CharacterController CC { get; private set; }
     private Collider _collider = default;
+    private CapsuleCollider _capsule = default;
     private Animator _animator = default;
 
     public Action<float, float> OnDash;
@@ -69,6 +70,14 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     public Vector3 TeleportPos {  get { return _teleportPos; } }
     public PlayerNodeHandler NodeHandler => _nodeHandler;
     public PlayerData Data => _playerData;
+
+    // Derived from the node in hand on every read (no cached copy): a phased Intangible laser lets
+    // the player through only while this is true, and kills on the first raycast after it turns false.
+    public bool IsIntangible => _nodeHandler != null && _nodeHandler.HasNode && _nodeHandler.CurrentLevel == GlitchState.Intangible;
+
+    // The player's only solid colliders are the root's CharacterController and CapsuleCollider; the
+    // rest are triggers. Compared by reference so per-frame raycasts need no GetComponent.
+    public bool IsOwnCollider(Collider coll) => coll != null && (coll == CC || coll == _capsule);
     #endregion
 
     private void Awake()
@@ -96,7 +105,8 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         View = new PlayerView(gameObject, _renderer, _walkPS, _orbitPS, _animator, _walkSource, _fxSource, _playerData, _defaultPS, _corruptedPS, _teleportPS);
 
         // CapsuleCollider explícito: GetComponent<Collider>() puede devolver el propio CharacterController.
-        _intangibility = new PlayerIntangibilityHandler(CC, GetComponent<CapsuleCollider>(), _nodeHandler, _playerData);
+        _capsule = GetComponent<CapsuleCollider>();
+        _intangibility = new PlayerIntangibilityHandler(CC, _capsule, _nodeHandler, _playerData);
 
         _checkPointPos = transform.position;
 

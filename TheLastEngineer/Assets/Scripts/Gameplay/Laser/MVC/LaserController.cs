@@ -182,6 +182,11 @@ public class LaserController : MonoBehaviour
         // que no sea ignorable (RaycastNonAlloc no garantiza orden).
         int count = Physics.RaycastNonAlloc(origin, dir, _hitBuffer, _maxDist, Layer, QueryTriggerInteraction.Ignore);
 
+        // El jugador con un nodo Intangible en la mano también se atraviesa. Se consulta en cada
+        // raycast (sin caché): si deja de serlo dentro del haz, este mismo frame vuelve a pegarle.
+        var player = PlayerController.Instance;
+        var ignorePlayer = player != null && player.IsIntangible;
+
         var closest = default(RaycastHit);
         didHit = false;
 
@@ -190,6 +195,7 @@ public class LaserController : MonoBehaviour
             var candidate = _hitBuffer[i];
 
             if (didHit && candidate.distance >= closest.distance) continue;
+            if (ignorePlayer && player.IsOwnCollider(candidate.collider)) continue;
             if (IsPhasedIntangible(candidate.collider)) continue;
 
             closest = candidate;
