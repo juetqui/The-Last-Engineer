@@ -1,31 +1,60 @@
 using UnityEngine;
 
+/// <summary>
+/// Carries the player on the elevator, whose root is moved by its Animator (Normal update mode).
+/// </summary>
 public class AttachPlayer : MonoBehaviour
 {
-    private IMovablePassenger _player = null;
-    private Vector3 _lastPosition = Vector3.zero;
-    private bool _hasPlayerOn = false;
+    private Rigidbody _body;
+    private PlayerController _player;
+    private Vector3 _lastPosition;
+
+    private void Awake()
+    {
+        _body = KinematicBody.Ensure(gameObject);
+        _lastPosition = transform.position;
+    }
 
     private void LateUpdate()
     {
-        if (!_hasPlayerOn || _player == null)
-            return;
+        // The Animator moved the transform after Update. Push the pose to the kinematic body now, so next
+        // frame's CharacterController.Move collides with the floor where it is, then hand the player this
+        // frame's displacement (applied in its next Update).
+        Vector3 position = transform.position;
+        _body.position = position;
 
-        Vector3 displacement = transform.position - _lastPosition;
+        if (_player != null)
+            _player.OnPlatformMoving(position - _lastPosition);
 
-        if (displacement.sqrMagnitude > 0.0001f)
-            _player.OnPlatformMoving(displacement);
-
-        _lastPosition = transform.position;
+        _lastPosition = position;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out IMovablePassenger player))
-        {
-            _player = player;
-            _hasPlayerOn = true;
-            _lastPosition = transform.position;
-        }
+        if (!other.TryGetComponent(out PlayerController player) || player == _player || player.IsDead)
+            return;
+
+        Release();
+        _player = player;
+        _player.OnDied += Release;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent(out PlayerController player) && player == _player)
+            Release();
+    }
+
+    private void OnDestroy()
+    {
+        Release();
+    }
+
+    private void Release()
+    {
+        if (_player != null)
+            _player.OnDied -= Release;
+
+        _player = null;
     }
 }

@@ -16,22 +16,6 @@ public class MovingState : IPlatformState
 
     public void Tick(float d)
     {
-        if (_pc.ReachedTarget())
-        {
-            if (_pc.CheckStop())
-            {
-                _pc.StopImmediate();
-                _pc.StopPassenger();
-                _pc.AdvanceRouteAndWait();
-                return;
-            }
-
-            _pc.AdvanceRoute();
-            _isDecelerating = false;
-            _pc.RefreshSegmentSpeed();
-            _pc.ContinueWithNewSegmentSpeed();
-        }
-
         if (!_isDecelerating && _pc.CheckStop())
         {
             Vector3 target = _pc.Route.CurrentPoint;
@@ -48,7 +32,22 @@ public class MovingState : IPlatformState
             }
         }
 
-        _pc.MoveStep();
+        // Move first: the frame that reaches the point lands exactly on it and the passenger gets that last delta.
+        if (!_pc.MoveStep(out float leftover)) return;
+
+        if (_pc.CheckStop())
+        {
+            _pc.StopImmediate();
+            _pc.StopPassenger();
+            _pc.AdvanceRouteAndWait();
+            return;
+        }
+
+        _pc.AdvanceRoute();
+        _isDecelerating = false;
+        _pc.RefreshSegmentSpeed();
+        _pc.ContinueWithNewSegmentSpeed();
+        _pc.MoveDistance(leftover);
     }
 
     public void Exit() { }

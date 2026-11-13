@@ -16,19 +16,17 @@ public class ReturningState : IPlatformState
 
     public void Tick(float d)
     {
-        if (_pc.ReachedTarget())
-        {
-            if (_pc.Route.AtStart())
-            {
-                _pc.StopPassenger();
-                _fsm.ToInactive();
-                return;
-            }
+        if (!_pc.MoveStep(out float leftover)) return;
 
-            _pc.Route.Advance();
+        if (_pc.Route.AtStart())
+        {
+            _pc.StopPassenger();
+            _fsm.ToInactive();
+            return;
         }
 
-        _pc.MoveStep();
+        _pc.Route.Advance();
+        _pc.MoveDistance(leftover);
     }
 
     public void Exit() { }

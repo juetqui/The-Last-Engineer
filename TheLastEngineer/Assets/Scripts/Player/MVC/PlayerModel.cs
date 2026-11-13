@@ -18,7 +18,6 @@ public class PlayerModel
 
     private Vector3 _cinematicMovementDirection = Vector3.zero;
     private bool _isInCinematicMode = false;
-    private bool onVerticalPlatform = false;
 
     #region Teleport Variables
     private float _teleportDuration = 0.25f;
@@ -27,7 +26,8 @@ public class PlayerModel
     private bool _isTeleporting = false;
     #endregion
 
-    private Vector3 _velocity = default, _platformDisplacement = Vector3.zero, _cameraForward = Vector3.zero;
+    private Vector3 _velocity = default, _cameraForward = Vector3.zero;
+    private readonly PassengerDisplacement _platformDisplacement = new PassengerDisplacement();
 
     public bool IsDashing { get { return _isDashing; } }
     public bool CanDash { get { return _canDash; } }
@@ -75,7 +75,12 @@ public class PlayerModel
     }
     private Vector3 MovePlayer(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight)
     {
-        if (_isDashing) return Vector3.zero;
+        if (_isDashing)
+        {
+            // The dash isn't carried by platforms (as before); drop it so it isn't applied in one lump afterwards.
+            _platformDisplacement.Consume();
+            return Vector3.zero;
+        }
 
         if (_isInCinematicMode)
             moveDir = _cinematicMovementDirection;
@@ -102,10 +107,14 @@ public class PlayerModel
 
         var horizontal = GetHorizontalMovement(moveDir);
         var vertical = HandleVerticalMovement();
-        var totalMovement = horizontal + vertical + _platformDisplacement;
+        // The platform's displacement goes in its own Move, before the player's: isGrounded only reflects a
+        // Move whose net vertical component goes down, so a single combined Move on a rising platform
+        // would report "not grounded" every frame and gravity would make the player bob.
+        var platformDisplacement = _platformDisplacement.Consume();
+        if (platformDisplacement != Vector3.zero)
+            _cc.Move(platformDisplacement);
 
-        _cc.Move(totalMovement);
-        _platformDisplacement = Vector3.zero;
+        _cc.Move(horizontal + vertical);
     
         return actualDirection; // Return the actual movement direction for animation
     }
@@ -145,7 +154,7 @@ public class PlayerModel
 
     private Vector3 HandleVerticalMovement()
     {
-        if (!_isDashing && _useGravity && !onVerticalPlatform)
+        if (!_isDashing && _useGravity)
         {
             if (_cc.isGrounded) _velocity.y = -1f;
             else _velocity.y += _gravity * Time.deltaTime;
@@ -162,7 +171,7 @@ public class PlayerModel
 
     public void OnPlatformMoving(Vector3 displacementPerFrame)
     {
-        _platformDisplacement = displacementPerFrame;
+        _platformDisplacement.Add(displacementPerFrame);
     }
 
     public bool CanDashWithCoyoteTime()

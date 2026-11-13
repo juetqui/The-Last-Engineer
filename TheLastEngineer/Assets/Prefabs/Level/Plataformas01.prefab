@@ -89,6 +89,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &563482479956064823
 MonoBehaviour:
@@ -195,6 +196,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &1767709033066094601
 MonoBehaviour:
@@ -301,6 +303,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4800936901509776368
 MonoBehaviour:
@@ -407,6 +410,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4788623049751651436
 MonoBehaviour:
@@ -513,6 +517,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4753639331683426760
 MonoBehaviour:
@@ -619,6 +624,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &3807129009127200196
 MonoBehaviour:
@@ -647,10 +653,11 @@ GameObject:
   - component: {fileID: 7553246663687364677}
   - component: {fileID: 8995443345205824582}
   - component: {fileID: 5648629566238063894}
-  - component: {fileID: 3368943900579612999}
-  - component: {fileID: 4953269273088069958}
   - component: {fileID: 8142806102212680788}
   - component: {fileID: 1534302066135191939}
+  - component: {fileID: 8780038493131800803}
+  - component: {fileID: 4953269273088069958}
+  - component: {fileID: 3368943900579612999}
   m_Layer: 0
   m_Name: Plataforma
   m_TagString: Untagged
@@ -732,45 +739,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3368943900579612999
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3377067172309594714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab2f02db47f0fe54faaa017a6ce72162, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _connection: {fileID: 0}
-  _enabledColor: {r: 0, g: 1.2146597, b: 2.9960785, a: 1}
-  _disabledColor: {r: 0, g: 0, b: 0, a: 0}
-  _lerpTime: 1
---- !u!114 &4953269273088069958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3377067172309594714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6689ebcc1ca873f48958fcb7a88b9bd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _moveSpeed: 20
-  _accelTime: 1
-  _decelTime: 1
-  _waitCD: 1
-  _accelEase: 15
-  _decelEase: 14
-  _connection: {fileID: 0}
-  _positions2: []
-  isStopped: 0
-  isReversed: 0
 --- !u!65 &8142806102212680788
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -813,6 +783,72 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 8.154171, y: 4.1872673, z: 8.447693}
   m_Center: {x: -0.08097267, y: 1.6322532, z: 0.007949829}
+--- !u!54 &8780038493131800803
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3377067172309594714}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &4953269273088069958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3377067172309594714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6689ebcc1ca873f48958fcb7a88b9bd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _moveTime: 2
+  _accelTime: 1
+  _decelTime: 1
+  _waitCD: 1
+  _accelEase: 15
+  _decelEase: 14
+  _connection: {fileID: 0}
+  _positions2: []
+  isStopped: 0
+  isReversed: 0
+  isVertical: 0
+--- !u!114 &3368943900579612999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3377067172309594714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab2f02db47f0fe54faaa017a6ce72162, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _connection: {fileID: 0}
+  _enabledColor: {r: 0, g: 1.2146597, b: 2.9960785, a: 1}
+  _disabledColor: {r: 0, g: 0, b: 0, a: 0}
+  _lerpTime: 1
 --- !u!1 &3944586942211842373
 GameObject:
   m_ObjectHideFlags: 0
@@ -902,6 +938,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7541303612801905088
 MonoBehaviour:
@@ -1008,6 +1045,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &307641468573989061
 MonoBehaviour:
@@ -1114,6 +1152,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4396901896051874773
 MonoBehaviour:
@@ -1220,6 +1259,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &6430310122405007981
 MonoBehaviour:
@@ -1326,6 +1366,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &8522984968630029946
 MonoBehaviour:
@@ -1432,6 +1473,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &2728792609869124613
 MonoBehaviour:
@@ -1586,6 +1628,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &2412788403497230904
 MonoBehaviour:
@@ -1692,6 +1735,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &9044189165513421552
 MonoBehaviour:
@@ -1798,6 +1842,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7392852395545257976
 MonoBehaviour:
@@ -1904,6 +1949,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &956192251492119132
 MonoBehaviour:
@@ -2010,6 +2056,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &4513267933510268805
 MonoBehaviour:
@@ -2116,6 +2163,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &5700659870812898687
 MonoBehaviour:
@@ -2222,6 +2270,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7853238731506112797
 MonoBehaviour:
@@ -2328,6 +2377,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7697502816250381890
 MonoBehaviour:

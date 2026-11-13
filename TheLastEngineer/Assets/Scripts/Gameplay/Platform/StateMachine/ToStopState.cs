@@ -17,17 +17,13 @@ public class ToStopState : IPlatformState
 
     public void Tick(float d)
     {
-        if (_pc.ReachedTarget())
-        {
-            _pc.StopImmediate();
-            _pc.StopPassenger();
-            _fsm.ToInactive();
-            _pc.Route.Advance();
-            _pc.isStopped = true;
-            return;
-        }
+        if (!_pc.MoveStep(out _)) return;
 
-        _pc.MoveStep();
+        _pc.StopImmediate();
+        _pc.StopPassenger();
+        _fsm.ToInactive();
+        _pc.Route.Advance();
+        _pc.isStopped = true;
     }
 
     public void Exit()

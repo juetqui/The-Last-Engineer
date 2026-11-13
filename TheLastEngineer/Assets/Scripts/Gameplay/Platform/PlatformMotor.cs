@@ -2,35 +2,40 @@ using UnityEngine;
 
 public class PlatformMotor
 {
+    private readonly Rigidbody _body;
     private readonly Transform _transform;
-    private readonly float _baseThreshold;
 
-    public PlatformMotor(Transform transform, IMovablePassenger passenger, float threshold = 0.15f)
+    public PlatformMotor(Rigidbody body, Transform transform)
     {
+        _body = body;
         _transform = transform;
-        _baseThreshold = threshold;
     }
 
-    public bool InTarget(Vector3 target, float speed = 0f)
+    /// <summary>Advances one frame toward <paramref name="target"/>. Returns true when it landed exactly on it.</summary>
+    public bool Step(Vector3 target, float speed, IMovablePassenger passenger, out float leftover)
     {
-        float dynamicThreshold = Mathf.Max(_baseThreshold, speed * Time.deltaTime * 1.1f);
-        return Vector3.Distance(_transform.position, target) <= dynamicThreshold;
+        float distance = Vector3.Distance(_transform.position, target);
+        return Travel(target, PlatformStep.StepDistance(speed, Time.deltaTime, distance), passenger, out leftover);
     }
 
-    public void MoveTowards(Vector3 target, float speed, IMovablePassenger passenger = null)
+    /// <summary>Moves up to <paramref name="distance"/> toward <paramref name="target"/> and carries the passenger along.</summary>
+    public bool Travel(Vector3 target, float distance, IMovablePassenger passenger, out float leftover)
     {
-        Vector3 toTarget = target - _transform.position;
-        float distance = toTarget.magnitude;
-        float step = speed * Time.deltaTime;
+        PlatformStepResult result = PlatformStep.Advance(_transform.position, target, distance);
+        leftover = result.Leftover;
 
-        if (step > distance)
-            step = distance;
+        if (result.Delta != Vector3.zero)
+        {
+            // Runs in Update before the player (ExecutionOrder.Platform) on purpose: Rigidbody.position moves
+            // the kinematic body in the physics scene right away, so this frame's CharacterController.Move
+            // collides with the floor where it is drawn. FixedUpdate + interpolation would leave the physics
+            // pose up to a step ahead of the visual one and make the player jitter on vertical platforms.
+            _body.position = result.Position;
+            _transform.position = result.Position;
+            passenger?.OnPlatformMoving(result.Delta);
+        }
 
-        Vector3 move = toTarget.normalized * step;
-        _transform.position += move;
-
-        if (passenger != null)
-            passenger?.OnPlatformMoving(move);
+        return result.Arrived;
     }
 
     public void Stop(IMovablePassenger passenger)

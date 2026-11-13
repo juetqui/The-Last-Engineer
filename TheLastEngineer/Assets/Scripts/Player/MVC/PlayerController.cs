@@ -116,7 +116,6 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
     }
     public void SetVerticalPlatform(bool bul)
     {
-        print(bul);
         _model.SetVerticalPlatform(bul);
     }
     private void Start()

@@ -10,6 +10,7 @@ public class StationsStops
     public bool IsStation;
 }
 
+[DefaultExecutionOrder(ExecutionOrder.Platform)]
 public class PlatformController : MonoBehaviour
 {
     [Header("Configuraci�n")]
@@ -61,7 +62,7 @@ public class PlatformController : MonoBehaviour
         }
         
         Route = new RouteManager(myDictionary.Keys.ToArray(),this);
-        Motor = new PlatformMotor(transform, null);
+        Motor = new PlatformMotor(KinematicBody.Ensure(gameObject), transform);
         CurrentSpeed = 0f;
 
         if (_connection != null)
@@ -79,6 +80,7 @@ public class PlatformController : MonoBehaviour
     private void OnDestroy()
     {
         _tween.Stop();
+        ReleasePassenger();
 
         if (_connection != null)
             _connection.OnNodeConnected -= OnConnectionChanged;
@@ -146,14 +148,9 @@ public class PlatformController : MonoBehaviour
 
     public void StopPassenger()
     {
-        if (_passenger != null) return;
+        if (_passenger == null) return;
 
-        Motor.Stop(_passenger);
-    }
-
-    public bool ReachedTarget()
-    {
-        return Motor.InTarget(CurrentTarget, CurrentSpeed);
+        Motor.Stop(ActivePassenger);
     }
 
     public bool CheckStop()
@@ -161,10 +158,20 @@ public class PlatformController : MonoBehaviour
         return myDictionary[CurrentTarget];
     }
 
-    public void MoveStep()
+    /// <summary>Moves one frame toward the current target. True when it landed exactly on it.</summary>
+    public bool MoveStep(out float leftover)
     {
-        Motor.MoveTowards(CurrentTarget, CurrentSpeed, _passenger);
+        return Motor.Step(CurrentTarget, CurrentSpeed, ActivePassenger, out leftover);
     }
+
+    /// <summary>Spends the distance left over after reaching a waypoint on the next segment, so the speed doesn't dip.</summary>
+    public void MoveDistance(float distance)
+    {
+        Motor.Travel(CurrentTarget, distance, ActivePassenger, out _);
+    }
+
+    // The passenger is always the player; a destroyed player must not be called through the interface.
+    private IMovablePassenger ActivePassenger => _player == null ? null : _passenger;
 
     public void CancelSpeedTween()
     {
@@ -219,11 +226,20 @@ public class PlatformController : MonoBehaviour
     }
     #endregion
 
-    private void CleanPlayerReferences()
+    // Releases the rider for every way of getting off: leaving the trigger, dying on the platform, or the
+    // platform being destroyed. Restores gravity a vertical platform switched off.
+    private void ReleasePassenger()
     {
-        if (_player == null) return;
-        
-        _player.OnDied -= CleanPlayerReferences;
+        if (_player != null)
+        {
+            _player.OnPlatformMoving(Vector3.zero);
+
+            if (isVertical)
+                _player.SetVerticalPlatform(false);
+
+            _player.OnDied -= ReleasePassenger;
+        }
+
         _player = null;
         _passenger = null;
     }
@@ -234,30 +250,27 @@ public class PlatformController : MonoBehaviour
         {
             if (passenger is not PlayerController player || player.IsDead)
             {
-                CleanPlayerReferences();
+                ReleasePassenger();
                 return;
             }
 
+            // A second collider of the same player (or of this platform's compound) must not subscribe twice.
+            if (player == _player) return;
+
+            ReleasePassenger();
             _passenger = passenger;
             _player = player;
             if (isVertical)
             {
                 _player.SetVerticalPlatform(true);
             }
-            _player.OnDied += CleanPlayerReferences;
+            _player.OnDied += ReleasePassenger;
         }
     }
 
     private void OnTriggerExit(Collider coll)
     {
         if (coll.TryGetComponent(out IMovablePassenger passenger) && _passenger == passenger)
-        {
-            _passenger.OnPlatformMoving(Vector3.zero);
-            if(_player)
-            {
-                _player.SetVerticalPlatform(false);
-            }
-            _passenger = null;
-        }
+            ReleasePassenger();
     }
 }
