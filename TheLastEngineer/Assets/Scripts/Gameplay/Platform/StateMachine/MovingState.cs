@@ -12,6 +12,7 @@ public class MovingState : IPlatformState
         _isDecelerating = false;
         _pc.RefreshSegmentSpeed();
         _pc.StartAccelerationToMax();
+        _pc.NotifyMoving(true);
     }
 
     public void Tick(float d)

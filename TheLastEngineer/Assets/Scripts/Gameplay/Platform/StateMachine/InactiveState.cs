@@ -7,6 +7,8 @@ public class InactiveState : IPlatformState
     public void Enter()
     {
         _pc.StopPassenger();
+        _pc.NotifyMoving(false);
+        _pc.NotifyInactive();
     }
 
     public void Tick(float d) { }

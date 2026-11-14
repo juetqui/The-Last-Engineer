@@ -38,6 +38,18 @@ public class PlatformController : MonoBehaviour
     public bool isReversed;
     public bool isVertical;
 
+    /// <summary>A connection with the required level powered the platform on (also on scene load, for connections that start plugged).</summary>
+    public event System.Action PoweredOn;
+
+    /// <summary>The platform came to rest unpowered: it entered the Inactive state (after ToStop, or straight from Waiting).</summary>
+    public event System.Action BecameInactive;
+
+    /// <summary>The player got on (true) or off (false): trigger exit, death on the platform, or the platform being destroyed.</summary>
+    public event System.Action<bool> PassengerChanged;
+
+    /// <summary>The platform started travelling (Moving; stays true while decelerating in ToStop) or came to rest (Waiting/Inactive).</summary>
+    public event System.Action<bool> MovingChanged;
+
     public float CurrentSpeed { get; private set; }
     public float SegmentSpeed { get; private set; }
     public float MoveTime => _moveTime;
@@ -116,6 +128,8 @@ public class PlatformController : MonoBehaviour
                 _fsm.ToWaiting();
             else
                 _fsm.ToMoving();
+
+            PoweredOn?.Invoke();
         }
         else if(!(_fsm.Current==_fsm.Waiting)&& !(_fsm.Current == _fsm.Inactive))
             _fsm.ToStop();
@@ -139,6 +153,16 @@ public class PlatformController : MonoBehaviour
             _fsm.ToWaiting();
 
         AdvanceRoute();
+    }
+
+    public void NotifyInactive()
+    {
+        BecameInactive?.Invoke();
+    }
+
+    public void NotifyMoving(bool isMoving)
+    {
+        MovingChanged?.Invoke(isMoving);
     }
 
     public void BeginWait()
@@ -230,6 +254,9 @@ public class PlatformController : MonoBehaviour
     // platform being destroyed. Restores gravity a vertical platform switched off.
     private void ReleasePassenger()
     {
+        // C# null check on the interface: a destroyed player still counts as a rider to release.
+        bool hadPassenger = _passenger != null;
+
         if (_player != null)
         {
             _player.OnPlatformMoving(Vector3.zero);
@@ -242,6 +269,9 @@ public class PlatformController : MonoBehaviour
 
         _player = null;
         _passenger = null;
+
+        if (hadPassenger)
+            PassengerChanged?.Invoke(false);
     }
 
     private void OnTriggerEnter(Collider coll)
@@ -265,6 +295,7 @@ public class PlatformController : MonoBehaviour
                 _player.SetVerticalPlatform(true);
             }
             _player.OnDied += ReleasePassenger;
+            PassengerChanged?.Invoke(true);
         }
     }
 

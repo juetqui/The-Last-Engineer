@@ -17,6 +17,7 @@ public class WaitingState : IPlatformState
     {
         _pc.BeginWait();
         _pc.StopPassenger();
+        _pc.NotifyMoving(false);
         _timer = 0f;
     }
 
