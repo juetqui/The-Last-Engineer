@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Builds a physics rope between two points on Awake: a chain of capsule segments linked by
 /// ConfigurableJoints (position locked, rotation free), all tuned from <see cref="RopeSettings"/>.
+/// Each segment is an instance of the settings' segment prefab (the visual) with the physics added on top.
 /// Each end hooks to the first Rigidbody on its Transform or parents (e.g. a FloatingPlatform corner);
 /// with none, that end is pinned to the world. Keep this object unscaled: segments are its children.
 /// </summary>
@@ -23,6 +24,10 @@ public class Rope : MonoBehaviour
     private readonly List<Rigidbody> _segments = new List<Rigidbody>();
     private readonly List<CapsuleCollider> _colliders = new List<CapsuleCollider>();
     private readonly List<float> _halfLengths = new List<float>();
+    private readonly List<Joint> _strippedJoints = new List<Joint>();
+    private readonly List<Rigidbody> _strippedBodies = new List<Rigidbody>();
+    private readonly List<Collider> _strippedColliders = new List<Collider>();
+    private bool _warnedAboutPrefabPhysics;
     private Vector3[] _gizmoPoints;
 
     /// <summary>Rope points from start to end: segment joints plus both ends. 0 before it is built.</summary>
@@ -91,12 +96,12 @@ public class Rope : MonoBehaviour
         for (int i = 0; i < points.Length - 1; i++)
         {
             Rigidbody segment = CreateSegment(i, points[i], points[i + 1]);
-            AddJoint(segment, previous, Vector3.up * _halfLengths[i], previous == startBody);
+            AddJoint(segment, previous, Vector3.up * LocalHalfLength(i), previous == startBody);
             previous = segment;
         }
 
         int lastIndex = _segments.Count - 1;
-        AddJoint(_segments[lastIndex], endBody, Vector3.down * _halfLengths[lastIndex], true);
+        AddJoint(_segments[lastIndex], endBody, Vector3.down * LocalHalfLength(lastIndex), true);
 
         IgnoreSelfCollisions();
         IgnoreCollidersAtEnd(_colliders[0], points[0]);
@@ -119,14 +124,18 @@ public class Rope : MonoBehaviour
         Vector3 axis = top - bottom;
         float length = axis.magnitude;
 
-        var segmentObject = new GameObject(SegmentNamePrefix + index) { layer = gameObject.layer };
-        segmentObject.transform.SetParent(transform, false);
-        segmentObject.transform.SetPositionAndRotation((top + bottom) * 0.5f, Quaternion.FromToRotation(Vector3.up, axis));
+        GameObject segmentObject = InstantiateSegmentObject(index);
+        Transform segmentTransform = segmentObject.transform;
+        Quaternion twist = Quaternion.AngleAxis(_settings.LinkTwist * index, Vector3.up);
+        segmentTransform.SetPositionAndRotation((top + bottom) * 0.5f, Quaternion.FromToRotation(Vector3.up, axis) * twist);
+        StretchToSegment(segmentTransform, length);
 
+        // Collider sizes are local: undo the segment's scale so the physics keep the settings' meters.
+        Vector3 scale = segmentTransform.lossyScale;
         var capsule = segmentObject.AddComponent<CapsuleCollider>();
         capsule.direction = 1;
-        capsule.radius = _settings.Radius;
-        capsule.height = length;
+        capsule.radius = _settings.Radius / Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z), Mathf.Epsilon);
+        capsule.height = length / Mathf.Max(Mathf.Abs(scale.y), Mathf.Epsilon);
 
         var body = segmentObject.AddComponent<Rigidbody>();
         body.mass = _settings.SegmentMass;
@@ -142,6 +151,50 @@ public class Rope : MonoBehaviour
         _halfLengths.Add(length * 0.5f);
         return body;
     }
+
+    // The segment prefab is the visual; with none the segment is an empty object (draw it with RopeLine).
+    private GameObject InstantiateSegmentObject(int index)
+    {
+        GameObject prefab = _settings.LinkPrefab;
+        GameObject segmentObject = prefab != null ? Instantiate(prefab, transform, false) : new GameObject();
+        segmentObject.name = SegmentNamePrefix + index;
+        segmentObject.layer = gameObject.layer;
+
+        if (prefab != null) StripPhysics(segmentObject);
+        return segmentObject;
+    }
+
+    private void StretchToSegment(Transform segmentTransform, float length)
+    {
+        GameObject prefab = _settings.LinkPrefab;
+        if (prefab == null || !_settings.StretchLinkToSegment) return;
+
+        Vector3 scale = prefab.transform.localScale;
+        scale.y *= length / _settings.LinkLength;
+        segmentTransform.localScale = scale;
+    }
+
+    // The rope adds its own Rigidbody, collider and joints; any the prefab brings would fight them.
+    private void StripPhysics(GameObject segmentObject)
+    {
+        segmentObject.GetComponentsInChildren(true, _strippedJoints);
+        segmentObject.GetComponentsInChildren(true, _strippedBodies);
+        segmentObject.GetComponentsInChildren(true, _strippedColliders);
+        if (_strippedJoints.Count == 0 && _strippedBodies.Count == 0 && _strippedColliders.Count == 0) return;
+
+        if (!_warnedAboutPrefabPhysics)
+        {
+            _warnedAboutPrefabPhysics = true;
+            Debug.LogWarning($"[Rope] Segment prefab of '{name}' has Joints/Rigidbodies/Colliders; removed from the segments. Remove them from the prefab.", this);
+        }
+
+        foreach (Joint joint in _strippedJoints) DestroyImmediate(joint);
+        foreach (Rigidbody body in _strippedBodies) DestroyImmediate(body);
+        foreach (Collider collider in _strippedColliders) DestroyImmediate(collider);
+    }
+
+    private float LocalHalfLength(int index) =>
+        _halfLengths[index] / Mathf.Max(Mathf.Abs(_segments[index].transform.lossyScale.y), Mathf.Epsilon);
 
     private void AddJoint(Rigidbody segment, Rigidbody connected, Vector3 localAnchor, bool isEnd)
     {

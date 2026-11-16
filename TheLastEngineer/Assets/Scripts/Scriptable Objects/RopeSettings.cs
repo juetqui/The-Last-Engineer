@@ -41,8 +41,8 @@ public class RopeSettings : ScriptableObject
     [Tooltip("Connected Mass Scale on the joints to each end's Rigidbody. A 120 kg platform on a 1.5 kg segment jitters; below 1 the joint sees the end as lighter.")]
     [SerializeField, Range(0.01f, 1f)] private float _endConnectedMassScale = 0.1f;
 
-    [Header("Links (RopeLinks visual)")]
-    [Tooltip("Mesh repeated once per segment, modelled along its local Y and centred on its pivot. Colliders and Rigidbodies on it are stripped.")]
+    [Header("Segment prefab (visual)")]
+    [Tooltip("Instantiated as every segment; the rope adds Rigidbody, CapsuleCollider and joints to it. Visual only: model along local Y, centred on the root pivot; its root rotation is replaced. Empty = invisible segments (use RopeLine).")]
     [SerializeField] private GameObject _linkPrefab;
 
     [Tooltip("Length of the prefab along its local Y at scale 1 (m). Used to stretch it to each segment.")]
