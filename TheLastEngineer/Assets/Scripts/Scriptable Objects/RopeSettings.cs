@@ -38,6 +38,9 @@ public class RopeSettings : ScriptableObject
     [SerializeField, Range(1, 64)] private int _solverVelocityIterations = 4;
 
     [Header("Ends")]
+    [Tooltip("Pin the start to its world position at Awake, ignoring any Rigidbody on it or its parents: the rope tenses instead of dragging the anchor. Off = hook to that Rigidbody (e.g. a kinematic one you move).")]
+    [SerializeField] private bool _pinStartToWorld = true;
+
     [Tooltip("Connected Mass Scale on the joints to each end's Rigidbody. A 120 kg platform on a 1.5 kg segment jitters; below 1 the joint sees the end as lighter.")]
     [SerializeField, Range(0.01f, 1f)] private float _endConnectedMassScale = 0.1f;
 
@@ -70,4 +73,5 @@ public class RopeSettings : ScriptableObject
     public int SolverIterations => _solverIterations;
     public int SolverVelocityIterations => _solverVelocityIterations;
     public float EndConnectedMassScale => _endConnectedMassScale;
+    public bool PinStartToWorld => _pinStartToWorld;
 }

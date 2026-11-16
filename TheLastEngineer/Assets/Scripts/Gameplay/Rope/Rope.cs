@@ -1,17 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Builds a physics rope between two points on Awake: a chain of capsule segments linked by
 /// ConfigurableJoints (position locked, rotation free), all tuned from <see cref="RopeSettings"/>.
 /// Each segment is an instance of the settings' segment prefab (the visual) with the physics added on top.
 /// Each end hooks to the first Rigidbody on its Transform or parents (e.g. a FloatingPlatform corner);
-/// with none, that end is pinned to the world. Keep this object unscaled: segments are its children.
+/// with none, that end is pinned to the world. The start can be pinned to the world regardless (settings).
+/// Segments live in their own root object, so the rope may sit anywhere, even under a moving platform.
 /// </summary>
 [DisallowMultipleComponent]
 public class Rope : MonoBehaviour
 {
     private const string SegmentNamePrefix = "RopeSegment_";
+    private const string SegmentRootSuffix = "_Segments";
 
     [SerializeField] private RopeSettings _settings;
 
@@ -28,6 +31,7 @@ public class Rope : MonoBehaviour
     private readonly List<Rigidbody> _strippedBodies = new List<Rigidbody>();
     private readonly List<Collider> _strippedColliders = new List<Collider>();
     private bool _warnedAboutPrefabPhysics;
+    private Transform _segmentRoot;
     private Vector3[] _gizmoPoints;
 
     /// <summary>Rope points from start to end: segment joints plus both ends. 0 before it is built.</summary>
@@ -66,6 +70,21 @@ public class Rope : MonoBehaviour
         Build();
     }
 
+    private void OnDestroy()
+    {
+        if (_segmentRoot != null) Destroy(_segmentRoot.gameObject);
+    }
+
+    // Under a moving parent (e.g. the platform) the hierarchy would drag every dynamic segment along
+    // with it, fighting the joints; an unscaled root object in the same scene keeps them independent.
+    private void CreateSegmentRoot()
+    {
+        var root = new GameObject(name + SegmentRootSuffix);
+        SceneManager.MoveGameObjectToScene(root, gameObject.scene);
+        root.layer = gameObject.layer;
+        _segmentRoot = root.transform;
+    }
+
     private bool IsValid()
     {
         if (_settings == null || _start == null || _end == null)
@@ -80,16 +99,27 @@ public class Rope : MonoBehaviour
             return false;
         }
 
-        if (transform.lossyScale != Vector3.one)
-            Debug.LogWarning($"[Rope] '{name}' is scaled {transform.lossyScale}; segments are its children and will be distorted. Keep it at scale 1.", this);
+        if (_settings.PinStartToWorld && HasDynamicBodyAbove(_start))
+            Debug.LogWarning($"[Rope] '{name}' start '{_start.name}' is under a non-kinematic Rigidbody: the rope stays pinned but that object will move away from it. Move it out of that hierarchy.", this);
 
         return true;
     }
 
+    private static bool HasDynamicBodyAbove(Transform point)
+    {
+        for (Transform current = point; current != null; current = current.parent)
+        {
+            if (current.TryGetComponent(out Rigidbody body) && !body.isKinematic) return true;
+        }
+
+        return false;
+    }
+
     private void Build()
     {
+        CreateSegmentRoot();
         Vector3[] points = ComputeLayout(_start.position, _end.position);
-        Rigidbody startBody = _start.GetComponentInParent<Rigidbody>();
+        Rigidbody startBody = _settings.PinStartToWorld ? null : _start.GetComponentInParent<Rigidbody>();
         Rigidbody endBody = _end.GetComponentInParent<Rigidbody>();
 
         Rigidbody previous = startBody;
@@ -156,7 +186,8 @@ public class Rope : MonoBehaviour
     private GameObject InstantiateSegmentObject(int index)
     {
         GameObject prefab = _settings.LinkPrefab;
-        GameObject segmentObject = prefab != null ? Instantiate(prefab, transform, false) : new GameObject();
+        GameObject segmentObject = prefab != null ? Instantiate(prefab, _segmentRoot, false) : new GameObject();
+        segmentObject.transform.SetParent(_segmentRoot, false);
         segmentObject.name = SegmentNamePrefix + index;
         segmentObject.layer = gameObject.layer;
 
