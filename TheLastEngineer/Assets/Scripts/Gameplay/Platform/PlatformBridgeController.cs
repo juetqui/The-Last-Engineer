@@ -15,6 +15,6 @@ public class PlatformBridgeController : MonoBehaviour
     private void OnNodeConnected(GlitchState state, bool connected)
     {
         if (connected) _animator.SetTrigger("Set");
-        else _animator.SetTrigger("UnSet");
+        else _animator.SetTrigger("Unset");
     }
 }
