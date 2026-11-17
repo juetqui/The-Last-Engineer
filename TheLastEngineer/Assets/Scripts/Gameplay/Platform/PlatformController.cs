@@ -23,9 +23,11 @@ public class PlatformController : MonoBehaviour
     [SerializeField] private Connection _connection = default;
     [SerializeField] private StationsStops[] _positions2;
 
-    private bool[] _stationList;
-    private Transform[] _positions;
     public Dictionary<Vector3, bool> myDictionary;
+    // Route points without duplicate positions, in route order (aligned with Route's indices).
+    private StationsStops[] _stops;
+    private bool[] _isStation;
+    private Transform _targetStation;
     private IMovablePassenger _passenger;
     private IPlatformState _state;
     private PlatformStateMachine _fsm;
@@ -50,6 +52,15 @@ public class PlatformController : MonoBehaviour
     /// <summary>The platform started travelling (Moving; stays true while decelerating in ToStop) or came to rest (Waiting/Inactive).</summary>
     public event System.Action<bool> MovingChanged;
 
+    /// <summary>The connection stopped powering the platform (unplugged or wrong level). It may still be travelling to its target.</summary>
+    public event System.Action PoweredOff;
+
+    /// <summary>The platform arrived at a station and stopped there while powered.</summary>
+    public event System.Action<Transform> StationReached;
+
+    /// <summary>The station the platform is heading to changed (always raised after arriving at a station). Null when the route has none.</summary>
+    public event System.Action<Transform> TargetStationChanged;
+
     public float CurrentSpeed { get; private set; }
     public float SegmentSpeed { get; private set; }
     public float MoveTime => _moveTime;
@@ -63,17 +74,38 @@ public class PlatformController : MonoBehaviour
     public RouteManager Route { get; private set; }
     public Vector3 CurrentTarget => Route.CurrentPoint;
 
+    /// <summary>The route as serialized in the Inspector (available before Awake).</summary>
+    public IReadOnlyList<StationsStops> Stops => _positions2;
+
+    /// <summary>The station the platform is heading to, or null when the route has none.</summary>
+    public Transform TargetStation => _targetStation;
+
     private void Awake()
     {
         myDictionary = new Dictionary<Vector3, bool>();
-        
+        var uniqueStops = new List<StationsStops>(_positions2.Length);
+
         for(int i = 0; i < _positions2.Length; i++)
         {
-            if (!myDictionary.ContainsKey(_positions2[i].Position.position))
-                myDictionary.Add(_positions2[i].Position.position, _positions2[i].IsStation);
+            StationsStops stop = _positions2[i];
+
+            if (stop == null || stop.Position == null)
+            {
+                Debug.LogWarning($"{nameof(PlatformController)} on '{name}' has an empty route point at {i}; skipping it.", this);
+                continue;
+            }
+
+            if (myDictionary.ContainsKey(stop.Position.position)) continue;
+
+            myDictionary.Add(stop.Position.position, stop.IsStation);
+            uniqueStops.Add(stop);
         }
-        
+
+        _stops = uniqueStops.ToArray();
+        _isStation = _stops.Select(s => s.IsStation).ToArray();
+
         Route = new RouteManager(myDictionary.Keys.ToArray(),this);
+        _targetStation = StopAt(Route.NextStation(_isStation));
         Motor = new PlatformMotor(KinematicBody.Ensure(gameObject), transform);
         CurrentSpeed = 0f;
 
@@ -131,28 +163,48 @@ public class PlatformController : MonoBehaviour
 
             PoweredOn?.Invoke();
         }
-        else if(!(_fsm.Current==_fsm.Waiting)&& !(_fsm.Current == _fsm.Inactive))
-            _fsm.ToStop();
         else
         {
-            _fsm.ToInactive();
+            if(!(_fsm.Current==_fsm.Waiting)&& !(_fsm.Current == _fsm.Inactive))
+                _fsm.ToStop();
+            else
+                _fsm.ToInactive();
+
+            PoweredOff?.Invoke();
         }
         //_fsm.ToReturning();
     }
 
+    private Transform StopAt(int index)
+    {
+        return index >= 0 && index < _stops.Length ? _stops[index].Position : null;
+    }
+
     /* -------------------- API interna usada por los estados -------------------- */
     #region
-    public void AdvanceRoute()
+    /// <param name="notifyTarget">Raise <see cref="TargetStationChanged"/> even if the target is the same station (heading back to it).</param>
+    public void AdvanceRoute(bool notifyTarget = false)
     {
         Route.Advance();
+
+        Transform target = StopAt(Route.NextStation(_isStation));
+        if (target == _targetStation && !notifyTarget) return;
+
+        _targetStation = target;
+        TargetStationChanged?.Invoke(target);
     }
 
     public void AdvanceRouteAndWait()
     {
-        if (Route.HasToWait(myDictionary[CurrentTarget]))
+        bool isStation = myDictionary[CurrentTarget];
+
+        if (isStation)
+            StationReached?.Invoke(StopAt(Route.CurrentIndex));
+
+        if (Route.HasToWait(isStation))
             _fsm.ToWaiting();
 
-        AdvanceRoute();
+        AdvanceRoute(notifyTarget: isStation);
     }
 
     public void NotifyInactive()

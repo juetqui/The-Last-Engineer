@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 6467079599853010161}
   - component: {fileID: 7486464046638676671}
   - component: {fileID: 1103315714858887328}
+  - component: {fileID: 1890321166552956192}
   m_Layer: 0
   m_Name: Point Light (1)
   m_TagString: Untagged
@@ -135,7 +136,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 20
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -172,7 +173,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -218,6 +219,24 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &1890321166552956192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339758184640187852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  _minRange: 20
+  _maxRange: 30
+  _cycleDuration: 2
+  _durationVariation: 0.1
+  _easeType: 4
+  _useUnscaledTime: 0
 --- !u!1 &1691832327660825006
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,6 +430,7 @@ GameObject:
   - component: {fileID: 2647832015559361343}
   - component: {fileID: 2378618836455423142}
   - component: {fileID: 7025123612962684127}
+  - component: {fileID: 1050706666087674584}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -444,7 +464,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 20
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -481,7 +501,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -527,6 +547,24 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &1050706666087674584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3750848162414108338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  _minRange: 20
+  _maxRange: 30
+  _cycleDuration: 2
+  _durationVariation: 0.1
+  _easeType: 4
+  _useUnscaledTime: 0
 --- !u!1 &3836072985214797221
 GameObject:
   m_ObjectHideFlags: 0
@@ -536,6 +574,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1007842834055722149}
+  - component: {fileID: 5387977565777941518}
   m_Layer: 0
   m_Name: GrupoReceptores
   m_TagString: Untagged
@@ -562,6 +601,24 @@ Transform:
   - {fileID: 949281957851725442}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5387977565777941518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836072985214797221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d262a1a595edfac7a3fe41f40a96a26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RouteStationLight
+  _blinkColor: {r: 2.943396, g: 0.49888065, b: 0.20825912, a: 1}
+  _blinkHalfCycle: 0.5
+  _blinkEase: 4
+  _onColor: {r: 1, g: 1, b: 1, a: 1}
+  _switchDuration: 0.5
+  _switchEase: 3
 --- !u!1 &7011362451825908901
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,6 +630,7 @@ GameObject:
   - component: {fileID: 8355360529487689031}
   - component: {fileID: 126114358709388734}
   - component: {fileID: 2122459067771086690}
+  - component: {fileID: 1122786642739834671}
   m_Layer: 0
   m_Name: Point Light (3)
   m_TagString: Untagged
@@ -606,7 +664,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 20
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -643,7 +701,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -689,6 +747,24 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &1122786642739834671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7011362451825908901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  _minRange: 20
+  _maxRange: 30
+  _cycleDuration: 2
+  _durationVariation: 0.1
+  _easeType: 4
+  _useUnscaledTime: 0
 --- !u!1 &7275031134449380093
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,6 +867,7 @@ GameObject:
   - component: {fileID: 8914073035264325487}
   - component: {fileID: 4347732607964631009}
   - component: {fileID: 6830672995829813855}
+  - component: {fileID: 4870609499666487184}
   m_Layer: 0
   m_Name: Point Light (2)
   m_TagString: Untagged
@@ -824,7 +901,7 @@ Light:
   serializedVersion: 12
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 20
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -861,7 +938,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -907,3 +984,21 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &4870609499666487184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8027217390441761970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  _minRange: 20
+  _maxRange: 30
+  _cycleDuration: 2
+  _durationVariation: 0.1
+  _easeType: 4
+  _useUnscaledTime: 0

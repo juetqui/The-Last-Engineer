@@ -20,29 +20,21 @@ public class RouteManager
     public int TravelDir => _dir;
 
 
+    public int CurrentIndex => _index;
+
     public void Advance()
     {
-        if (!IsValid || _points.Length == 1) return;
+        if (!IsValid) return;
 
-        int last = _points.Length - 1;
+        RouteStep.Advance(_points.Length, _pc.isReversed, ref _index, ref _dir);
+    }
 
-        if ((_index + _dir > last || _index + _dir < 0))
-        {
-            if (!_pc.isReversed)
-            {
-                _dir *= -1;
-                _index += _dir;
-            }
-            else
-            {
-                last = 0;
-                _index = 0;
-            }
-        }
-        else
-        {
-            _index += _dir;
-        }
+    /// <summary>Index of the station the platform is heading to, or <see cref="RouteStep.NoStation"/>.</summary>
+    public int NextStation(bool[] isStation)
+    {
+        if (!IsValid) return RouteStep.NoStation;
+
+        return RouteStep.NextStation(isStation, _index, _dir, _pc.isReversed);
     }
 
     public void ForceReverse()

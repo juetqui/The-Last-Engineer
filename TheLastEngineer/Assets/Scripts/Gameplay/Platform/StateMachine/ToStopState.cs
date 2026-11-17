@@ -22,7 +22,7 @@ public class ToStopState : IPlatformState
         _pc.StopImmediate();
         _pc.StopPassenger();
         _fsm.ToInactive();
-        _pc.Route.Advance();
+        _pc.AdvanceRoute();
         _pc.isStopped = true;
     }
 
