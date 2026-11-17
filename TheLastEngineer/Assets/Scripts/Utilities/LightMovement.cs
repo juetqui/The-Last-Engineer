@@ -26,7 +26,15 @@ public class LightMovement : MonoBehaviour
     public float MaxRange => _maxRange;
     public Ease EaseType => _easeType;
 
-    private void OnValidate()
+    private const int InfiniteCycles = -1;
+
+    /// <summary>Subclasses return false to give every instance the same cycle (no offset, no duration variation).</summary>
+    protected virtual bool UseDesync => true;
+
+    /// <summary>Subclasses return false to keep the light still at its min range instead of oscillating.</summary>
+    protected virtual bool ShouldAnimate => true;
+
+    protected virtual void OnValidate()
     {
         _maxRange = Mathf.Max(_minRange, _maxRange);
         _cycleDuration = Mathf.Max(0.01f, _cycleDuration);
@@ -41,7 +49,7 @@ public class LightMovement : MonoBehaviour
         _light = GetComponent<Light>();
     }
 
-    void OnEnable()
+    protected virtual void OnEnable()
     {
         InitializeCycle();
     }
@@ -59,15 +67,53 @@ public class LightMovement : MonoBehaviour
     /// </summary>
     public void InitializeCycle()
     {
-        var rng = new System.Random(GetStableSeed());
+        float duration = _cycleDuration;
+        _timeOffset = 0f;
 
-        float variation = (float)(rng.NextDouble() * 2d - 1d) * _durationVariation;
-        float duration = Mathf.Max(0.01f, _cycleDuration + variation);
+        if (UseDesync)
+        {
+            var rng = new System.Random(GetStableSeed());
+
+            float variation = (float)(rng.NextDouble() * 2d - 1d) * _durationVariation;
+            duration = Mathf.Max(0.01f, _cycleDuration + variation);
+            _timeOffset = (float)rng.NextDouble() * duration;
+        }
 
         _halfDuration = duration * 0.5f;
-        _timeOffset = (float)rng.NextDouble() * duration;
 
         RestartTween();
+    }
+
+    /// <summary>
+    /// Oscillates again. A cycle still finishing towards min (<see cref="FinishCycleAtMin"/>) just goes back
+    /// to looping from where it is, without a jump. A light already resting at min restarts at its cycle
+    /// offset, so with desync on it can jump from min to that point.
+    /// </summary>
+    protected void ResumeOscillation()
+    {
+        if (_tween.isAlive)
+            _tween.SetRemainingCycles(InfiniteCycles);
+        else
+            RestartTween();
+    }
+
+    /// <summary>
+    /// Lets the current cycle run until the range reaches min and stops there. With no oscillation running,
+    /// the range is set to min right away.
+    /// </summary>
+    protected void FinishCycleAtMin()
+    {
+        if (!CanDriveLight()) return;
+
+        if (_tween.isAlive)
+        {
+            // In Yoyo the tween's start value is _minRange: stop the next time it gets there.
+            _tween.SetRemainingCycles(stopAtEndValue: false);
+            return;
+        }
+
+        CaptureOriginalRange();
+        _light.range = _minRange;
     }
 
     /// <summary>
@@ -76,19 +122,9 @@ public class LightMovement : MonoBehaviour
     /// </summary>
     private void RestartTween()
     {
-        // PrimeTween no corre en edit mode: ahi la oscilacion la dibuja la preview del LightMovementEditor.
-        if (!Application.isPlaying || !isActiveAndEnabled) return;
+        if (!ShouldAnimate || !CanDriveLight()) return;
 
-        if (_light == null)
-            _light = GetComponent<Light>();
-
-        if (_light == null) return;
-
-        if (!_hasOriginalRange)
-        {
-            _originalRange = _light.range;
-            _hasOriginalRange = true;
-        }
+        CaptureOriginalRange();
 
         _tween.Stop();
         _tween = Tween.LightRange(_light, _minRange, _maxRange, _halfDuration, _easeType,
@@ -96,6 +132,25 @@ public class LightMovement : MonoBehaviour
 
         // Arranca cada luz en un punto distinto del ciclo (el offset puede caer en cualquiera de las dos mitades).
         _tween.elapsedTimeTotal = _timeOffset;
+    }
+
+    // PrimeTween no corre en edit mode: ahi la oscilacion la dibuja la preview del LightMovementEditor.
+    private bool CanDriveLight()
+    {
+        if (!Application.isPlaying || !isActiveAndEnabled) return false;
+
+        if (_light == null)
+            _light = GetComponent<Light>();
+
+        return _light != null;
+    }
+
+    private void CaptureOriginalRange()
+    {
+        if (_hasOriginalRange) return;
+
+        _originalRange = _light.range;
+        _hasOriginalRange = true;
     }
 
     private void RestoreOriginalRange()

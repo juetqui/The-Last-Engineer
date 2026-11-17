@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 6467079599853010161}
   - component: {fileID: 7486464046638676671}
   - component: {fileID: 1103315714858887328}
-  - component: {fileID: 1890321166552956192}
+  - component: {fileID: 2232164807612215793}
   m_Layer: 0
   m_Name: Point Light (1)
   m_TagString: Untagged
@@ -137,7 +137,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 20
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -219,7 +219,7 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &1890321166552956192
+--- !u!114 &2232164807612215793
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -228,15 +228,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1339758184640187852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1d960d6157efe994cbe617fe435aaec8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  m_EditorClassIdentifier: Assembly-CSharp::StationLightMovement
   _minRange: 20
   _maxRange: 30
-  _cycleDuration: 2
+  _cycleDuration: 5
   _durationVariation: 0.1
   _easeType: 4
   _useUnscaledTime: 0
+  _desync: 0
+  _animate: 0
 --- !u!1 &1691832327660825006
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,7 +432,7 @@ GameObject:
   - component: {fileID: 2647832015559361343}
   - component: {fileID: 2378618836455423142}
   - component: {fileID: 7025123612962684127}
-  - component: {fileID: 1050706666087674584}
+  - component: {fileID: 5304898940668273083}
   m_Layer: 0
   m_Name: Point Light
   m_TagString: Untagged
@@ -465,7 +467,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 20
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -547,7 +549,7 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &1050706666087674584
+--- !u!114 &5304898940668273083
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -556,15 +558,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3750848162414108338}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1d960d6157efe994cbe617fe435aaec8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  m_EditorClassIdentifier: Assembly-CSharp::StationLightMovement
   _minRange: 20
   _maxRange: 30
-  _cycleDuration: 2
+  _cycleDuration: 5
   _durationVariation: 0.1
   _easeType: 4
   _useUnscaledTime: 0
+  _desync: 0
+  _animate: 0
 --- !u!1 &3836072985214797221
 GameObject:
   m_ObjectHideFlags: 0
@@ -630,7 +634,7 @@ GameObject:
   - component: {fileID: 8355360529487689031}
   - component: {fileID: 126114358709388734}
   - component: {fileID: 2122459067771086690}
-  - component: {fileID: 1122786642739834671}
+  - component: {fileID: 5566477741716766563}
   m_Layer: 0
   m_Name: Point Light (3)
   m_TagString: Untagged
@@ -665,7 +669,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 20
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -747,7 +751,7 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &1122786642739834671
+--- !u!114 &5566477741716766563
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -756,15 +760,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 7011362451825908901}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1d960d6157efe994cbe617fe435aaec8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  m_EditorClassIdentifier: Assembly-CSharp::StationLightMovement
   _minRange: 20
   _maxRange: 30
-  _cycleDuration: 2
+  _cycleDuration: 5
   _durationVariation: 0.1
   _easeType: 4
   _useUnscaledTime: 0
+  _desync: 0
+  _animate: 0
 --- !u!1 &7275031134449380093
 GameObject:
   m_ObjectHideFlags: 0
@@ -867,7 +873,7 @@ GameObject:
   - component: {fileID: 8914073035264325487}
   - component: {fileID: 4347732607964631009}
   - component: {fileID: 6830672995829813855}
-  - component: {fileID: 4870609499666487184}
+  - component: {fileID: 6534829890225946365}
   m_Layer: 0
   m_Name: Point Light (2)
   m_TagString: Untagged
@@ -902,7 +908,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 20
-  m_Range: 10
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 0.5, y: 0.5}
@@ -984,7 +990,7 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!114 &4870609499666487184
+--- !u!114 &6534829890225946365
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -993,12 +999,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 8027217390441761970}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2008f67ad8c00dc4f90f12bfb00c8f4d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1d960d6157efe994cbe617fe435aaec8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LightMovement
+  m_EditorClassIdentifier: Assembly-CSharp::StationLightMovement
   _minRange: 20
   _maxRange: 30
-  _cycleDuration: 2
+  _cycleDuration: 5
   _durationVariation: 0.1
   _easeType: 4
   _useUnscaledTime: 0
+  _desync: 0
+  _animate: 0

@@ -28,7 +28,7 @@ public class RouteStationLight : MonoBehaviour
 
     private Material[] _materials = System.Array.Empty<Material>();
     private Light[] _lights = System.Array.Empty<Light>();
-    private LightMovement[] _movements = System.Array.Empty<LightMovement>();
+    private StationLightMovement[] _movements = System.Array.Empty<StationLightMovement>();
     private Color _current = Color.black;
     private Tween _tween;
 
@@ -39,7 +39,7 @@ public class RouteStationLight : MonoBehaviour
         int movementCount = 0;
         var materials = new Material[transform.childCount];
         var lights = new Light[transform.childCount];
-        var movements = new LightMovement[transform.childCount];
+        var movements = new StationLightMovement[transform.childCount];
 
         foreach (Transform child in transform)
         {
@@ -57,8 +57,10 @@ public class RouteStationLight : MonoBehaviour
 
             lights[lightCount++] = childLight;
 
-            if (childLight.TryGetComponent(out LightMovement movement))
+            if (childLight.TryGetComponent(out StationLightMovement movement))
                 movements[movementCount++] = movement;
+            else if (childLight.TryGetComponent(out LightMovement _))
+                Debug.LogWarning($"{nameof(RouteStationLight)} on '{name}': light '{childLight.name}' uses {nameof(LightMovement)}; swap it for {nameof(StationLightMovement)} so it can be switched on and off.", this);
         }
 
         System.Array.Resize(ref materials, count);
@@ -124,13 +126,13 @@ public class RouteStationLight : MonoBehaviour
         _tween = Tween.Custom(this, _current, target, _switchDuration, (light, c) => light.Apply(c), _switchEase);
     }
 
-    // LightMovement restores the light's original range when disabled.
+    // Stopping lets each light finish its current cycle and rest at its min range.
     private void SetMoving(bool moving)
     {
-        foreach (LightMovement movement in _movements)
+        foreach (StationLightMovement movement in _movements)
         {
             if (movement != null)
-                movement.enabled = moving;
+                movement.Animate = moving;
         }
     }
 

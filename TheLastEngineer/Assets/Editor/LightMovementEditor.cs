@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 /// Permite ver la oscilacion de range de LightMovement en el Scene View sin entrar a Play.
 /// La preview corre solo mientras esta prendida y siempre restaura el range original al detenerse.
 /// </summary>
-[CustomEditor(typeof(LightMovement))]
+[CustomEditor(typeof(LightMovement), editorForChildClasses: true)]
 [CanEditMultipleObjects]
 public class LightMovementEditor : UnityEditor.Editor
 {
