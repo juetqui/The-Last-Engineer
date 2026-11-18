@@ -37485,6 +37485,64 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8529926795586809336, guid: 53bd9b1e950f46748bb6fc3fdb07a92e, type: 3}
   m_PrefabInstance: {fileID: 675609346}
   m_PrefabAsset: {fileID: 0}
+--- !u!21 &675876571
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_ParedConnectionActive (Instance)
+  m_Shader: {fileID: -6465566751694194690, guid: c4c31b1a0f7cf8e48917d7d18f0a67fe, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3001
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BlackContorno: 0
+    - _Black_contorno_Arriba: 0
+    - _IsCorrupted: 0
+    - _QueueControl: 1
+    - _QueueOffset: 0
+    - _SliderFill: 1
+    - _Test: 0
+    - _brigth: 80
+    m_Colors:
+    - _Balck_Contorno: {r: 0.35, g: 1, b: 0, a: 0}
+    - _Black_contorno_arriba: {r: -0.02, g: 1, b: 0, a: 0}
+    - _Color: {r: 0.32805258, g: 2.743746, b: 3.6603773, a: 1}
+    - _ColorCorrupted: {r: 2.4150944, g: 0.53542185, b: 1.8943741, a: 1}
+    - _ColorCorrupted_1: {r: 0.27244508, g: 0, b: 0.509434, a: 1}
+    - _ColorDefault: {r: 0.30768666, g: 1.665537, b: 1.8365052, a: 1}
+    - _ColorDefault_1: {r: 0, g: 0.15638885, b: 0.5882353, a: 1}
+    - _ColorTube: {r: 0.5444999, g: 0.7169812, b: 0.6756782, a: 1}
+    - _Color_1: {r: 0.0032929946, g: 0.23752883, b: 0.6981132, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1001 &677298888
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -76085,6 +76143,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Wall_Connection (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6541010078576690243, guid: fc6f057a221c43a4c8058be59558c9fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 675876571}
     - target: {fileID: 7399522104628882926, guid: fc6f057a221c43a4c8058be59558c9fc, type: 3}
       propertyPath: _tubes.Array.size
       value: 7
@@ -92300,7 +92362,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7592607135571999840, guid: bed58d42581a0944c9e38f25072e78cb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 326
+      value: 200.5
       objectReference: {fileID: 0}
     - target: {fileID: 7592607135571999840, guid: bed58d42581a0944c9e38f25072e78cb, type: 3}
       propertyPath: m_LocalRotation.w
