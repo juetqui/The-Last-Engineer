@@ -29,8 +29,14 @@ public class PlayerModel
     private Vector3 _velocity = default, _cameraForward = Vector3.zero;
     private readonly PassengerDisplacement _platformDisplacement = new PassengerDisplacement();
 
+    private readonly AnimationCurve _moveSpeedByTilt;
+    private readonly float _minMoveSpeedFraction;
+    private float _speedFraction = 0f;
+
     public bool IsDashing { get { return _isDashing; } }
     public bool CanDash { get { return _canDash; } }
+    /// <summary>Fraction (0..1) of the max move speed applied this frame; drives the walk/run blend.</summary>
+    public float SpeedFraction => _speedFraction;
 
     public Action<float> OnDashCDStarted = delegate { };
 
@@ -49,6 +55,8 @@ public class PlayerModel
         _dashDuration = playerData.dashDuration;
         _dashCD = playerData.dashCD;
         _coyoteTime = playerData.coyoteTime;
+        _moveSpeedByTilt = playerData.MoveSpeedByTilt;
+        _minMoveSpeedFraction = playerData.MinMoveSpeedFraction;
     }
 
     public Vector3 OnUpdate(Vector3 moveDir, Vector3 cameraForward, Vector3 cameraRight, float moveSpeed)
@@ -79,11 +87,15 @@ public class PlayerModel
         {
             // The dash isn't carried by platforms (as before); drop it so it isn't applied in one lump afterwards.
             _platformDisplacement.Consume();
+            _speedFraction = 0f;
             return Vector3.zero;
         }
 
         if (_isInCinematicMode)
             moveDir = _cinematicMovementDirection;
+
+        // Read the stick tilt before the direction is normalized; the cinematic direction is already unit length.
+        _speedFraction = AnalogMoveSpeed.Evaluate(moveDir.magnitude, _moveSpeedByTilt, _minMoveSpeedFraction);
 
         var actualDirection = Vector3.zero;
 
@@ -149,7 +161,7 @@ public class PlayerModel
 
     private Vector3 GetHorizontalMovement(Vector3 moveDir)
     {
-        return moveDir.normalized * _moveSpeed * Time.deltaTime;
+        return moveDir.normalized * (_moveSpeed * _speedFraction * Time.deltaTime);
     }
 
     private Vector3 HandleVerticalMovement()

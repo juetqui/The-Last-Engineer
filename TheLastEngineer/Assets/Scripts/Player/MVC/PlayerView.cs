@@ -16,6 +16,10 @@ public class PlayerView
 
     private Color _defaultOutline = new Color(0, 0, 0, 0);
 
+    private static readonly int MoveBlendParam = Animator.StringToHash("Blend");
+    private readonly float _moveAnimBlendDampTime;
+    private float _moveBlend = 0f;
+
     public Action OnDashViewPlayed = delegate { };
 
     public PlayerView(GameObject playerObj, Renderer renderer, ParticleSystem walkPS, ParticleSystem orbitPS, Animator animator, AudioSource walkSource, AudioSource fxSource, PlayerData playerData, ParticleSystem defaultPS, ParticleSystem corruptedPS, ParticleSystem teleportPS)
@@ -37,6 +41,7 @@ public class PlayerView
         _putDownClip = playerData.putDownClip;
         _deathClip = playerData.deathClip;
         _fallClip = playerData.fallClip;
+        _moveAnimBlendDampTime = playerData.MoveAnimBlendDampTime;
         _defaultPS = defaultPS;
         _corruptedPS = corruptedPS;
         _teleportPS = teleportPS;
@@ -57,8 +62,11 @@ public class PlayerView
             _corruptionMats[i] = corruptionMat;
     }
 
-    public void Walk(Vector3 moveVector)
+    /// <param name="speedFraction">0..1 of the max move speed; maps onto the Idle/Walk/Run blend tree.</param>
+    public void Walk(Vector3 moveVector, float speedFraction)
     {
+        _moveBlend = MoveBlendDamper.Step(_moveBlend, speedFraction, _moveAnimBlendDampTime, Time.deltaTime);
+        _animator.SetFloat(MoveBlendParam, _moveBlend);
 
         if (moveVector.magnitude > 0f)
         {

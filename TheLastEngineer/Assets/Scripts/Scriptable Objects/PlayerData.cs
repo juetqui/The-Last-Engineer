@@ -19,6 +19,20 @@ public class PlayerData : ScriptableObject
     [Tooltip("Layers que el CharacterController y el CapsuleCollider excluyen mientras el jugador lleva un nodo en Intangible.")]
     public LayerMask intangibleExcludeLayers = default;
 
+    [Header("Analog Movement")]
+    [Tooltip("Inclinación del stick (0..1) → fracción de la velocidad máxima. El teclado siempre entra con 1.")]
+    [SerializeField] private AnimationCurve _moveSpeedByTilt = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+
+    [Tooltip("Fracción mínima de la velocidad apenas el stick sale de la zona muerta.")]
+    [SerializeField, Range(0f, 1f)] private float _minMoveSpeedFraction = 0.3f;
+
+    [Tooltip("Suavizado (segundos) del parámetro Blend del Animator (Idle 0 / Walk 0.5 / Run 1).")]
+    [SerializeField, Min(0f)] private float _moveAnimBlendDampTime = 0.1f;
+
+    public AnimationCurve MoveSpeedByTilt => _moveSpeedByTilt;
+    public float MinMoveSpeedFraction => _minMoveSpeedFraction;
+    public float MoveAnimBlendDampTime => _moveAnimBlendDampTime;
+
     [Header("Interaction")]
     public float interactionRadius = 2.5f;
 

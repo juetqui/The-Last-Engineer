@@ -155,7 +155,7 @@ public class PlayerController : MonoBehaviour, IMovablePassenger, ILaserReceptor
         _followController.GetCameraBasis(out var camForward, out var camRight);
         var actualMovement = _model.OnUpdate(mv3, camForward, camRight, _currentSpeed);
 
-        View.Walk(actualMovement);
+        View.Walk(actualMovement, _model.SpeedFraction);
         StateMachine.Tick();
         _intangibility.Tick();
 

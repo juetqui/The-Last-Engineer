@@ -34,7 +34,32 @@ MonoBehaviour:
   intangibleExcludeLayers:
     serializedVersion: 2
     m_Bits: 1048576
-  intangibleMat: {fileID: 2100000, guid: 54000a144e3f8f84ba369fa0a6439258, type: 2}
+  _moveSpeedByTilt:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _minMoveSpeedFraction: 0.1
+  _moveAnimBlendDampTime: 0.1
   interactionRadius: 7
   losCheckInterval: 0
   losDebounceTime: 0.08
@@ -44,9 +69,7 @@ MonoBehaviour:
   dashDuration: 0.3
   dashCD: 0.5
   holdInteractionTime: 0
-  transferHoldDelay: 0.3
   transferInitialRumble: {x: 0.35, y: 0.5}
-  transferHoldRumble: {x: 0.6, y: 1}
   transferErrorRumble: {x: 0, y: 0.8}
   transferErrorRumbleDuration: 0.08
   lowRumbleFrequency: 0.25
