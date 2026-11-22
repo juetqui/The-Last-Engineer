@@ -12,6 +12,9 @@ public class PlatformStationLights : MonoBehaviour
 
     private readonly Dictionary<Transform, RouteStationLight> _lights = new Dictionary<Transform, RouteStationLight>();
     private RouteStationLight _target;
+    // The station the platform is resting at, until it starts moving again.
+    private RouteStationLight _restingAt;
+    private bool _moving;
     private bool _powered;
     private bool _subscribed;
 
@@ -47,6 +50,7 @@ public class PlatformStationLights : MonoBehaviour
         _platform.BecameInactive += HandleBecameInactive;
         _platform.StationReached += HandleStationReached;
         _platform.TargetStationChanged += HandleTargetStationChanged;
+        _platform.MovingChanged += HandleMovingChanged;
         _subscribed = true;
     }
 
@@ -59,6 +63,7 @@ public class PlatformStationLights : MonoBehaviour
             _platform.BecameInactive -= HandleBecameInactive;
             _platform.StationReached -= HandleStationReached;
             _platform.TargetStationChanged -= HandleTargetStationChanged;
+            _platform.MovingChanged -= HandleMovingChanged;
         }
         _subscribed = false;
     }
@@ -73,6 +78,13 @@ public class PlatformStationLights : MonoBehaviour
             if (stationLight == _target) stationLight.StartBlinking();
             else stationLight.TurnOn();
         }
+
+        // Powered on while resting at a station (scene start, or after coming to rest unpowered).
+        if (!_moving && _restingAt == null)
+            _restingAt = StationUnderPlatform();
+
+        if (_restingAt != null && _restingAt != _target)
+            _restingAt.Arrived();
     }
 
     private void HandlePoweredOff()
@@ -91,6 +103,7 @@ public class PlatformStationLights : MonoBehaviour
     {
         _powered = false;
         _target = null;
+        _restingAt = null;
 
         foreach (RouteStationLight stationLight in _lights.Values)
             stationLight.TurnOff();
@@ -100,9 +113,21 @@ public class PlatformStationLights : MonoBehaviour
     {
         if (!_powered) return;
 
-        RouteStationLight stationLight = LightAt(station);
-        if (stationLight != null)
-            stationLight.TurnOn();
+        _restingAt = LightAt(station);
+        if (_restingAt != null)
+            _restingAt.Arrived();
+    }
+
+    private void HandleMovingChanged(bool moving)
+    {
+        _moving = moving;
+        if (!moving) return;
+
+        // Leaving for the same station it rests at (a route heading back to it) keeps its scanner shown.
+        if (_restingAt != null && _restingAt != _target)
+            _restingAt.Departed();
+
+        _restingAt = null;
     }
 
     private void HandleTargetStationChanged(Transform station)
@@ -113,6 +138,22 @@ public class PlatformStationLights : MonoBehaviour
         _target = LightAt(station);
         if (_target != null)
             _target.StartBlinking();
+    }
+
+    // At rest the motor leaves the platform exactly on its route point, so a tiny tolerance is enough.
+    private const float RestingTolerance = 0.01f;
+
+    private RouteStationLight StationUnderPlatform()
+    {
+        Vector3 position = _platform.transform.position;
+
+        foreach (KeyValuePair<Transform, RouteStationLight> pair in _lights)
+        {
+            if (pair.Key != null && (pair.Key.position - position).sqrMagnitude <= RestingTolerance * RestingTolerance)
+                return pair.Value;
+        }
+
+        return null;
     }
 
     private RouteStationLight LightAt(Transform station)
