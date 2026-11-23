@@ -13,8 +13,10 @@ public class ConnectionPositiveFeedback : MonoBehaviour
 
     private void Awake()
     {
-        _positivePS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
+        if (_connection == null) _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += playPS;
+        
+        _positivePS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
     }
 
     private void OnDestroy()

@@ -10,8 +10,10 @@ public class ConnectionNegativeFeedback : MonoBehaviour
     // Awake y no Start: el evento del nodo pre-asignado sale de Connection.Start.
     private void Awake()
     {
-        _errorPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
+        if (_connection == null) _connection = GetComponentInParent<Connection>();
         _connection.OnNodeConnected += playPS;
+        
+        _errorPS = new List<ParticleSystem>(GetComponentsInChildren<ParticleSystem>());
     }
 
     private void OnDestroy()
