@@ -11,8 +11,9 @@ using UnityEngine.Rendering.Universal;
 /// En los niveles con verticalidad casi siempre hay un piso semitransparente (FloorDitherManager)
 /// entre la camara y el jugador, y ese dither es opaco con alpha clip: escribe depth en los pixeles
 /// que sobreviven. Por eso no alcanza con un ZTest Greater contra el depth de camara (saldria un
-/// outline punteado) y se arma un depth propio filtrado por Rendering Layers:
-///   1. Occluder Depth: depth-only de los opacos, sin el jugador ni los pisos dithered.
+/// outline punteado) y se arma un depth propio:
+///   1. Occluder Depth: depth-only de los opacos, sin el jugador (Rendering Layer). Los pisos con
+///      dither se descartan enteros activando el global _FloorOccluderPass que lee FloorDither.hlsl.
 ///   2. Mask: el jugador (override material) a un R8G8: R = jugador, G = jugador tapado.
 ///   3. Composite: relleno en G y outline alrededor de G, solo fuera de la silueta.
 ///
@@ -38,9 +39,6 @@ public class PlayerXRayFeature : ScriptableRendererFeature
 
         [Tooltip("Rendering Layer que PlayerXRayTarget pone en el jugador.")]
         public RenderingLayerMask playerRenderingLayer;
-
-        [Tooltip("Rendering Layer que FloorDitherManager pone en los pisos con opacidad reducida.")]
-        public RenderingLayerMask ditheredRenderingLayer;
 
         [Tooltip("Dibujar tambien en la Scene view (util para ajustar el material).")]
         public bool includeSceneView = false;
@@ -94,13 +92,15 @@ public class PlayerXRayFeature : ScriptableRendererFeature
         private const string k_PassName = "XRay Occluder Depth";
 
         // Lo exponen tanto los shaders de URP escritos a mano como los de Shader Graph. Respeta el
-        // alpha clip de cada material: un piso a opacidad 0 no escribe nada aunque no este filtrado.
+        // alpha clip de cada material; con _FloorOccluderPass = 1 el Sub Graph FloorDither descarta
+        // entero todo piso que no este 100% visible, en vez de dejarlo punteado.
         private static readonly List<ShaderTagId> k_ShaderTagIds = new List<ShaderTagId>
         {
             new ShaderTagId("DepthOnly"),
         };
 
         private static readonly int k_OccluderDepthId = Shader.PropertyToID("_XRayOccluderDepth");
+        private static readonly int k_FloorOccluderPassId = Shader.PropertyToID("_FloorOccluderPass");
 
         private LayerMask _layerMask;
         private uint _renderingLayerMask;
@@ -120,7 +120,7 @@ public class PlayerXRayFeature : ScriptableRendererFeature
         {
             renderPassEvent = settings.occluderDepthEvent;
             _layerMask = settings.occluderLayerMask;
-            _renderingLayerMask = ~(settings.playerRenderingLayer.value | settings.ditheredRenderingLayer.value);
+            _renderingLayerMask = ~settings.playerRenderingLayer.value;
             _includeSceneView = settings.includeSceneView;
         }
 
@@ -166,11 +166,14 @@ public class PlayerXRayFeature : ScriptableRendererFeature
                 builder.UseRendererList(passData.rendererList);
 
                 builder.SetGlobalTextureAfterPass(depth, k_OccluderDepthId);
+                builder.AllowGlobalStateModification(true);
 
                 builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
                 {
                     context.cmd.ClearRenderTarget(RTClearFlags.Depth, Color.clear, 1f, 0);
+                    context.cmd.SetGlobalFloat(k_FloorOccluderPassId, 1f);
                     context.cmd.DrawRendererList(data.rendererList);
+                    context.cmd.SetGlobalFloat(k_FloorOccluderPassId, 0f);
                 });
             }
         }
