@@ -34,7 +34,8 @@ public class Intangible : MonoBehaviour, IGlitchSwapTarget
     [Header("Debug")]
     [SerializeField] private bool debug = false;
 
-    // Renderer slots: [0] glitch material (distortion) and [1] overlay shown while Intangible.
+    // Renderer slots: [0] glitch material (distortion; its _Alpha fades opposite to the overlay)
+    // and [1] overlay shown while Intangible.
     private const int GlitchMatIndex = 0;
     private const int OverlayMatIndex = 1;
     private const float OverlapSkin = 0.02f;
@@ -135,8 +136,8 @@ public class Intangible : MonoBehaviour, IGlitchSwapTarget
     }
 
     /// <summary>
-    /// Overlay (_Alpha) to 1 and distortion to 0 while phased; the opposite otherwise (distortion
-    /// back to its initial value). Interpolates from the current values so a mid-fade change doesn't jump.
+    /// Overlay (_Alpha) to 1, glitch _Alpha to 0 and distortion to 0 while phased; the opposite otherwise
+    /// (distortion back to its initial value). Interpolates from the current values so a mid-fade change doesn't jump.
     /// </summary>
     public void FadeVisual(bool phased)
     {
@@ -220,7 +221,10 @@ public class Intangible : MonoBehaviour, IGlitchSwapTarget
     private void SetVisual(float alpha, float distortion)
     {
         if (_overlayMat != null) _overlayMat.SetFloat(AlphaId, alpha);
-        if (_glitchMat != null && _glitchMat.HasProperty(DistortionId)) _glitchMat.SetFloat(DistortionId, distortion);
+        if (_glitchMat == null) return;
+        if (_glitchMat.HasProperty(DistortionId)) _glitchMat.SetFloat(DistortionId, distortion);
+        // The glitch fades opposite to the overlay, derived from the same value so both stay in sync.
+        if (_glitchMat.HasProperty(AlphaId)) _glitchMat.SetFloat(AlphaId, 1f - alpha);
     }
 
     private static void SetLayerRecursively(GameObject go, int layer)
