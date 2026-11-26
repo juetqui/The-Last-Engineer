@@ -34,7 +34,7 @@ public class LaserView : MonoBehaviour
         // renderer.material makes a per-instance copy: every laser tints only its own beam.
         _lineMaterial = _line.material;
 
-        _audio = GetComponent<AudioSource>();
+        _audio = TryGetComponent(out AudioSource source) ? source : null;
     }
 
     public void SetEmissionColor(Color color)
@@ -87,6 +87,7 @@ public class LaserView : MonoBehaviour
 
     public void PlayAudio()
     {
+        if (_audio == null) return;
         if (_audio.isPlaying) return;
 
         _audio.pitch = Random.Range(0.9f, 1.1f);
@@ -95,6 +96,7 @@ public class LaserView : MonoBehaviour
 
     public void StopAudio()
     {
+        if (_audio == null) return;
         if (_audio.isPlaying) _audio.Stop();
     }
 }
