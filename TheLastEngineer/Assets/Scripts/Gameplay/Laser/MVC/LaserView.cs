@@ -1,3 +1,4 @@
+using PrimeTween;
 using UnityEngine;
 
 public class LaserView : MonoBehaviour
@@ -12,11 +13,17 @@ public class LaserView : MonoBehaviour
     [SerializeField] private ParticleSystem _Smoke;
     [SerializeField] private TrailRenderer _trailRenderer;
     [SerializeField] private Vector3 _particleOffset;
+
+    // The sound fade targets are the same for every laser: they come from Resources/LaserData.asset.
+    private static LaserData Data => LaserData.Default;
+
+    private const float SoundOff = 0f;
     
     private LineRenderer _line;
     private Material _lineMaterial;
     private AudioSource _audio;
     private bool _trailEmitting;
+    private Sequence _soundTween;
 
     public void Init(float width)
     {
@@ -85,18 +92,54 @@ public class LaserView : MonoBehaviour
         if (!enable && _beamLaser.isPlaying) _beamLaser.Stop();
     }
 
-    public void PlayAudio()
+    // Tweens volume and pitch from their current values, so an interrupted fade reverses from where it
+    // is. The duration scales with the volume left to cover. Off stops the source once it reaches 0.
+    public void SetSound(bool on)
     {
         if (_audio == null) return;
-        if (_audio.isPlaying) return;
 
-        _audio.pitch = Random.Range(0.9f, 1.1f);
-        _audio.Play();
+        _soundTween.Stop();
+
+        var data = Data;
+        var targetVolume = on ? data.SoundMaxVolume : SoundOff;
+        var targetPitch = on ? Random.Range(data.SoundMinPitch, data.SoundMaxPitch) : SoundOff;
+
+        // Already silent and stopped: nothing to fade out.
+        if (!on && !_audio.isPlaying) return;
+
+        if (on && !_audio.isPlaying)
+        {
+            _audio.volume = SoundOff;
+            _audio.pitch = SoundOff;
+            _audio.Play();
+        }
+
+        var remaining = Mathf.Abs(targetVolume - _audio.volume);
+
+        if (data.SoundMaxVolume <= 0f || data.SoundEaseTime <= 0f || Mathf.Approximately(remaining, 0f))
+        {
+            _audio.volume = targetVolume;
+            _audio.pitch = targetPitch;
+            if (!on) StopSource();
+            return;
+        }
+
+        var duration = data.SoundEaseTime * Mathf.Clamp01(remaining / data.SoundMaxVolume);
+
+        _soundTween = Sequence.Create()
+            .Group(Tween.AudioVolume(_audio, targetVolume, duration, data.SoundEaseType))
+            .Group(Tween.AudioPitch(_audio, targetPitch, duration, data.SoundEaseType));
+
+        if (!on) _soundTween.OnComplete(this, view => view.StopSource());
     }
 
-    public void StopAudio()
+    private void StopSource()
     {
-        if (_audio == null) return;
-        if (_audio.isPlaying) _audio.Stop();
+        if (_audio != null && _audio.isPlaying) _audio.Stop();
+    }
+
+    private void OnDestroy()
+    {
+        _soundTween.Stop();
     }
 }

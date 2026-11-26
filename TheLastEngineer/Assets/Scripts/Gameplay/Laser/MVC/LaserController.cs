@@ -81,6 +81,9 @@ public class LaserController : MonoBehaviour
 
         _lightTarget = _isInitialized ? _lightMaxIntensity : LightOffIntensity;
         if (_light != null) _light.intensity = _lightTarget;
+
+        // A glitched laser already on the move stays silent until it reintegrates.
+        if (_isInitialized && !_isTransitioning) _view.SetSound(true);
     }
 
     private void OnDestroy()
@@ -114,6 +117,9 @@ public class LaserController : MonoBehaviour
 
     private void UpdateGlitchedBehaviour(IState newState)
     {
+        var wasIdle = _isIdle;
+        var wasTransitioning = _isTransitioning;
+
         (_isIdle, _isTransitioning) = newState switch
         {
             GlitchReintegratingState or GlitchIdleState => (true, false),
@@ -123,6 +129,11 @@ public class LaserController : MonoBehaviour
 
         _isToggling = false;
         _idleSetupDone = false;
+
+        // Sound follows the light: up when it reintegrates, down when it starts moving. Only on the
+        // edge, so Reintegrating -> Idle doesn't restart the fade (or pick a new pitch).
+        if (_isIdle && !wasIdle && _isInitialized) _view.SetSound(true);
+        else if (_isTransitioning && !wasTransitioning) _view.SetSound(false);
     }
 
     private void IdleBehaviour()
@@ -145,7 +156,6 @@ public class LaserController : MonoBehaviour
             _isToggling = false;
             _view.EnableBeam(false);
             _view.StopHitEffect();
-            _view.StopAudio();
             FinishPendingLightOff();
             return;
         }
@@ -198,7 +208,6 @@ public class LaserController : MonoBehaviour
         _isToggling = false;
         _view.EnableBeam(false);
         _view.StopHitEffect();
-        _view.StopAudio();
         _lightOffPending = false;
         TryTweenLight(LightOffIntensity);
     }
@@ -298,8 +307,6 @@ public class LaserController : MonoBehaviour
 
         // After ShowHitEffect, so the trail is already at the hit point when it is cleared and turned on.
         _view.SetTrailEmitting(didHit && lengthIsStable);
-
-        _view.PlayAudio();
     }
 
     // Every eased length change turns the trail off; CheckCommonBehaviour turns it back on once the
@@ -332,6 +339,9 @@ public class LaserController : MonoBehaviour
             return;
         }
 
+        // The sound rises together with the light, not after it.
+        _view.SetSound(true);
+
         if (TryTweenLight(_lightMaxIntensity))
             _lightTween.OnComplete(this, laser => laser.ActivateBeam());
         else
@@ -360,7 +370,7 @@ public class LaserController : MonoBehaviour
         _idleSetupDone = false;
         _model.ClearReceptor();
         StartLengthTransition(0f);
-        _view.StopAudio();
+        _view.SetSound(false);
 
         // Beam first, light after: the light waits for the retraction. With no beam out, it goes now.
         _lightOffPending = beamIsOut;
