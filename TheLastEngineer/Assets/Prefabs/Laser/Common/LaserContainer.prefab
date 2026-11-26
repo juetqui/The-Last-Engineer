@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6280850464221078893}
   - component: {fileID: 5544805203445010122}
   - component: {fileID: 8926922114964510303}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 2
-  m_Color: {r: 0.34117648, g: 0.86666673, b: 1, a: 1}
+  m_Color: {r: 0.41189036, g: 0.9811321, b: 0.9811321, a: 1}
   m_Intensity: 20
   m_Range: 31.999996
   m_SpotAngle: 68.05962
@@ -82,7 +82,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 65534
+    m_Bits: 4194047
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -231,7 +231,7 @@ GameObject:
   - component: {fileID: 2099061027224228018}
   - component: {fileID: 695977572901055074}
   - component: {fileID: 9201921563146836264}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Laser Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -271,6 +271,10 @@ MonoBehaviour:
   _startsInitialized: 1
   _debug: 0
   _gizmosColor: {r: 1, g: 0, b: 0, a: 1}
+  _light: {fileID: 6280850464221078893}
+  _lightEaseType: 4
+  _lightEaseTime: 0.5
+  _lightMaxIntensity: 20
 --- !u!114 &695977572901055074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -399,6 +403,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 9f93a384110f25e4d83c5bc6bb31f0ea, type: 2}
+    - target: {fileID: 2466722576648680841, guid: f6166f26d60d94d4193d7afb05f9a21b, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4981892080900944098, guid: f6166f26d60d94d4193d7afb05f9a21b, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -450,6 +458,14 @@ PrefabInstance:
     - target: {fileID: 6057702745406093739, guid: f6166f26d60d94d4193d7afb05f9a21b, type: 3}
       propertyPath: m_Name
       value: "Asset_Ca\xF1on"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6057702745406093739, guid: f6166f26d60d94d4193d7afb05f9a21b, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7991449729212553014, guid: f6166f26d60d94d4193d7afb05f9a21b, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -661,6 +677,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LaserBeam
       objectReference: {fileID: 0}
+    - target: {fileID: 3598781072741633053, guid: d7d95a28f594c8c4fac7dbaa068c25a5, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -724,9 +744,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1628687228183435152, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2660302298422186345, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5968165276550321381, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
       propertyPath: m_Name
       value: LaserHit
+      objectReference: {fileID: 0}
+    - target: {fileID: 5968165276550321381, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8998000598591952919, guid: 5bf9c409754a1f6428ebc1c89bbb8ac9, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

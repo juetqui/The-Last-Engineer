@@ -1,4 +1,4 @@
-using System;
+using PrimeTween;
 using UnityEngine;
 
 public class LaserController : MonoBehaviour
@@ -10,6 +10,21 @@ public class LaserController : MonoBehaviour
     [SerializeField] private bool _startsInitialized = true;
     [SerializeField] private bool _debug = false;
     [SerializeField] private Color _gizmosColor = Color.red;
+
+    // Turning on, the light comes up first and the beam follows; turning off, the beam retracts first
+    // and the light follows. Optional: without a Light the beam toggles right away.
+    [Header("Light")]
+    [SerializeField] private Light _light;
+    [SerializeField] private Ease _lightEaseType = Ease.InOutSine;
+    [SerializeField] private float _lightEaseTime = 0.5f;
+    [SerializeField] private float _lightMaxIntensity = 1f;
+
+    private const float LightOffIntensity = 0f;
+
+    private Tween _lightTween;
+    private float _lightTarget = LightOffIntensity;
+    // Set when the beam starts retracting: the light goes off once the retraction is over.
+    private bool _lightOffPending = false;
 
     private LaserModel _model;
     private LaserView _view;
@@ -63,10 +78,15 @@ public class LaserController : MonoBehaviour
         // GlitchComponent never raises its initial state: pull it here, then follow the changes.
         ApplyEmissionColor(EmitterState);
         if (_glitch != null) _glitch.OnGlitchStateChanged += ApplyEmissionColor;
+
+        _lightTarget = _isInitialized ? _lightMaxIntensity : LightOffIntensity;
+        if (_light != null) _light.intensity = _lightTarget;
     }
 
     private void OnDestroy()
     {
+        _lightTween.Stop();
+
         if (_glitcheable != null)
             _glitcheable.FSM.OnStateChanged -= UpdateGlitchedBehaviour;
 
@@ -109,7 +129,11 @@ public class LaserController : MonoBehaviour
     {
         if (!_isInitialized)
         {
-            if (!_isToggling) return;
+            if (!_isToggling)
+            {
+                FinishPendingLightOff();
+                return;
+            }
 
             _model.UpdateRaycastDistance();
             var origin = GetLaserOrigin();
@@ -122,27 +146,38 @@ public class LaserController : MonoBehaviour
             _view.EnableBeam(false);
             _view.StopHitEffect();
             _view.StopAudio();
+            FinishPendingLightOff();
             return;
         }
 
-        _view.EnableBeam(true);
-
         if (!_idleSetupDone)
         {
+            // Reintegrating: the light comes up first, the beam waits for it (and receptors with it).
+            if (!IsLightOn)
+            {
+                if (!IsLightRampingUp) TryTweenLight(_lightMaxIntensity);
+                return;
+            }
+
             var hit = CheckRaycast(out var origin, out var dir, out var didHit);
-            
+
             StartLengthTransition(didHit ? hit.distance : _maxDist);
             _isToggling = true;
             _idleSetupDone = true;
         }
 
+        _view.EnableBeam(true);
         CheckCommonBehaviour();
     }
 
     private void TransitioningBehaviour()
     {
-        if (!_isInitialized) return;
-        
+        if (!_isInitialized)
+        {
+            FinishPendingLightOff();
+            return;
+        }
+
         if (!_isToggling)
         {
             _isToggling = true;
@@ -164,6 +199,8 @@ public class LaserController : MonoBehaviour
         _view.EnableBeam(false);
         _view.StopHitEffect();
         _view.StopAudio();
+        _lightOffPending = false;
+        TryTweenLight(LightOffIntensity);
     }
 
     private RaycastHit CheckRaycast(out Vector3 origin, out Vector3 dir, out bool didHit)
@@ -229,6 +266,7 @@ public class LaserController : MonoBehaviour
         }
 
         _isToggling = false;
+        FinishPendingLightOff();
         _model.SetInstant(_isInitialized ? (didHit ? hit.distance : _maxDist) : 0f);
 
         if (!_isInitialized)
@@ -277,6 +315,31 @@ public class LaserController : MonoBehaviour
     {
         if (_startsInitialized) return;
 
+        StartLaser();
+    }
+
+    // Light up first, beam on completion. From any point of a turn-off: if the beam is still
+    // retracting the light is already on, so the beam comes back right away.
+    private void StartLaser()
+    {
+        _lightOffPending = false;
+
+        // A glitched laser on the move keeps its beam and light off: IdleBehaviour turns the light on
+        // when it reintegrates.
+        if (_isTransitioning)
+        {
+            ActivateBeam();
+            return;
+        }
+
+        if (TryTweenLight(_lightMaxIntensity))
+            _lightTween.OnComplete(this, laser => laser.ActivateBeam());
+        else
+            ActivateBeam();
+    }
+
+    private void ActivateBeam()
+    {
         _isInitialized = true;
         _isToggling = true;
 
@@ -289,12 +352,55 @@ public class LaserController : MonoBehaviour
     {
         if (_startsInitialized) return;
 
+        // The beam is out (or still retracting) unless the light was coming up for it.
+        var beamIsOut = (_isInitialized && !IsLightRampingUp) || _lightOffPending;
+
         _isInitialized = false;
         _isToggling = true;
         _idleSetupDone = false;
         _model.ClearReceptor();
         StartLengthTransition(0f);
         _view.StopAudio();
+
+        // Beam first, light after: the light waits for the retraction. With no beam out, it goes now.
+        _lightOffPending = beamIsOut;
+        if (!beamIsOut) TryTweenLight(LightOffIntensity);
+    }
+
+    private void FinishPendingLightOff()
+    {
+        if (!_lightOffPending) return;
+
+        _lightOffPending = false;
+        TryTweenLight(LightOffIntensity);
+    }
+
+    private bool IsLightOn => _light == null || Mathf.Approximately(_light.intensity, _lightMaxIntensity);
+
+    private bool IsLightRampingUp => _lightTween.isAlive && Mathf.Approximately(_lightTarget, _lightMaxIntensity);
+
+    // Tweens the light from its current intensity, so an interrupted ramp reverses from where it is.
+    // The duration scales with the distance left. Returns false when there is nothing to tween (no
+    // light, or already there): the caller continues right away.
+    private bool TryTweenLight(float target)
+    {
+        _lightTween.Stop();
+        _lightTarget = target;
+
+        if (_light == null) return false;
+
+        var range = Mathf.Abs(_lightMaxIntensity - LightOffIntensity);
+        var remaining = Mathf.Abs(target - _light.intensity);
+
+        if (range <= 0f || _lightEaseTime <= 0f || Mathf.Approximately(remaining, 0f))
+        {
+            _light.intensity = target;
+            return false;
+        }
+
+        var duration = _lightEaseTime * Mathf.Clamp01(remaining / range);
+        _lightTween = Tween.LightIntensity(_light, target, duration, _lightEaseType);
+        return true;
     }
 
     private Vector3 GetLaserOrigin()
