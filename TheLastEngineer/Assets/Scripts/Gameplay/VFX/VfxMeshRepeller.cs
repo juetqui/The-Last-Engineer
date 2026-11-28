@@ -7,7 +7,10 @@ using UnityEditor;
 /// <summary>
 /// Detects the closest collider overlapping a box (local center and size) on this object and feeds its position to a
 /// VFX Graph, so the particles placed on a mesh are pushed along their normals (VFXGraph_RepelObject).
-/// Runs in Edit Mode too ([ExecuteAlways]) so the effect can be tuned without entering Play Mode.
+/// In Play Mode only the player's body counts, and only while it carries an Intangible node; otherwise
+/// the weight fades back to 0 and the particles return to the mesh.
+/// Runs in Edit Mode too ([ExecuteAlways]) so the effect can be tuned without entering Play Mode; there
+/// any collider previews it, since there is no player instance.
 /// </summary>
 [ExecuteAlways]
 [RequireComponent(typeof(VisualEffect))]
@@ -64,7 +67,8 @@ public class VfxMeshRepeller : MonoBehaviour
         if (!_hasProperties || _vfx == null)
             return;
 
-        Collider closest = FindClosestOverlap();
+        // Skips the physics query entirely while nothing is allowed to push.
+        Collider closest = CanRepelThisFrame() ? FindClosestOverlap() : null;
         float targetWeight = closest != null ? FullRepeller : NoRepeller;
         _weight = Mathf.MoveTowards(_weight, targetWeight, _weightFadeSpeed * GetDeltaTime());
 
@@ -91,7 +95,7 @@ public class VfxMeshRepeller : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             Collider hit = _overlaps[i];
-            if (hit == null || hit.transform.IsChildOf(transform))
+            if (!IsValidRepeller(hit))
                 continue;
 
             float sqrDistance = (hit.bounds.center - center).sqrMagnitude;
@@ -102,6 +106,31 @@ public class VfxMeshRepeller : MonoBehaviour
             }
         }
         return closest;
+    }
+
+    // In Play Mode only the player pushes, and only while the node in hand is Intangible. Edit Mode
+    // has no player instance (it is set in Awake), so any collider previews the effect there.
+    private static bool CanRepelThisFrame()
+    {
+        if (!Application.isPlaying)
+            return true;
+
+        PlayerController player = PlayerController.Instance;
+        return player != null && player.IsIntangible;
+    }
+
+    // Play Mode: only the player's body (CharacterController + CapsuleCollider), not its child
+    // triggers such as the interaction radius. Edit Mode: anything outside this object.
+    private bool IsValidRepeller(Collider hit)
+    {
+        if (hit == null)
+            return false;
+
+        if (!Application.isPlaying)
+            return !hit.transform.IsChildOf(transform);
+
+        PlayerController player = PlayerController.Instance;
+        return player != null && player.IsOwnCollider(hit);
     }
 
     private float GetDeltaTime()
