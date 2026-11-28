@@ -197,6 +197,7 @@ GameObject:
   - component: {fileID: 388869991194834864}
   - component: {fileID: 5370614358130434109}
   - component: {fileID: 2135451157074704967}
+  - component: {fileID: 1645570501470908351}
   m_Layer: 18
   m_Name: GlitcheableQuadLaserContainer
   m_TagString: Untagged
@@ -246,7 +247,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2332061995615490714}
-  m_Mesh: {fileID: 7583537249072941135, guid: 607932b6851a39a4d954a29a69973ed5, type: 3}
+  m_Mesh: {fileID: 5498978483458330240, guid: c4b03e9000f7e1c4f89a30458b0e3bb3, type: 3}
 --- !u!23 &737878923823412714
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -502,6 +503,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlitchComponent
   _currentLevel: 2
+--- !u!114 &1645570501470908351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2332061995615490714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 147d79da62f9600439f8be5fe8ff4b89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CristalController
 --- !u!1 &2594923253240675911
 GameObject:
   m_ObjectHideFlags: 0
@@ -15942,6 +15955,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 18
       objectReference: {fileID: 0}
+    - target: {fileID: 9024252242792483889, guid: c7d3db6bd21fffe43a3142066cdbd0bf, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -16700,6 +16717,10 @@ PrefabInstance:
     - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_Layer
       value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 3102474880014512871, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3831067715324032870, guid: b791ee2dca45aa64eb4d0d7a47316e38, type: 3}
       propertyPath: m_LocalScale.x
