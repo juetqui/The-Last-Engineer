@@ -1,6 +1,6 @@
 /// <summary>
-/// Already Clean, but the player is still inside: the visual fades out now and the layer stays
-/// intangible until the player leaves, otherwise they would be stuck or pushed out.
+/// Already Clean, but the player is still inside: the layer and the visual stay intangible until the player
+/// leaves, otherwise they would be stuck or pushed out. Clean applies both when they do.
 /// </summary>
 public class IntangibleExitingState : IState
 {
@@ -8,7 +8,7 @@ public class IntangibleExitingState : IState
 
     public IntangibleExitingState(Intangible owner) { _owner = owner; }
 
-    public void Enter() => _owner.FadeVisual(false);
+    public void Enter() { }
 
     // Polled: nothing raises an event when the player walks out.
     public void Tick(float dt)
